@@ -61,7 +61,7 @@ object GameLogic {
     val emojiGrid = attempts.joinToString("\n") { attempt ->
       attempt.feedback.joinToString("") { fb ->
         when (fb.state) {
-          LetterState.CORRECT -> "🟩"
+          LetterState.CORRECT -> "🟦"
           LetterState.PRESENT -> "🟧"
           LetterState.ABSENT -> "🟥"
           LetterState.UNUSED -> "⬜"

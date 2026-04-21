@@ -70,13 +70,13 @@ class GameLogicShareTextTest {
     )
     // Each attempt generates one line of emojis; count lines with colored squares
     val emojiLines = text.lines().filter { line ->
-      line.contains("🟩") || line.contains("🟧") || line.contains("🟥")
+      line.contains("🟦") || line.contains("🟧") || line.contains("🟥")
     }
     assertThat(emojiLines).hasSize(3)
   }
 
   @Test
-  fun `share text maps CORRECT to green square`() {
+  fun `share text maps CORRECT to blue square`() {
     val attempts = listOf(
       Attempt("gatos", List(5) { LetterFeedback('g', LetterState.CORRECT) }),
     )
@@ -88,7 +88,7 @@ class GameLogicShareTextTest {
       xpGained = 1,
       won = true,
     )
-    assertThat(text).contains("🟩🟩🟩🟩🟩")
+    assertThat(text).contains("🟦🟦🟦🟦🟦")
   }
 
   @Test
