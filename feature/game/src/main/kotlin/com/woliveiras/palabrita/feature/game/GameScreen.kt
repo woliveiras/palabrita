@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -120,7 +123,10 @@ private fun DifficultyPickerScreen(
   onSettings: () -> Unit,
 ) {
   Column(
-    modifier = Modifier.fillMaxSize().padding(32.dp),
+    modifier = Modifier
+      .fillMaxSize()
+      .windowInsetsPadding(WindowInsets.statusBars)
+      .padding(32.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Row(
@@ -260,7 +266,10 @@ private fun PlayingScreen(
   val wordLength = puzzle.word.length
 
   Column(
-    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 16.dp),
+    modifier = Modifier
+      .fillMaxSize()
+      .windowInsetsPadding(WindowInsets.statusBars)
+      .padding(horizontal = 8.dp, vertical = 8.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     // Header
@@ -269,7 +278,7 @@ private fun PlayingScreen(
       style = MaterialTheme.typography.titleMedium,
       fontWeight = FontWeight.Bold,
     )
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(8.dp))
 
     // Word Grid
     WordGrid(
@@ -367,13 +376,13 @@ private fun LetterCell(letter: Char?, state: LetterState) {
 
   Box(
     modifier = Modifier
-      .size(44.dp)
-      .background(bgColor, RoundedCornerShape(4.dp)),
+      .size(56.dp)
+      .background(bgColor, RoundedCornerShape(6.dp)),
     contentAlignment = Alignment.Center,
   ) {
     Text(
       text = letter?.uppercaseChar()?.toString() ?: "",
-      style = MaterialTheme.typography.titleMedium,
+      style = MaterialTheme.typography.titleLarge,
       fontWeight = FontWeight.Bold,
       color = textColor,
     )
@@ -430,10 +439,10 @@ private fun GameKeyboard(
         onClick = onDelete,
         shape = RoundedCornerShape(4.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier.height(48.dp).width(48.dp),
+        modifier = Modifier.height(52.dp).width(52.dp),
       ) {
         Box(contentAlignment = Alignment.Center) {
-          Icon(Icons.Rounded.Backspace, contentDescription = stringResource(CommonR.string.delete_action), modifier = Modifier.size(20.dp))
+          Icon(Icons.Rounded.Backspace, contentDescription = stringResource(CommonR.string.delete_action), modifier = Modifier.size(22.dp))
         }
       }
       ROW3.forEach { letter ->
@@ -444,13 +453,13 @@ private fun GameKeyboard(
         onClick = onSubmit,
         shape = RoundedCornerShape(4.dp),
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.height(48.dp).width(48.dp),
+        modifier = Modifier.height(52.dp).width(52.dp),
       ) {
         Box(contentAlignment = Alignment.Center) {
           Icon(
             Icons.Rounded.Send,
             contentDescription = stringResource(CommonR.string.send),
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(22.dp),
             tint = MaterialTheme.colorScheme.onPrimary,
           )
         }
@@ -489,12 +498,12 @@ private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit) {
     onClick = onClick,
     shape = RoundedCornerShape(4.dp),
     color = bgColor,
-    modifier = Modifier.size(width = 32.dp, height = 48.dp),
+    modifier = Modifier.size(width = 36.dp, height = 52.dp),
   ) {
     Box(contentAlignment = Alignment.Center) {
       Text(
         text = letter.uppercaseChar().toString(),
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         fontWeight = FontWeight.Medium,
         color = textColor,
       )
