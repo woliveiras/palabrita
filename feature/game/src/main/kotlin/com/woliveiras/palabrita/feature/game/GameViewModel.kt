@@ -178,26 +178,19 @@ class GameViewModel @Inject constructor(
 
     if (won || lost) {
       viewModelScope.launch {
-        val xp = statsRepository.updateAfterGame(
+        statsRepository.updateAfterGame(
           won = won,
           attempts = newAttempts.size,
           difficulty = current.chosenDifficulty,
           hintsUsed = current.revealedHints.size,
         )
         puzzleRepository.markAsPlayed(puzzle.id)
-        gameSessionRepository.update(
-          com.woliveiras.palabrita.core.model.GameSession(
-            puzzleId = puzzle.id,
-            attempts = newAttempts.map { it.word },
-            startedAt = 0,
-            completedAt = System.currentTimeMillis(),
-            hintsUsed = current.revealedHints.size,
-            won = won,
-            dailyChallengeIndex = dailyChallengeIndex,
-            dailyChallengeDate = if (dailyChallengeIndex != null) {
-              LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
-            } else null,
-          ),
+        gameSessionRepository.completeSession(
+          puzzleId = puzzle.id,
+          attempts = newAttempts.map { it.word },
+          completedAt = System.currentTimeMillis(),
+          hintsUsed = current.revealedHints.size,
+          won = won,
         )
       }
     }

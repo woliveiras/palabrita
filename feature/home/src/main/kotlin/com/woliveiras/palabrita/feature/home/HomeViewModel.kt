@@ -28,10 +28,6 @@ class HomeViewModel @Inject constructor(
 
   private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
-  init {
-    loadHome()
-  }
-
   fun onAction(action: HomeAction) {
     when (action) {
       is HomeAction.StartDailyChallenge -> { /* navigation handled by UI */ }

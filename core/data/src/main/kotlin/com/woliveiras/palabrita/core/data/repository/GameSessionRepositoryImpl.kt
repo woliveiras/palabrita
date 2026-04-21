@@ -7,6 +7,10 @@ import com.woliveiras.palabrita.core.model.GameSession
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+private val json = Json { ignoreUnknownKeys = true }
 
 @Singleton
 class GameSessionRepositoryImpl @Inject constructor(
@@ -18,6 +22,20 @@ class GameSessionRepositoryImpl @Inject constructor(
 
   override suspend fun update(session: GameSession) =
     dao.update(session.toEntity())
+
+  override suspend fun completeSession(
+    puzzleId: Long,
+    attempts: List<String>,
+    completedAt: Long,
+    hintsUsed: Int,
+    won: Boolean,
+  ) = dao.completeSession(
+    puzzleId = puzzleId,
+    attempts = json.encodeToString(attempts),
+    completedAt = completedAt,
+    hintsUsed = hintsUsed,
+    won = won,
+  )
 
   override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
     dao.getByPuzzleId(puzzleId)?.toDomain()

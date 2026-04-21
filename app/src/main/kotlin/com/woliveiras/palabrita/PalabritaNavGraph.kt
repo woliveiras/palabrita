@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -27,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
+import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.feature.chat.ChatScreen
 import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen
@@ -54,7 +56,7 @@ data class GameRoute(
 private data class BottomNavItem(
   val route: Any,
   val icon: ImageVector,
-  val label: String,
+  val labelRes: Int,
 )
 
 @Composable
@@ -65,9 +67,9 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
   val context = LocalContext.current
 
   val bottomNavItems = listOf(
-    BottomNavItem(HomeRoute, Icons.Rounded.Home, "Home"),
-    BottomNavItem(StatsRoute, Icons.Rounded.QueryStats, "Stats"),
-    BottomNavItem(SettingsRoute, Icons.Rounded.MoreHoriz, "Mais"),
+    BottomNavItem(HomeRoute, Icons.Rounded.Home, CommonR.string.home_tab),
+    BottomNavItem(StatsRoute, Icons.Rounded.QueryStats, CommonR.string.stats_tab),
+    BottomNavItem(SettingsRoute, Icons.Rounded.MoreHoriz, CommonR.string.more_tab),
   )
 
   val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -93,8 +95,8 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
                   restoreState = true
                 }
               },
-              icon = { Icon(item.icon, contentDescription = item.label) },
-              label = { Text(item.label) },
+              icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
+              label = { Text(stringResource(item.labelRes)) },
             )
           }
         }

@@ -34,16 +34,21 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.LocalGameColors
+import com.woliveiras.palabrita.core.common.R as CommonR
 
 @Composable
 fun HomeScreen(
@@ -57,8 +62,17 @@ fun HomeScreen(
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
 
-  LaunchedEffect(Unit) {
-    viewModel.loadHome()
+  val lifecycleOwner = LocalLifecycleOwner.current
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) {
+        viewModel.loadHome()
+      }
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose {
+      lifecycleOwner.lifecycle.removeObserver(observer)
+    }
   }
 
   if (state.isLoading) {
@@ -76,7 +90,7 @@ fun HomeScreen(
   ) {
     // Title
     Text(
-      text = "PALABRITA",
+      text = stringResource(CommonR.string.home_title),
       style = MaterialTheme.typography.headlineMedium,
       fontWeight = FontWeight.Bold,
       color = MaterialTheme.colorScheme.primary,
@@ -106,11 +120,6 @@ fun HomeScreen(
       },
       onExploreChat = { puzzleId -> onNavigateToChat(puzzleId) },
     )
-
-    Spacer(Modifier.height(16.dp))
-
-    // Free Play Card
-    FreePlayCard(onStart = onNavigateToFreePlay)
 
     Spacer(Modifier.height(16.dp))
 
@@ -160,7 +169,7 @@ private fun StreakCard(streak: Int, nextMilestone: Int) {
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
       Text(
-        text = if (streak > 0) "\uD83D\uDD25 $streak dias de streak!" else "\uD83D\uDD25 Comece seu streak hoje!",
+        text = if (streak > 0) stringResource(CommonR.string.home_streak_active, streak) else stringResource(CommonR.string.home_streak_start),
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
       )
@@ -173,7 +182,7 @@ private fun StreakCard(streak: Int, nextMilestone: Int) {
       )
       Spacer(Modifier.height(4.dp))
       Text(
-        text = "Próximo marco: $nextMilestone dias",
+        text = stringResource(CommonR.string.home_streak_milestone, nextMilestone),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
       )
@@ -197,7 +206,7 @@ private fun DailyChallengesCard(
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
       Text(
-        text = "⭐ DESAFIOS DO DIA ($completedCount/3)",
+        text = stringResource(CommonR.string.home_daily_title, completedCount),
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
       )
@@ -215,7 +224,7 @@ private fun DailyChallengesCard(
       if (allComplete) {
         Spacer(Modifier.height(4.dp))
         Text(
-          text = "✓ 3/3 completos! +bônus XP",
+          text = stringResource(CommonR.string.home_daily_complete),
           style = MaterialTheme.typography.labelLarge,
           color = LocalGameColors.current.correct,
           fontWeight = FontWeight.Bold,
@@ -229,7 +238,7 @@ private fun DailyChallengesCard(
             onClick = { onStartChallenge(it.index) },
             modifier = Modifier.fillMaxWidth(),
           ) {
-            Text("JOGAR #${it.index + 1}")
+            Text(stringResource(CommonR.string.home_daily_play, it.index + 1))
           }
         }
       }
@@ -300,7 +309,7 @@ private fun DailyChallengeRow(
       }
       challenge.state == DailyChallengeState.LOCKED -> {
         Text(
-          text = "???",
+          text = stringResource(CommonR.string.home_daily_locked),
           style = MaterialTheme.typography.labelMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
         )
@@ -369,10 +378,10 @@ private fun QuickStatsRow(
       modifier = Modifier.fillMaxWidth().padding(12.dp),
       horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-      StatItem(value = "$totalPlayed", label = "jogos")
-      StatItem(value = "${(winRate * 100).toInt()}%", label = "wins")
-      StatItem(value = playerTier, label = "tier")
-      StatItem(value = "$totalXp", label = "XP")
+      StatItem(value = "$totalPlayed", label = stringResource(CommonR.string.home_stats_games))
+      StatItem(value = "${(winRate * 100).toInt()}%", label = stringResource(CommonR.string.home_stats_wins))
+      StatItem(value = playerTier, label = stringResource(CommonR.string.home_stats_tier))
+      StatItem(value = "$totalXp", label = stringResource(CommonR.string.home_stats_xp))
     }
   }
 }
@@ -409,13 +418,13 @@ private fun GenerationIndicator(isGenerating: Boolean, isComplete: Boolean) {
         CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
         Spacer(Modifier.width(8.dp))
         Text(
-          text = "Gerando novos puzzles…",
+          text = stringResource(CommonR.string.home_generating),
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       } else if (isComplete) {
         Text(
-          text = "✓ Novos puzzles prontos!",
+          text = stringResource(CommonR.string.home_generation_complete),
           style = MaterialTheme.typography.bodyMedium,
           color = LocalGameColors.current.correct,
         )

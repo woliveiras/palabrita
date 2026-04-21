@@ -26,6 +26,24 @@ interface GameSessionDao {
 
   @Query(
     """
+    UPDATE game_sessions SET
+      attempts = :attempts,
+      completedAt = :completedAt,
+      hintsUsed = :hintsUsed,
+      won = :won
+    WHERE puzzleId = :puzzleId
+    """,
+  )
+  suspend fun completeSession(
+    puzzleId: Long,
+    attempts: String,
+    completedAt: Long,
+    hintsUsed: Int,
+    won: Boolean,
+  )
+
+  @Query(
+    """
     SELECT * FROM game_sessions
     WHERE dailyChallengeDate = :date
     ORDER BY dailyChallengeIndex

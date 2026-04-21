@@ -186,4 +186,18 @@
     <string name="home_tab">Home</string>
     <string name="stats_tab">Stats</string>
     <string name="more_tab">Más</string>
+    <string name="home_title">PALABRITA</string>
+    <string name="home_streak_active">🔥 %1$d días de racha!</string>
+    <string name="home_streak_start">🔥 ¡Empieza tu racha hoy!</string>
+    <string name="home_streak_milestone">Próximo logro: %1$d días</string>
+    <string name="home_daily_title">⭐ DESAFÍOS DEL DÍA (%1$d/3)</string>
+    <string name="home_daily_complete">✓ 3/3 completos! +bono XP</string>
+    <string name="home_daily_play">JUGAR #%1$d</string>
+    <string name="home_daily_locked">\?\?\?</string>
+    <string name="home_stats_games">juegos</string>
+    <string name="home_stats_wins">victorias</string>
+    <string name="home_stats_tier">tier</string>
+    <string name="home_stats_xp">XP</string>
+    <string name="home_generating">Generando nuevos puzzles…</string>
+    <string name="home_generation_complete">✓ ¡Nuevos puzzles listos!</string>
 </resources>
