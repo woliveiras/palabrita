@@ -33,6 +33,8 @@ interface PuzzleDao {
 
   @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insert(puzzle: PuzzleEntity): Long
 
+  @Query("SELECT * FROM puzzles WHERE id = :id") suspend fun getById(id: Long): PuzzleEntity?
+
   @Query("UPDATE puzzles SET isPlayed = 1, playedAt = :playedAt WHERE id = :id")
   suspend fun markAsPlayed(id: Long, playedAt: Long)
 }
