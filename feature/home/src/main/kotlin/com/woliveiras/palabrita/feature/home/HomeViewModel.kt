@@ -1,7 +1,10 @@
 package com.woliveiras.palabrita.feature.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.woliveiras.palabrita.core.model.PlayerTier
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
@@ -16,11 +19,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+private const val PUZZLE_GENERATION_WORK_NAME = "puzzle_generation"
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
   private val statsRepository: StatsRepository,
   private val gameSessionRepository: GameSessionRepository,
   private val puzzleRepository: PuzzleRepository,
+  private val workManager: WorkManager,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(HomeState())
@@ -60,6 +66,7 @@ class HomeViewModel @Inject constructor(
         }
       }
     }
+    observeGeneration()
   }
 
   fun onAction(action: HomeAction) {
@@ -86,6 +93,24 @@ class HomeViewModel @Inject constructor(
           allDailiesComplete = completedCount >= 3,
         )
       }
+    }
+  }
+
+  private fun observeGeneration() {
+    viewModelScope.launch {
+      workManager.getWorkInfosForUniqueWorkLiveData(PUZZLE_GENERATION_WORK_NAME)
+        .asFlow()
+        .collect { workInfos ->
+          val info = workInfos.firstOrNull()
+          val isRunning = info?.state == WorkInfo.State.RUNNING || info?.state == WorkInfo.State.ENQUEUED
+          val isComplete = info?.state == WorkInfo.State.SUCCEEDED
+          _state.update {
+            it.copy(
+              isGeneratingPuzzles = isRunning,
+              generationComplete = isComplete && !it.isGeneratingPuzzles,
+            )
+          }
+        }
     }
   }
 
