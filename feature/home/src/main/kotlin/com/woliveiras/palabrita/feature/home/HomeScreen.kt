@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Casino
+import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -27,6 +28,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -289,6 +291,20 @@ private fun DailyChallengeRow(
           style = MaterialTheme.typography.labelMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        if (challenge.state == DailyChallengeState.COMPLETED && challenge.puzzleId != null) {
+          Spacer(Modifier.width(8.dp))
+          IconButton(
+            onClick = onExploreChat,
+            modifier = Modifier.size(28.dp),
+          ) {
+            Icon(
+              Icons.Rounded.ChatBubble,
+              contentDescription = stringResource(CommonR.string.chat_card_cta),
+              modifier = Modifier.size(18.dp),
+              tint = MaterialTheme.colorScheme.primary,
+            )
+          }
+        }
       }
       challenge.state == DailyChallengeState.LOCKED -> {
         Text(
