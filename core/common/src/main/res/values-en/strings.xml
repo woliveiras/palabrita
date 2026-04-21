@@ -1,0 +1,149 @@
+<resources>
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="continue_button">Continue</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="recommended">Recommended</string>
+    <string name="send">Send</string>
+    <string name="delete_action">Delete</string>
+    <string name="share">Share</string>
+    <string name="checkmark">✓</string>
+    <string name="settings">Settings</string>
+    <string name="warning">Warning</string>
+
+    <!-- Onboarding: Welcome -->
+    <string name="welcome_title">Discover the word of the day</string>
+    <string name="welcome_description">A word game with artificial intelligence, right on your phone</string>
+    <string name="welcome_start">Get started</string>
+
+    <!-- Onboarding: Language -->
+    <string name="language_title">What language do you want to play in?</string>
+    <string name="language_hint">You can change this later in settings</string>
+
+    <!-- Onboarding: Model Selection -->
+    <string name="model_selection_title">Do you want to choose your AI?</string>
+    <string name="model_device_title">Your device</string>
+    <string name="model_low_tier_message">Your device does not support local AI. But don\'t worry! You\'ll play with our curated word bank, which is just as fun!</string>
+    <string name="model_low_tier_button">Got it, let\'s play!</string>
+    <string name="model_powerful_title">I have a powerful device</string>
+    <string name="model_powerful_subtitle">Gemma 4 E2B · ~2.6 GB download</string>
+    <string name="model_powerful_info">Requires 8 GB of RAM</string>
+    <string name="model_compact_title">I need to save space</string>
+    <string name="model_compact_subtitle">Gemma 3 1B · ~529 MB download</string>
+    <string name="model_compact_info">Requires 4 GB of RAM</string>
+    <string name="model_auto_select">No, choose for me</string>
+
+    <!-- Onboarding: Download -->
+    <string name="download_title">Preparing your AI</string>
+    <string name="download_description">The AI model will be downloaded to your phone. After that, everything works offline!</string>
+    <string name="download_model_label">Model: %s</string>
+    <string name="download_model_gemma4">Gemma 4 E2B (~2.6 GB)</string>
+    <string name="download_model_gemma3">Gemma 3 1B (~1 GB)</string>
+    <string name="download_model_unknown">—</string>
+    <string name="download_failed">Download failed</string>
+    <string name="download_retry">Try again</string>
+    <string name="download_choose_other">Choose another model</string>
+    <string name="download_checking">Checking…</string>
+
+    <!-- Onboarding: Generation -->
+    <string name="generation_title">Generating your first challenges…</string>
+    <string name="generation_hint">This only happens the first time</string>
+    <string name="generation_progress">Puzzle %1$d of %2$d…</string>
+
+    <!-- Onboarding: Tier Warning -->
+    <string name="tier_warning_message">The selected model may require more memory than your device has. Performance may be poor or the app may crash.</string>
+    <string name="tier_warning_confirm">Continue anyway</string>
+    <string name="tier_warning_choose_other">Choose another</string>
+
+    <!-- Game: Difficulty Picker -->
+    <string name="difficulty_title">Choose difficulty</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_normal">Normal</string>
+    <string name="difficulty_hard">Hard</string>
+    <string name="difficulty_challenging">Challenging</string>
+    <string name="difficulty_expert">Expert</string>
+    <string name="play">Play</string>
+
+    <!-- Game: Playing -->
+    <string name="loading_puzzle">Preparing puzzle…</string>
+    <string name="hint_button">Hint (%1$d/%2$d)</string>
+    <string name="hint_label">Hint %1$d: %2$s</string>
+
+    <!-- Game: Result -->
+    <string name="result_won">Congratulations!</string>
+    <string name="result_lost">Better luck next time</string>
+    <string name="result_attempts">You got it in %1$d/6</string>
+    <string name="result_word">Word: %s</string>
+    <string name="result_category">Category: %s</string>
+    <string name="result_hints_used">%d hints used</string>
+    <string name="result_explore">Explore the word</string>
+
+    <!-- Game: Error -->
+    <string name="error_no_puzzle">No puzzle available</string>
+
+    <!-- Chat -->
+    <string name="chat_title">Explore: %s</string>
+    <string name="chat_message_count">%1$d of %2$d messages</string>
+    <string name="chat_limit_reached">You have reached the question limit for this word.</string>
+    <string name="chat_input_placeholder">Type your question</string>
+    <string name="chat_suggestion_origin">Where does this word come from?</string>
+    <string name="chat_suggestion_synonyms">Give me synonyms</string>
+    <string name="chat_suggestion_sentence">How to use it in a sentence?</string>
+    <string name="chat_suggestion_english">How do you say it in English?</string>
+    <string name="chat_suggestion_trivia">Any fun facts?</string>
+
+    <!-- Settings -->
+    <string name="settings_section_game">Game</string>
+    <string name="settings_language">Word language</string>
+    <string name="settings_word_size">Word size</string>
+    <string name="settings_word_size_default">Default</string>
+    <string name="settings_word_size_locked">Unlocked at Challenging</string>
+    <string name="settings_stats">Statistics</string>
+    <string name="settings_stats_summary">%1$d games · %2$d%% wins</string>
+    <string name="settings_section_ai">Artificial Intelligence</string>
+    <string name="settings_current_model">Current model</string>
+    <string name="settings_model_gemma4">Gemma 4 E2B</string>
+    <string name="settings_model_gemma3">Gemma 3 1B</string>
+    <string name="settings_model_none">None (Light Mode)</string>
+    <string name="settings_storage">Storage used</string>
+    <string name="settings_storage_size">Model: %d MB</string>
+    <string name="settings_section_data">Data</string>
+    <string name="settings_delete_model">Delete model</string>
+    <string name="settings_delete_model_hint">Switches to Light mode</string>
+    <string name="settings_reset_progress">Reset progress</string>
+    <string name="settings_reset_hint">Clears stats and puzzles</string>
+    <string name="settings_delete_model_message">This will delete the AI model. The app will switch to Light mode with a curated word bank. You can download a model again at any time.</string>
+    <string name="settings_reset_message">This will erase all your statistics, played puzzles, and chat history. This action cannot be undone.</string>
+    <string name="settings_delete_confirm">Delete</string>
+    <string name="settings_reset_confirm">Reset</string>
+    <string name="settings_error_active_game">Finish the current game before switching</string>
+    <string name="settings_error_download_soon">Model download coming soon</string>
+
+    <!-- Stats -->
+    <string name="stats_title">Statistics</string>
+    <string name="stats_games">Games</string>
+    <string name="stats_wins">Wins</string>
+    <string name="stats_current_streak">Current streak</string>
+    <string name="stats_best_streak">Best streak</string>
+    <string name="stats_distribution">Guess distribution</string>
+    <string name="stats_share">Share statistics</string>
+    <string name="stats_share_text_header">Palabrita</string>
+    <string name="stats_share_text_summary">%1$d games · %2$d%% wins</string>
+    <string name="stats_share_text_streak">Streak: %d</string>
+
+    <!-- Word Size Options -->
+    <string name="word_size_default_label">Default</string>
+    <string name="word_size_default_desc">Dynamic by difficulty (5–8)</string>
+    <string name="word_size_short_label">Short words</string>
+    <string name="word_size_short_desc">5–6 letters</string>
+    <string name="word_size_long_label">Long words</string>
+    <string name="word_size_long_desc">7–9 letters</string>
+    <string name="word_size_epic_label">Epic words</string>
+    <string name="word_size_epic_desc">8–10 letters</string>
+
+    <!-- AI/Download errors -->
+    <string name="error_engine_init">Failed to initialize AI</string>
+    <string name="error_download_unknown">Unknown download error</string>
+    <string name="error_insufficient_space">Insufficient space. Required: %1$s, Available: %2$s</string>
+</resources>

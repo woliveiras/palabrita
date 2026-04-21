@@ -44,6 +44,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.ModelId
+import androidx.compose.ui.res.stringResource
+import com.woliveiras.palabrita.core.common.R as CommonR
 
 @Composable
 fun OnboardingScreen(
@@ -129,20 +131,20 @@ private fun WelcomeScreen(onNext: () -> Unit) {
     )
     Spacer(Modifier.height(24.dp))
     Text(
-      text = "Descubra a palavra do dia",
+      text = stringResource(CommonR.string.welcome_title),
       style = MaterialTheme.typography.headlineMedium,
       textAlign = TextAlign.Center,
     )
     Spacer(Modifier.height(12.dp))
     Text(
-      text = "Um jogo de palavras com inteligência artificial, direto no seu celular",
+      text = stringResource(CommonR.string.welcome_description),
       style = MaterialTheme.typography.bodyLarge,
       textAlign = TextAlign.Center,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(Modifier.height(48.dp))
     Button(onClick = onNext, modifier = Modifier.fillMaxWidth()) {
-      Text("Começar")
+      Text(stringResource(CommonR.string.welcome_start))
     }
   }
 }
@@ -160,13 +162,13 @@ private fun LanguageScreen(
   ) {
     Spacer(Modifier.height(48.dp))
     Text(
-      text = "Em qual idioma você quer jogar?",
+      text = stringResource(CommonR.string.language_title),
       style = MaterialTheme.typography.headlineSmall,
       textAlign = TextAlign.Center,
     )
     Spacer(Modifier.height(8.dp))
     Text(
-      text = "Você pode mudar isso depois nas configurações",
+      text = stringResource(CommonR.string.language_hint),
       style = MaterialTheme.typography.bodyMedium,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -180,8 +182,8 @@ private fun LanguageScreen(
 
     Spacer(Modifier.weight(1f))
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-      TextButton(onClick = onBack) { Text("Voltar") }
-      Button(onClick = onNext) { Text("Continuar") }
+      TextButton(onClick = onBack) { Text(stringResource(CommonR.string.back)) }
+      Button(onClick = onNext) { Text(stringResource(CommonR.string.continue_button)) }
     }
   }
 }
@@ -254,43 +256,42 @@ private fun ModelSelectionScreen(
     if (deviceTier == DeviceTier.LOW) {
       // Low tier — auto Light mode
       Text(
-        text = "Seu dispositivo",
+        text = stringResource(CommonR.string.model_device_title),
         style = MaterialTheme.typography.headlineSmall,
       )
       Spacer(Modifier.height(16.dp))
       Text(
-        text = "Seu dispositivo não suporta IA local. Mas não se preocupe! " +
-          "Você jogará com nosso banco de palavras que é super divertido igual!",
+        text = stringResource(CommonR.string.model_low_tier_message),
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       Spacer(Modifier.weight(1f))
       Button(onClick = onSkipToLight, modifier = Modifier.fillMaxWidth()) {
-        Text("Entendi, vamos jogar!")
+        Text(stringResource(CommonR.string.model_low_tier_button))
       }
     } else {
       // Medium or High tier — model selection
       Text(
-        text = "Você quer escolher sua IA?",
+        text = stringResource(CommonR.string.model_selection_title),
         style = MaterialTheme.typography.headlineSmall,
         textAlign = TextAlign.Center,
       )
       Spacer(Modifier.height(24.dp))
 
       ModelCard(
-        title = "Tenho um dispositivo potente",
-        subtitle = "Gemma 4 E2B · ~2,6 GB de download",
-        info = "Requer 8 GB de RAM",
+        title = stringResource(CommonR.string.model_powerful_title),
+        subtitle = stringResource(CommonR.string.model_powerful_subtitle),
+        info = stringResource(CommonR.string.model_powerful_info),
         isRecommended = deviceTier == DeviceTier.HIGH,
         isSelected = selectedModel == ModelId.GEMMA4_E2B,
         onClick = { onSelectModel(ModelId.GEMMA4_E2B) },
       )
       Spacer(Modifier.height(12.dp))
       ModelCard(
-        title = "Preciso economizar espaço",
-        subtitle = "Gemma 3 1B · ~529 MB de download",
-        info = "Requer 4 GB de RAM",
+        title = stringResource(CommonR.string.model_compact_title),
+        subtitle = stringResource(CommonR.string.model_compact_subtitle),
+        info = stringResource(CommonR.string.model_compact_info),
         isRecommended = deviceTier == DeviceTier.MEDIUM,
         isSelected = selectedModel == ModelId.GEMMA3_1B,
         onClick = { onSelectModel(ModelId.GEMMA3_1B) },
@@ -298,14 +299,14 @@ private fun ModelSelectionScreen(
 
       Spacer(Modifier.height(24.dp))
       OutlinedButton(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
-        Text("Não, escolha pra mim")
+        Text(stringResource(CommonR.string.model_auto_select))
       }
 
       Spacer(Modifier.weight(1f))
       Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        TextButton(onClick = onBack) { Text("Voltar") }
+        TextButton(onClick = onBack) { Text(stringResource(CommonR.string.back)) }
         Button(onClick = onNext, enabled = selectedModel != null) {
-          Text("Continuar")
+          Text(stringResource(CommonR.string.continue_button))
         }
       }
     }
@@ -340,7 +341,7 @@ private fun ModelCard(
           colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
         ) {
           Text(
-            text = "Recomendado",
+            text = stringResource(CommonR.string.recommended),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onTertiary,
@@ -382,24 +383,23 @@ private fun DownloadScreen(
     verticalArrangement = Arrangement.Center,
   ) {
     Text(
-      text = "Preparando sua IA",
+      text = stringResource(CommonR.string.download_title),
       style = MaterialTheme.typography.headlineSmall,
     )
     Spacer(Modifier.height(16.dp))
     Text(
-      text = "O modelo de inteligência artificial será baixado para o seu celular. " +
-        "Depois disso, tudo funcionará offline!",
+      text = stringResource(CommonR.string.download_description),
       style = MaterialTheme.typography.bodyLarge,
       textAlign = TextAlign.Center,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(Modifier.height(8.dp))
     val modelName = when (modelId) {
-      ModelId.GEMMA4_E2B -> "Gemma 4 E2B (~2,6 GB)"
-      ModelId.GEMMA3_1B -> "Gemma 3 1B (~1 GB)"
-      else -> "—"
+      ModelId.GEMMA4_E2B -> stringResource(CommonR.string.download_model_gemma4)
+      ModelId.GEMMA3_1B -> stringResource(CommonR.string.download_model_gemma3)
+      else -> stringResource(CommonR.string.download_model_unknown)
     }
-    Text(text = "Modelo: $modelName", style = MaterialTheme.typography.bodyMedium)
+    Text(text = stringResource(CommonR.string.download_model_label, modelName), style = MaterialTheme.typography.bodyMedium)
     Spacer(Modifier.height(32.dp))
 
     if (downloadFailed) {
@@ -411,18 +411,18 @@ private fun DownloadScreen(
       )
       Spacer(Modifier.height(12.dp))
       Text(
-        text = errorMessage ?: "Falha no download",
+        text = errorMessage ?: stringResource(CommonR.string.download_failed),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.error,
         textAlign = TextAlign.Center,
       )
       Spacer(Modifier.height(24.dp))
       Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
-        Text("Tentar novamente")
+        Text(stringResource(CommonR.string.download_retry))
       }
       Spacer(Modifier.height(8.dp))
       OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
-        Text("Escolher outro modelo")
+        Text(stringResource(CommonR.string.download_choose_other))
       }
     } else {
       LinearProgressIndicator(
@@ -434,7 +434,7 @@ private fun DownloadScreen(
       val sizeText = if (totalBytes > 0) {
         "${formatBytes(downloadedBytes)} / ${formatBytes(totalBytes)}"
       } else {
-        "Verificando..."
+        stringResource(CommonR.string.download_checking)
       }
       Text(
         text = "$percentText — $sizeText",
@@ -443,7 +443,7 @@ private fun DownloadScreen(
       )
       Spacer(Modifier.height(32.dp))
       OutlinedButton(onClick = onCancel) {
-        Text("Cancelar")
+        Text(stringResource(CommonR.string.cancel))
       }
     }
   }
@@ -457,13 +457,13 @@ private fun GenerationScreen(progress: GenerationProgress?) {
     verticalArrangement = Arrangement.Center,
   ) {
     Text(
-      text = "Gerando seus primeiros desafios...",
+      text = stringResource(CommonR.string.generation_title),
       style = MaterialTheme.typography.headlineSmall,
       textAlign = TextAlign.Center,
     )
     Spacer(Modifier.height(8.dp))
     Text(
-      text = "Isso acontece apenas na primeira vez",
+      text = stringResource(CommonR.string.generation_hint),
       style = MaterialTheme.typography.bodyLarge,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -472,7 +472,7 @@ private fun GenerationScreen(progress: GenerationProgress?) {
     if (progress != null) {
       Spacer(Modifier.height(16.dp))
       Text(
-        text = "Puzzle ${progress.current} de ${progress.total}...",
+        text = stringResource(CommonR.string.generation_progress, progress.current, progress.total),
         style = MaterialTheme.typography.bodyMedium,
       )
     }
@@ -486,18 +486,17 @@ private fun TierWarningDialog(
 ) {
   AlertDialog(
     onDismissRequest = onChooseOther,
-    title = { Text("Atenção") },
+    title = { Text(stringResource(CommonR.string.warning)) },
     text = {
       Text(
-        "O modelo selecionado pode exigir mais memória do que seu dispositivo possui. " +
-          "A performance pode ser ruim ou o app pode travar."
+        stringResource(CommonR.string.tier_warning_message)
       )
     },
     confirmButton = {
-      TextButton(onClick = onConfirm) { Text("Continuar mesmo assim") }
+      TextButton(onClick = onConfirm) { Text(stringResource(CommonR.string.tier_warning_confirm)) }
     },
     dismissButton = {
-      TextButton(onClick = onChooseOther) { Text("Escolher outro") }
+      TextButton(onClick = onChooseOther) { Text(stringResource(CommonR.string.tier_warning_choose_other)) }
     },
   )
 }

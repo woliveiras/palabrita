@@ -52,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.LocalGameColors
+import androidx.compose.ui.res.stringResource
+import com.woliveiras.palabrita.core.common.R as CommonR
 
 @Composable
 fun GameScreen(
@@ -128,13 +130,13 @@ private fun DifficultyPickerScreen(
       androidx.compose.material3.IconButton(onClick = onSettings) {
         Icon(
           Icons.Rounded.Settings,
-          contentDescription = "Configurações",
+          contentDescription = stringResource(CommonR.string.settings),
         )
       }
     }
     Spacer(Modifier.height(16.dp))
     Text(
-      text = "Escolha a dificuldade",
+      text = stringResource(CommonR.string.difficulty_title),
       style = MaterialTheme.typography.headlineSmall,
     )
     Spacer(Modifier.height(24.dp))
@@ -153,7 +155,7 @@ private fun DifficultyPickerScreen(
       onClick = onStart,
       modifier = Modifier.fillMaxWidth(),
     ) {
-      Text("Jogar")
+      Text(stringResource(CommonR.string.play))
     }
   }
 }
@@ -201,7 +203,7 @@ private fun DifficultyCard(
         }
         Spacer(Modifier.width(8.dp))
         Text(
-          text = option.label,
+          text = stringResource(option.labelRes),
           style = MaterialTheme.typography.titleSmall,
         )
       }
@@ -217,7 +219,7 @@ private fun DifficultyCard(
           color = MaterialTheme.colorScheme.tertiary,
         ) {
           Text(
-            text = "Recomendado",
+            text = stringResource(CommonR.string.recommended),
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onTertiary,
@@ -239,7 +241,7 @@ private fun LoadingScreen() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
       CircularProgressIndicator()
       Spacer(Modifier.height(16.dp))
-      Text("Preparando puzzle...", style = MaterialTheme.typography.bodyLarge)
+      Text(stringResource(CommonR.string.loading_puzzle), style = MaterialTheme.typography.bodyLarge)
     }
   }
 }
@@ -293,7 +295,7 @@ private fun PlayingScreen(
     ) {
       Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(18.dp))
       Spacer(Modifier.width(4.dp))
-      Text("Dica ($hintsRemaining/${puzzle.hints.size})")
+      Text(stringResource(CommonR.string.hint_button, hintsRemaining, puzzle.hints.size))
     }
 
     Spacer(Modifier.weight(1f))
@@ -394,7 +396,7 @@ private fun HintsList(hints: List<String>) {
         ),
       ) {
         Text(
-          text = "Dica ${index + 1}: $hint",
+          text = stringResource(CommonR.string.hint_label, index + 1, hint),
           modifier = Modifier.padding(12.dp),
           style = MaterialTheme.typography.bodyMedium,
         )
@@ -431,7 +433,7 @@ private fun GameKeyboard(
         modifier = Modifier.height(48.dp).width(48.dp),
       ) {
         Box(contentAlignment = Alignment.Center) {
-          Icon(Icons.Rounded.Backspace, contentDescription = "Apagar", modifier = Modifier.size(20.dp))
+          Icon(Icons.Rounded.Backspace, contentDescription = stringResource(CommonR.string.delete_action), modifier = Modifier.size(20.dp))
         }
       }
       ROW3.forEach { letter ->
@@ -447,7 +449,7 @@ private fun GameKeyboard(
         Box(contentAlignment = Alignment.Center) {
           Icon(
             Icons.Rounded.Send,
-            contentDescription = "Enviar",
+            contentDescription = stringResource(CommonR.string.send),
             modifier = Modifier.size(20.dp),
             tint = MaterialTheme.colorScheme.onPrimary,
           )
@@ -517,14 +519,14 @@ private fun ResultScreen(
     verticalArrangement = Arrangement.Center,
   ) {
     Text(
-      text = if (won) "Parabéns!" else "Não foi dessa vez",
+      text = if (won) stringResource(CommonR.string.result_won) else stringResource(CommonR.string.result_lost),
       style = MaterialTheme.typography.headlineMedium,
     )
     Spacer(Modifier.height(16.dp))
 
     if (won) {
       Text(
-        text = "Você descobriu em ${attempts.size}/6",
+        text = stringResource(CommonR.string.result_attempts, attempts.size),
         style = MaterialTheme.typography.bodyLarge,
       )
     }
@@ -532,13 +534,13 @@ private fun ResultScreen(
     Spacer(Modifier.height(12.dp))
     puzzle?.let {
       Text(
-        text = "Palavra: ${it.wordDisplay}",
+        text = stringResource(CommonR.string.result_word, it.wordDisplay),
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
       )
       Spacer(Modifier.height(4.dp))
       Text(
-        text = "Categoria: ${it.category}",
+        text = stringResource(CommonR.string.result_category, it.category),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
@@ -547,7 +549,7 @@ private fun ResultScreen(
     if (hintsUsed > 0) {
       Spacer(Modifier.height(8.dp))
       Text(
-        text = "$hintsUsed dicas usadas",
+        text = stringResource(CommonR.string.result_hints_used, hintsUsed),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
@@ -557,13 +559,13 @@ private fun ResultScreen(
 
     if (puzzle?.source == com.woliveiras.palabrita.core.model.PuzzleSource.AI) {
       OutlinedButton(onClick = onExplore, modifier = Modifier.fillMaxWidth()) {
-        Text("Explorar a palavra")
+        Text(stringResource(CommonR.string.result_explore))
       }
       Spacer(Modifier.height(8.dp))
     }
 
     Button(onClick = onShare, modifier = Modifier.fillMaxWidth()) {
-      Text("Compartilhar")
+      Text(stringResource(CommonR.string.share))
     }
   }
 }

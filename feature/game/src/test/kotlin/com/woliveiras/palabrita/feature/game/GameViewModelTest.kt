@@ -105,7 +105,7 @@ class GameViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(GameAction.StartGame)
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.error).isNotNull()
+    assertThat(vm.state.value.errorRes).isNotNull()
     assertThat(vm.state.value.gameStatus).isEqualTo(GameStatus.CHOOSING_DIFFICULTY)
   }
 

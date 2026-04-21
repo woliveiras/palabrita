@@ -45,6 +45,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelId
+import androidx.compose.ui.res.stringResource
+import com.woliveiras.palabrita.core.common.R as CommonR
 
 private val LANGUAGES = listOf(
   "pt" to "Português (BR)",
@@ -61,6 +63,7 @@ fun SettingsScreen(
   viewModel: SettingsViewModel = hiltViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
+  val context = androidx.compose.ui.platform.LocalContext.current
   val snackbarHostState = remember { SnackbarHostState() }
 
   var showLanguageDialog by remember { mutableStateOf(false) }
@@ -68,9 +71,9 @@ fun SettingsScreen(
   var showDeleteModelDialog by remember { mutableStateOf(false) }
   var showResetDialog by remember { mutableStateOf(false) }
 
-  LaunchedEffect(state.error) {
-    state.error?.let {
-      snackbarHostState.showSnackbar(it)
+  LaunchedEffect(state.errorRes) {
+    state.errorRes?.let {
+      snackbarHostState.showSnackbar(context.getString(it))
       viewModel.onAction(SettingsAction.DismissError)
     }
   }
@@ -78,10 +81,10 @@ fun SettingsScreen(
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text("Configurações") },
+        title = { Text(stringResource(CommonR.string.settings)) },
         navigationIcon = {
           IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar")
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(CommonR.string.back))
           }
         },
       )
@@ -95,30 +98,30 @@ fun SettingsScreen(
         .verticalScroll(rememberScrollState()),
     ) {
       // --- JOGO ---
-      SectionHeader("Jogo")
+      SectionHeader(stringResource(CommonR.string.settings_section_game))
 
       ListItem(
-        headlineContent = { Text("Idioma das palavras") },
+        headlineContent = { Text(stringResource(CommonR.string.settings_language)) },
         supportingContent = { Text(LANGUAGES.find { it.first == state.currentLanguage }?.second ?: state.currentLanguage) },
         leadingContent = { Icon(Icons.Rounded.Language, contentDescription = null) },
         modifier = Modifier.clickable { showLanguageDialog = true },
       )
 
       ListItem(
-        headlineContent = { Text("Tamanho das palavras") },
+        headlineContent = { Text(stringResource(CommonR.string.settings_word_size)) },
         supportingContent = {
           if (state.isWordSizeUnlocked) {
             val opt = WORD_SIZE_OPTIONS.find { it.key == state.wordSizePreference }
-            Text(opt?.label ?: "Padrão")
+            Text(opt?.let { stringResource(it.labelRes) } ?: stringResource(CommonR.string.settings_word_size_default))
           } else {
-            Text("Desbloqueado no Astuto")
+            Text(stringResource(CommonR.string.settings_word_size_locked))
           }
         },
         leadingContent = {
           if (state.isWordSizeUnlocked) {
             Icon(Icons.Rounded.SortByAlpha, contentDescription = null)
           } else {
-            Icon(Icons.Rounded.Lock, contentDescription = "Bloqueado")
+            Icon(Icons.Rounded.Lock, contentDescription = stringResource(CommonR.string.settings_word_size_locked))
           }
         },
         modifier = Modifier.clickable {
@@ -127,23 +130,23 @@ fun SettingsScreen(
       )
 
       ListItem(
-        headlineContent = { Text("Estatísticas") },
-        supportingContent = { Text("${state.stats.totalPlayed} jogos · ${state.winRate}% vitórias") },
+        headlineContent = { Text(stringResource(CommonR.string.settings_stats)) },
+        supportingContent = { Text(stringResource(CommonR.string.settings_stats_summary, state.stats.totalPlayed, state.winRate)) },
         modifier = Modifier.clickable { onNavigateToStats() },
       )
 
       HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
       // --- INTELIGÊNCIA ARTIFICIAL ---
-      SectionHeader("Inteligência Artificial")
+      SectionHeader(stringResource(CommonR.string.settings_section_ai))
 
       val modelName = when (state.currentModel.modelId) {
-        ModelId.GEMMA4_E2B -> "Gemma 4 E2B"
-        ModelId.GEMMA3_1B -> "Gemma 3 1B"
-        ModelId.NONE -> "Nenhum (Modo Light)"
+        ModelId.GEMMA4_E2B -> stringResource(CommonR.string.settings_model_gemma4)
+        ModelId.GEMMA3_1B -> stringResource(CommonR.string.settings_model_gemma3)
+        ModelId.NONE -> stringResource(CommonR.string.settings_model_none)
       }
       ListItem(
-        headlineContent = { Text("Modelo atual") },
+        headlineContent = { Text(stringResource(CommonR.string.settings_current_model)) },
         supportingContent = { Text(modelName) },
         leadingContent = { Icon(Icons.Rounded.Memory, contentDescription = null) },
       )
@@ -152,10 +155,10 @@ fun SettingsScreen(
         state.currentModel.downloadState == DownloadState.DOWNLOADED
       ) {
         ListItem(
-          headlineContent = { Text("Espaço usado") },
+          headlineContent = { Text(stringResource(CommonR.string.settings_storage)) },
           supportingContent = {
             val sizeMb = state.currentModel.sizeBytes / (1024 * 1024)
-            Text("Modelo: ${sizeMb} MB")
+            Text(stringResource(CommonR.string.settings_storage_size, sizeMb))
           },
           leadingContent = { Icon(Icons.Rounded.Storage, contentDescription = null) },
         )
@@ -164,12 +167,12 @@ fun SettingsScreen(
       HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
       // --- DADOS ---
-      SectionHeader("Dados")
+      SectionHeader(stringResource(CommonR.string.settings_section_data))
 
       if (state.currentModel.modelId != ModelId.NONE) {
         ListItem(
-          headlineContent = { Text("Excluir modelo") },
-          supportingContent = { Text("Muda para modo Light") },
+          headlineContent = { Text(stringResource(CommonR.string.settings_delete_model)) },
+          supportingContent = { Text(stringResource(CommonR.string.settings_delete_model_hint)) },
           leadingContent = {
             Icon(
               Icons.Rounded.Delete,
@@ -183,9 +186,9 @@ fun SettingsScreen(
 
       ListItem(
         headlineContent = {
-          Text("Resetar progresso", color = MaterialTheme.colorScheme.error)
+          Text(stringResource(CommonR.string.settings_reset_progress), color = MaterialTheme.colorScheme.error)
         },
-        supportingContent = { Text("Limpa stats e puzzles") },
+        supportingContent = { Text(stringResource(CommonR.string.settings_reset_hint)) },
         leadingContent = {
           Icon(
             Icons.Rounded.RestartAlt,
@@ -228,11 +231,10 @@ fun SettingsScreen(
   if (showDeleteModelDialog) {
     AlertDialog(
       onDismissRequest = { showDeleteModelDialog = false },
-      title = { Text("Excluir modelo") },
+      title = { Text(stringResource(CommonR.string.settings_delete_model)) },
       text = {
         Text(
-          "Isso excluirá o modelo de IA. O app mudará para o modo Light " +
-            "com banco de palavras curado. Você pode baixar um modelo novamente a qualquer momento.",
+          stringResource(CommonR.string.settings_delete_model_message),
         )
       },
       confirmButton = {
@@ -240,11 +242,11 @@ fun SettingsScreen(
           viewModel.onAction(SettingsAction.DeleteModel)
           showDeleteModelDialog = false
         }) {
-          Text("Excluir", color = MaterialTheme.colorScheme.error)
+          Text(stringResource(CommonR.string.settings_delete_confirm), color = MaterialTheme.colorScheme.error)
         }
       },
       dismissButton = {
-        TextButton(onClick = { showDeleteModelDialog = false }) { Text("Cancelar") }
+        TextButton(onClick = { showDeleteModelDialog = false }) { Text(stringResource(CommonR.string.cancel)) }
       },
     )
   }
@@ -252,11 +254,10 @@ fun SettingsScreen(
   if (showResetDialog) {
     AlertDialog(
       onDismissRequest = { showResetDialog = false },
-      title = { Text("Resetar progresso") },
+      title = { Text(stringResource(CommonR.string.settings_reset_progress)) },
       text = {
         Text(
-          "Isso apagará todas as suas estatísticas, puzzles jogados e " +
-            "histórico de chat. Esta ação não pode ser desfeita.",
+          stringResource(CommonR.string.settings_reset_message),
         )
       },
       confirmButton = {
@@ -264,11 +265,11 @@ fun SettingsScreen(
           viewModel.onAction(SettingsAction.ResetProgress)
           showResetDialog = false
         }) {
-          Text("Resetar", color = MaterialTheme.colorScheme.error)
+          Text(stringResource(CommonR.string.settings_reset_confirm), color = MaterialTheme.colorScheme.error)
         }
       },
       dismissButton = {
-        TextButton(onClick = { showResetDialog = false }) { Text("Cancelar") }
+        TextButton(onClick = { showResetDialog = false }) { Text(stringResource(CommonR.string.cancel)) }
       },
     )
   }
@@ -292,7 +293,7 @@ private fun LanguageDialog(
 ) {
   AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Idioma das palavras") },
+    title = { Text(stringResource(CommonR.string.settings_language)) },
     text = {
       Column {
         LANGUAGES.forEach { (code, name) ->
@@ -312,7 +313,7 @@ private fun LanguageDialog(
       }
     },
     confirmButton = {
-      TextButton(onClick = onDismiss) { Text("Fechar") }
+      TextButton(onClick = onDismiss) { Text(stringResource(CommonR.string.close)) }
     },
   )
 }
@@ -328,7 +329,7 @@ private fun WordSizeDialog(
 
   AlertDialog(
     onDismissRequest = onDismiss,
-    title = { Text("Tamanho das palavras") },
+    title = { Text(stringResource(CommonR.string.settings_word_size)) },
     text = {
       Column {
         options.forEach { option ->
@@ -340,9 +341,9 @@ private fun WordSizeDialog(
             horizontalArrangement = Arrangement.SpaceBetween,
           ) {
             Column(modifier = Modifier.weight(1f)) {
-              Text(option.label)
+              Text(stringResource(option.labelRes))
               Text(
-                option.description,
+                stringResource(option.descriptionRes),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
@@ -355,7 +356,7 @@ private fun WordSizeDialog(
       }
     },
     confirmButton = {
-      TextButton(onClick = onDismiss) { Text("Fechar") }
+      TextButton(onClick = onDismiss) { Text(stringResource(CommonR.string.close)) }
     },
   )
 }

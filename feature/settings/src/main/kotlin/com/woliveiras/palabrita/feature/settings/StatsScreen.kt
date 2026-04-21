@@ -33,6 +33,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.woliveiras.palabrita.core.common.R as CommonR
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,14 +46,15 @@ fun StatsScreen(
   viewModel: SettingsViewModel = hiltViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
+  val context = LocalContext.current
 
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text("Estatísticas") },
+        title = { Text(stringResource(CommonR.string.stats_title)) },
         navigationIcon = {
           IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar")
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(CommonR.string.back))
           }
         },
       )
@@ -70,23 +74,23 @@ fun StatsScreen(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
       ) {
-        StatCard(value = "${state.stats.totalPlayed}", label = "Jogos")
-        StatCard(value = "${state.winRate}%", label = "Vitórias")
+        StatCard(value = "${state.stats.totalPlayed}", label = stringResource(CommonR.string.stats_games))
+        StatCard(value = "${state.winRate}%", label = stringResource(CommonR.string.stats_wins))
       }
       Spacer(Modifier.height(16.dp))
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
       ) {
-        StatCard(value = "${state.stats.currentStreak}", label = "Sequência atual")
-        StatCard(value = "${state.stats.maxStreak}", label = "Melhor sequência")
+        StatCard(value = "${state.stats.currentStreak}", label = stringResource(CommonR.string.stats_current_streak))
+        StatCard(value = "${state.stats.maxStreak}", label = stringResource(CommonR.string.stats_best_streak))
       }
 
       Spacer(Modifier.height(32.dp))
 
       // Histogram
       Text(
-        "Distribuição de tentativas",
+        stringResource(CommonR.string.stats_distribution),
         style = MaterialTheme.typography.titleMedium,
       )
       Spacer(Modifier.height(12.dp))
@@ -96,12 +100,12 @@ fun StatsScreen(
 
       // Share button
       OutlinedButton(
-        onClick = { onShareStats(generateShareStatsText(state.stats)) },
+        onClick = { onShareStats(generateShareStatsText(state.stats, context)) },
         modifier = Modifier.fillMaxWidth(),
       ) {
         Icon(Icons.Rounded.Share, contentDescription = null)
         Spacer(Modifier.width(8.dp))
-        Text("Compartilhar estatísticas")
+        Text(stringResource(CommonR.string.stats_share))
       }
 
       Spacer(Modifier.height(32.dp))

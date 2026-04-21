@@ -1,5 +1,7 @@
 package com.woliveiras.palabrita.feature.game
 
+import androidx.annotation.StringRes
+
 data class GameState(
   val puzzle: com.woliveiras.palabrita.core.model.Puzzle? = null,
   val chosenDifficulty: Int = 1,
@@ -10,12 +12,12 @@ data class GameState(
   val keyboardState: Map<Char, LetterState> = emptyMap(),
   val gameStatus: GameStatus = GameStatus.CHOOSING_DIFFICULTY,
   val isLoading: Boolean = false,
-  val error: String? = null,
+  @StringRes val errorRes: Int? = null,
 )
 
 data class DifficultyOption(
   val level: Int,
-  val label: String,
+  @StringRes val labelRes: Int,
   val baseXp: Int,
   val isUnlocked: Boolean,
   val isSelectable: Boolean,

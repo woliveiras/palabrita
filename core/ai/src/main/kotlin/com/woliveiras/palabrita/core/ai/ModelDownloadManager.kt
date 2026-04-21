@@ -88,8 +88,11 @@ constructor(
     if (availableBytes < info.sizeBytes + 100_000_000L) {
       _progress.value =
         ModelDownloadProgress.Failed(
-          "Espaço insuficiente. Necessário: ${formatBytes(info.sizeBytes)}, " +
-            "Disponível: ${formatBytes(availableBytes)}"
+          context.getString(
+            com.woliveiras.palabrita.core.common.R.string.error_insufficient_space,
+            formatBytes(info.sizeBytes),
+            formatBytes(availableBytes),
+          )
         )
       return
     }
@@ -105,7 +108,7 @@ constructor(
             throw e
           } catch (e: Exception) {
             _progress.value =
-              ModelDownloadProgress.Failed(e.message ?: "Erro desconhecido no download")
+              ModelDownloadProgress.Failed(e.message ?: context.getString(com.woliveiras.palabrita.core.common.R.string.error_download_unknown))
           }
         }
       downloadJob?.join()

@@ -103,10 +103,14 @@ class GameLogicDifficultyTest {
   }
 
   @Test
-  fun `labels are correct for all levels`() {
+  fun `labelRes are set for all levels`() {
     val options = GameLogic.buildDifficultyOptions(currentDifficulty = 1, maxUnlockedDifficulty = 5)
-    assertThat(options.map { it.label }).containsExactly(
-      "Fácil", "Normal", "Difícil", "Desafiante", "Expert",
+    assertThat(options.map { it.labelRes }).containsExactly(
+      com.woliveiras.palabrita.core.common.R.string.difficulty_easy,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_normal,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_hard,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_challenging,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_expert,
     ).inOrder()
   }
 }

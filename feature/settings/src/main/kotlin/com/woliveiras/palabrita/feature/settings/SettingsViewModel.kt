@@ -44,7 +44,7 @@ class SettingsViewModel @Inject constructor(
       is SettingsAction.DeleteModel -> deleteModel()
       is SettingsAction.ResetProgress -> resetProgress()
       is SettingsAction.ShareStats -> { /* handled by UI via generateShareStatsText */ }
-      is SettingsAction.DismissError -> _state.update { it.copy(error = null) }
+      is SettingsAction.DismissError -> _state.update { it.copy(errorRes = null) }
     }
   }
 
@@ -81,7 +81,7 @@ class SettingsViewModel @Inject constructor(
 
   private fun switchModel(newModelId: ModelId) {
     if (_state.value.hasActiveGame) {
-      _state.update { it.copy(error = "Termine o jogo atual antes de trocar") }
+      _state.update { it.copy(errorRes = com.woliveiras.palabrita.core.common.R.string.settings_error_active_game) }
       return
     }
     viewModelScope.launch {
@@ -97,7 +97,7 @@ class SettingsViewModel @Inject constructor(
         _state.update { it.copy(currentModel = config, isModelSwitching = false) }
       } else {
         // V2: actual download flow
-        _state.update { it.copy(isModelSwitching = false, error = "Download de modelos disponível em breve") }
+        _state.update { it.copy(isModelSwitching = false, errorRes = com.woliveiras.palabrita.core.common.R.string.settings_error_download_soon) }
       }
     }
   }

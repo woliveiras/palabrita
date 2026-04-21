@@ -87,13 +87,19 @@ object GameLogic {
     currentDifficulty: Int,
     maxUnlockedDifficulty: Int,
   ): List<DifficultyOption> {
-    val labels = listOf("Fácil", "Normal", "Difícil", "Desafiante", "Expert")
+    val labelRes = listOf(
+      com.woliveiras.palabrita.core.common.R.string.difficulty_easy,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_normal,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_hard,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_challenging,
+      com.woliveiras.palabrita.core.common.R.string.difficulty_expert,
+    )
     val baseXps = listOf(1, 2, 3, 5, 8)
 
     return (1..5).map { level ->
       DifficultyOption(
         level = level,
-        label = labels[level - 1],
+        labelRes = labelRes[level - 1],
         baseXp = baseXps[level - 1],
         isUnlocked = level <= maxUnlockedDifficulty,
         isSelectable = level <= maxUnlockedDifficulty + 1,

@@ -41,13 +41,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.model.MessageRole
+import androidx.compose.ui.res.stringResource
+import com.woliveiras.palabrita.core.common.R as CommonR
 
-private val SUGGESTIONS = listOf(
-  "De onde vem essa palavra?",
-  "Me dá sinônimos",
-  "Como usar em uma frase?",
-  "Como se diz em inglês?",
-  "Alguma curiosidade?",
+private val SUGGESTIONS: List<@Composable () -> String> = listOf(
+  { stringResource(CommonR.string.chat_suggestion_origin) },
+  { stringResource(CommonR.string.chat_suggestion_synonyms) },
+  { stringResource(CommonR.string.chat_suggestion_sentence) },
+  { stringResource(CommonR.string.chat_suggestion_english) },
+  { stringResource(CommonR.string.chat_suggestion_trivia) },
 )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -70,10 +72,10 @@ fun ChatScreen(
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text("Explorar: ${state.word.replaceFirstChar { it.uppercase() }}") },
+        title = { Text(stringResource(CommonR.string.chat_title, state.word.replaceFirstChar { it.uppercase() })) },
         navigationIcon = {
           IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Voltar")
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(CommonR.string.back))
           }
         },
       )
@@ -102,7 +104,7 @@ fun ChatScreen(
       // Message counter
       if (state.userMessageCount > 0) {
         Text(
-          text = "${state.userMessageCount} de ${state.maxMessages} mensagens",
+          text = stringResource(CommonR.string.chat_message_count, state.userMessageCount, state.maxMessages),
           style = MaterialTheme.typography.labelSmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -115,7 +117,8 @@ fun ChatScreen(
           modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
           horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-          SUGGESTIONS.forEach { suggestion ->
+          SUGGESTIONS.forEach { suggestionProvider ->
+            val suggestion = suggestionProvider()
             AssistChip(
               onClick = { viewModel.onAction(ChatAction.SelectSuggestion(suggestion)) },
               label = { Text(suggestion, style = MaterialTheme.typography.labelSmall) },
@@ -128,7 +131,7 @@ fun ChatScreen(
       // Limit reached
       if (state.isAtLimit) {
         Text(
-          text = "Você atingiu o limite de perguntas para esta palavra.",
+          text = stringResource(CommonR.string.chat_limit_reached),
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.error,
           modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -144,7 +147,7 @@ fun ChatScreen(
           value = state.currentInput,
           onValueChange = { viewModel.onAction(ChatAction.UpdateInput(it)) },
           modifier = Modifier.weight(1f),
-          placeholder = { Text("Digite sua pergunta") },
+          placeholder = { Text(stringResource(CommonR.string.chat_input_placeholder)) },
           enabled = !state.isModelResponding && !state.isAtLimit,
           singleLine = true,
           shape = RoundedCornerShape(24.dp),
@@ -156,7 +159,7 @@ fun ChatScreen(
         ) {
           Icon(
             Icons.AutoMirrored.Rounded.Send,
-            contentDescription = "Enviar",
+            contentDescription = stringResource(CommonR.string.send),
             tint = if (state.currentInput.isNotBlank() && !state.isModelResponding)
               MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.onSurfaceVariant,

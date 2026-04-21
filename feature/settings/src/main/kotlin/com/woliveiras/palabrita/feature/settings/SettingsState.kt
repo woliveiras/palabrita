@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.feature.settings
 
+import androidx.annotation.StringRes
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.PlayerStats
@@ -12,7 +13,7 @@ data class SettingsState(
   val storageInfo: StorageInfo = StorageInfo(),
   val isModelSwitching: Boolean = false,
   val downloadProgress: Float? = null,
-  val error: String? = null,
+  @StringRes val errorRes: Int? = null,
   val hasActiveGame: Boolean = false,
 ) {
   val currentLanguage: String get() = stats.preferredLanguage
@@ -36,26 +37,26 @@ data class StorageInfo(
 
 data class WordSizeOption(
   val key: String,
-  val label: String,
-  val description: String,
+  @androidx.annotation.StringRes val labelRes: Int,
+  @androidx.annotation.StringRes val descriptionRes: Int,
 )
 
 val WORD_SIZE_OPTIONS = listOf(
-  WordSizeOption("DEFAULT", "Padrão", "Dinâmico por dificuldade (5-8)"),
-  WordSizeOption("SHORT", "Palavras curtas", "5-6 letras"),
-  WordSizeOption("LONG", "Palavras longas", "7-9 letras"),
-  WordSizeOption("EPIC", "Palavras épicas", "8-10 letras"),
+  WordSizeOption("DEFAULT", com.woliveiras.palabrita.core.common.R.string.word_size_default_label, com.woliveiras.palabrita.core.common.R.string.word_size_default_desc),
+  WordSizeOption("SHORT", com.woliveiras.palabrita.core.common.R.string.word_size_short_label, com.woliveiras.palabrita.core.common.R.string.word_size_short_desc),
+  WordSizeOption("LONG", com.woliveiras.palabrita.core.common.R.string.word_size_long_label, com.woliveiras.palabrita.core.common.R.string.word_size_long_desc),
+  WordSizeOption("EPIC", com.woliveiras.palabrita.core.common.R.string.word_size_epic_label, com.woliveiras.palabrita.core.common.R.string.word_size_epic_desc),
 )
 
-fun generateShareStatsText(stats: PlayerStats): String {
+fun generateShareStatsText(stats: PlayerStats, context: android.content.Context): String {
   val winRate = if (stats.totalPlayed > 0) {
     stats.totalWon * 100 / stats.totalPlayed
   } else {
     0
   }
   return buildString {
-    appendLine("Palabrita")
-    appendLine("${stats.totalPlayed} jogos · ${winRate}% vitórias")
-    append("Sequência: ${stats.currentStreak}")
+    appendLine(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_header))
+    appendLine(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_summary, stats.totalPlayed, winRate))
+    append(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_streak, stats.currentStreak))
   }
 }

@@ -55,7 +55,7 @@ class LlmEngineManagerImpl @Inject constructor(
         }
       }
     } catch (e: Exception) {
-      mutex.withLock { _engineState.value = EngineState.Error(e.message ?: "Engine init failed") }
+      mutex.withLock { _engineState.value = EngineState.Error(e.message ?: context.getString(com.woliveiras.palabrita.core.common.R.string.error_engine_init)) }
     }
   }
 

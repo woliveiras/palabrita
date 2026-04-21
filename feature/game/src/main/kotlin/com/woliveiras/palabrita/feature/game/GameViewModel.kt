@@ -75,7 +75,7 @@ class GameViewModel @Inject constructor(
             currentInput = "",
             revealedHints = emptyList(),
             keyboardState = emptyMap(),
-            error = null,
+            errorRes = null,
             isLoading = false,
           )
         }
@@ -86,7 +86,7 @@ class GameViewModel @Inject constructor(
           ),
         )
       } else {
-        _state.update { it.copy(error = "Nenhum puzzle disponível", gameStatus = GameStatus.CHOOSING_DIFFICULTY, isLoading = false) }
+        _state.update { it.copy(errorRes = com.woliveiras.palabrita.core.common.R.string.error_no_puzzle, gameStatus = GameStatus.CHOOSING_DIFFICULTY, isLoading = false) }
       }
     }
   }
