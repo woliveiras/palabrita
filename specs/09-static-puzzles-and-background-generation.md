@@ -53,6 +53,7 @@ The current onboarding flow blocks the user with a "Generating puzzles…" scree
 - [ ] Given unplayed puzzles >= 10, when the generation worker is triggered, then it skips generation
 - [ ] Given the device is on low battery, when the worker is scheduled, then it respects battery constraints (defers execution)
 - [ ] Given generation is in progress, when the user starts a game, then gameplay is unaffected (no UI blocking)
+- [ ] Given background generation completes successfully, when puzzles are saved, then a push notification is shown telling the user new AI-generated challenges are ready
 
 ### Puzzle Queue
 
@@ -79,6 +80,7 @@ The current onboarding flow blocks the user with a "Generating puzzles…" scree
 | Static data format | JSON in assets/ | Simple, no network dependency, easy to update |
 | Generation step in onboarding | Removed entirely | Static puzzles make it unnecessary |
 | WorkManager constraints | Network not required, battery not low | Generation is CPU-bound and local |
+| Completion notification | Push notification via NotificationManager | User knows AI puzzles are ready for a better experience |
 
 ## Out of Scope
 
