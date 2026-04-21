@@ -271,7 +271,7 @@ private fun ModelSelectionScreen(
       Spacer(Modifier.height(24.dp))
 
       ModelCard(
-        title = "Não preciso economizar espaço",
+        title = "Tenho um dispositivo potente",
         subtitle = "Gemma 4 E2B · ~2,6 GB de download",
         info = "Requer 8 GB de RAM",
         isRecommended = deviceTier == DeviceTier.HIGH,
