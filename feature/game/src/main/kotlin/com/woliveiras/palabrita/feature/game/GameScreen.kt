@@ -15,10 +15,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -45,6 +48,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -266,11 +272,13 @@ private fun PlayingScreen(
 ) {
   val puzzle = state.puzzle ?: return
   val wordLength = puzzle.word.length
+  var showHintsDialog by remember { mutableStateOf(false) }
 
   Column(
     modifier = Modifier
       .fillMaxSize()
       .windowInsetsPadding(WindowInsets.statusBars)
+      .windowInsetsPadding(WindowInsets.navigationBars)
       .padding(horizontal = 8.dp, vertical = 8.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
@@ -282,34 +290,38 @@ private fun PlayingScreen(
     )
     Spacer(Modifier.height(8.dp))
 
-    // Word Grid
+    // Word Grid — fluid width, capped at 400dp
     WordGrid(
       attempts = state.attempts,
       currentInput = state.currentInput,
       wordLength = wordLength,
       maxAttempts = 6,
+      modifier = Modifier.fillMaxWidth().widthIn(max = 400.dp),
     )
 
     Spacer(Modifier.height(8.dp))
 
-    // Hints
-    if (state.revealedHints.isNotEmpty()) {
-      HintsList(hints = state.revealedHints)
-      Spacer(Modifier.height(4.dp))
-    }
-
     // Hint button
     val hintsRemaining = puzzle.hints.size - state.revealedHints.size
     FilledTonalButton(
-      onClick = onRevealHint,
-      enabled = hintsRemaining > 0,
+      onClick = {
+        if (hintsRemaining > 0) onRevealHint()
+        showHintsDialog = true
+      },
+      enabled = hintsRemaining > 0 || state.revealedHints.isNotEmpty(),
     ) {
       Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(18.dp))
       Spacer(Modifier.width(4.dp))
-      Text(stringResource(CommonR.string.hint_button, hintsRemaining, puzzle.hints.size))
+      Text(
+        if (state.revealedHints.isNotEmpty() && hintsRemaining == 0)
+          stringResource(CommonR.string.hint_view_all)
+        else
+          stringResource(CommonR.string.hint_button, hintsRemaining, puzzle.hints.size)
+      )
     }
 
-    Spacer(Modifier.height(8.dp))
+    // Push keyboard to bottom
+    Spacer(Modifier.weight(1f))
 
     // Keyboard
     GameKeyboard(
@@ -317,6 +329,14 @@ private fun PlayingScreen(
       onKey = onTypeLetter,
       onDelete = onDelete,
       onSubmit = onSubmit,
+    )
+  }
+
+  // Hints dialog
+  if (showHintsDialog && state.revealedHints.isNotEmpty()) {
+    HintsDialog(
+      hints = state.revealedHints,
+      onDismiss = { showHintsDialog = false },
     )
   }
 }
@@ -329,13 +349,18 @@ private fun WordGrid(
   currentInput: String,
   wordLength: Int,
   maxAttempts: Int,
+  modifier: Modifier = Modifier,
 ) {
   Column(
+    modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(4.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     for (row in 0 until maxAttempts) {
-      Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+      ) {
         when {
           row < attempts.size -> {
             // Submitted attempt
@@ -391,29 +416,40 @@ private fun LetterCell(letter: Char?, state: LetterState) {
   }
 }
 
-// --- Hints List ---
+// --- Hints Dialog ---
 
 @Composable
-private fun HintsList(hints: List<String>) {
-  LazyColumn(
-    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-    verticalArrangement = Arrangement.spacedBy(4.dp),
-  ) {
-    items(hints.withIndex().toList()) { (index, hint) ->
-      Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        ),
-      ) {
-        Text(
-          text = stringResource(CommonR.string.hint_label, index + 1, hint),
-          modifier = Modifier.padding(12.dp),
-          style = MaterialTheme.typography.bodyMedium,
-        )
+private fun HintsDialog(
+  hints: List<String>,
+  onDismiss: () -> Unit,
+) {
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = { Text(stringResource(CommonR.string.hints_dialog_title)) },
+    text = {
+      Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        hints.forEachIndexed { index, hint ->
+          Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+          ) {
+            Text(
+              text = stringResource(CommonR.string.hint_label, index + 1, hint),
+              modifier = Modifier.padding(12.dp),
+              style = MaterialTheme.typography.bodyMedium,
+            )
+          }
+        }
       }
-    }
-  }
+    },
+    confirmButton = {
+      TextButton(onClick = onDismiss) {
+        Text(stringResource(CommonR.string.close))
+      }
+    },
+  )
 }
 
 // --- Keyboard ---

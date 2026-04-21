@@ -69,7 +69,9 @@
     <!-- Game: Playing -->
     <string name="loading_puzzle">Preparando puzzle…</string>
     <string name="hint_button">Dica (%1$d/%2$d)</string>
+    <string name="hint_view_all">Ver dicas</string>
     <string name="hint_label">Dica %1$d: %2$s</string>
+    <string name="hints_dialog_title">Dicas</string>
 
     <!-- Game: Result -->
     <string name="result_won">Parabéns!</string>
