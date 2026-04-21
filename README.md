@@ -1,0 +1,1 @@
+# Palabrita — On-Device AI Word Game
