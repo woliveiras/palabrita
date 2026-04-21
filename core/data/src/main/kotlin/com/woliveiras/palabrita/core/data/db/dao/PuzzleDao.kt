@@ -13,7 +13,8 @@ interface PuzzleDao {
     """
         SELECT * FROM puzzles
         WHERE isPlayed = 0 AND language = :lang AND difficulty = :difficulty
-        ORDER BY generatedAt LIMIT 1
+        ORDER BY CASE source WHEN 'AI' THEN 0 ELSE 1 END, RANDOM()
+        LIMIT 1
         """
   )
   suspend fun getNextUnplayed(lang: String, difficulty: Int): PuzzleEntity?
@@ -26,12 +27,22 @@ interface PuzzleDao {
   )
   suspend fun countUnplayed(lang: String, difficulty: Int): Int
 
+  @Query(
+    """
+        SELECT COUNT(*) FROM puzzles
+        WHERE isPlayed = 0 AND language = :lang
+        """
+  )
+  suspend fun countAllUnplayed(lang: String): Int
+
   @Query("SELECT word FROM puzzles") suspend fun getAllWords(): List<String>
 
   @Query("SELECT word FROM puzzles ORDER BY generatedAt DESC LIMIT :limit")
   suspend fun getRecentWords(limit: Int): List<String>
 
   @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insert(puzzle: PuzzleEntity): Long
+
+  @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insertAll(puzzles: List<PuzzleEntity>)
 
   @Query("SELECT * FROM puzzles WHERE id = :id") suspend fun getById(id: Long): PuzzleEntity?
 

@@ -142,6 +142,12 @@
     <string name="word_size_epic_label">Epic words</string>
     <string name="word_size_epic_desc">8–10 letters</string>
 
+    <!-- Notifications -->
+    <string name="notification_channel_name">Challenges</string>
+    <string name="notification_channel_description">Notifications about new AI-generated challenges</string>
+    <string name="notification_generation_title">New challenges ready!</string>
+    <string name="notification_generation_body">The AI created %d new challenges. Next time you play, it will be even more fun!</string>
+
     <!-- AI/Download errors -->
     <string name="error_engine_init">Failed to initialize AI</string>
     <string name="error_download_unknown">Unknown download error</string>

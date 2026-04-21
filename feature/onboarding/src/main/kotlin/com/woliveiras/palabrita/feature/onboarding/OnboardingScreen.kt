@@ -99,8 +99,6 @@ fun OnboardingScreen(
           onRetry = { viewModel.onAction(OnboardingAction.RetryDownload) },
           onCancel = { viewModel.onAction(OnboardingAction.CancelDownload) },
         )
-      OnboardingStep.GENERATION ->
-        GenerationScreen(progress = state.generationProgress)
       OnboardingStep.COMPLETE -> { /* handled above */ }
     }
   }
@@ -445,36 +443,6 @@ private fun DownloadScreen(
       OutlinedButton(onClick = onCancel) {
         Text(stringResource(CommonR.string.cancel))
       }
-    }
-  }
-}
-
-@Composable
-private fun GenerationScreen(progress: GenerationProgress?) {
-  Column(
-    modifier = Modifier.fillMaxSize().padding(32.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
-  ) {
-    Text(
-      text = stringResource(CommonR.string.generation_title),
-      style = MaterialTheme.typography.headlineSmall,
-      textAlign = TextAlign.Center,
-    )
-    Spacer(Modifier.height(8.dp))
-    Text(
-      text = stringResource(CommonR.string.generation_hint),
-      style = MaterialTheme.typography.bodyLarge,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    Spacer(Modifier.height(32.dp))
-    CircularProgressIndicator(modifier = Modifier.size(48.dp))
-    if (progress != null) {
-      Spacer(Modifier.height(16.dp))
-      Text(
-        text = stringResource(CommonR.string.generation_progress, progress.current, progress.total),
-        style = MaterialTheme.typography.bodyMedium,
-      )
     }
   }
 }

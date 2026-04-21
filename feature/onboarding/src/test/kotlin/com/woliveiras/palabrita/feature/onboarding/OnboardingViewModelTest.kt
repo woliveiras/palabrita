@@ -7,15 +7,14 @@ import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.LlmSession
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
-import com.woliveiras.palabrita.core.ai.PuzzleGenerator
+import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
+import com.woliveiras.palabrita.core.data.seeder.StaticPuzzleSeeder
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
-import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
-import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -186,11 +185,11 @@ class OnboardingViewModelTest {
       deviceTier = deviceTier,
       statsRepository = FakeStatsRepository(),
       modelRepository = FakeModelRepository(),
-      puzzleRepository = FakePuzzleRepository(),
       appPreferences = FakeAppPreferences(),
       downloadManager = FakeModelDownloadManager(),
       engineManager = FakeLlmEngineManager(),
-      puzzleGenerator = FakePuzzleGenerator(),
+      staticPuzzleSeeder = FakeStaticPuzzleSeeder(),
+      generationScheduler = FakeGenerationScheduler(),
     )
 }
 
@@ -235,32 +234,6 @@ private class FakeAppPreferences : AppPreferences {
   }
 }
 
-private class FakePuzzleRepository : PuzzleRepository {
-  private val puzzles = mutableListOf<Puzzle>()
-
-  override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? =
-    puzzles.firstOrNull { !it.isPlayed && it.language == language && it.difficulty == difficulty }
-
-  override suspend fun countUnplayed(language: String, difficulty: Int): Int =
-    puzzles.count { !it.isPlayed && it.language == language && it.difficulty == difficulty }
-
-  override suspend fun getAllGeneratedWords(): Set<String> = puzzles.map { it.word }.toSet()
-
-  override suspend fun getRecentWords(limit: Int): List<String> =
-    puzzles.takeLast(limit).map { it.word }
-
-  override suspend fun savePuzzle(puzzle: Puzzle): Long {
-    puzzles.add(puzzle)
-    return puzzles.size.toLong()
-  }
-
-  override suspend fun markAsPlayed(puzzleId: Long) {}
-
-  override suspend fun deleteUnplayedAiPuzzles() {}
-
-  override suspend fun markAllUnplayed() {}
-}
-
 private class FakeModelDownloadManager : ModelDownloadManager {
   private val _progress = MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)
   override val progress: StateFlow<ModelDownloadProgress> = _progress
@@ -301,24 +274,14 @@ private class FakeLlmEngineManager : LlmEngineManager {
   override fun isReady(): Boolean = _state.value is EngineState.Ready
 }
 
-private class FakePuzzleGenerator : PuzzleGenerator {
-  override suspend fun generateBatch(
-    count: Int,
-    language: String,
-    targetDifficulty: Int,
-    recentWords: List<String>,
-    allExistingWords: Set<String>,
-    modelId: ModelId,
-  ): List<Puzzle> = List(count) { i ->
-    Puzzle(
-      word = "teste$i",
-      wordDisplay = "TESTE$i",
-      language = language,
-      difficulty = targetDifficulty,
-      category = "test",
-      hints = listOf("h1", "h2", "h3", "h4", "h5"),
-      source = com.woliveiras.palabrita.core.model.PuzzleSource.AI,
-      generatedAt = System.currentTimeMillis(),
-    )
+private class FakeStaticPuzzleSeeder : StaticPuzzleSeeder {
+  override suspend fun seedIfNeeded(language: String) {}
+  override suspend fun seedAllLanguages() {}
+}
+
+private class FakeGenerationScheduler : PuzzleGenerationScheduler {
+  var scheduledModelId: ModelId? = null
+  override fun scheduleGeneration(modelId: ModelId) {
+    scheduledModelId = modelId
   }
 }

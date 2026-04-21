@@ -7,11 +7,15 @@ interface PuzzleRepository {
 
   suspend fun countUnplayed(language: String, difficulty: Int): Int
 
+  suspend fun countAllUnplayed(language: String): Int
+
   suspend fun getAllGeneratedWords(): Set<String>
 
   suspend fun getRecentWords(limit: Int = 50): List<String>
 
   suspend fun savePuzzle(puzzle: Puzzle): Long
+
+  suspend fun savePuzzles(puzzles: List<Puzzle>)
 
   suspend fun markAsPlayed(puzzleId: Long)
 

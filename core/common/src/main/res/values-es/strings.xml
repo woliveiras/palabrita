@@ -142,6 +142,12 @@
     <string name="word_size_epic_label">Palabras épicas</string>
     <string name="word_size_epic_desc">8–10 letras</string>
 
+    <!-- Notifications -->
+    <string name="notification_channel_name">Desafíos</string>
+    <string name="notification_channel_description">Notificaciones sobre nuevos desafíos generados por la IA</string>
+    <string name="notification_generation_title">¡Nuevos desafíos listos!</string>
+    <string name="notification_generation_body">La IA creó %d nuevos desafíos. ¡La próxima vez que juegues, será aún más divertido!</string>
+
     <!-- AI/Download errors -->
     <string name="error_engine_init">Error al inicializar la IA</string>
     <string name="error_download_unknown">Error desconocido en la descarga</string>

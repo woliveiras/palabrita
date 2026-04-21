@@ -10,6 +10,8 @@ import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.ai.PuzzleGeneratorImpl
 import com.woliveiras.palabrita.core.ai.PuzzleValidator
 import com.woliveiras.palabrita.core.ai.PuzzleValidatorImpl
+import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
+import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationSchedulerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -31,4 +33,8 @@ abstract class AiModule {
   @Binds abstract fun bindLlmResponseParser(impl: LlmResponseParserImpl): LlmResponseParser
 
   @Binds abstract fun bindPuzzleValidator(impl: PuzzleValidatorImpl): PuzzleValidator
+
+  @Binds
+  @Singleton
+  abstract fun bindPuzzleGenerationScheduler(impl: PuzzleGenerationSchedulerImpl): PuzzleGenerationScheduler
 }

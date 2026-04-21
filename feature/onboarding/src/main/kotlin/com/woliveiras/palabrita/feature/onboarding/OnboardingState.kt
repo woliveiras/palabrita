@@ -14,7 +14,6 @@ data class OnboardingState(
   val totalBytes: Long = 0L,
   val downloadFailed: Boolean = false,
   val downloadErrorMessage: String? = null,
-  val generationProgress: GenerationProgress? = null,
   val error: OnboardingError? = null,
 )
 
@@ -23,20 +22,11 @@ enum class OnboardingStep {
   LANGUAGE,
   MODEL_SELECTION,
   DOWNLOAD,
-  GENERATION,
   COMPLETE,
 }
 
-data class GenerationProgress(
-  val current: Int,
-  val total: Int,
-  val lastGeneratedWord: String? = null,
-)
-
 sealed class OnboardingError {
   data class DownloadFailed(val message: String) : OnboardingError()
-
-  data class GenerationFailed(val validCount: Int, val requiredCount: Int) : OnboardingError()
 
   data class InsufficientStorage(val requiredBytes: Long, val availableBytes: Long) :
     OnboardingError()
@@ -60,8 +50,6 @@ sealed class OnboardingAction {
   data object CancelDownload : OnboardingAction()
 
   data object RetryDownload : OnboardingAction()
-
-  data object StartGeneration : OnboardingAction()
 
   data object DismissTierWarning : OnboardingAction()
 }

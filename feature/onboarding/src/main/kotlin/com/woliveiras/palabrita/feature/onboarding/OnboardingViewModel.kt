@@ -6,12 +6,12 @@ import com.woliveiras.palabrita.core.ai.EngineState
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
-import com.woliveiras.palabrita.core.ai.PuzzleGenerator
+import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
+import com.woliveiras.palabrita.core.data.seeder.StaticPuzzleSeeder
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
-import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -26,11 +26,11 @@ class OnboardingViewModel @Inject constructor(
   deviceTier: DeviceTier,
   private val statsRepository: StatsRepository,
   private val modelRepository: ModelRepository,
-  private val puzzleRepository: PuzzleRepository,
   private val appPreferences: AppPreferences,
   private val downloadManager: ModelDownloadManager,
   private val engineManager: LlmEngineManager,
-  private val puzzleGenerator: PuzzleGenerator,
+  private val staticPuzzleSeeder: StaticPuzzleSeeder,
+  private val generationScheduler: PuzzleGenerationScheduler,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(
@@ -44,6 +44,13 @@ class OnboardingViewModel @Inject constructor(
 
   init {
     observeDownloadProgress()
+    seedStaticPuzzles()
+  }
+
+  private fun seedStaticPuzzles() {
+    viewModelScope.launch {
+      staticPuzzleSeeder.seedAllLanguages()
+    }
   }
 
   fun onAction(action: OnboardingAction) {
@@ -58,7 +65,6 @@ class OnboardingViewModel @Inject constructor(
       is OnboardingAction.StartDownload -> startDownload()
       is OnboardingAction.CancelDownload -> cancelDownload()
       is OnboardingAction.RetryDownload -> retryDownload()
-      is OnboardingAction.StartGeneration -> startGeneration()
     }
   }
 
@@ -102,15 +108,17 @@ class OnboardingViewModel @Inject constructor(
         OnboardingStep.WELCOME -> OnboardingStep.LANGUAGE
         OnboardingStep.LANGUAGE -> OnboardingStep.MODEL_SELECTION
         OnboardingStep.MODEL_SELECTION -> OnboardingStep.DOWNLOAD
-        OnboardingStep.DOWNLOAD -> OnboardingStep.GENERATION
-        OnboardingStep.GENERATION -> OnboardingStep.COMPLETE
+        OnboardingStep.DOWNLOAD -> OnboardingStep.COMPLETE
         OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
       }
       if (nextStep == OnboardingStep.DOWNLOAD && current.selectedModel != null) {
         startDownloadForModel(current.selectedModel)
       }
       if (nextStep == OnboardingStep.COMPLETE) {
-        viewModelScope.launch { appPreferences.setOnboardingComplete() }
+        viewModelScope.launch {
+          statsRepository.updateLanguage(current.selectedLanguage)
+          appPreferences.setOnboardingComplete()
+        }
       }
       current.copy(currentStep = nextStep)
     }
@@ -126,7 +134,6 @@ class OnboardingViewModel @Inject constructor(
           downloadManager.cancelDownload()
           OnboardingStep.MODEL_SELECTION
         }
-        OnboardingStep.GENERATION -> OnboardingStep.GENERATION
         OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
       }
       current.copy(currentStep = prevStep)
@@ -159,12 +166,13 @@ class OnboardingViewModel @Inject constructor(
 
   private fun skipToLightMode() {
     _state.update {
-      it.copy(
-        selectedModel = ModelId.NONE,
-        currentStep = OnboardingStep.GENERATION,
-      )
+      it.copy(selectedModel = ModelId.NONE)
     }
-    startGeneration()
+    viewModelScope.launch {
+      statsRepository.updateLanguage(_state.value.selectedLanguage)
+      appPreferences.setOnboardingComplete()
+      _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
+    }
   }
 
   private fun startDownloadForModel(modelId: ModelId) {
@@ -194,91 +202,39 @@ class OnboardingViewModel @Inject constructor(
 
   private fun initializeEngineAndGenerate(modelPath: String) {
     viewModelScope.launch {
-      _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
-
       try {
         engineManager.initialize(modelPath)
 
         engineManager.engineState.collect { engineState ->
           when (engineState) {
             is EngineState.Ready -> {
-              generatePuzzles()
+              enqueueBackgroundGeneration()
+              statsRepository.updateLanguage(_state.value.selectedLanguage)
+              appPreferences.setOnboardingComplete()
+              _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
               return@collect
             }
             is EngineState.Error -> {
-              _state.update {
-                it.copy(
-                  error = OnboardingError.GenerationFailed(0, INITIAL_PUZZLE_COUNT),
-                )
-              }
+              // Engine failed, but static puzzles are available — complete onboarding anyway
+              statsRepository.updateLanguage(_state.value.selectedLanguage)
+              appPreferences.setOnboardingComplete()
+              _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
               return@collect
             }
             else -> { /* waiting */ }
           }
         }
       } catch (e: Exception) {
-        _state.update {
-          it.copy(error = OnboardingError.GenerationFailed(0, INITIAL_PUZZLE_COUNT))
-        }
-      }
-    }
-  }
-
-  private fun startGeneration() {
-    if (_state.value.selectedModel == ModelId.NONE) {
-      viewModelScope.launch {
-        _state.update {
-          it.copy(
-            generationProgress = GenerationProgress(1, 1),
-            currentStep = OnboardingStep.GENERATION,
-          )
-        }
+        // Even on failure, static puzzles are available
+        statsRepository.updateLanguage(_state.value.selectedLanguage)
         appPreferences.setOnboardingComplete()
         _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
       }
-      return
-    }
-
-    viewModelScope.launch { generatePuzzles() }
-  }
-
-  private suspend fun generatePuzzles() {
-    val currentState = _state.value
-    val modelId = currentState.selectedModel ?: return
-
-    _state.update {
-      it.copy(generationProgress = GenerationProgress(0, INITIAL_PUZZLE_COUNT))
-    }
-
-    try {
-      val puzzles = puzzleGenerator.generateBatch(
-        count = INITIAL_PUZZLE_COUNT,
-        language = currentState.selectedLanguage,
-        targetDifficulty = 1,
-        recentWords = emptyList(),
-        allExistingWords = emptySet(),
-        modelId = modelId,
-      )
-
-      puzzles.forEachIndexed { index, puzzle ->
-        puzzleRepository.savePuzzle(puzzle)
-        _state.update {
-          it.copy(generationProgress = GenerationProgress(index + 1, INITIAL_PUZZLE_COUNT))
-        }
-      }
-
-      val stats = statsRepository.getStats()
-      statsRepository.updateLanguage(currentState.selectedLanguage)
-      appPreferences.setOnboardingComplete()
-      _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
-    } catch (e: Exception) {
-      _state.update {
-        it.copy(error = OnboardingError.GenerationFailed(0, INITIAL_PUZZLE_COUNT))
-      }
     }
   }
 
-  companion object {
-    private const val INITIAL_PUZZLE_COUNT = 7
+  private fun enqueueBackgroundGeneration() {
+    val modelId = _state.value.selectedModel ?: return
+    generationScheduler.scheduleGeneration(modelId)
   }
 }

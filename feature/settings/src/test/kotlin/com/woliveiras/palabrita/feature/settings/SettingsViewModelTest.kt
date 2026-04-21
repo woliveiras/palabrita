@@ -404,9 +404,11 @@ private class FakePuzzleRepository : PuzzleRepository {
 
   override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? = null
   override suspend fun countUnplayed(language: String, difficulty: Int): Int = 0
+  override suspend fun countAllUnplayed(language: String): Int = 0
   override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
   override suspend fun getRecentWords(limit: Int): List<String> = emptyList()
   override suspend fun savePuzzle(puzzle: Puzzle): Long = 0
+  override suspend fun savePuzzles(puzzles: List<Puzzle>) {}
   override suspend fun markAsPlayed(puzzleId: Long) {}
   override suspend fun deleteUnplayedAiPuzzles() { unplayedAiPuzzlesCleared = true }
   override suspend fun markAllUnplayed() { allUnplayed = true }

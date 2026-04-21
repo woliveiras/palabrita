@@ -47,6 +47,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.serialization.json)
   implementation(libs.datastore.preferences)
+  implementation(libs.workmanager)
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)

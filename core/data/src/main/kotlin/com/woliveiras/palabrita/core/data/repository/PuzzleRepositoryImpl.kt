@@ -18,6 +18,9 @@ class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao)
   override suspend fun countUnplayed(language: String, difficulty: Int): Int =
     puzzleDao.countUnplayed(language, difficulty)
 
+  override suspend fun countAllUnplayed(language: String): Int =
+    puzzleDao.countAllUnplayed(language)
+
   override suspend fun getAllGeneratedWords(): Set<String> =
     puzzleDao.getAllWords().toSet()
 
@@ -26,6 +29,9 @@ class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao)
 
   override suspend fun savePuzzle(puzzle: Puzzle): Long =
     puzzleDao.insert(puzzle.toEntity())
+
+  override suspend fun savePuzzles(puzzles: List<Puzzle>) =
+    puzzleDao.insertAll(puzzles.map { it.toEntity() })
 
   override suspend fun markAsPlayed(puzzleId: Long) {
     puzzleDao.markAsPlayed(puzzleId, System.currentTimeMillis())
