@@ -1,8 +1,9 @@
 package com.woliveiras.palabrita.core.ai
 
+import javax.inject.Inject
 import kotlinx.serialization.json.Json
 
-class LlmResponseParserImpl : LlmResponseParser {
+class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
 
   private val json = Json { ignoreUnknownKeys = true }
 

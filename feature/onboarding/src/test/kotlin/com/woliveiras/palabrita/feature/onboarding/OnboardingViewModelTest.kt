@@ -2,17 +2,26 @@ package com.woliveiras.palabrita.feature.onboarding
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.woliveiras.palabrita.core.ai.EngineState
+import com.woliveiras.palabrita.core.ai.LlmEngineManager
+import com.woliveiras.palabrita.core.ai.LlmSession
+import com.woliveiras.palabrita.core.ai.ModelDownloadManager
+import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
+import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
+import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
+import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -145,13 +154,13 @@ class OnboardingViewModelTest {
   // --- LOW tier skips to Light mode ---
 
   @Test
-  fun `LOW tier skip-to-light navigates to GENERATION`() = runTest {
+  fun `LOW tier skip-to-light completes onboarding`() = runTest {
     val vm = createViewModel(deviceTier = DeviceTier.LOW)
     vm.onAction(OnboardingAction.Next) // → LANGUAGE
     vm.onAction(OnboardingAction.Next) // → MODEL_SELECTION
     vm.onAction(OnboardingAction.SkipToLightMode)
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.currentStep).isEqualTo(OnboardingStep.GENERATION)
+    assertThat(vm.state.value.currentStep).isEqualTo(OnboardingStep.COMPLETE)
     assertThat(vm.state.value.selectedModel).isEqualTo(ModelId.NONE)
   }
 
@@ -177,7 +186,11 @@ class OnboardingViewModelTest {
       deviceTier = deviceTier,
       statsRepository = FakeStatsRepository(),
       modelRepository = FakeModelRepository(),
+      puzzleRepository = FakePuzzleRepository(),
       appPreferences = FakeAppPreferences(),
+      downloadManager = FakeModelDownloadManager(),
+      engineManager = FakeLlmEngineManager(),
+      puzzleGenerator = FakePuzzleGenerator(),
     )
 }
 
@@ -219,5 +232,93 @@ private class FakeAppPreferences : AppPreferences {
 
   override suspend fun setOnboardingComplete() {
     _isOnboardingComplete.value = true
+  }
+}
+
+private class FakePuzzleRepository : PuzzleRepository {
+  private val puzzles = mutableListOf<Puzzle>()
+
+  override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? =
+    puzzles.firstOrNull { !it.isPlayed && it.language == language && it.difficulty == difficulty }
+
+  override suspend fun countUnplayed(language: String, difficulty: Int): Int =
+    puzzles.count { !it.isPlayed && it.language == language && it.difficulty == difficulty }
+
+  override suspend fun getAllGeneratedWords(): Set<String> = puzzles.map { it.word }.toSet()
+
+  override suspend fun getRecentWords(limit: Int): List<String> =
+    puzzles.takeLast(limit).map { it.word }
+
+  override suspend fun savePuzzle(puzzle: Puzzle): Long {
+    puzzles.add(puzzle)
+    return puzzles.size.toLong()
+  }
+
+  override suspend fun markAsPlayed(puzzleId: Long) {}
+
+  override suspend fun deleteUnplayedAiPuzzles() {}
+
+  override suspend fun markAllUnplayed() {}
+}
+
+private class FakeModelDownloadManager : ModelDownloadManager {
+  private val _progress = MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)
+  override val progress: StateFlow<ModelDownloadProgress> = _progress
+
+  override suspend fun startDownload(modelId: ModelId) {
+    _progress.value = ModelDownloadProgress.Completed("/fake/model.litertlm")
+  }
+
+  override fun cancelDownload() {
+    _progress.value = ModelDownloadProgress.Idle
+  }
+
+  override fun getModelPath(modelId: ModelId): String? = null
+}
+
+private class FakeLlmEngineManager : LlmEngineManager {
+  private val _state = MutableStateFlow<EngineState>(EngineState.Uninitialized)
+  override val engineState: StateFlow<EngineState> = _state
+
+  override suspend fun initialize(modelPath: String) {
+    _state.value = EngineState.Ready
+  }
+
+  override suspend fun generateSingleTurn(systemPrompt: String?, userPrompt: String): String =
+    """{"word":"teste","category":"test","difficulty":1,"hints":["h1","h2","h3","h4","h5"]}"""
+
+  override suspend fun createChatSession(systemPrompt: String): LlmSession =
+    object : LlmSession {
+      override suspend fun sendMessage(message: String): String = "response"
+      override fun sendMessageStreaming(message: String): Flow<String> = flowOf("response")
+      override fun close() {}
+    }
+
+  override fun destroy() {
+    _state.value = EngineState.Uninitialized
+  }
+
+  override fun isReady(): Boolean = _state.value is EngineState.Ready
+}
+
+private class FakePuzzleGenerator : PuzzleGenerator {
+  override suspend fun generateBatch(
+    count: Int,
+    language: String,
+    targetDifficulty: Int,
+    recentWords: List<String>,
+    allExistingWords: Set<String>,
+    modelId: ModelId,
+  ): List<Puzzle> = List(count) { i ->
+    Puzzle(
+      word = "teste$i",
+      wordDisplay = "TESTE$i",
+      language = language,
+      difficulty = targetDifficulty,
+      category = "test",
+      hints = listOf("h1", "h2", "h3", "h4", "h5"),
+      source = com.woliveiras.palabrita.core.model.PuzzleSource.AI,
+      generatedAt = System.currentTimeMillis(),
+    )
   }
 }

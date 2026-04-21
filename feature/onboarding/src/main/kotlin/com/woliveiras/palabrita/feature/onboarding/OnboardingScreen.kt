@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Spellcheck
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -26,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
@@ -87,7 +89,13 @@ fun OnboardingScreen(
       OnboardingStep.DOWNLOAD ->
         DownloadScreen(
           modelId = state.selectedModel,
-          onBack = { viewModel.onAction(OnboardingAction.Back) },
+          downloadProgress = state.downloadProgress,
+          downloadedBytes = state.downloadedBytes,
+          totalBytes = state.totalBytes,
+          downloadFailed = state.downloadFailed,
+          errorMessage = state.downloadErrorMessage,
+          onRetry = { viewModel.onAction(OnboardingAction.RetryDownload) },
+          onCancel = { viewModel.onAction(OnboardingAction.CancelDownload) },
         )
       OnboardingStep.GENERATION ->
         GenerationScreen(progress = state.generationProgress)
@@ -360,7 +368,13 @@ private fun ModelCard(
 @Composable
 private fun DownloadScreen(
   modelId: ModelId?,
-  onBack: () -> Unit,
+  downloadProgress: Float,
+  downloadedBytes: Long,
+  totalBytes: Long,
+  downloadFailed: Boolean,
+  errorMessage: String?,
+  onRetry: () -> Unit,
+  onCancel: () -> Unit,
 ) {
   Column(
     modifier = Modifier.fillMaxSize().padding(32.dp),
@@ -382,22 +396,55 @@ private fun DownloadScreen(
     Spacer(Modifier.height(8.dp))
     val modelName = when (modelId) {
       ModelId.GEMMA4_E2B -> "Gemma 4 E2B (~2,6 GB)"
-      ModelId.GEMMA3_1B -> "Gemma 3 1B (~529 MB)"
+      ModelId.GEMMA3_1B -> "Gemma 3 1B (~1 GB)"
       else -> "—"
     }
     Text(text = "Modelo: $modelName", style = MaterialTheme.typography.bodyMedium)
     Spacer(Modifier.height(32.dp))
-    // TODO: Replace with real download progress
-    CircularProgressIndicator(modifier = Modifier.size(48.dp))
-    Spacer(Modifier.height(16.dp))
-    Text(
-      text = "Download será implementado com Play Asset Delivery",
-      style = MaterialTheme.typography.bodySmall,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    Spacer(Modifier.height(32.dp))
-    OutlinedButton(onClick = onBack) {
-      Text("Cancelar")
+
+    if (downloadFailed) {
+      Icon(
+        imageVector = Icons.Rounded.ErrorOutline,
+        contentDescription = null,
+        modifier = Modifier.size(48.dp),
+        tint = MaterialTheme.colorScheme.error,
+      )
+      Spacer(Modifier.height(12.dp))
+      Text(
+        text = errorMessage ?: "Falha no download",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.error,
+        textAlign = TextAlign.Center,
+      )
+      Spacer(Modifier.height(24.dp))
+      Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
+        Text("Tentar novamente")
+      }
+      Spacer(Modifier.height(8.dp))
+      OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
+        Text("Escolher outro modelo")
+      }
+    } else {
+      LinearProgressIndicator(
+        progress = { downloadProgress },
+        modifier = Modifier.fillMaxWidth().height(8.dp),
+      )
+      Spacer(Modifier.height(12.dp))
+      val percentText = "${(downloadProgress * 100).toInt()}%"
+      val sizeText = if (totalBytes > 0) {
+        "${formatBytes(downloadedBytes)} / ${formatBytes(totalBytes)}"
+      } else {
+        "Verificando..."
+      }
+      Text(
+        text = "$percentText — $sizeText",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+      Spacer(Modifier.height(32.dp))
+      OutlinedButton(onClick = onCancel) {
+        Text("Cancelar")
+      }
     }
   }
 }
@@ -453,5 +500,10 @@ private fun TierWarningDialog(
       TextButton(onClick = onChooseOther) { Text("Escolher outro") }
     },
   )
+}
+
+private fun formatBytes(bytes: Long): String {
+  val gb = bytes / 1_000_000_000.0
+  return if (gb >= 1.0) "%.1f GB".format(gb) else "%.0f MB".format(bytes / 1_000_000.0)
 }
 

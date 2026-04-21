@@ -1,6 +1,8 @@
 package com.woliveiras.palabrita.core.ai
 
-class PuzzleValidatorImpl : PuzzleValidator {
+import javax.inject.Inject
+
+class PuzzleValidatorImpl @Inject constructor() : PuzzleValidator {
 
   private val validChars = Regex("^[a-z]+$")
 

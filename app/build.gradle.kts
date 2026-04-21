@@ -34,9 +34,14 @@ android {
     targetCompatibility = JavaVersion.VERSION_21
   }
 
-  kotlinOptions { jvmTarget = "21" }
 
   buildFeatures { compose = true }
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+  }
 }
 
 dependencies {

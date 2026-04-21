@@ -9,6 +9,11 @@ data class OnboardingState(
   val deviceTier: DeviceTier = DeviceTier.HIGH,
   val selectedModel: ModelId? = null,
   val showTierWarning: Boolean = false,
+  val downloadProgress: Float = 0f,
+  val downloadedBytes: Long = 0L,
+  val totalBytes: Long = 0L,
+  val downloadFailed: Boolean = false,
+  val downloadErrorMessage: String? = null,
   val generationProgress: GenerationProgress? = null,
   val error: OnboardingError? = null,
 )

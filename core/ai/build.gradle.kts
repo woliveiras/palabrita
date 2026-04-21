@@ -17,12 +17,19 @@ android {
     targetCompatibility = JavaVersion.VERSION_21
   }
 
-  kotlinOptions { jvmTarget = "21" }
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+  }
 }
 
 dependencies {
   implementation(project(":core:model"))
   implementation(project(":core:common"))
+
+  implementation(libs.litertlm.android)
 
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
