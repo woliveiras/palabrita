@@ -27,4 +27,7 @@ class ChatRepositoryImpl @Inject constructor(
 
   override suspend fun getPuzzle(puzzleId: Long): Puzzle? =
     puzzleDao.getById(puzzleId)?.toDomain()
+
+  override suspend fun deleteAll() =
+    chatDao.deleteAll()
 }

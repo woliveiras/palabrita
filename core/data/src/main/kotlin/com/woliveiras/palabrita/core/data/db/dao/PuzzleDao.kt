@@ -37,4 +37,10 @@ interface PuzzleDao {
 
   @Query("UPDATE puzzles SET isPlayed = 1, playedAt = :playedAt WHERE id = :id")
   suspend fun markAsPlayed(id: Long, playedAt: Long)
+
+  @Query("DELETE FROM puzzles WHERE isPlayed = 0 AND source = 'AI'")
+  suspend fun deleteUnplayedAiPuzzles()
+
+  @Query("UPDATE puzzles SET isPlayed = 0, playedAt = NULL")
+  suspend fun markAllUnplayed()
 }

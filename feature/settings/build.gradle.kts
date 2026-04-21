@@ -33,6 +33,7 @@ dependencies {
   implementation(libs.compose.ui.graphics)
   implementation(libs.compose.ui.tooling.preview)
   implementation(libs.compose.material3)
+  implementation(libs.compose.material.icons.extended)
   debugImplementation(libs.compose.ui.tooling)
 
   implementation(libs.hilt.android)
@@ -42,4 +43,8 @@ dependencies {
   implementation(libs.lifecycle.runtime.compose)
   implementation(libs.lifecycle.viewmodel.compose)
   implementation(libs.navigation.compose)
+
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
+  testImplementation(libs.kotlinx.coroutines.test)
 }

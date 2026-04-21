@@ -14,4 +14,8 @@ interface PuzzleRepository {
   suspend fun savePuzzle(puzzle: Puzzle): Long
 
   suspend fun markAsPlayed(puzzleId: Long)
+
+  suspend fun deleteUnplayedAiPuzzles()
+
+  suspend fun markAllUnplayed()
 }

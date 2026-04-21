@@ -192,6 +192,12 @@ private class FakeStatsRepository : StatsRepository {
 
   override suspend fun checkAndPromoteDifficulty(): Int = stats.currentDifficulty
 
+  override suspend fun updateLanguage(language: String) {}
+
+  override suspend fun updateWordSizePreference(preference: String) {}
+
+  override suspend fun resetProgress() {}
+
   override fun observeStats(): Flow<PlayerStats> = flowOf(stats)
 }
 

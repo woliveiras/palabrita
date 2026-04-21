@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.Backspace
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -58,6 +59,7 @@ private val CoralColor = Color(0xFFFF6B6B)
 @Composable
 fun GameScreen(
   onNavigateToChat: (Long) -> Unit,
+  onNavigateToSettings: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: GameViewModel = hiltViewModel(),
 ) {
@@ -78,6 +80,7 @@ fun GameScreen(
         chosen = state.chosenDifficulty,
         onSelect = { viewModel.onAction(GameAction.SelectDifficulty(it)) },
         onStart = { viewModel.onAction(GameAction.StartGame) },
+        onSettings = onNavigateToSettings,
       )
       GameStatus.LOADING -> LoadingScreen()
       GameStatus.PLAYING -> PlayingScreen(
@@ -115,12 +118,24 @@ private fun DifficultyPickerScreen(
   chosen: Int,
   onSelect: (Int) -> Unit,
   onStart: () -> Unit,
+  onSettings: () -> Unit,
 ) {
   Column(
     modifier = Modifier.fillMaxSize().padding(32.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Spacer(Modifier.height(48.dp))
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.End,
+    ) {
+      androidx.compose.material3.IconButton(onClick = onSettings) {
+        Icon(
+          Icons.Rounded.Settings,
+          contentDescription = "Configurações",
+        )
+      }
+    }
+    Spacer(Modifier.height(16.dp))
     Text(
       text = "Escolha a dificuldade",
       style = MaterialTheme.typography.headlineSmall,

@@ -30,4 +30,10 @@ class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao)
   override suspend fun markAsPlayed(puzzleId: Long) {
     puzzleDao.markAsPlayed(puzzleId, System.currentTimeMillis())
   }
+
+  override suspend fun deleteUnplayedAiPuzzles() =
+    puzzleDao.deleteUnplayedAiPuzzles()
+
+  override suspend fun markAllUnplayed() =
+    puzzleDao.markAllUnplayed()
 }

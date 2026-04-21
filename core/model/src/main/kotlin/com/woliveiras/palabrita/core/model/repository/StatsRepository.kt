@@ -10,5 +10,11 @@ interface StatsRepository {
 
   suspend fun checkAndPromoteDifficulty(): Int
 
+  suspend fun updateLanguage(language: String)
+
+  suspend fun updateWordSizePreference(preference: String)
+
+  suspend fun resetProgress()
+
   fun observeStats(): Flow<PlayerStats>
 }

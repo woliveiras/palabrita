@@ -300,4 +300,6 @@ private class FakeChatRepository(
   override suspend fun countUserMessages(puzzleId: Long): Int = userMessageCount
 
   override suspend fun getPuzzle(puzzleId: Long): Puzzle? = puzzle
+
+  override suspend fun deleteAll() {}
 }

@@ -124,6 +124,25 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
   override fun observeStats(): Flow<PlayerStats> =
     statsDao.observe().map { it?.toDomain() ?: PlayerStats() }
 
+  override suspend fun updateLanguage(language: String) {
+    val current = getStats()
+    statsDao.upsert(current.copy(preferredLanguage = language).toEntity())
+  }
+
+  override suspend fun updateWordSizePreference(preference: String) {
+    val current = getStats()
+    statsDao.upsert(current.copy(wordSizePreference = preference).toEntity())
+  }
+
+  override suspend fun resetProgress() {
+    val current = getStats()
+    val reset = PlayerStats(
+      preferredLanguage = current.preferredLanguage,
+      wordSizePreference = current.wordSizePreference,
+    )
+    statsDao.upsert(reset.toEntity())
+  }
+
   private fun computeStreak(stats: PlayerStats, now: Long): Int {
     if (stats.lastPlayedAt == 0L) return 1
     val dayMs = 86_400_000L

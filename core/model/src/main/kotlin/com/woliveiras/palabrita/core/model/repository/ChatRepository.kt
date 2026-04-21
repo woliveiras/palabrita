@@ -8,4 +8,5 @@ interface ChatRepository {
   suspend fun saveMessage(message: ChatMessage)
   suspend fun countUserMessages(puzzleId: Long): Int
   suspend fun getPuzzle(puzzleId: Long): Puzzle?
+  suspend fun deleteAll()
 }

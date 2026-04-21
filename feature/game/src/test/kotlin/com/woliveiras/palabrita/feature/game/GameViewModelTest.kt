@@ -345,12 +345,17 @@ private class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleR
   override suspend fun getRecentWords(limit: Int): List<String> = emptyList()
   override suspend fun savePuzzle(puzzle: Puzzle): Long = puzzle.id
   override suspend fun markAsPlayed(puzzleId: Long) { markedPlayed.add(puzzleId) }
+  override suspend fun deleteUnplayedAiPuzzles() {}
+  override suspend fun markAllUnplayed() {}
 }
 
 private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()) : StatsRepository {
   override suspend fun getStats(): PlayerStats = stats
   override suspend fun updateAfterGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int) {}
   override suspend fun checkAndPromoteDifficulty(): Int = stats.currentDifficulty
+  override suspend fun updateLanguage(language: String) {}
+  override suspend fun updateWordSizePreference(preference: String) {}
+  override suspend fun resetProgress() {}
   override fun observeStats(): Flow<PlayerStats> = flowOf(stats)
 }
 
@@ -369,4 +374,11 @@ private class FakeGameSessionRepository : GameSessionRepository {
 
   override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
     sessions.find { it.puzzleId == puzzleId }
+
+  override suspend fun hasActiveGame(): Boolean =
+    sessions.any { it.completedAt == null }
+
+  override suspend fun deleteAll() {
+    sessions.clear()
+  }
 }
