@@ -99,6 +99,7 @@ fun GameScreen(
         hintsUsed = state.revealedHints.size,
         onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
         onShare = { viewModel.onAction(GameAction.ShareResult) },
+        onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
       )
       GameStatus.LOST -> ResultScreen(
         won = false,
@@ -107,6 +108,7 @@ fun GameScreen(
         hintsUsed = state.revealedHints.size,
         onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
         onShare = { viewModel.onAction(GameAction.ShareResult) },
+        onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
       )
     }
   }
@@ -288,12 +290,12 @@ private fun PlayingScreen(
       maxAttempts = 6,
     )
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(8.dp))
 
     // Hints
     if (state.revealedHints.isNotEmpty()) {
       HintsList(hints = state.revealedHints)
-      Spacer(Modifier.height(8.dp))
+      Spacer(Modifier.height(4.dp))
     }
 
     // Hint button
@@ -307,7 +309,7 @@ private fun PlayingScreen(
       Text(stringResource(CommonR.string.hint_button, hintsRemaining, puzzle.hints.size))
     }
 
-    Spacer(Modifier.weight(1f))
+    Spacer(Modifier.height(8.dp))
 
     // Keyboard
     GameKeyboard(
@@ -376,13 +378,13 @@ private fun LetterCell(letter: Char?, state: LetterState) {
 
   Box(
     modifier = Modifier
-      .size(56.dp)
+      .size(62.dp)
       .background(bgColor, RoundedCornerShape(6.dp)),
     contentAlignment = Alignment.Center,
   ) {
     Text(
       text = letter?.uppercaseChar()?.toString() ?: "",
-      style = MaterialTheme.typography.titleLarge,
+      fontSize = 24.sp,
       fontWeight = FontWeight.Bold,
       color = textColor,
     )
@@ -428,38 +430,42 @@ private fun GameKeyboard(
   onSubmit: () -> Unit,
 ) {
   Column(
+    modifier = Modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(4.dp),
   ) {
     KeyRow(ROW1, keyboardState, onKey)
     KeyRow(ROW2, keyboardState, onKey)
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
       // Backspace
       Surface(
         onClick = onDelete,
         shape = RoundedCornerShape(4.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = Modifier.height(52.dp).width(52.dp),
+        modifier = Modifier.height(56.dp).weight(1.3f),
       ) {
         Box(contentAlignment = Alignment.Center) {
-          Icon(Icons.Rounded.Backspace, contentDescription = stringResource(CommonR.string.delete_action), modifier = Modifier.size(22.dp))
+          Icon(Icons.Rounded.Backspace, contentDescription = stringResource(CommonR.string.delete_action), modifier = Modifier.size(24.dp))
         }
       }
       ROW3.forEach { letter ->
-        KeyButton(letter = letter, state = keyboardState[letter], onClick = { onKey(letter) })
+        KeyButton(letter = letter, state = keyboardState[letter], onClick = { onKey(letter) }, modifier = Modifier.weight(1f).height(56.dp))
       }
       // Enter
       Surface(
         onClick = onSubmit,
         shape = RoundedCornerShape(4.dp),
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.height(52.dp).width(52.dp),
+        modifier = Modifier.height(56.dp).weight(1.3f),
       ) {
         Box(contentAlignment = Alignment.Center) {
           Icon(
             Icons.Rounded.Send,
             contentDescription = stringResource(CommonR.string.send),
-            modifier = Modifier.size(22.dp),
+            modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.onPrimary,
           )
         }
@@ -474,15 +480,18 @@ private fun KeyRow(
   keyboardState: Map<Char, LetterState>,
   onKey: (Char) -> Unit,
 ) {
-  Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.spacedBy(4.dp),
+  ) {
     letters.forEach { letter ->
-      KeyButton(letter = letter, state = keyboardState[letter], onClick = { onKey(letter) })
+      KeyButton(letter = letter, state = keyboardState[letter], onClick = { onKey(letter) }, modifier = Modifier.weight(1f).height(56.dp))
     }
   }
 }
 
 @Composable
-private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit) {
+private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit, modifier: Modifier = Modifier) {
   val gameColors = LocalGameColors.current
   val bgColor = when (state) {
     LetterState.CORRECT -> gameColors.correct
@@ -498,13 +507,13 @@ private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit) {
     onClick = onClick,
     shape = RoundedCornerShape(4.dp),
     color = bgColor,
-    modifier = Modifier.size(width = 36.dp, height = 52.dp),
+    modifier = modifier,
   ) {
     Box(contentAlignment = Alignment.Center) {
       Text(
         text = letter.uppercaseChar().toString(),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.SemiBold,
         color = textColor,
       )
     }
@@ -521,9 +530,13 @@ private fun ResultScreen(
   hintsUsed: Int,
   onExplore: () -> Unit,
   onShare: () -> Unit,
+  onPlayAgain: () -> Unit,
 ) {
   Column(
-    modifier = Modifier.fillMaxSize().padding(32.dp),
+    modifier = Modifier
+      .fillMaxSize()
+      .windowInsetsPadding(WindowInsets.statusBars)
+      .padding(32.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
@@ -575,6 +588,11 @@ private fun ResultScreen(
 
     Button(onClick = onShare, modifier = Modifier.fillMaxWidth()) {
       Text(stringResource(CommonR.string.share))
+    }
+
+    Spacer(Modifier.height(8.dp))
+    OutlinedButton(onClick = onPlayAgain, modifier = Modifier.fillMaxWidth()) {
+      Text(stringResource(CommonR.string.play_again))
     }
   }
 }

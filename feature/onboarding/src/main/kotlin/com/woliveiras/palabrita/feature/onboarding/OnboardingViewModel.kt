@@ -162,6 +162,7 @@ class OnboardingViewModel @Inject constructor(
       DeviceTier.LOW -> ModelId.NONE
     }
     _state.update { it.copy(selectedModel = model, showTierWarning = false) }
+    navigateNext()
   }
 
   private fun skipToLightMode() {
