@@ -51,10 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
-private val MintColor = Color(0xFF4ECDC4)
-private val AmberColor = Color(0xFFFFB347)
-private val CoralColor = Color(0xFFFF6B6B)
+import com.woliveiras.palabrita.core.common.LocalGameColors
 
 @Composable
 fun GameScreen(
@@ -355,15 +352,16 @@ private fun WordGrid(
 
 @Composable
 private fun LetterCell(letter: Char?, state: LetterState) {
+  val gameColors = LocalGameColors.current
   val bgColor = when (state) {
-    LetterState.CORRECT -> MintColor
-    LetterState.PRESENT -> AmberColor
-    LetterState.ABSENT -> CoralColor
+    LetterState.CORRECT -> gameColors.correct
+    LetterState.PRESENT -> gameColors.present
+    LetterState.ABSENT -> gameColors.absent
     LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
   }
   val textColor = if (state == LetterState.UNUSED)
     MaterialTheme.colorScheme.onSurface
-  else Color.White
+  else gameColors.onFeedback
 
   Box(
     modifier = Modifier
@@ -474,14 +472,15 @@ private fun KeyRow(
 
 @Composable
 private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit) {
+  val gameColors = LocalGameColors.current
   val bgColor = when (state) {
-    LetterState.CORRECT -> MintColor
-    LetterState.PRESENT -> AmberColor
-    LetterState.ABSENT -> CoralColor
+    LetterState.CORRECT -> gameColors.correct
+    LetterState.PRESENT -> gameColors.present
+    LetterState.ABSENT -> gameColors.absent
     null, LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
   }
   val textColor = if (state != null && state != LetterState.UNUSED)
-    Color.White
+    gameColors.onFeedback
   else MaterialTheme.colorScheme.onSurface
 
   Surface(

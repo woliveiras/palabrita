@@ -1,6 +1,7 @@
 plugins {
   alias(libs.plugins.android.library)
   alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.compose.compiler)
   alias(libs.plugins.ksp)
   alias(libs.plugins.hilt)
 }
@@ -17,11 +18,16 @@ android {
   }
 
   kotlinOptions { jvmTarget = "21" }
+
+  buildFeatures { compose = true }
 }
 
 dependencies {
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.core.ktx)
+
+  implementation(platform(libs.compose.bom))
+  implementation(libs.compose.ui)
 
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
