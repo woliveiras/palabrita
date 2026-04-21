@@ -35,10 +35,22 @@ object AiModelRegistry {
       requiredRamMb = 4096,
     )
 
+  val QWEN3_0_6B =
+    AiModelInfo(
+      modelId = ModelId.QWEN3_0_6B,
+      displayName = "Qwen3 0.6B",
+      fileName = "Qwen3-0.6B.litertlm",
+      downloadUrl =
+        "https://huggingface.co/litert-community/Qwen3-0.6B/resolve/main/Qwen3-0.6B.litertlm",
+      sizeBytes = 614_000_000L,
+      requiredRamMb = 2048,
+    )
+
   fun getInfo(modelId: ModelId): AiModelInfo? =
     when (modelId) {
       ModelId.GEMMA4_E2B -> GEMMA4_E2B
       ModelId.GEMMA3_1B -> GEMMA3_1B
+      ModelId.QWEN3_0_6B -> QWEN3_0_6B
       ModelId.NONE -> null
     }
 }

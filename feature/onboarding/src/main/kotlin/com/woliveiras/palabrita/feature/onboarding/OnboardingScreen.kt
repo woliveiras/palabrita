@@ -291,8 +291,8 @@ private fun ModelSelectionScreen(
         subtitle = stringResource(CommonR.string.model_compact_subtitle),
         info = stringResource(CommonR.string.model_compact_info),
         isRecommended = deviceTier == DeviceTier.MEDIUM,
-        isSelected = selectedModel == ModelId.GEMMA3_1B,
-        onClick = { onSelectModel(ModelId.GEMMA3_1B) },
+        isSelected = selectedModel == ModelId.QWEN3_0_6B,
+        onClick = { onSelectModel(ModelId.QWEN3_0_6B) },
       )
 
       Spacer(Modifier.height(24.dp))
@@ -394,7 +394,7 @@ private fun DownloadScreen(
     Spacer(Modifier.height(8.dp))
     val modelName = when (modelId) {
       ModelId.GEMMA4_E2B -> stringResource(CommonR.string.download_model_gemma4)
-      ModelId.GEMMA3_1B -> stringResource(CommonR.string.download_model_gemma3)
+      ModelId.QWEN3_0_6B -> stringResource(CommonR.string.download_model_qwen3)
       else -> stringResource(CommonR.string.download_model_unknown)
     }
     Text(text = stringResource(CommonR.string.download_model_label, modelName), style = MaterialTheme.typography.bodyMedium)

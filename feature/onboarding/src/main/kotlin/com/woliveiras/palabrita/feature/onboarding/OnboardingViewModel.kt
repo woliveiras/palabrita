@@ -158,7 +158,7 @@ class OnboardingViewModel @Inject constructor(
   private fun autoSelectModel() {
     val model = when (_state.value.deviceTier) {
       DeviceTier.HIGH -> ModelId.GEMMA4_E2B
-      DeviceTier.MEDIUM -> ModelId.GEMMA3_1B
+      DeviceTier.MEDIUM -> ModelId.QWEN3_0_6B
       DeviceTier.LOW -> ModelId.NONE
     }
     _state.update { it.copy(selectedModel = model, showTierWarning = false) }
