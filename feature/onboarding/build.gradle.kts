@@ -42,4 +42,10 @@ dependencies {
   implementation(libs.lifecycle.runtime.compose)
   implementation(libs.lifecycle.viewmodel.compose)
   implementation(libs.navigation.compose)
+  implementation(libs.datastore.preferences)
+
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
+  testImplementation(libs.turbine)
+  testImplementation(libs.kotlinx.coroutines.test)
 }
