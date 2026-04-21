@@ -28,6 +28,40 @@ class HomeViewModel @Inject constructor(
 
   private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
+  init {
+    viewModelScope.launch {
+      statsRepository.observeStats().collect { stats ->
+        val today = LocalDate.now().format(dateFormatter)
+        val dailySessions = gameSessionRepository.getDailyChallengesForDate(today)
+        val completedCount = dailySessions.count { it.completedAt != null }
+        val challenges = buildDailyChallenges(stats.currentDifficulty, dailySessions)
+        val winRate = if (stats.totalPlayed > 0) {
+          stats.totalWon.toFloat() / stats.totalPlayed
+        } else 0f
+        val milestone = when {
+          stats.currentStreak < 7 -> 7
+          stats.currentStreak < 30 -> 30
+          stats.currentStreak < 100 -> 100
+          else -> 365
+        }
+        _state.update {
+          it.copy(
+            streak = stats.currentStreak,
+            nextStreakMilestone = milestone,
+            dailyChallenges = challenges,
+            completedDailies = completedCount,
+            allDailiesComplete = completedCount >= 3,
+            totalPlayed = stats.totalPlayed,
+            winRate = winRate,
+            playerTier = PlayerTier.fromXp(stats.totalXp).displayName,
+            totalXp = stats.totalXp,
+            isLoading = false,
+          )
+        }
+      }
+    }
+  }
+
   fun onAction(action: HomeAction) {
     when (action) {
       is HomeAction.StartDailyChallenge -> { /* navigation handled by UI */ }
@@ -40,38 +74,16 @@ class HomeViewModel @Inject constructor(
 
   fun loadHome() {
     viewModelScope.launch {
-      _state.update { it.copy(isLoading = true) }
-
-      val stats = statsRepository.getStats()
       val today = LocalDate.now().format(dateFormatter)
       val dailySessions = gameSessionRepository.getDailyChallengesForDate(today)
-
       val completedCount = dailySessions.count { it.completedAt != null }
+      val stats = statsRepository.getStats()
       val challenges = buildDailyChallenges(stats.currentDifficulty, dailySessions)
-
-      val winRate = if (stats.totalPlayed > 0) {
-        stats.totalWon.toFloat() / stats.totalPlayed
-      } else 0f
-
-      val milestone = when {
-        stats.currentStreak < 7 -> 7
-        stats.currentStreak < 30 -> 30
-        stats.currentStreak < 100 -> 100
-        else -> 365
-      }
-
       _state.update {
         it.copy(
-          streak = stats.currentStreak,
-          nextStreakMilestone = milestone,
           dailyChallenges = challenges,
           completedDailies = completedCount,
           allDailiesComplete = completedCount >= 3,
-          totalPlayed = stats.totalPlayed,
-          winRate = winRate,
-          playerTier = PlayerTier.fromXp(stats.totalXp).displayName,
-          totalXp = stats.totalXp,
-          isLoading = false,
         )
       }
     }
