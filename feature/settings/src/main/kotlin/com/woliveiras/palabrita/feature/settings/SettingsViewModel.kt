@@ -34,6 +34,11 @@ class SettingsViewModel @Inject constructor(
 
   init {
     loadData()
+    viewModelScope.launch {
+      statsRepository.observeStats().collect { stats ->
+        _state.update { it.copy(stats = stats) }
+      }
+    }
   }
 
   fun onAction(action: SettingsAction) {
