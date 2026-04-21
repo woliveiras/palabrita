@@ -12,6 +12,7 @@ android {
 
   defaultConfig {
     minSdk = 31
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     ksp {
       arg("room.schemaLocation", "$projectDir/schemas")
@@ -46,4 +47,13 @@ dependencies {
   testImplementation(libs.truth)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.room.testing)
+
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.truth)
+  androidTestImplementation(libs.turbine)
+  androidTestImplementation(libs.kotlinx.coroutines.test)
+  androidTestImplementation(libs.room.testing)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.test.ext.junit)
 }
