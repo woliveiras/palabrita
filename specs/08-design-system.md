@@ -155,6 +155,165 @@ Baseado em múltiplos de 4dp (Material 3):
 // Lendário: efeito shimmer no background
 ```
 
+## Novos Componentes (Spec 10-12)
+
+### BottomNavigation
+
+```kotlin
+// 3 tabs: Home (🏠), Stats (📊), Mais (⚙️)
+// Background: surface
+// Indicador ativo: primary (mint) pill shape
+// Ícones: Material Icons (Home, BarChart, MoreHoriz)
+// Labels: labelMedium
+// Elevation: 2dp
+// Height: 80dp (include bottom inset)
+```
+
+### HomeCards
+
+Todos os cards do HomeScreen seguem o padrão `PalabritaCard` com variações:
+
+**StreakCard**
+```kotlin
+// Background: primaryContainer (#D4F5F2 light / #1A3A38 dark)
+// Ícone: 🔥 (emoji inline)
+// Barra de progresso: primary (#4ECDC4) sobre outline (#D1D5DB)
+// Texto do streak: titleMedium, bold
+// Texto do marco: bodyMedium, onSurfaceVariant
+// Padding: spacingMd (16dp)
+// Corner: 16dp
+```
+
+**DailyChallengesCard**
+```kotlin
+// Background: surfaceVariant
+// Header: "⭐ DESAFIOS DO DIA (N/3)" — titleMedium
+// Cada desafio: Row com número + ícone estado + categoria + dificuldade
+// Estados:
+//   ✅ COMPLETED: texto onSurface, ícone correct (#4ECDC4)
+//   🔓 AVAILABLE: texto onSurface, ícone primary
+//   🔒 LOCKED: texto onSurfaceVariant (dimmed), ícone outline
+// CTA "JOGAR #N": PalabritaButton Primary
+// Corner: 16dp
+// Elevation: 1dp
+```
+
+**FreePlayCard**
+```kotlin
+// Background: surfaceVariant
+// Ícone: 🎲 (emoji inline)
+// Título: "MODO LIVRE" — titleMedium
+// Descrição: bodyMedium, onSurfaceVariant
+// CTA: PalabritaButton Secondary (outlined)
+// Corner: 16dp
+```
+
+**QuickStatsRow**
+```kotlin
+// 2×2 grid de mini-cards
+// Cada mini-card: surfaceVariant, corner 12dp, padding spacingSm
+// Valor: titleMedium, bold, onSurface
+// Label: labelMedium, onSurfaceVariant
+// Gap: spacingSm (8dp)
+```
+
+### GenerationIndicator
+
+```kotlin
+// Background: surfaceVariant com borda outline
+// Ícone: animação de loading (CircularProgressIndicator, size 16dp)
+// Texto: bodyMedium, onSurfaceVariant
+// Estado "pronto": ícone ✓ (correct color), auto-dismiss 3s
+// Corner: 12dp
+// Padding: spacingSm vertical, spacingMd horizontal
+```
+
+### ChatCard (ResultScreen)
+
+```kotlin
+// Background: primaryContainer (#D4F5F2 light / #1A3A38 dark)
+// Borda: 2dp, primary (#4ECDC4)
+// Corner: 16dp
+// Elevation: 2dp
+// Header: "💬 Explore '{palavra}'" — titleMedium
+// Sugestões: chips horizontais scrolláveis
+//   Cada chip: surfaceVariant bg, corner 8dp, labelMedium
+//   Ícone: emoji da categoria + texto
+// Bônus: "+1 XP bônus ✨" — labelMedium, primary color
+// CTA: PalabritaButton Primary "EXPLORAR AGORA"
+// Modo Light: substitui por StaticCuriosityCard
+```
+
+### StaticCuriosityCard (Modo Light)
+
+```kotlin
+// Background: surfaceVariant
+// Borda: 1dp, outline
+// Corner: 16dp
+// Ícone: 📖
+// Título: "Sobre '{palavra}'" — titleMedium
+// Texto: bodyMedium, onSurface — curiosidade estática do puzzle
+// Rodapé: "— Curiosidade do dia" — labelMedium, onSurfaceVariant, italic
+```
+
+### ChatNudge
+
+```kotlin
+// Background: primaryContainer
+// Corner: 12dp
+// Texto: "💬 Quer saber mais sobre '{palavra}'?" — bodyMedium
+// CTA: "Explorar agora" — labelLarge, primary
+// Dismiss: IconButton "✕" no canto superior direito
+// Animação: slide-in de baixo, 250ms
+```
+
+### ConfirmAbandonDialog
+
+```kotlin
+// Dialog padrão Material 3 (AlertDialog)
+// Título: "Abandonar partida?" — headlineMedium
+// Body: "Seu progresso neste jogo será perdido." — bodyLarge
+// Botão primário: "Continuar jogando" — PalabritaButton Primary
+// Botão destrutivo: "Abandonar" — PalabritaButton Destructive
+// Corner: 28dp (Material 3 default)
+```
+
+### SharingCard (compartilhamento visual — futuro)
+
+```kotlin
+// Background: surface
+// Header: "Palabrita 🔥N · Tier · XP" — titleLarge
+// Contexto: "Desafio N/3 ⭐⭐" ou "Livre ⭐⭐⭐" — bodyMedium
+// Grid de emojis: monospaced, bodyLarge
+// Rodapé: dicas + XP — labelMedium, onSurfaceVariant
+// Corner: 16dp
+// Borda: 1dp, outline
+```
+
+### Confetti Animation
+
+```kotlin
+// Trigger: vitória no jogo (todas as células correct)
+// Partículas: 50-80 retângulos/quadrados coloridos
+// Cores: correct (#4ECDC4), present (#FFB347), absent (#FF6B6B), primary
+// Duração: 2s
+// Origem: topo da tela, gravidade para baixo
+// Easing: EaseOut para gravidade
+// Biblioteca sugerida: nl.dionsegijn:konfetti-compose (leve, Compose-native)
+// Fallback: se performance < 60fps, reduzir partículas ou desabilitar
+```
+
+### Badge Component
+
+```kotlin
+// Tamanhos: Small (24dp), Medium (32dp), Large (48dp)
+// Earned: ícone colorido + background tier color
+// Not earned: ícone cinza (unused #787C7E) + background surfaceVariant
+// Progresso: "7/10" — labelMedium abaixo do ícone
+// Corner: 50% (circular)
+// Lendário: efeito shimmer (mesmo do TierBadge)
+```
+
 ## Acessibilidade
 
 - **Contraste mínimo**: WCAG AA (4.5:1 para texto, 3:1 para UI)
@@ -206,3 +365,12 @@ data class GameColors(
 - [ ] TalkBack descreve estados das células sem depender de cor
 - [ ] Theme switching (light/dark) não causa flash ou jank
 - [ ] Emojis de compartilhamento usam 🟦🟧🟥 (não 🟩🟨⬜)
+- [ ] BottomNavigation com 3 tabs e indicador ativo em mint
+- [ ] HomeCards (Streak, Daily, FreePlay, QuickStats) seguem padrão PalabritaCard
+- [ ] ChatCard no ResultScreen usa primaryContainer com borda primary
+- [ ] StaticCuriosityCard aparece em modo Light no lugar do ChatCard
+- [ ] ChatNudge com slide-in animation
+- [ ] ConfirmAbandonDialog segue padrão Material 3
+- [ ] Confetti animation na vitória a 60fps
+- [ ] GenerationIndicator com loading spinner e auto-dismiss
+- [ ] Badge component em 3 tamanhos com shimmer para Lendário

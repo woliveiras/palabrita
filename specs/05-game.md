@@ -45,9 +45,11 @@ Exemplo: palavra = "gatos", tentativa = "gagas"
 - a[3] → ABSENT (coral — 'a' só aparece 1x e já foi usada)
 - s[4] → CORRECT (mint)
 
-### Seleção de Dificuldade (antes do jogo)
+### Seleção de Dificuldade (apenas Modo Livre)
 
-Antes de cada partida, o jogador escolhe a dificuldade:
+> **Nota (Spec 11):** Nos Daily Challenges, a dificuldade é automática (progressiva). O DifficultyPicker só aparece no Modo Livre.
+
+Antes de cada partida no Modo Livre, o jogador escolhe a dificuldade:
 
 ```
 ┌──────────────────────────────┐
@@ -101,7 +103,7 @@ Antes de aceitar uma tentativa:
 
 ```
 ┌──────────────────────────────┐
-│ Header: "Palabrita" + stats  │
+│ ← │ DESAFIO 2/3 │ 💡 3/5    │  ← Header contextual
 ├──────────────────────────────┤
 │                              │
 │     ┌─┬─┬─┬─┬─┬─┐          │
@@ -118,8 +120,7 @@ Antes de aceitar uma tentativa:
 │     │ │ │ │ │ │ │  ← vazia
 │     └─┴─┴─┴─┴─┴─┘          │
 │                              │
-│  [💡 Dica (3/5 restantes)]   │
-│                              │
+
 │  ┌──────────────────────────┐│
 │  │  Q W E R T Y U I O P    ││
 │  │   A S D F G H J K L     ││
@@ -161,43 +162,85 @@ Antes de aceitar uma tentativa:
 - Posição: entre o grid e o teclado (scrollável se necessário)
 - Animação: fade-in + slide de baixo
 
-### Tela de Vitória
+### Header Contextual
+
+O header do jogo mostra contexto diferente para dailies vs free play:
+
+| Modo | Header | Exemplo |
+|------|--------|---------|
+| Daily Challenge | "DESAFIO N/3" | "DESAFIO 2/3" |
+| Free Play | "LIVRE" | "LIVRE" |
+
+**Elementos do header:**
+- **Esquerda**: botão voltar (←) com confirmação "Abandonar partida?"
+- **Centro**: contexto do jogo ("DESAFIO N/3" ou "LIVRE")
+- **Direita**: contador de dicas (💡 3/5)
+
+### Botão Voltar — Confirmação
+
+Ao pressionar ← ou back do sistema durante um jogo ativo:
 
 ```
 ┌──────────────────────────────┐
 │                              │
-│         🎉 Parabéns!         │
+│    Abandonar partida?        │
 │                              │
-│    Você descobriu em X/6     │
+│    Seu progresso neste       │
+│    jogo será perdido.        │
 │                              │
-│    Palavra: GATOS            │
-│    Categoria: Animal         │
-│                              │
-│  [🔍 Explorar a palavra]     │  ← navega para Chat (se AI mode)
-│  [📊 Ver estatísticas]       │
-│  [📤 Compartilhar]           │
-│                              │
-│    Próximo puzzle em XX:XX   │
+│    [Continuar jogando]       │  ← primary
+│    [Abandonar]               │  ← destructive
 │                              │
 └──────────────────────────────┘
 ```
 
-- "Explorar a palavra" → navega para Chat screen (apenas em modo AI)
-- Em modo Light: mostra card estático de curiosidade inline
-- "Compartilhar" → gera grid de emojis (estilo Wordle)
+- "Continuar jogando" → fecha dialog, volta ao jogo
+- "Abandonar" → GameSession marcada como abandoned, navega para Home
+- Se o jogo já terminou (WON/LOST): back navega direto sem confirmação
 
-### Tela de Derrota
+### Tela de Resultado (Vitória e Derrota)
+
+> **Mudança (Spec 12):** O Chat Card é agora o CTA principal do ResultScreen. Ver Spec 12 para detalhes do Chat IA Engagement.
 
 ```
 ┌──────────────────────────────┐
 │                              │
-│       😔 Não foi dessa vez   │
+│     🎉 Parabéns!             │  ← ou "😔 Não foi dessa vez"
+│     Você descobriu em 3/6   │  ← ou "A palavra era: GATOS"
 │                              │
-│    A palavra era: GATOS      │
-│    Categoria: Animal         │
+│     Palavra: GATOS           │
+│     Categoria: Animal        │
+│     +8 XP ✨                 │
 │                              │
-│  [🔍 Explorar a palavra]     │
-│  [📊 Ver estatísticas]       │
+│  ┌────────────────────────┐  │
+│  │  💬 Explore "GATOS"    │  │  ← CTA PRINCIPAL (Spec 12)
+│  │                        │  │
+│  │  🧬 Etimologia         │  │
+│  │  🌎 Curiosidade        │  │
+│  │  📝 Frases de exemplo  │  │
+│  │                        │  │
+│  │  +1 XP bônus ✨        │  │
+│  │                        │  │
+│  │  [ EXPLORAR AGORA ]    │  │
+│  └────────────────────────┘  │
+│                              │
+│  [▶ Jogar de novo]           │  ← secundário
+│  [📤 Compartilhar]           │  ← terciário
+│                              │
+└──────────────────────────────┘
+```
+
+**Hierarquia visual:**
+1. Resultado (parabéns/derrota + palavra + XP ganho)
+2. **Chat Card** (CTA principal — `primaryContainer` bg, borda `primary`)
+3. Jogar de novo (botão secundário)
+4. Compartilhar (botão ghost)
+
+**Modo Light:** Chat Card substituído por curiosidade estática inline (sem navegação).
+
+**"Jogar de novo":**
+- Em daily: navega para o próximo daily (se houver) ou para Home
+- Em free play: volta ao DifficultyPicker
 │                              │
 │    Próximo puzzle em XX:XX   │
 │                              │
@@ -206,28 +249,27 @@ Antes de aceitar uma tentativa:
 
 ### Formato de Compartilhamento
 
-```
-Palabrita ⭐⭐⭐ — 4/6
+> **Mudança (Spec 11):** Puzzles são únicos por jogador (IA local). Não há "puzzle do dia #123". O share destaca streak, tier e XP — identidade do jogador, não do puzzle.
 
-🟥🟧🟥🟥🟥🟥
-🟥🟥🟦🟥🟥🟥
-🟦🟦🟦🟥🟦🟥
-🟦🟦🟦🟦🟦🟦
-
-A palavra era: GATOS
-💡 2 dicas usadas · +4 XP
-```
-
-**Detalhes:**
-- `⭐⭐⭐` = dificuldade escolhida (1-5 estrelas)
-- A palavra é exibida no share — cada jogador tem uma palavra única (gerada por IA), não há risco de spoiler
-- Emoji temático ao lado da palavra (derivado da categoria, opcional — fallback sem emoji)
-- XP ganho no rodapé (incentiva o amigo a jogar em dificuldade alta)
-- Em caso de derrota:
+**Vitória:**
 
 ```
-Palabrita ⭐⭐⭐ — X/6
+Palabrita 🔥12 · Astuto · 350 XP
 
+Desafio 1 ⭐ — 3/6
+🟦🟦🟧⬜⬜
+🟦🟦🟦⬜🟦
+🟦🟦🟦🟦🟦
+
+💡 1 dica usada · +8 XP hoje
+```
+
+**Derrota:**
+
+```
+Palabrita 🔥12 · Astuto · 350 XP
+
+Desafio 2 ⭐⭐ — X/6
 🟥🟧🟥🟥🟥🟥
 🟥🟥🟦🟥🟥🟥
 🟥🟦🟦🟥🟦🟥
@@ -235,9 +277,30 @@ Palabrita ⭐⭐⭐ — X/6
 🟦🟦🟦🟥🟦🟥
 🟥🟦🟦🟦🟦🟥
 
-A palavra era: GATOS
 💡 3 dicas usadas
 ```
+
+**Free play:**
+
+```
+Palabrita 🔥12 · Astuto · 350 XP
+
+Livre ⭐⭐⭐ — 4/6
+🟦🟧🟥🟥🟥🟥
+🟦🟦🟧🟥🟥🟥
+🟦🟦🟦🟥🟦🟥
+🟦🟦🟦🟦🟦🟦
+
+A palavra era: GATOS 🐱
+💡 2 dicas · +4 XP
+```
+
+**Detalhes:**
+- Header: streak + tier + XP total (identidade do jogador)
+- Contexto: "Desafio N/3" ou "Livre" + estrelas de dificuldade
+- Palavra exibida no share (cada jogador tem palavra única, sem spoiler)
+- Emoji temático da categoria (opcional, fallback sem emoji)
+- XP ganho no rodapé
 
 ## Dificuldade Adaptativa
 
@@ -395,8 +458,16 @@ data class GameState(
     val keyboardState: Map<Char, LetterState>,
     val gameStatus: GameStatus,
     val isLoading: Boolean,
-    val error: String?
+    val error: String?,
+    // Novos campos (Spec 10, 11):
+    val gameContext: GameContext = GameContext.FreePlay,
+    val showAbandonDialog: Boolean = false,
 )
+
+sealed class GameContext {
+    data class DailyChallenge(val index: Int, val total: Int = 3) : GameContext()
+    data object FreePlay : GameContext()
+}
 
 data class DifficultyOption(
     val level: Int,
@@ -434,6 +505,9 @@ sealed class GameAction {
     data object NavigateToChat : GameAction()
     data object NavigateToStats : GameAction()
     data object LoadNextPuzzle : GameAction()
+    data object BackPressed : GameAction()         // Novo: confirmar abandono
+    data object ConfirmAbandon : GameAction()       // Novo: confirmar dialog
+    data object DismissAbandonDialog : GameAction() // Novo: cancelar dialog
 }
 ```
 
@@ -477,3 +551,12 @@ sealed class GameAction {
 - [ ] Nível recomendado é destacado
 - [ ] "Explorar a palavra" só aparece em modo AI
 - [ ] WorkManager gera puzzles em background quando estoque < 3
+- [ ] Header mostra "DESAFIO N/3" para dailies e "LIVRE" para free play
+- [ ] Botão voltar durante jogo ativo mostra "Abandonar partida?"
+- [ ] "Continuar jogando" fecha dialog e retorna ao jogo
+- [ ] "Abandonar" marca GameSession como abandoned e navega para Home
+- [ ] Back sem confirmação se jogo já terminou (WON/LOST)
+- [ ] Chat Card é o CTA principal no ResultScreen (acima de "jogar de novo")
+- [ ] Compartilhamento mostra streak + tier + XP no header
+- [ ] Compartilhamento mostra contexto ("Desafio N/3" ou "Livre")
+- [ ] DifficultyPicker só aparece no Modo Livre (não nos dailies)
