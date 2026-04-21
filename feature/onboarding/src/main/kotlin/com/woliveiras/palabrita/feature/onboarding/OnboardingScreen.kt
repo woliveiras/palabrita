@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun OnboardingScreen(onComplete: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Onboarding — TODO")
-    }
+  Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Text("Onboarding — TODO")
+  }
 }

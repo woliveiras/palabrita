@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun ChatScreen(puzzleId: Long, onBack: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Chat — TODO")
-    }
+  Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Text("Chat — TODO")
+  }
 }

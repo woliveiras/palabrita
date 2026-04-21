@@ -9,10 +9,10 @@ import com.woliveiras.palabrita.core.data.db.entity.GameSessionEntity
 @Dao
 interface GameSessionDao {
 
-    @Insert suspend fun insert(session: GameSessionEntity): Long
+  @Insert suspend fun insert(session: GameSessionEntity): Long
 
-    @Update suspend fun update(session: GameSessionEntity)
+  @Update suspend fun update(session: GameSessionEntity)
 
-    @Query("SELECT * FROM game_sessions WHERE puzzleId = :puzzleId")
-    suspend fun getByPuzzleId(puzzleId: Long): GameSessionEntity?
+  @Query("SELECT * FROM game_sessions WHERE puzzleId = :puzzleId")
+  suspend fun getByPuzzleId(puzzleId: Long): GameSessionEntity?
 }

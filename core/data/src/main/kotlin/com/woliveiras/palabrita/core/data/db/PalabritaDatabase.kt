@@ -14,25 +14,25 @@ import com.woliveiras.palabrita.core.data.db.entity.PlayerStatsEntity
 import com.woliveiras.palabrita.core.data.db.entity.PuzzleEntity
 
 @Database(
-    entities =
-        [
-            PuzzleEntity::class,
-            PlayerStatsEntity::class,
-            GameSessionEntity::class,
-            ChatMessageEntity::class,
-            ModelConfigEntity::class,
-        ],
-    version = 1,
-    exportSchema = true,
+  entities =
+    [
+      PuzzleEntity::class,
+      PlayerStatsEntity::class,
+      GameSessionEntity::class,
+      ChatMessageEntity::class,
+      ModelConfigEntity::class,
+    ],
+  version = 1,
+  exportSchema = true,
 )
 abstract class PalabritaDatabase : RoomDatabase() {
-    abstract fun puzzleDao(): PuzzleDao
+  abstract fun puzzleDao(): PuzzleDao
 
-    abstract fun playerStatsDao(): PlayerStatsDao
+  abstract fun playerStatsDao(): PlayerStatsDao
 
-    abstract fun gameSessionDao(): GameSessionDao
+  abstract fun gameSessionDao(): GameSessionDao
 
-    abstract fun chatMessageDao(): ChatMessageDao
+  abstract fun chatMessageDao(): ChatMessageDao
 
-    abstract fun modelConfigDao(): ModelConfigDao
+  abstract fun modelConfigDao(): ModelConfigDao
 }

@@ -9,35 +9,35 @@ import com.woliveiras.palabrita.core.common.StateMachine
  */
 class LlmEngineManager {
 
-    sealed class State {
-        data object Uninitialized : State()
+  sealed class State {
+    data object Uninitialized : State()
 
-        data object Initializing : State()
+    data object Initializing : State()
 
-        data object Ready : State()
+    data object Ready : State()
 
-        data class Error(val message: String) : State()
+    data class Error(val message: String) : State()
+  }
+
+  sealed class Event {
+    data object Initialize : Event()
+
+    data object Success : Event()
+
+    data class Failure(val message: String) : Event()
+
+    data object Destroy : Event()
+
+    data object Retry : Event()
+  }
+
+  val stateMachine =
+    StateMachine.create<State, Event>(initialState = State.Uninitialized) {
+      on<State.Uninitialized, Event.Initialize> { _, _ -> State.Initializing }
+      on<State.Initializing, Event.Success> { _, _ -> State.Ready }
+      on<State.Initializing, Event.Failure> { _, event -> State.Error(event.message) }
+      on<State.Ready, Event.Destroy> { _, _ -> State.Uninitialized }
+      on<State.Error, Event.Retry> { _, _ -> State.Initializing }
+      on<State.Error, Event.Destroy> { _, _ -> State.Uninitialized }
     }
-
-    sealed class Event {
-        data object Initialize : Event()
-
-        data object Success : Event()
-
-        data class Failure(val message: String) : Event()
-
-        data object Destroy : Event()
-
-        data object Retry : Event()
-    }
-
-    val stateMachine =
-        StateMachine.create<State, Event>(initialState = State.Uninitialized) {
-            on<State.Uninitialized, Event.Initialize> { _, _ -> State.Initializing }
-            on<State.Initializing, Event.Success> { _, _ -> State.Ready }
-            on<State.Initializing, Event.Failure> { _, event -> State.Error(event.message) }
-            on<State.Ready, Event.Destroy> { _, _ -> State.Uninitialized }
-            on<State.Error, Event.Retry> { _, _ -> State.Initializing }
-            on<State.Error, Event.Destroy> { _, _ -> State.Uninitialized }
-        }
 }

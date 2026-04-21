@@ -9,11 +9,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PlayerStatsDao {
 
-    @Query("SELECT * FROM player_stats WHERE id = 1")
-    suspend fun get(): PlayerStatsEntity?
+  @Query("SELECT * FROM player_stats WHERE id = 1") suspend fun get(): PlayerStatsEntity?
 
-    @Query("SELECT * FROM player_stats WHERE id = 1")
-    fun observe(): Flow<PlayerStatsEntity?>
+  @Query("SELECT * FROM player_stats WHERE id = 1") fun observe(): Flow<PlayerStatsEntity?>
 
-    @Upsert suspend fun upsert(stats: PlayerStatsEntity)
+  @Upsert suspend fun upsert(stats: PlayerStatsEntity)
 }

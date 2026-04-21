@@ -1,0 +1,17 @@
+{
+  "kotlin.languageServer.enabled": true,
+  "files.exclude": {
+    "**/.gradle": true,
+    "**/build": true,
+    "**/.kotlin": true,
+    "local.properties": true
+  },
+  "search.exclude": {
+    "**/build": true,
+    "**/.gradle": true,
+    "**/.kotlin": true
+  },
+  "files.associations": {
+    "*.gradle.kts": "kotlin"
+  }
+}

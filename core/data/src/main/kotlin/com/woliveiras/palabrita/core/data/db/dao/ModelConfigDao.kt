@@ -9,11 +9,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ModelConfigDao {
 
-    @Query("SELECT * FROM model_config WHERE id = 1")
-    suspend fun get(): ModelConfigEntity?
+  @Query("SELECT * FROM model_config WHERE id = 1") suspend fun get(): ModelConfigEntity?
 
-    @Query("SELECT * FROM model_config WHERE id = 1")
-    fun observe(): Flow<ModelConfigEntity?>
+  @Query("SELECT * FROM model_config WHERE id = 1") fun observe(): Flow<ModelConfigEntity?>
 
-    @Upsert suspend fun upsert(config: ModelConfigEntity)
+  @Upsert suspend fun upsert(config: ModelConfigEntity)
 }

@@ -5,10 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "model_config")
 data class ModelConfigEntity(
-    @PrimaryKey val id: Int = 1,
-    val modelId: String = "none",
-    val downloadState: String = "NOT_DOWNLOADED",
-    val modelPath: String? = null,
-    val sizeBytes: Long = 0,
-    val selectedAt: Long = 0,
+  @PrimaryKey val id: Int = 1,
+  val modelId: String = "none",
+  val downloadState: String = "NOT_DOWNLOADED",
+  val modelPath: String? = null,
+  val sizeBytes: Long = 0,
+  val selectedAt: Long = 0,
 )

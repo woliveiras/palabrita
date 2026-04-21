@@ -21,23 +21,19 @@ import kotlinx.serialization.Serializable
 
 @Composable
 fun PalabritaNavGraph() {
-    val navController = rememberNavController()
+  val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = OnboardingRoute) {
-        composable<OnboardingRoute> {
-            OnboardingScreen(onComplete = { navController.navigate(GameRoute) })
-        }
-        composable<GameRoute> {
-            GameScreen(
-                onNavigateToChat = { puzzleId -> navController.navigate(ChatRoute(puzzleId)) }
-            )
-        }
-        composable<ChatRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<ChatRoute>()
-            ChatScreen(puzzleId = route.puzzleId, onBack = { navController.popBackStack() })
-        }
-        composable<SettingsRoute> {
-            SettingsScreen(onBack = { navController.popBackStack() })
-        }
+  NavHost(navController = navController, startDestination = OnboardingRoute) {
+    composable<OnboardingRoute> {
+      OnboardingScreen(onComplete = { navController.navigate(GameRoute) })
     }
+    composable<GameRoute> {
+      GameScreen(onNavigateToChat = { puzzleId -> navController.navigate(ChatRoute(puzzleId)) })
+    }
+    composable<ChatRoute> { backStackEntry ->
+      val route = backStackEntry.toRoute<ChatRoute>()
+      ChatScreen(puzzleId = route.puzzleId, onBack = { navController.popBackStack() })
+    }
+    composable<SettingsRoute> { SettingsScreen(onBack = { navController.popBackStack() }) }
+  }
 }
