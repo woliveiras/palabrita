@@ -162,6 +162,8 @@
     <string name="error_engine_init">Failed to initialize AI</string>
     <string name="error_download_unknown">Unknown download error</string>
     <string name="error_insufficient_space">Insufficient space. Required: %1$s, Available: %2$s</string>
+    <string name="error_model_gated">This model requires license acceptance on HuggingFace. It is not available for automatic download at this time.</string>
+    <string name="error_download_http">Download error (HTTP %1$d)</string>
 
     <!-- Game: Header -->
     <string name="game_header_daily">CHALLENGE %1$d/%2$d</string>

@@ -162,6 +162,8 @@
     <string name="error_engine_init">Falha ao inicializar IA</string>
     <string name="error_download_unknown">Erro desconhecido no download</string>
     <string name="error_insufficient_space">Espaço insuficiente. Necessário: %1$s, Disponível: %2$s</string>
+    <string name="error_model_gated">Este modelo requer aceitação de licença no HuggingFace. Ele não está disponível para download automático no momento.</string>
+    <string name="error_download_http">Erro no download (HTTP %1$d)</string>
 
     <!-- Game: Header -->
     <string name="game_header_daily">DESAFIO %1$d/%2$d</string>

@@ -45,6 +45,8 @@ interface ModelDownloadManager {
   fun getModelPath(modelId: ModelId): String?
 }
 
+private class ModelGatedException : Exception()
+
 @Singleton
 class ModelDownloadManagerImpl
 @Inject
@@ -106,6 +108,9 @@ constructor(
           } catch (e: kotlin.coroutines.cancellation.CancellationException) {
             _progress.value = ModelDownloadProgress.Idle
             throw e
+          } catch (_: ModelGatedException) {
+            _progress.value =
+              ModelDownloadProgress.Failed(context.getString(com.woliveiras.palabrita.core.common.R.string.error_model_gated))
           } catch (e: Exception) {
             _progress.value =
               ModelDownloadProgress.Failed(e.message ?: context.getString(com.woliveiras.palabrita.core.common.R.string.error_download_unknown))
@@ -132,7 +137,9 @@ constructor(
         val totalBytes: Long
         val startOffset: Long
 
-        if (responseCode == HttpURLConnection.HTTP_PARTIAL) {
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED || responseCode == 403) {
+          throw ModelGatedException()
+        } else if (responseCode == HttpURLConnection.HTTP_PARTIAL) {
           totalBytes = existingBytes + connection.contentLengthLong()
           startOffset = existingBytes
         } else if (responseCode == HttpURLConnection.HTTP_OK) {

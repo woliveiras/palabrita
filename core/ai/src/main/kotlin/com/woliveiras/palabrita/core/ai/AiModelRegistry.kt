@@ -30,7 +30,7 @@ object AiModelRegistry {
       displayName = "Gemma 3 1B",
       fileName = "Gemma3-1B-IT.litertlm",
       downloadUrl =
-        "https://huggingface.co/litert-community/Gemma3-1B-IT-litert-lm/resolve/main/Gemma3-1B-IT.litertlm",
+        "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/Gemma3-1B-IT.litertlm",
       sizeBytes = 1_005_000_000L,
       requiredRamMb = 4096,
     )
