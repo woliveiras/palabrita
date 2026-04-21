@@ -17,14 +17,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Spellcheck
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -108,9 +113,11 @@ private fun WelcomeScreen(onNext: () -> Unit) {
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
-    Text(
-      text = "🔤",
-      style = MaterialTheme.typography.displayLarge,
+    Icon(
+      imageVector = Icons.Rounded.Spellcheck,
+      contentDescription = null,
+      modifier = Modifier.size(72.dp),
+      tint = MaterialTheme.colorScheme.primary,
     )
     Spacer(Modifier.height(24.dp))
     Text(
@@ -157,11 +164,11 @@ private fun LanguageScreen(
     )
     Spacer(Modifier.height(32.dp))
 
-    LanguageCard("🇧🇷", "Português", "pt", selectedLanguage, onSelectLanguage)
+    LanguageCard("PT", "Português", "pt", selectedLanguage, onSelectLanguage)
     Spacer(Modifier.height(12.dp))
-    LanguageCard("🇺🇸", "English", "en", selectedLanguage, onSelectLanguage)
+    LanguageCard("EN", "English", "en", selectedLanguage, onSelectLanguage)
     Spacer(Modifier.height(12.dp))
-    LanguageCard("🇪🇸", "Español", "es", selectedLanguage, onSelectLanguage)
+    LanguageCard("ES", "Español", "es", selectedLanguage, onSelectLanguage)
 
     Spacer(Modifier.weight(1f))
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -198,7 +205,21 @@ private fun LanguageCard(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      Text(text = flag, style = MaterialTheme.typography.headlineMedium)
+      Surface(
+        shape = CircleShape,
+        color = if (code == selected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.size(40.dp),
+      ) {
+        Box(contentAlignment = Alignment.Center) {
+          Text(
+            text = flag,
+            style = MaterialTheme.typography.labelMedium,
+            color = if (code == selected) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+        }
+      }
       Text(text = label, style = MaterialTheme.typography.titleMedium)
     }
   }
