@@ -1,27 +1,62 @@
 package com.woliveiras.palabrita.feature.game
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+sealed class GameEvent {
+  data object NavigateToHome : GameEvent()
+}
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
   private val puzzleRepository: PuzzleRepository,
   private val statsRepository: StatsRepository,
   private val gameSessionRepository: GameSessionRepository,
+  savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(GameState())
   val state: StateFlow<GameState> = _state.asStateFlow()
+
+  private val _events = MutableSharedFlow<GameEvent>()
+  val events = _events.asSharedFlow()
+
+  private val dailyChallengeIndex: Int? =
+    savedStateHandle.get<Int>("dailyChallengeIndex")?.takeIf { it >= 0 }
+  private val dailyChallengeDifficulty: Int? =
+    savedStateHandle.get<Int>("dailyChallengeDifficulty")?.takeIf { it >= 0 }
+
+  init {
+    val context = if (dailyChallengeIndex != null) {
+      GameContext.DailyChallenge(index = dailyChallengeIndex)
+    } else {
+      GameContext.FreePlay
+    }
+    _state.update { it.copy(gameContext = context) }
+
+    if (dailyChallengeIndex != null && dailyChallengeDifficulty != null) {
+      // Daily challenge: skip difficulty picker, start directly
+      _state.update { it.copy(chosenDifficulty = dailyChallengeDifficulty) }
+      startGame()
+    } else {
+      loadDifficultyOptions()
+    }
+  }
 
   fun onAction(action: GameAction) {
     when (action) {
@@ -35,6 +70,10 @@ class GameViewModel @Inject constructor(
       is GameAction.NavigateToChat -> { /* handled by UI */ }
       is GameAction.NavigateToStats -> { /* handled by UI */ }
       is GameAction.LoadNextPuzzle -> loadDifficultyOptions()
+      is GameAction.BackPressed -> handleBackPressed()
+      is GameAction.ConfirmAbandon -> confirmAbandon()
+      is GameAction.DismissAbandonDialog ->
+        _state.update { it.copy(showAbandonDialog = false) }
     }
   }
 
@@ -79,10 +118,13 @@ class GameViewModel @Inject constructor(
             isLoading = false,
           )
         }
+        val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
         gameSessionRepository.create(
           com.woliveiras.palabrita.core.model.GameSession(
             puzzleId = puzzle.id,
             startedAt = System.currentTimeMillis(),
+            dailyChallengeIndex = dailyChallengeIndex,
+            dailyChallengeDate = if (dailyChallengeIndex != null) today else null,
           ),
         )
       } else {
@@ -136,7 +178,7 @@ class GameViewModel @Inject constructor(
 
     if (won || lost) {
       viewModelScope.launch {
-        statsRepository.updateAfterGame(
+        val xp = statsRepository.updateAfterGame(
           won = won,
           attempts = newAttempts.size,
           difficulty = current.chosenDifficulty,
@@ -151,6 +193,10 @@ class GameViewModel @Inject constructor(
             completedAt = System.currentTimeMillis(),
             hintsUsed = current.revealedHints.size,
             won = won,
+            dailyChallengeIndex = dailyChallengeIndex,
+            dailyChallengeDate = if (dailyChallengeIndex != null) {
+              LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            } else null,
           ),
         )
       }
@@ -165,5 +211,19 @@ class GameViewModel @Inject constructor(
     _state.update {
       it.copy(revealedHints = it.revealedHints + puzzle.hints[revealed])
     }
+  }
+
+  private fun handleBackPressed() {
+    val status = _state.value.gameStatus
+    if (status == GameStatus.PLAYING) {
+      _state.update { it.copy(showAbandonDialog = true) }
+    } else {
+      viewModelScope.launch { _events.emit(GameEvent.NavigateToHome) }
+    }
+  }
+
+  private fun confirmAbandon() {
+    _state.update { it.copy(showAbandonDialog = false) }
+    viewModelScope.launch { _events.emit(GameEvent.NavigateToHome) }
   }
 }

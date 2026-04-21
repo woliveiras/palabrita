@@ -162,4 +162,28 @@
     <string name="error_engine_init">Error al inicializar la IA</string>
     <string name="error_download_unknown">Error desconocido en la descarga</string>
     <string name="error_insufficient_space">Espacio insuficiente. Necesario: %1$s, Disponible: %2$s</string>
+
+    <!-- Game: Header -->
+    <string name="game_header_daily">DESAFÍO %1$d/%2$d</string>
+    <string name="game_header_free">LIBRE</string>
+
+    <!-- Game: Abandon Dialog -->
+    <string name="abandon_title">¿Abandonar partida?</string>
+    <string name="abandon_message">Tu progreso en este juego se perderá.</string>
+    <string name="abandon_continue">Seguir jugando</string>
+    <string name="abandon_confirm">Abandonar</string>
+
+    <!-- Game: Result — Chat Card -->
+    <string name="result_next_daily">Siguiente desafío</string>
+    <string name="chat_card_title">Explora \"%s\"</string>
+    <string name="chat_suggestion_etymology">Etimología</string>
+    <string name="chat_suggestion_curiosity">Curiosidad</string>
+    <string name="chat_suggestion_examples">Ejemplos</string>
+    <string name="chat_card_bonus">+1 XP bonus ✨</string>
+    <string name="chat_card_cta">EXPLORAR AHORA</string>
+
+    <!-- Home -->
+    <string name="home_tab">Home</string>
+    <string name="stats_tab">Stats</string>
+    <string name="more_tab">Más</string>
 </resources>

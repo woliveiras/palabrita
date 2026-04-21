@@ -50,6 +50,7 @@ dependencies {
   implementation(project(":core:ai"))
   implementation(project(":core:common"))
   implementation(project(":feature:onboarding"))
+  implementation(project(":feature:home"))
   implementation(project(":feature:game"))
   implementation(project(":feature:chat"))
   implementation(project(":feature:settings"))
@@ -59,6 +60,7 @@ dependencies {
   implementation(libs.compose.ui.graphics)
   implementation(libs.compose.ui.tooling.preview)
   implementation(libs.compose.material3)
+  implementation(libs.compose.material.icons.extended)
   debugImplementation(libs.compose.ui.tooling)
   debugImplementation(libs.compose.ui.test.manifest)
 

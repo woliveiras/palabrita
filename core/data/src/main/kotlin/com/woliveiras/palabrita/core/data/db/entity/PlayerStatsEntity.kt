@@ -22,4 +22,5 @@ data class PlayerStatsEntity(
   val wordSizePreference: String = "DEFAULT",
   val guessDistribution: String = "{}",
   val lastPlayedAt: Long = 0,
+  val lastDailyDate: String? = null,
 )

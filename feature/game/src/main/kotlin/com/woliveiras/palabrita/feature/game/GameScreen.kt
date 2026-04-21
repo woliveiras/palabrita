@@ -22,17 +22,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Backspace
-import androidx.compose.material.icons.rounded.EmojiEvents
-import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Star
@@ -41,8 +36,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,9 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,13 +67,28 @@ import com.woliveiras.palabrita.core.common.R as CommonR
 fun GameScreen(
   onNavigateToChat: (Long) -> Unit,
   onNavigateToSettings: () -> Unit,
+  onNavigateToHome: () -> Unit,
+  dailyChallengeIndex: Int? = null,
+  dailyChallengeDifficulty: Int? = null,
   modifier: Modifier = Modifier,
   viewModel: GameViewModel = hiltViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
 
   LaunchedEffect(Unit) {
-    viewModel.loadDifficultyOptions()
+    viewModel.events.collect { event ->
+      when (event) {
+        GameEvent.NavigateToHome -> onNavigateToHome()
+      }
+    }
+  }
+
+  // Abandon dialog
+  if (state.showAbandonDialog) {
+    AbandonDialog(
+      onContinue = { viewModel.onAction(GameAction.DismissAbandonDialog) },
+      onAbandon = { viewModel.onAction(GameAction.ConfirmAbandon) },
+    )
   }
 
   AnimatedContent(
@@ -105,25 +111,29 @@ fun GameScreen(
         onDelete = { viewModel.onAction(GameAction.DeleteLetter) },
         onSubmit = { viewModel.onAction(GameAction.SubmitAttempt) },
         onRevealHint = { viewModel.onAction(GameAction.RevealHint) },
-        onSettings = onNavigateToSettings,
+        onBack = { viewModel.onAction(GameAction.BackPressed) },
       )
       GameStatus.WON -> ResultScreen(
         won = true,
         puzzle = state.puzzle,
         attempts = state.attempts,
         hintsUsed = state.revealedHints.size,
+        gameContext = state.gameContext,
         onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
         onShare = { viewModel.onAction(GameAction.ShareResult) },
         onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
+        onHome = onNavigateToHome,
       )
       GameStatus.LOST -> ResultScreen(
         won = false,
         puzzle = state.puzzle,
         attempts = state.attempts,
         hintsUsed = state.revealedHints.size,
+        gameContext = state.gameContext,
         onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
         onShare = { viewModel.onAction(GameAction.ShareResult) },
         onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
+        onHome = onNavigateToHome,
       )
     }
   }
@@ -272,51 +282,33 @@ private fun LoadingScreen() {
 // --- Game Top Bar ---
 
 @Composable
-private fun GameTopBar(onSettings: () -> Unit) {
-  var menuExpanded by remember { mutableStateOf(false) }
-
+private fun GameTopBar(gameContext: GameContext, onBack: () -> Unit, hintsRemaining: Int, totalHints: Int) {
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Box {
-      IconButton(onClick = { menuExpanded = true }) {
-        Icon(Icons.Rounded.Menu, contentDescription = stringResource(CommonR.string.menu))
-      }
-      DropdownMenu(
-        expanded = menuExpanded,
-        onDismissRequest = { menuExpanded = false },
-      ) {
-        DropdownMenuItem(
-          text = { Text(stringResource(CommonR.string.menu_home)) },
-          onClick = { menuExpanded = false },
-          leadingIcon = { Icon(Icons.Rounded.Home, contentDescription = null) },
-        )
-        DropdownMenuItem(
-          text = { Text(stringResource(CommonR.string.menu_scores)) },
-          onClick = { menuExpanded = false },
-          leadingIcon = { Icon(Icons.Rounded.EmojiEvents, contentDescription = null) },
-        )
-        DropdownMenuItem(
-          text = { Text(stringResource(CommonR.string.settings)) },
-          onClick = {
-            menuExpanded = false
-            onSettings()
-          },
-          leadingIcon = { Icon(Icons.Rounded.Settings, contentDescription = null) },
-        )
-      }
+    IconButton(onClick = onBack) {
+      Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(CommonR.string.back))
     }
 
     Text(
-      text = stringResource(CommonR.string.app_name_display),
+      text = when (gameContext) {
+        is GameContext.DailyChallenge -> stringResource(CommonR.string.game_header_daily, gameContext.index + 1, gameContext.total)
+        is GameContext.FreePlay -> stringResource(CommonR.string.game_header_free)
+      },
       style = MaterialTheme.typography.titleMedium,
       fontWeight = FontWeight.Bold,
     )
 
-    IconButton(onClick = { /* TODO: navigate to profile */ }) {
-      Icon(Icons.Rounded.Person, contentDescription = stringResource(CommonR.string.profile))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(16.dp))
+      Spacer(Modifier.width(2.dp))
+      Text(
+        text = "$hintsRemaining/$totalHints",
+        style = MaterialTheme.typography.labelMedium,
+      )
+      Spacer(Modifier.width(8.dp))
     }
   }
 }
@@ -330,11 +322,12 @@ private fun PlayingScreen(
   onDelete: () -> Unit,
   onSubmit: () -> Unit,
   onRevealHint: () -> Unit,
-  onSettings: () -> Unit,
+  onBack: () -> Unit,
 ) {
   val puzzle = state.puzzle ?: return
   val wordLength = puzzle.word.length
   var showHintsDialog by remember { mutableStateOf(false) }
+  val hintsRemaining = puzzle.hints.size - state.revealedHints.size
 
   Column(
     modifier = Modifier
@@ -344,8 +337,13 @@ private fun PlayingScreen(
       .padding(horizontal = 8.dp, vertical = 8.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    // Top Bar
-    GameTopBar(onSettings = onSettings)
+    // Top Bar — contextual header
+    GameTopBar(
+      gameContext = state.gameContext,
+      onBack = onBack,
+      hintsRemaining = hintsRemaining,
+      totalHints = puzzle.hints.size,
+    )
     Spacer(Modifier.height(8.dp))
 
     // Word Grid — fluid, edge-to-edge
@@ -369,7 +367,6 @@ private fun PlayingScreen(
     Spacer(Modifier.weight(0.3f))
 
     // Hint button
-    val hintsRemaining = puzzle.hints.size - state.revealedHints.size
     FilledTonalButton(
       onClick = {
         if (hintsRemaining > 0) onRevealHint()
@@ -620,6 +617,33 @@ private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit, mo
   }
 }
 
+// --- Abandon Dialog ---
+
+@Composable
+private fun AbandonDialog(
+  onContinue: () -> Unit,
+  onAbandon: () -> Unit,
+) {
+  AlertDialog(
+    onDismissRequest = onContinue,
+    title = { Text(stringResource(CommonR.string.abandon_title)) },
+    text = { Text(stringResource(CommonR.string.abandon_message)) },
+    confirmButton = {
+      Button(onClick = onContinue) {
+        Text(stringResource(CommonR.string.abandon_continue))
+      }
+    },
+    dismissButton = {
+      TextButton(onClick = onAbandon) {
+        Text(
+          stringResource(CommonR.string.abandon_confirm),
+          color = MaterialTheme.colorScheme.error,
+        )
+      }
+    },
+  )
+}
+
 // --- Result Screen ---
 
 @Composable
@@ -628,9 +652,11 @@ private fun ResultScreen(
   puzzle: com.woliveiras.palabrita.core.model.Puzzle?,
   attempts: List<Attempt>,
   hintsUsed: Int,
+  gameContext: GameContext,
   onExplore: () -> Unit,
   onShare: () -> Unit,
   onPlayAgain: () -> Unit,
+  onHome: () -> Unit,
 ) {
   Column(
     modifier = Modifier
@@ -677,22 +703,81 @@ private fun ResultScreen(
       )
     }
 
-    Spacer(Modifier.height(32.dp))
+    Spacer(Modifier.height(24.dp))
 
+    // Chat Card — CTA principal (only in AI mode)
     if (puzzle?.source == com.woliveiras.palabrita.core.model.PuzzleSource.AI) {
-      OutlinedButton(onClick = onExplore, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(CommonR.string.result_explore))
-      }
-      Spacer(Modifier.height(8.dp))
+      ChatCardCta(
+        word = puzzle.wordDisplay,
+        onExplore = onExplore,
+      )
+      Spacer(Modifier.height(16.dp))
     }
 
-    Button(onClick = onShare, modifier = Modifier.fillMaxWidth()) {
-      Text(stringResource(CommonR.string.share))
+    // Play Again / Go Home
+    val playAgainText = when (gameContext) {
+      is GameContext.DailyChallenge -> stringResource(CommonR.string.result_next_daily)
+      is GameContext.FreePlay -> stringResource(CommonR.string.play_again)
+    }
+    OutlinedButton(onClick = {
+      when (gameContext) {
+        is GameContext.DailyChallenge -> onHome()
+        is GameContext.FreePlay -> onPlayAgain()
+      }
+    }, modifier = Modifier.fillMaxWidth()) {
+      Text(playAgainText)
     }
 
     Spacer(Modifier.height(8.dp))
-    OutlinedButton(onClick = onPlayAgain, modifier = Modifier.fillMaxWidth()) {
-      Text(stringResource(CommonR.string.play_again))
+    TextButton(onClick = onShare) {
+      Text(stringResource(CommonR.string.share))
+    }
+  }
+}
+
+// --- Chat Card CTA ---
+
+@Composable
+private fun ChatCardCta(
+  word: String,
+  onExplore: () -> Unit,
+) {
+  Card(
+    modifier = Modifier.fillMaxWidth(),
+    colors = CardDefaults.cardColors(
+      containerColor = MaterialTheme.colorScheme.primaryContainer,
+    ),
+    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+    shape = RoundedCornerShape(16.dp),
+  ) {
+    Column(
+      modifier = Modifier.padding(16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      Text(
+        text = "\uD83D\uDCAC ${stringResource(CommonR.string.chat_card_title, word)}",
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+      )
+      Spacer(Modifier.height(8.dp))
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+      ) {
+        Text("\uD83E\uDDEC ${stringResource(CommonR.string.chat_suggestion_etymology)}", style = MaterialTheme.typography.labelMedium)
+        Text("\uD83C\uDF0E ${stringResource(CommonR.string.chat_suggestion_curiosity)}", style = MaterialTheme.typography.labelMedium)
+        Text("\uD83D\uDCDD ${stringResource(CommonR.string.chat_suggestion_examples)}", style = MaterialTheme.typography.labelMedium)
+      }
+      Spacer(Modifier.height(8.dp))
+      Text(
+        text = stringResource(CommonR.string.chat_card_bonus),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary,
+      )
+      Spacer(Modifier.height(12.dp))
+      Button(onClick = onExplore, modifier = Modifier.fillMaxWidth()) {
+        Text(stringResource(CommonR.string.chat_card_cta))
+      }
     }
   }
 }

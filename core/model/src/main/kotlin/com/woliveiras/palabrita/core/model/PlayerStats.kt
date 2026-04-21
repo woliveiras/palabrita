@@ -18,4 +18,5 @@ data class PlayerStats(
   val wordSizePreference: String = "DEFAULT",
   val guessDistribution: Map<Int, Int> = emptyMap(),
   val lastPlayedAt: Long = 0,
+  val lastDailyDate: String? = null,
 )

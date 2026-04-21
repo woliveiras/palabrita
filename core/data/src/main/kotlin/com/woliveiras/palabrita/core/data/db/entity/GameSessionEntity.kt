@@ -13,4 +13,7 @@ data class GameSessionEntity(
   val completedAt: Long? = null,
   val hintsUsed: Int = 0,
   val won: Boolean = false,
+  val dailyChallengeIndex: Int? = null,
+  val dailyChallengeDate: String? = null,
+  val chatExplored: Boolean = false,
 )

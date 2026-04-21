@@ -8,4 +8,6 @@ interface GameSessionRepository {
   suspend fun getByPuzzleId(puzzleId: Long): GameSession?
   suspend fun hasActiveGame(): Boolean
   suspend fun deleteAll()
+  suspend fun getDailyChallengesForDate(date: String): List<GameSession>
+  suspend fun countCompletedDailies(date: String): Int
 }

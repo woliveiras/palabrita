@@ -162,4 +162,28 @@
     <string name="error_engine_init">Failed to initialize AI</string>
     <string name="error_download_unknown">Unknown download error</string>
     <string name="error_insufficient_space">Insufficient space. Required: %1$s, Available: %2$s</string>
+
+    <!-- Game: Header -->
+    <string name="game_header_daily">CHALLENGE %1$d/%2$d</string>
+    <string name="game_header_free">FREE PLAY</string>
+
+    <!-- Game: Abandon Dialog -->
+    <string name="abandon_title">Abandon game?</string>
+    <string name="abandon_message">Your progress in this game will be lost.</string>
+    <string name="abandon_continue">Keep playing</string>
+    <string name="abandon_confirm">Abandon</string>
+
+    <!-- Game: Result — Chat Card -->
+    <string name="result_next_daily">Next challenge</string>
+    <string name="chat_card_title">Explore \"%s\"</string>
+    <string name="chat_suggestion_etymology">Etymology</string>
+    <string name="chat_suggestion_curiosity">Fun fact</string>
+    <string name="chat_suggestion_examples">Examples</string>
+    <string name="chat_card_bonus">+1 XP bonus ✨</string>
+    <string name="chat_card_cta">EXPLORE NOW</string>
+
+    <!-- Home -->
+    <string name="home_tab">Home</string>
+    <string name="stats_tab">Stats</string>
+    <string name="more_tab">More</string>
 </resources>

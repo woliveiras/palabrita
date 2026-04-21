@@ -13,4 +13,7 @@ sealed class GameAction {
   data object NavigateToChat : GameAction()
   data object NavigateToStats : GameAction()
   data object LoadNextPuzzle : GameAction()
+  data object BackPressed : GameAction()
+  data object ConfirmAbandon : GameAction()
+  data object DismissAbandonDialog : GameAction()
 }
