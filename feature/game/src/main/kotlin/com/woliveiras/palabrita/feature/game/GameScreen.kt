@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,15 +21,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Backspace
+import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Star
@@ -37,8 +41,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
@@ -56,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -97,6 +105,7 @@ fun GameScreen(
         onDelete = { viewModel.onAction(GameAction.DeleteLetter) },
         onSubmit = { viewModel.onAction(GameAction.SubmitAttempt) },
         onRevealHint = { viewModel.onAction(GameAction.RevealHint) },
+        onSettings = onNavigateToSettings,
       )
       GameStatus.WON -> ResultScreen(
         won = true,
@@ -141,7 +150,7 @@ private fun DifficultyPickerScreen(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.End,
     ) {
-      androidx.compose.material3.IconButton(onClick = onSettings) {
+      IconButton(onClick = onSettings) {
         Icon(
           Icons.Rounded.Settings,
           contentDescription = stringResource(CommonR.string.settings),
@@ -260,6 +269,58 @@ private fun LoadingScreen() {
   }
 }
 
+// --- Game Top Bar ---
+
+@Composable
+private fun GameTopBar(onSettings: () -> Unit) {
+  var menuExpanded by remember { mutableStateOf(false) }
+
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Box {
+      IconButton(onClick = { menuExpanded = true }) {
+        Icon(Icons.Rounded.Menu, contentDescription = stringResource(CommonR.string.menu))
+      }
+      DropdownMenu(
+        expanded = menuExpanded,
+        onDismissRequest = { menuExpanded = false },
+      ) {
+        DropdownMenuItem(
+          text = { Text(stringResource(CommonR.string.menu_home)) },
+          onClick = { menuExpanded = false },
+          leadingIcon = { Icon(Icons.Rounded.Home, contentDescription = null) },
+        )
+        DropdownMenuItem(
+          text = { Text(stringResource(CommonR.string.menu_scores)) },
+          onClick = { menuExpanded = false },
+          leadingIcon = { Icon(Icons.Rounded.EmojiEvents, contentDescription = null) },
+        )
+        DropdownMenuItem(
+          text = { Text(stringResource(CommonR.string.settings)) },
+          onClick = {
+            menuExpanded = false
+            onSettings()
+          },
+          leadingIcon = { Icon(Icons.Rounded.Settings, contentDescription = null) },
+        )
+      }
+    }
+
+    Text(
+      text = stringResource(CommonR.string.app_name_display),
+      style = MaterialTheme.typography.titleMedium,
+      fontWeight = FontWeight.Bold,
+    )
+
+    IconButton(onClick = { /* TODO: navigate to profile */ }) {
+      Icon(Icons.Rounded.Person, contentDescription = stringResource(CommonR.string.profile))
+    }
+  }
+}
+
 // --- Playing ---
 
 @Composable
@@ -269,6 +330,7 @@ private fun PlayingScreen(
   onDelete: () -> Unit,
   onSubmit: () -> Unit,
   onRevealHint: () -> Unit,
+  onSettings: () -> Unit,
 ) {
   val puzzle = state.puzzle ?: return
   val wordLength = puzzle.word.length
@@ -282,24 +344,29 @@ private fun PlayingScreen(
       .padding(horizontal = 8.dp, vertical = 8.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    // Header
-    Text(
-      text = "Palabrita",
-      style = MaterialTheme.typography.titleMedium,
-      fontWeight = FontWeight.Bold,
-    )
+    // Top Bar
+    GameTopBar(onSettings = onSettings)
     Spacer(Modifier.height(8.dp))
 
-    // Word Grid — fluid width, capped at 400dp
-    WordGrid(
-      attempts = state.attempts,
-      currentInput = state.currentInput,
-      wordLength = wordLength,
-      maxAttempts = 6,
-      modifier = Modifier.fillMaxWidth().widthIn(max = 400.dp),
-    )
+    // Word Grid — fluid, edge-to-edge
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+      val gap = 4.dp
+      val totalGap = gap * (wordLength - 1)
+      val tileFromWidth = (maxWidth - totalGap) / wordLength
+      val maxTile = 72.dp
+      val tileSize = minOf(tileFromWidth, maxTile)
 
-    Spacer(Modifier.height(8.dp))
+      WordGrid(
+        attempts = state.attempts,
+        currentInput = state.currentInput,
+        wordLength = wordLength,
+        maxAttempts = 6,
+        tileSize = tileSize,
+      )
+    }
+
+    // Space above hint button
+    Spacer(Modifier.weight(0.3f))
 
     // Hint button
     val hintsRemaining = puzzle.hints.size - state.revealedHints.size
@@ -320,8 +387,8 @@ private fun PlayingScreen(
       )
     }
 
-    // Push keyboard to bottom
-    Spacer(Modifier.weight(1f))
+    // Space below hint button — push keyboard toward bottom
+    Spacer(Modifier.weight(0.7f))
 
     // Keyboard
     GameKeyboard(
@@ -349,12 +416,12 @@ private fun WordGrid(
   currentInput: String,
   wordLength: Int,
   maxAttempts: Int,
-  modifier: Modifier = Modifier,
+  tileSize: Dp,
 ) {
   Column(
-    modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(4.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
+    modifier = Modifier.fillMaxWidth(),
   ) {
     for (row in 0 until maxAttempts) {
       Row(
@@ -363,23 +430,20 @@ private fun WordGrid(
       ) {
         when {
           row < attempts.size -> {
-            // Submitted attempt
             val attempt = attempts[row]
             attempt.feedback.forEach { fb ->
-              LetterCell(letter = fb.letter, state = fb.state)
+              LetterCell(letter = fb.letter, state = fb.state, size = tileSize)
             }
           }
           row == attempts.size -> {
-            // Current input row
             for (col in 0 until wordLength) {
               val letter = currentInput.getOrNull(col)
-              LetterCell(letter = letter, state = LetterState.UNUSED)
+              LetterCell(letter = letter, state = LetterState.UNUSED, size = tileSize)
             }
           }
           else -> {
-            // Empty row
             repeat(wordLength) {
-              LetterCell(letter = null, state = LetterState.UNUSED)
+              LetterCell(letter = null, state = LetterState.UNUSED, size = tileSize)
             }
           }
         }
@@ -389,7 +453,7 @@ private fun WordGrid(
 }
 
 @Composable
-private fun LetterCell(letter: Char?, state: LetterState) {
+private fun LetterCell(letter: Char?, state: LetterState, size: Dp) {
   val gameColors = LocalGameColors.current
   val bgColor = when (state) {
     LetterState.CORRECT -> gameColors.correct
@@ -403,13 +467,13 @@ private fun LetterCell(letter: Char?, state: LetterState) {
 
   Box(
     modifier = Modifier
-      .size(62.dp)
+      .size(size)
       .background(bgColor, RoundedCornerShape(6.dp)),
     contentAlignment = Alignment.Center,
   ) {
     Text(
       text = letter?.uppercaseChar()?.toString() ?: "",
-      fontSize = 24.sp,
+      fontSize = 28.sp,
       fontWeight = FontWeight.Bold,
       color = textColor,
     )

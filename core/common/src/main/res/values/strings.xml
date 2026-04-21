@@ -66,6 +66,13 @@
     <string name="difficulty_expert">Expert</string>
     <string name="play">Jogar</string>
 
+    <!-- Game: Top Bar -->
+    <string name="app_name_display">Palabrita</string>
+    <string name="menu">Menu</string>
+    <string name="menu_home">Início</string>
+    <string name="menu_scores">Pontuação</string>
+    <string name="profile">Perfil</string>
+
     <!-- Game: Playing -->
     <string name="loading_puzzle">Preparando puzzle…</string>
     <string name="hint_button">Dica (%1$d/%2$d)</string>
