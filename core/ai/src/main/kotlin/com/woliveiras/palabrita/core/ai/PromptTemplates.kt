@@ -5,7 +5,9 @@ object PromptTemplates {
   fun puzzleSystemPromptGemma4(): String =
     """
     You are a word generator for a guessing game.
-    Always respond using the provided function. Never add text outside the function call.
+    Always respond with ONLY a JSON object. No markdown, no code fences, no explanation.
+    The JSON keys MUST be in English: "word", "category", "difficulty", "hints".
+    The values for word, category, and hints must be in the requested language.
     """
       .trimIndent()
 
@@ -18,13 +20,19 @@ object PromptTemplates {
   ): String {
     val rarity = difficultyToRarity(difficulty)
     return """
-      Generate a word for the game.
-      Output language: $language
-      Difficulty: $difficulty (1=easy, 5=hard)
-      Length: $minLength-$maxLength letters
-      Word rarity: $rarity
-      The word, category, and hints MUST be in $language.
-      Avoid these recent words: ${recentWords.joinToString(", ")}
+      Generate a word for the game. Return ONLY a JSON object, no markdown.
+
+      Required JSON format (keys MUST be in English):
+      {"word": "string", "category": "string", "difficulty": number, "hints": ["h1","h2","h3","h4","h5"]}
+
+      Rules:
+      - Output language for values: $language
+      - The word MUST be a common noun in $language, $minLength-$maxLength lowercase letters, no accents
+      - Word rarity: $rarity
+      - difficulty: $difficulty (1=easy, 5=hard)
+      - Exactly 5 progressive hints in $language: from vaguest to most specific
+      - Hints MUST NOT contain the word itself
+      - Avoid these recent words: ${recentWords.joinToString(", ")}
     """
       .trimIndent()
   }
@@ -38,18 +46,18 @@ object PromptTemplates {
   ): String {
     val rarity = difficultyToRarity(difficulty)
     return """
-      You are a word generator for a game. Return ONLY valid JSON, no extra text.
+      You are a word generator for a game. Return ONLY a JSON object, no markdown, no code fences.
 
-      Schema:
-      {"word": "string", "category": "string", "difficulty": number, "hints": ["string","string","string","string","string"]}
+      Required JSON format (keys MUST be in English exactly as shown):
+      {"word": "string", "category": "string", "difficulty": number, "hints": ["h1","h2","h3","h4","h5"]}
 
       Rules:
-      - The word MUST be a common noun in $language, $minLength-$maxLength letters
+      - The word MUST be a common noun in $language, $minLength-$maxLength lowercase letters, no accents
       - Word rarity: $rarity
-      - No proper nouns, no accents, lowercase only
+      - No proper nouns
       - difficulty: $difficulty (1=easy, 5=hard)
-      - 5 progressive hints: from vaguest to most specific, written in $language
-      - Hints MUST NOT contain the word
+      - Exactly 5 progressive hints in $language: from vaguest to most specific
+      - Hints MUST NOT contain the word itself
       - Avoid these recent words: ${recentWords.joinToString(", ")}
     """
       .trimIndent()

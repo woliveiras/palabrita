@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.core.ai
 
+import android.util.Log
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.PuzzleSource
@@ -14,6 +15,7 @@ interface PuzzleGenerator {
     recentWords: List<String>,
     allExistingWords: Set<String>,
     modelId: ModelId,
+    onPuzzleAttempted: suspend (successCount: Int) -> Unit = {},
   ): List<Puzzle>
 }
 
@@ -33,12 +35,15 @@ constructor(
     recentWords: List<String>,
     allExistingWords: Set<String>,
     modelId: ModelId,
+    onPuzzleAttempted: suspend (successCount: Int) -> Unit,
   ): List<Puzzle> {
     require(engineManager.isReady()) { "Engine not ready" }
 
     val wordLength = difficultyToWordLength(targetDifficulty)
     val generated = mutableListOf<Puzzle>()
     val usedWords = allExistingWords.toMutableSet()
+
+    Log.i(TAG, "generateBatch: difficulty=$targetDifficulty count=$count length=$wordLength")
 
     for (i in 0 until count) {
       val puzzle =
@@ -53,9 +58,14 @@ constructor(
       if (puzzle != null) {
         generated.add(puzzle)
         usedWords.add(puzzle.word)
+        Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
+      } else {
+        Log.w(TAG, "  puzzle ${i + 1}/$count FAILED after $MAX_RETRIES retries")
       }
+      onPuzzleAttempted(generated.size)
     }
 
+    Log.i(TAG, "generateBatch: done, ${generated.size}/$count succeeded")
     return generated
   }
 
@@ -69,12 +79,27 @@ constructor(
   ): Puzzle? {
     repeat(MAX_RETRIES) { attempt ->
       val rawResponse = callLlm(language, difficulty, wordLength, recentWords, modelId, attempt)
+      Log.d(
+        TAG,
+        "  attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(300)}",
+      )
       val parseResult = parser.parsePuzzle(rawResponse)
 
-      if (parseResult is ParseResult.Success) {
-        val validation = validator.validate(parseResult.data, usedWords, wordLength)
-        if (validation is ValidationResult.Valid) {
-          return puzzleFromResponse(parseResult.data, language, difficulty)
+      when (parseResult) {
+        is ParseResult.Success -> {
+          val validation = validator.validate(parseResult.data, usedWords, wordLength)
+          when (validation) {
+            is ValidationResult.Valid -> {
+              Log.d(TAG, "  attempt $attempt VALID: '${parseResult.data.word}'")
+              return puzzleFromResponse(parseResult.data, language, difficulty)
+            }
+            is ValidationResult.Invalid -> {
+              Log.w(TAG, "  attempt $attempt validation failed: ${validation.reasons}")
+            }
+          }
+        }
+        is ParseResult.Error -> {
+          Log.w(TAG, "  attempt $attempt parse failed: ${parseResult.reason}")
         }
       }
     }
@@ -168,6 +193,7 @@ constructor(
     )
 
   companion object {
+    private const val TAG = "PuzzleGenerator"
     private const val MAX_RETRIES = 3
 
     fun difficultyToWordLength(difficulty: Int): IntRange =

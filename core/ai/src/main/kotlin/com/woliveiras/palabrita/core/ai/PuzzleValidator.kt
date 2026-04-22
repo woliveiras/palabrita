@@ -29,9 +29,9 @@ class PuzzleValidatorImpl @Inject constructor() : PuzzleValidator {
       reasons.add("duplicate word '$word'")
     }
 
-    // Hints count
-    if (puzzle.hints.size != 5) {
-      reasons.add("expected exactly 5 hints, got ${puzzle.hints.size}")
+    // Hints count (accept 2-5; small models may produce fewer)
+    if (puzzle.hints.size !in 2..5) {
+      reasons.add("expected 2-5 hints, got ${puzzle.hints.size}")
     }
 
     // Hints must not contain the word

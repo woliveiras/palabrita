@@ -81,7 +81,16 @@ constructor(
             recentWords = recentWords,
             allExistingWords = existingWords,
             modelId = modelId,
-          )
+          ) { batchSuccess ->
+            val currentTotal = totalGenerated + batchSuccess
+            setProgress(
+              workDataOf(
+                KEY_CURRENT_DIFFICULTY to difficulty,
+                KEY_GENERATED_COUNT to currentTotal,
+                KEY_TOTAL_EXPECTED to totalExpected,
+              )
+            )
+          }
         puzzleRepository.savePuzzles(puzzles)
         totalGenerated += puzzles.size
       } catch (_: Exception) {
