@@ -68,8 +68,7 @@ fun GameScreen(
   onNavigateToChat: (Long) -> Unit,
   onNavigateToSettings: () -> Unit,
   onNavigateToHome: () -> Unit,
-  dailyChallengeIndex: Int? = null,
-  dailyChallengeDifficulty: Int? = null,
+  onNoPuzzlesLeft: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: GameViewModel = hiltViewModel(),
 ) {
@@ -79,6 +78,7 @@ fun GameScreen(
     viewModel.events.collect { event ->
       when (event) {
         GameEvent.NavigateToHome -> onNavigateToHome()
+        GameEvent.NoPuzzlesLeft -> onNoPuzzlesLeft()
       }
     }
   }
@@ -118,7 +118,6 @@ fun GameScreen(
         puzzle = state.puzzle,
         attempts = state.attempts,
         hintsUsed = state.revealedHints.size,
-        gameContext = state.gameContext,
         onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
         onShare = { viewModel.onAction(GameAction.ShareResult) },
         onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
@@ -129,7 +128,6 @@ fun GameScreen(
         puzzle = state.puzzle,
         attempts = state.attempts,
         hintsUsed = state.revealedHints.size,
-        gameContext = state.gameContext,
         onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
         onShare = { viewModel.onAction(GameAction.ShareResult) },
         onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
@@ -282,7 +280,7 @@ private fun LoadingScreen() {
 // --- Game Top Bar ---
 
 @Composable
-private fun GameTopBar(gameContext: GameContext, onBack: () -> Unit, hintsRemaining: Int, totalHints: Int) {
+private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int) {
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceBetween,
@@ -293,10 +291,7 @@ private fun GameTopBar(gameContext: GameContext, onBack: () -> Unit, hintsRemain
     }
 
     Text(
-      text = when (gameContext) {
-        is GameContext.DailyChallenge -> stringResource(CommonR.string.game_header_daily, gameContext.index + 1, gameContext.total)
-        is GameContext.FreePlay -> stringResource(CommonR.string.game_header_free)
-      },
+      text = stringResource(CommonR.string.game_header_free),
       style = MaterialTheme.typography.titleMedium,
       fontWeight = FontWeight.Bold,
     )
@@ -339,7 +334,6 @@ private fun PlayingScreen(
   ) {
     // Top Bar — contextual header
     GameTopBar(
-      gameContext = state.gameContext,
       onBack = onBack,
       hintsRemaining = hintsRemaining,
       totalHints = puzzle.hints.size,
@@ -652,7 +646,6 @@ private fun ResultScreen(
   puzzle: com.woliveiras.palabrita.core.model.Puzzle?,
   attempts: List<Attempt>,
   hintsUsed: Int,
-  gameContext: GameContext,
   onExplore: () -> Unit,
   onShare: () -> Unit,
   onPlayAgain: () -> Unit,
@@ -705,8 +698,8 @@ private fun ResultScreen(
 
     Spacer(Modifier.height(24.dp))
 
-    // Chat Card — CTA principal (only in AI mode)
-    if (puzzle?.source == com.woliveiras.palabrita.core.model.PuzzleSource.AI) {
+    // Chat Card — CTA principal
+    if (puzzle != null) {
       ChatCardCta(
         word = puzzle.wordDisplay,
         onExplore = onExplore,
@@ -715,17 +708,8 @@ private fun ResultScreen(
     }
 
     // Play Again / Go Home
-    val playAgainText = when (gameContext) {
-      is GameContext.DailyChallenge -> stringResource(CommonR.string.result_next_daily)
-      is GameContext.FreePlay -> stringResource(CommonR.string.play_again)
-    }
-    OutlinedButton(onClick = {
-      when (gameContext) {
-        is GameContext.DailyChallenge -> onHome()
-        is GameContext.FreePlay -> onPlayAgain()
-      }
-    }, modifier = Modifier.fillMaxWidth()) {
-      Text(playAgainText)
+    OutlinedButton(onClick = onPlayAgain, modifier = Modifier.fillMaxWidth()) {
+      Text(stringResource(CommonR.string.play_again))
     }
 
     Spacer(Modifier.height(8.dp))

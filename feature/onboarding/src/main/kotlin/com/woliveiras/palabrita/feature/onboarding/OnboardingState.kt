@@ -22,6 +22,7 @@ enum class OnboardingStep {
   LANGUAGE,
   MODEL_SELECTION,
   DOWNLOAD,
+  GENERATION,
   COMPLETE,
 }
 

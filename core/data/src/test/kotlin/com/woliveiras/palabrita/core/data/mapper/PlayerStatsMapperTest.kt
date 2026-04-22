@@ -14,8 +14,6 @@ class PlayerStatsMapperTest {
       PlayerStatsEntity(
         totalPlayed = 50,
         totalWon = 35,
-        currentStreak = 7,
-        maxStreak = 12,
         avgAttempts = 3.5f,
         totalXp = 200,
         playerTier = "ASTUTO",
@@ -25,7 +23,6 @@ class PlayerStatsMapperTest {
 
     assertThat(domain.totalPlayed).isEqualTo(50)
     assertThat(domain.totalWon).isEqualTo(35)
-    assertThat(domain.currentStreak).isEqualTo(7)
     assertThat(domain.playerTier).isEqualTo(PlayerTier.ASTUTO)
     assertThat(domain.totalXp).isEqualTo(200)
   }
@@ -80,8 +77,6 @@ class PlayerStatsMapperTest {
       PlayerStats(
         totalPlayed = 100,
         totalWon = 75,
-        currentStreak = 15,
-        maxStreak = 30,
         avgAttempts = 3.2f,
         totalXp = 500,
         playerTier = PlayerTier.SABIO,

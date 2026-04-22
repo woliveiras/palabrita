@@ -47,14 +47,14 @@ class PuzzleMapperTest {
         difficulty = 2,
         category = "animal",
         hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
-        source = PuzzleSource.STATIC,
+        source = PuzzleSource.AI,
         generatedAt = 1000L,
       )
 
     val entity = domain.toEntity()
 
     assertThat(entity.word).isEqualTo("gatos")
-    assertThat(entity.source).isEqualTo("STATIC")
+    assertThat(entity.source).isEqualTo("AI")
     assertThat(entity.hints).contains("Dica 1")
     assertThat(entity.hints).contains("Dica 5")
   }
@@ -88,16 +88,5 @@ class PuzzleMapperTest {
       )
 
     assertThat(entity.toDomain().toEntity().source).isEqualTo("AI")
-  }
-
-  @Test
-  fun `source STATIC roundtrips correctly`() {
-    val entity =
-      PuzzleEntity(
-        word = "gatos", wordDisplay = "gatos", language = "pt", difficulty = 2,
-        category = "animal", hints = "[]", source = "STATIC", generatedAt = 0,
-      )
-
-    assertThat(entity.toDomain().toEntity().source).isEqualTo("STATIC")
   }
 }

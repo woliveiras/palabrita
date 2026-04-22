@@ -100,7 +100,7 @@ class PuzzleGenerationWorker @AssistedInject constructor(
       .setSmallIcon(CommonR.drawable.ic_notification)
       .setContentTitle(applicationContext.getString(CommonR.string.notification_generation_title))
       .setContentText(applicationContext.getString(CommonR.string.notification_generation_body, count))
-      .setPriority(NotificationCompat.PRIORITY_LOW)
+      .setPriority(NotificationCompat.PRIORITY_HIGH)
       .setAutoCancel(true)
       .build()
 

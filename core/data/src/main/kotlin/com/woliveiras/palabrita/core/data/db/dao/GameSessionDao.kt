@@ -41,21 +41,4 @@ interface GameSessionDao {
     hintsUsed: Int,
     won: Boolean,
   )
-
-  @Query(
-    """
-    SELECT * FROM game_sessions
-    WHERE dailyChallengeDate = :date
-    ORDER BY dailyChallengeIndex
-    """,
-  )
-  suspend fun getDailyChallengesForDate(date: String): List<GameSessionEntity>
-
-  @Query(
-    """
-    SELECT COUNT(*) FROM game_sessions
-    WHERE dailyChallengeDate = :date AND completedAt IS NOT NULL
-    """,
-  )
-  suspend fun countCompletedDailies(date: String): Int
 }

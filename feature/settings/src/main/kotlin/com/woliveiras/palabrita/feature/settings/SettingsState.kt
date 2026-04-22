@@ -57,6 +57,6 @@ fun generateShareStatsText(stats: PlayerStats, context: android.content.Context)
   return buildString {
     appendLine(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_header))
     appendLine(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_summary, stats.totalPlayed, winRate))
-    append(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_streak, stats.currentStreak))
+    append(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_xp, stats.totalXp))
   }
 }

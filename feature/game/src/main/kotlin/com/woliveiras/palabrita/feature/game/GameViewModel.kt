@@ -1,14 +1,11 @@
 package com.woliveiras.palabrita.feature.game
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +17,7 @@ import kotlinx.coroutines.launch
 
 sealed class GameEvent {
   data object NavigateToHome : GameEvent()
+  data object NoPuzzlesLeft : GameEvent()
 }
 
 @HiltViewModel
@@ -27,7 +25,6 @@ class GameViewModel @Inject constructor(
   private val puzzleRepository: PuzzleRepository,
   private val statsRepository: StatsRepository,
   private val gameSessionRepository: GameSessionRepository,
-  savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(GameState())
@@ -36,26 +33,8 @@ class GameViewModel @Inject constructor(
   private val _events = MutableSharedFlow<GameEvent>()
   val events = _events.asSharedFlow()
 
-  private val dailyChallengeIndex: Int? =
-    savedStateHandle.get<Int>("dailyChallengeIndex")?.takeIf { it >= 0 }
-  private val dailyChallengeDifficulty: Int? =
-    savedStateHandle.get<Int>("dailyChallengeDifficulty")?.takeIf { it >= 0 }
-
   init {
-    val context = if (dailyChallengeIndex != null) {
-      GameContext.DailyChallenge(index = dailyChallengeIndex)
-    } else {
-      GameContext.FreePlay
-    }
-    _state.update { it.copy(gameContext = context) }
-
-    if (dailyChallengeIndex != null && dailyChallengeDifficulty != null) {
-      // Daily challenge: skip difficulty picker, start directly
-      _state.update { it.copy(chosenDifficulty = dailyChallengeDifficulty) }
-      startGame()
-    } else {
-      loadDifficultyOptions()
-    }
+    loadDifficultyOptions()
   }
 
   fun onAction(action: GameAction) {
@@ -118,17 +97,15 @@ class GameViewModel @Inject constructor(
             isLoading = false,
           )
         }
-        val today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
         gameSessionRepository.create(
           com.woliveiras.palabrita.core.model.GameSession(
             puzzleId = puzzle.id,
             startedAt = System.currentTimeMillis(),
-            dailyChallengeIndex = dailyChallengeIndex,
-            dailyChallengeDate = if (dailyChallengeIndex != null) today else null,
           ),
         )
       } else {
-        _state.update { it.copy(errorRes = com.woliveiras.palabrita.core.common.R.string.error_no_puzzle, gameStatus = GameStatus.CHOOSING_DIFFICULTY, isLoading = false) }
+        _state.update { it.copy(gameStatus = GameStatus.CHOOSING_DIFFICULTY, isLoading = false) }
+        _events.emit(GameEvent.NoPuzzlesLeft)
       }
     }
   }

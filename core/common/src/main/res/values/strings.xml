@@ -48,9 +48,13 @@
     <string name="download_checking">Verificando…</string>
 
     <!-- Onboarding: Generation -->
-    <string name="generation_title">Gerando seus primeiros desafios…</string>
-    <string name="generation_hint">Isso acontece apenas na primeira vez</string>
-    <string name="generation_progress">Puzzle %1$d de %2$d…</string>
+    <string name="generation_title">Gerando puzzles…</string>
+    <string name="generation_subtitle">A IA está criando seus desafios. Isso pode levar alguns minutos.</string>
+    <string name="generation_complete_title">Puzzles prontos!</string>
+    <string name="generation_complete_subtitle">Seus desafios foram gerados com sucesso.</string>
+    <string name="generation_continue">COMEÇAR A JOGAR</string>
+    <string name="generation_failed">Falha ao gerar puzzles</string>
+    <string name="generation_retry">TENTAR NOVAMENTE</string>
 
     <!-- Onboarding: Tier Warning -->
     <string name="tier_warning_message">O modelo selecionado pode exigir mais memória do que seu dispositivo possui. A performance pode ser ruim ou o app pode travar.</string>
@@ -134,13 +138,13 @@
     <string name="stats_title">Estatísticas</string>
     <string name="stats_games">Jogos</string>
     <string name="stats_wins">Vitórias</string>
-    <string name="stats_current_streak">Sequência atual</string>
-    <string name="stats_best_streak">Melhor sequência</string>
+    <string name="stats_xp">XP total</string>
+    <string name="stats_tier">Tier</string>
     <string name="stats_distribution">Distribuição de tentativas</string>
     <string name="stats_share">Compartilhar estatísticas</string>
     <string name="stats_share_text_header">Palabrita</string>
     <string name="stats_share_text_summary">%1$d jogos · %2$d%% vitórias</string>
-    <string name="stats_share_text_streak">Sequência: %d</string>
+    <string name="stats_share_text_xp">XP: %d</string>
 
     <!-- Word Size Options -->
     <string name="word_size_default_label">Padrão</string>
@@ -189,13 +193,9 @@
     <string name="stats_tab">Stats</string>
     <string name="more_tab">Mais</string>
     <string name="home_title">PALABRITA</string>
-    <string name="home_streak_active">🔥 %1$d dias de streak!</string>
-    <string name="home_streak_start">🔥 Comece seu streak hoje!</string>
-    <string name="home_streak_milestone">Próximo marco: %1$d dias</string>
-    <string name="home_daily_title">⭐ DESAFIOS DO DIA (%1$d/3)</string>
-    <string name="home_daily_complete">✓ 3/3 completos! +bônus XP</string>
-    <string name="home_daily_play">JOGAR #%1$d</string>
-    <string name="home_daily_locked">\?\?\?</string>
+    <string name="home_play">JOGAR</string>
+    <string name="home_puzzles_remaining">%1$d puzzles disponíveis</string>
+    <string name="home_generate_more">GERAR MAIS PUZZLES</string>
     <string name="home_stats_games">jogos</string>
     <string name="home_stats_wins">wins</string>
     <string name="home_stats_tier">tier</string>

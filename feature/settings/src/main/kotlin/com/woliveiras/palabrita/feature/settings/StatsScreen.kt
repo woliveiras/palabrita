@@ -82,8 +82,8 @@ fun StatsScreen(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
       ) {
-        StatCard(value = "${state.stats.currentStreak}", label = stringResource(CommonR.string.stats_current_streak))
-        StatCard(value = "${state.stats.maxStreak}", label = stringResource(CommonR.string.stats_best_streak))
+        StatCard(value = "${state.stats.totalXp}", label = stringResource(CommonR.string.stats_xp))
+        StatCard(value = state.stats.playerTier.displayName, label = stringResource(CommonR.string.stats_tier))
       }
 
       Spacer(Modifier.height(32.dp))

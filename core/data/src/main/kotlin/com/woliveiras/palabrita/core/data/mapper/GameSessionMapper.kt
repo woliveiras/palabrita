@@ -16,8 +16,6 @@ fun GameSessionEntity.toDomain(): GameSession =
     completedAt = completedAt,
     hintsUsed = hintsUsed,
     won = won,
-    dailyChallengeIndex = dailyChallengeIndex,
-    dailyChallengeDate = dailyChallengeDate,
     chatExplored = chatExplored,
   )
 
@@ -30,7 +28,5 @@ fun GameSession.toEntity(): GameSessionEntity =
     completedAt = completedAt,
     hintsUsed = hintsUsed,
     won = won,
-    dailyChallengeIndex = dailyChallengeIndex,
-    dailyChallengeDate = dailyChallengeDate,
     chatExplored = chatExplored,
   )

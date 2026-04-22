@@ -32,6 +32,7 @@ import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.feature.chat.ChatScreen
 import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen
+import com.woliveiras.palabrita.feature.onboarding.GenerationScreen
 import com.woliveiras.palabrita.feature.onboarding.OnboardingScreen
 import com.woliveiras.palabrita.feature.settings.SettingsScreen
 import com.woliveiras.palabrita.feature.settings.StatsScreen
@@ -42,10 +43,12 @@ import kotlinx.serialization.Serializable
 @Serializable data object HomeRoute
 
 @Serializable
-data class GameRoute(
-  val dailyChallengeIndex: Int = -1,
-  val dailyChallengeDifficulty: Int = -1,
+data class GenerationRoute(
+  val modelId: String = "",
+  val isRegeneration: Boolean = false,
 )
+
+@Serializable data object GameRoute
 
 @Serializable data class ChatRoute(val puzzleId: Long)
 
@@ -115,44 +118,46 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
               popUpTo(OnboardingRoute) { inclusive = true }
             }
           },
+          onNavigateToGeneration = { modelId ->
+            navController.navigate(GenerationRoute(modelId = modelId.name)) {
+              popUpTo(OnboardingRoute) { inclusive = true }
+            }
+          },
+        )
+      }
+      composable<GenerationRoute> { backStackEntry ->
+        val route = backStackEntry.toRoute<GenerationRoute>()
+        val modelId = try {
+          com.woliveiras.palabrita.core.model.ModelId.valueOf(route.modelId)
+        } catch (_: Exception) { null }
+        GenerationScreen(
+          modelId = modelId,
+          isRegeneration = route.isRegeneration,
+          onComplete = {
+            navController.navigate(HomeRoute) {
+              popUpTo(GenerationRoute::class) { inclusive = true }
+            }
+          },
         )
       }
       composable<HomeRoute> {
         HomeScreen(
-          onNavigateToGame = { dailyIndex, difficulty ->
-            navController.navigate(
-              GameRoute(
-                dailyChallengeIndex = dailyIndex ?: -1,
-                dailyChallengeDifficulty = difficulty ?: -1,
-              ),
-            )
-          },
-          onNavigateToFreePlay = { navController.navigate(GameRoute()) },
-          onNavigateToChat = { puzzleId -> navController.navigate(ChatRoute(puzzleId)) },
-          onNavigateToStats = {
-            navController.navigate(StatsRoute) {
-              popUpTo(HomeRoute) { saveState = true }
-              launchSingleTop = true
-              restoreState = true
-            }
-          },
-          onNavigateToSettings = {
-            navController.navigate(SettingsRoute) {
-              popUpTo(HomeRoute) { saveState = true }
-              launchSingleTop = true
-              restoreState = true
-            }
+          onNavigateToGame = { navController.navigate(GameRoute) },
+          onNavigateToGeneration = {
+            navController.navigate(GenerationRoute(isRegeneration = true))
           },
         )
       }
-      composable<GameRoute> { backStackEntry ->
-        val route = backStackEntry.toRoute<GameRoute>()
+      composable<GameRoute> {
         GameScreen(
-          dailyChallengeIndex = if (route.dailyChallengeIndex >= 0) route.dailyChallengeIndex else null,
-          dailyChallengeDifficulty = if (route.dailyChallengeDifficulty >= 0) route.dailyChallengeDifficulty else null,
           onNavigateToChat = { puzzleId -> navController.navigate(ChatRoute(puzzleId)) },
           onNavigateToSettings = { navController.navigate(SettingsRoute) },
           onNavigateToHome = { navController.popBackStack(HomeRoute, inclusive = false) },
+          onNoPuzzlesLeft = {
+            navController.navigate(GenerationRoute(isRegeneration = true)) {
+              popUpTo(HomeRoute) { inclusive = false }
+            }
+          },
         )
       }
       composable<ChatRoute> { backStackEntry ->

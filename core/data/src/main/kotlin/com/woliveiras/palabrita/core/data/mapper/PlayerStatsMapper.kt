@@ -17,8 +17,6 @@ fun PlayerStatsEntity.toDomain(): PlayerStats =
     id = id,
     totalPlayed = totalPlayed,
     totalWon = totalWon,
-    currentStreak = currentStreak,
-    maxStreak = maxStreak,
     avgAttempts = avgAttempts,
     preferredLanguage = preferredLanguage,
     currentDifficulty = currentDifficulty,
@@ -31,7 +29,6 @@ fun PlayerStatsEntity.toDomain(): PlayerStats =
     wordSizePreference = wordSizePreference,
     guessDistribution = parseIntMap(guessDistribution),
     lastPlayedAt = lastPlayedAt,
-    lastDailyDate = lastDailyDate,
   )
 
 fun PlayerStats.toEntity(): PlayerStatsEntity =
@@ -39,8 +36,6 @@ fun PlayerStats.toEntity(): PlayerStatsEntity =
     id = id,
     totalPlayed = totalPlayed,
     totalWon = totalWon,
-    currentStreak = currentStreak,
-    maxStreak = maxStreak,
     avgAttempts = avgAttempts,
     preferredLanguage = preferredLanguage,
     currentDifficulty = currentDifficulty,
@@ -53,7 +48,6 @@ fun PlayerStats.toEntity(): PlayerStatsEntity =
     wordSizePreference = wordSizePreference,
     guessDistribution = encodeIntMap(guessDistribution),
     lastPlayedAt = lastPlayedAt,
-    lastDailyDate = lastDailyDate,
   )
 
 internal fun parseIntMap(jsonStr: String): Map<Int, Int> {

@@ -13,15 +13,9 @@ data class GameState(
   val gameStatus: GameStatus = GameStatus.CHOOSING_DIFFICULTY,
   val isLoading: Boolean = false,
   @StringRes val errorRes: Int? = null,
-  val gameContext: GameContext = GameContext.FreePlay,
   val showAbandonDialog: Boolean = false,
   val xpGained: Int = 0,
 )
-
-sealed class GameContext {
-  data class DailyChallenge(val index: Int, val total: Int = 3) : GameContext()
-  data object FreePlay : GameContext()
-}
 
 data class DifficultyOption(
   val level: Int,

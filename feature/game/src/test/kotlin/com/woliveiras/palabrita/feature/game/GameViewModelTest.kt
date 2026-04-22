@@ -99,14 +99,15 @@ class GameViewModelTest {
   }
 
   @Test
-  fun `starting game with no puzzle available shows error`() = runTest {
+  fun `starting game with no puzzle available emits NoPuzzlesLeft`() = runTest {
     val vm = createViewModel(puzzle = null)
     vm.loadDifficultyOptions()
     testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(GameAction.StartGame)
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.errorRes).isNotNull()
-    assertThat(vm.state.value.gameStatus).isEqualTo(GameStatus.CHOOSING_DIFFICULTY)
+    vm.events.test {
+      vm.onAction(GameAction.StartGame)
+      testDispatcher.scheduler.advanceUntilIdle()
+      assertThat(awaitItem()).isEqualTo(GameEvent.NoPuzzlesLeft)
+    }
   }
 
   // --- Typing ---
@@ -379,6 +380,18 @@ private class FakeGameSessionRepository : GameSessionRepository {
 
   override suspend fun hasActiveGame(): Boolean =
     sessions.any { it.completedAt == null }
+
+  override suspend fun completeSession(
+    puzzleId: Long,
+    attempts: List<String>,
+    completedAt: Long,
+    hintsUsed: Int,
+    won: Boolean,
+  ) {
+    val session = sessions.find { it.puzzleId == puzzleId } ?: return
+    sessions.remove(session)
+    sessions.add(session.copy(completedAt = completedAt, won = won))
+  }
 
   override suspend fun deleteAll() {
     sessions.clear()

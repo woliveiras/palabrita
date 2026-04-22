@@ -9,7 +9,6 @@ import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
 import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
-import com.woliveiras.palabrita.core.data.seeder.StaticPuzzleSeeder
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
@@ -29,7 +28,6 @@ class OnboardingViewModel @Inject constructor(
   private val appPreferences: AppPreferences,
   private val downloadManager: ModelDownloadManager,
   private val engineManager: LlmEngineManager,
-  private val staticPuzzleSeeder: StaticPuzzleSeeder,
   private val generationScheduler: PuzzleGenerationScheduler,
 ) : ViewModel() {
 
@@ -44,13 +42,6 @@ class OnboardingViewModel @Inject constructor(
 
   init {
     observeDownloadProgress()
-    seedStaticPuzzles()
-  }
-
-  private fun seedStaticPuzzles() {
-    viewModelScope.launch {
-      staticPuzzleSeeder.seedAllLanguages()
-    }
   }
 
   fun onAction(action: OnboardingAction) {
@@ -60,7 +51,7 @@ class OnboardingViewModel @Inject constructor(
       is OnboardingAction.SelectLanguage -> selectLanguage(action.language)
       is OnboardingAction.SelectModel -> selectModel(action.modelId)
       is OnboardingAction.AutoSelectModel -> autoSelectModel()
-      is OnboardingAction.SkipToLightMode -> skipToLightMode()
+      is OnboardingAction.SkipToLightMode -> {}
       is OnboardingAction.DismissTierWarning -> _state.update { it.copy(showTierWarning = false) }
       is OnboardingAction.StartDownload -> startDownload()
       is OnboardingAction.CancelDownload -> cancelDownload()
@@ -109,6 +100,7 @@ class OnboardingViewModel @Inject constructor(
         OnboardingStep.LANGUAGE -> OnboardingStep.MODEL_SELECTION
         OnboardingStep.MODEL_SELECTION -> OnboardingStep.DOWNLOAD
         OnboardingStep.DOWNLOAD -> OnboardingStep.COMPLETE
+        OnboardingStep.GENERATION -> OnboardingStep.GENERATION
         OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
       }
       if (nextStep == OnboardingStep.DOWNLOAD && current.selectedModel != null) {
@@ -134,6 +126,7 @@ class OnboardingViewModel @Inject constructor(
           downloadManager.cancelDownload()
           OnboardingStep.MODEL_SELECTION
         }
+        OnboardingStep.GENERATION -> OnboardingStep.GENERATION
         OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
       }
       current.copy(currentStep = prevStep)
@@ -159,21 +152,10 @@ class OnboardingViewModel @Inject constructor(
     val model = when (_state.value.deviceTier) {
       DeviceTier.HIGH -> ModelId.GEMMA4_E2B
       DeviceTier.MEDIUM -> ModelId.QWEN3_0_6B
-      DeviceTier.LOW -> ModelId.NONE
+      DeviceTier.LOW -> ModelId.QWEN3_0_6B
     }
     _state.update { it.copy(selectedModel = model, showTierWarning = false) }
     navigateNext()
-  }
-
-  private fun skipToLightMode() {
-    _state.update {
-      it.copy(selectedModel = ModelId.NONE)
-    }
-    viewModelScope.launch {
-      statsRepository.updateLanguage(_state.value.selectedLanguage)
-      appPreferences.setOnboardingComplete()
-      _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
-    }
   }
 
   private fun startDownloadForModel(modelId: ModelId) {
@@ -211,25 +193,20 @@ class OnboardingViewModel @Inject constructor(
             is EngineState.Ready -> {
               enqueueBackgroundGeneration()
               statsRepository.updateLanguage(_state.value.selectedLanguage)
-              appPreferences.setOnboardingComplete()
-              _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
+              _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
               return@collect
             }
             is EngineState.Error -> {
-              // Engine failed, but static puzzles are available — complete onboarding anyway
               statsRepository.updateLanguage(_state.value.selectedLanguage)
-              appPreferences.setOnboardingComplete()
-              _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
+              _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
               return@collect
             }
             else -> { /* waiting */ }
           }
         }
       } catch (e: Exception) {
-        // Even on failure, static puzzles are available
         statsRepository.updateLanguage(_state.value.selectedLanguage)
-        appPreferences.setOnboardingComplete()
-        _state.update { it.copy(currentStep = OnboardingStep.COMPLETE) }
+        _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
       }
     }
   }

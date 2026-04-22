@@ -23,7 +23,7 @@ object DatabaseModule {
   @Singleton
   fun provideDatabase(@ApplicationContext context: Context): PalabritaDatabase =
     Room.databaseBuilder(context, PalabritaDatabase::class.java, "palabrita.db")
-      .addMigrations(PalabritaDatabase.MIGRATION_1_2)
+      .fallbackToDestructiveMigration(false)
       .build()
 
   @Provides fun providePuzzleDao(db: PalabritaDatabase): PuzzleDao = db.puzzleDao()

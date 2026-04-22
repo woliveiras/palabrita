@@ -4,8 +4,6 @@ data class PlayerStats(
   val id: Int = 1,
   val totalPlayed: Int = 0,
   val totalWon: Int = 0,
-  val currentStreak: Int = 0,
-  val maxStreak: Int = 0,
   val avgAttempts: Float = 0f,
   val preferredLanguage: String = "pt",
   val currentDifficulty: Int = 1,
@@ -18,5 +16,4 @@ data class PlayerStats(
   val wordSizePreference: String = "DEFAULT",
   val guessDistribution: Map<Int, Int> = emptyMap(),
   val lastPlayedAt: Long = 0,
-  val lastDailyDate: String? = null,
 )

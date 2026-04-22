@@ -47,13 +47,11 @@ class SettingsViewModelTest {
 
   @Test
   fun `loads stats on init`() = runTest {
-    val stats = PlayerStats(totalPlayed = 42, totalWon = 36, currentStreak = 8, maxStreak = 12)
+    val stats = PlayerStats(totalPlayed = 42, totalWon = 36)
     val vm = createViewModel(stats = stats)
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.stats.totalPlayed).isEqualTo(42)
     assertThat(vm.state.value.stats.totalWon).isEqualTo(36)
-    assertThat(vm.state.value.stats.currentStreak).isEqualTo(8)
-    assertThat(vm.state.value.stats.maxStreak).isEqualTo(12)
   }
 
   @Test
@@ -383,6 +381,17 @@ private class FakeGameSessionRepository : GameSessionRepository {
     sessions.find { it.puzzleId == puzzleId }
   override suspend fun hasActiveGame(): Boolean =
     sessions.any { it.completedAt == null }
+  override suspend fun completeSession(
+    puzzleId: Long,
+    attempts: List<String>,
+    completedAt: Long,
+    hintsUsed: Int,
+    won: Boolean,
+  ) {
+    val session = sessions.find { it.puzzleId == puzzleId } ?: return
+    sessions.remove(session)
+    sessions.add(session.copy(completedAt = completedAt, won = won))
+  }
   override suspend fun deleteAll() {
     sessions.clear()
   }

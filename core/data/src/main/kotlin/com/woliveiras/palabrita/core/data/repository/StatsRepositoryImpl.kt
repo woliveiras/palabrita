@@ -27,8 +27,7 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
     val current = getStats()
     val now = System.currentTimeMillis()
 
-    val newStreak = computeStreak(current, now)
-    val xp = calculateXpForGame(won, attempts, difficulty, newStreak, hintsUsed)
+    val xp = calculateXpForGame(won, attempts, difficulty, hintsUsed)
     val newTotalXp = current.totalXp + xp
     val newTotalPlayed = current.totalPlayed + 1
     val newTotalWon = if (won) current.totalWon + 1 else current.totalWon
@@ -58,11 +57,6 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
         current.gamesWonByDifficulty
       }
 
-    // Track total games played at this difficulty for win rate
-    val totalAtDifficulty =
-      current.gamesWonByDifficulty.values.sum() +
-        (current.totalPlayed - current.totalWon) +
-        1 // rough, but we refine via per-difficulty tracking
     val winsAtDifficulty = newWonByDiff[difficulty] ?: 0
     val gamesAtDifficulty = (current.winRateByDifficulty[difficulty]?.let {
       if (it > 0f) ((current.gamesWonByDifficulty[difficulty] ?: 0) / it).toInt() else 0
@@ -79,8 +73,6 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
       current.copy(
         totalPlayed = newTotalPlayed,
         totalWon = newTotalWon,
-        currentStreak = newStreak,
-        maxStreak = maxOf(current.maxStreak, newStreak),
         avgAttempts = newAvg,
         totalXp = newTotalXp,
         playerTier = PlayerTier.fromXp(newTotalXp),
@@ -99,7 +91,7 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
     val current = stats.currentDifficulty
     val winsAtCurrent = stats.gamesWonByDifficulty[current] ?: 0
     val winRateAtCurrent = stats.winRateByDifficulty[current] ?: 0f
-    val requiredWins = if (stats.currentStreak >= 7) 4 else 5
+    val requiredWins = 5
 
     val newDifficulty =
       when {
@@ -142,25 +134,12 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
     )
     statsDao.upsert(reset.toEntity())
   }
-
-  private fun computeStreak(stats: PlayerStats, now: Long): Int {
-    if (stats.lastPlayedAt == 0L) return 1
-    val dayMs = 86_400_000L
-    val lastDay = stats.lastPlayedAt / dayMs
-    val today = now / dayMs
-    return when {
-      today == lastDay -> stats.currentStreak // same day
-      today - lastDay == 1L -> stats.currentStreak + 1 // consecutive day
-      else -> 1 // streak broken
-    }
-  }
 }
 
 fun calculateXpForGame(
   won: Boolean,
   attempts: Int,
   difficulty: Int,
-  currentStreak: Int,
   hintsUsed: Int,
 ): Int {
   if (!won) return 0
@@ -182,14 +161,7 @@ fun calculateXpForGame(
       else -> 0
     }
 
-  val streakBonus =
-    when {
-      currentStreak >= 30 && currentStreak % 30 == 0 -> 20
-      currentStreak >= 7 && currentStreak % 7 == 0 -> 5
-      else -> 0
-    }
-
   val hintPenalty = hintsUsed
 
-  return (baseXp + attemptBonus + streakBonus - hintPenalty).coerceAtLeast(1)
+  return (baseXp + attemptBonus - hintPenalty).coerceAtLeast(1)
 }

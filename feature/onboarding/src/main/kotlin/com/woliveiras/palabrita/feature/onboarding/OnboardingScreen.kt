@@ -50,10 +50,16 @@ import com.woliveiras.palabrita.core.common.R as CommonR
 @Composable
 fun OnboardingScreen(
   onComplete: () -> Unit,
+  onNavigateToGeneration: (com.woliveiras.palabrita.core.model.ModelId) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
+
+  if (state.currentStep == OnboardingStep.GENERATION) {
+    state.selectedModel?.let { onNavigateToGeneration(it) }
+    return
+  }
 
   if (state.currentStep == OnboardingStep.COMPLETE) {
     onComplete()
@@ -100,6 +106,7 @@ fun OnboardingScreen(
           onCancel = { viewModel.onAction(OnboardingAction.CancelDownload) },
         )
       OnboardingStep.COMPLETE -> { /* handled above */ }
+      OnboardingStep.GENERATION -> { /* handled above */ }
     }
   }
 

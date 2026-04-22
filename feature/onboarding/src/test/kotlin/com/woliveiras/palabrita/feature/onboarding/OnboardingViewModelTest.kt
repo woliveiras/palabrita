@@ -7,10 +7,10 @@ import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.LlmSession
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
+import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
 import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
-import com.woliveiras.palabrita.core.data.seeder.StaticPuzzleSeeder
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
@@ -150,17 +150,16 @@ class OnboardingViewModelTest {
     assertThat(vm.state.value.showTierWarning).isFalse()
   }
 
-  // --- LOW tier skips to Light mode ---
+  // --- SkipToLightMode is a no-op ---
 
   @Test
-  fun `LOW tier skip-to-light completes onboarding`() = runTest {
+  fun `SkipToLightMode is a no-op and stays on model selection`() = runTest {
     val vm = createViewModel(deviceTier = DeviceTier.LOW)
     vm.onAction(OnboardingAction.Next) // → LANGUAGE
     vm.onAction(OnboardingAction.Next) // → MODEL_SELECTION
     vm.onAction(OnboardingAction.SkipToLightMode)
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.currentStep).isEqualTo(OnboardingStep.COMPLETE)
-    assertThat(vm.state.value.selectedModel).isEqualTo(ModelId.NONE)
+    assertThat(vm.state.value.currentStep).isEqualTo(OnboardingStep.MODEL_SELECTION)
   }
 
   // --- State observation via Flow ---
@@ -188,7 +187,6 @@ class OnboardingViewModelTest {
       appPreferences = FakeAppPreferences(),
       downloadManager = FakeModelDownloadManager(),
       engineManager = FakeLlmEngineManager(),
-      staticPuzzleSeeder = FakeStaticPuzzleSeeder(),
       generationScheduler = FakeGenerationScheduler(),
     )
 }
@@ -274,14 +272,10 @@ private class FakeLlmEngineManager : LlmEngineManager {
   override fun isReady(): Boolean = _state.value is EngineState.Ready
 }
 
-private class FakeStaticPuzzleSeeder : StaticPuzzleSeeder {
-  override suspend fun seedIfNeeded(language: String) {}
-  override suspend fun seedAllLanguages() {}
-}
-
 private class FakeGenerationScheduler : PuzzleGenerationScheduler {
   var scheduledModelId: ModelId? = null
   override fun scheduleGeneration(modelId: ModelId) {
     scheduledModelId = modelId
   }
+  override fun observeGenerationState(): Flow<GenerationWorkState> = flowOf(GenerationWorkState.IDLE)
 }

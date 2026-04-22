@@ -45,10 +45,4 @@ class GameSessionRepositoryImpl @Inject constructor(
 
   override suspend fun deleteAll() =
     dao.deleteAll()
-
-  override suspend fun getDailyChallengesForDate(date: String): List<GameSession> =
-    dao.getDailyChallengesForDate(date).map { it.toDomain() }
-
-  override suspend fun countCompletedDailies(date: String): Int =
-    dao.countCompletedDailies(date)
 }

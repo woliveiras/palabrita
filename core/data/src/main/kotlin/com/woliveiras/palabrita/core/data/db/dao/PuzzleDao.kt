@@ -13,7 +13,7 @@ interface PuzzleDao {
     """
         SELECT * FROM puzzles
         WHERE isPlayed = 0 AND language = :lang AND difficulty = :difficulty
-        ORDER BY CASE source WHEN 'AI' THEN 0 ELSE 1 END, RANDOM()
+        ORDER BY RANDOM()
         LIMIT 1
         """
   )

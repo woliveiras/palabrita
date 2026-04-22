@@ -48,9 +48,13 @@
     <string name="download_checking">Checking…</string>
 
     <!-- Onboarding: Generation -->
-    <string name="generation_title">Generating your first challenges…</string>
-    <string name="generation_hint">This only happens the first time</string>
-    <string name="generation_progress">Puzzle %1$d of %2$d…</string>
+    <string name="generation_title">Generating puzzles…</string>
+    <string name="generation_subtitle">The AI is creating your challenges. This may take a few minutes.</string>
+    <string name="generation_complete_title">Puzzles ready!</string>
+    <string name="generation_complete_subtitle">Your challenges have been generated successfully.</string>
+    <string name="generation_continue">START PLAYING</string>
+    <string name="generation_failed">Failed to generate puzzles</string>
+    <string name="generation_retry">TRY AGAIN</string>
 
     <!-- Onboarding: Tier Warning -->
     <string name="tier_warning_message">The selected model may require more memory than your device has. Performance may be poor or the app may crash.</string>
@@ -134,13 +138,13 @@
     <string name="stats_title">Statistics</string>
     <string name="stats_games">Games</string>
     <string name="stats_wins">Wins</string>
-    <string name="stats_current_streak">Current streak</string>
-    <string name="stats_best_streak">Best streak</string>
+    <string name="stats_xp">Total XP</string>
+    <string name="stats_tier">Tier</string>
     <string name="stats_distribution">Guess distribution</string>
     <string name="stats_share">Share statistics</string>
     <string name="stats_share_text_header">Palabrita</string>
     <string name="stats_share_text_summary">%1$d games · %2$d%% wins</string>
-    <string name="stats_share_text_streak">Streak: %d</string>
+    <string name="stats_share_text_xp">XP: %d</string>
 
     <!-- Word Size Options -->
     <string name="word_size_default_label">Default</string>
@@ -189,13 +193,9 @@
     <string name="stats_tab">Stats</string>
     <string name="more_tab">More</string>
     <string name="home_title">PALABRITA</string>
-    <string name="home_streak_active">🔥 %1$d day streak!</string>
-    <string name="home_streak_start">🔥 Start your streak today!</string>
-    <string name="home_streak_milestone">Next milestone: %1$d days</string>
-    <string name="home_daily_title">⭐ DAILY CHALLENGES (%1$d/3)</string>
-    <string name="home_daily_complete">✓ 3/3 complete! +bonus XP</string>
-    <string name="home_daily_play">PLAY #%1$d</string>
-    <string name="home_daily_locked">\?\?\?</string>
+    <string name="home_play">PLAY</string>
+    <string name="home_puzzles_remaining">%1$d puzzles available</string>
+    <string name="home_generate_more">GENERATE MORE PUZZLES</string>
     <string name="home_stats_games">games</string>
     <string name="home_stats_wins">wins</string>
     <string name="home_stats_tier">tier</string>
