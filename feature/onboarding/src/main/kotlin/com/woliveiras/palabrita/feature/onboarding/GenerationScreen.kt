@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.feature.onboarding
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +52,12 @@ fun GenerationScreen(
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     if (state.isGenerating) {
+      val progress = state.progress
+      val hasProgress = progress.totalExpected > 0
+      val fraction =
+        if (hasProgress) progress.generatedCount.toFloat() / progress.totalExpected else 0f
+      val animatedFraction by animateFloatAsState(targetValue = fraction, label = "progress")
+
       CircularProgressIndicator(modifier = Modifier.size(64.dp))
       Spacer(Modifier.height(24.dp))
       Text(
@@ -65,6 +73,23 @@ fun GenerationScreen(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
       )
+      if (hasProgress) {
+        Spacer(Modifier.height(24.dp))
+        LinearProgressIndicator(progress = { animatedFraction }, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(8.dp))
+        Text(
+          text =
+            stringResource(
+              CommonR.string.generation_progress_detail,
+              progress.generatedCount,
+              progress.totalExpected,
+              progress.currentDifficulty,
+            ),
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          textAlign = TextAlign.Center,
+        )
+      }
     } else if (state.isComplete) {
       Text(
         text = stringResource(CommonR.string.generation_complete_title),

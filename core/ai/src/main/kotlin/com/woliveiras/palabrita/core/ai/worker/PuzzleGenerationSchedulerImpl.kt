@@ -43,4 +43,26 @@ class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager:
         else -> GenerationWorkState.IDLE
       }
     }
+
+  override fun observeGenerationInfo(): Flow<GenerationInfo> =
+    workManager.getWorkInfosForUniqueWorkFlow(PuzzleGenerationWorker.WORK_NAME).map { infos ->
+      val info = infos.firstOrNull()
+      val state =
+        when (info?.state) {
+          WorkInfo.State.SUCCEEDED -> GenerationWorkState.SUCCEEDED
+          WorkInfo.State.FAILED -> GenerationWorkState.FAILED
+          WorkInfo.State.RUNNING,
+          WorkInfo.State.ENQUEUED -> GenerationWorkState.RUNNING
+          else -> GenerationWorkState.IDLE
+        }
+      val progressData = info?.progress
+      val progress =
+        GenerationProgress(
+          currentDifficulty =
+            progressData?.getInt(PuzzleGenerationWorker.KEY_CURRENT_DIFFICULTY, 0) ?: 0,
+          generatedCount = progressData?.getInt(PuzzleGenerationWorker.KEY_GENERATED_COUNT, 0) ?: 0,
+          totalExpected = progressData?.getInt(PuzzleGenerationWorker.KEY_TOTAL_EXPECTED, 0) ?: 0,
+        )
+      GenerationInfo(state = state, progress = progress)
+    }
 }

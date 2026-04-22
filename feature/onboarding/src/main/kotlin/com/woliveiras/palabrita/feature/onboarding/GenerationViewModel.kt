@@ -2,6 +2,7 @@ package com.woliveiras.palabrita.feature.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.woliveiras.palabrita.core.ai.worker.GenerationProgress
 import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
 import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
@@ -19,6 +20,7 @@ data class GenerationState(
   val isGenerating: Boolean = true,
   val isComplete: Boolean = false,
   val failed: Boolean = false,
+  val progress: GenerationProgress = GenerationProgress(),
 )
 
 @HiltViewModel
@@ -50,8 +52,8 @@ constructor(
 
   private fun observeGeneration() {
     viewModelScope.launch {
-      generationScheduler.observeGenerationState().collect { workState ->
-        when (workState) {
+      generationScheduler.observeGenerationInfo().collect { info ->
+        when (info.state) {
           GenerationWorkState.SUCCEEDED -> {
             _state.update { it.copy(isGenerating = false, isComplete = true) }
           }
@@ -59,7 +61,7 @@ constructor(
             _state.update { it.copy(isGenerating = false, failed = true) }
           }
           GenerationWorkState.RUNNING -> {
-            _state.update { it.copy(isGenerating = true) }
+            _state.update { it.copy(isGenerating = true, progress = info.progress) }
           }
           GenerationWorkState.IDLE -> {}
         }

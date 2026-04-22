@@ -54,6 +54,7 @@
     <string name="generation_complete_subtitle">Tus desafíos se generaron con éxito.</string>
     <string name="generation_continue">EMPEZAR A JUGAR</string>
     <string name="generation_failed">Error al generar puzzles</string>
+    <string name="generation_progress_detail">%1$d de %2$d puzzles — dificultad %3$d de 5</string>
     <string name="generation_retry">INTENTAR DE NUEVO</string>
 
     <!-- Onboarding: Tier Warning -->

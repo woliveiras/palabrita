@@ -13,6 +13,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.common.R as CommonR
@@ -60,9 +61,17 @@ constructor(
     val existingWords = puzzleRepository.getAllGeneratedWords()
     val recentWords = puzzleRepository.getRecentWords(50)
     var totalGenerated = 0
+    val totalExpected = (1..5).sumOf { puzzlesPerDifficulty(it) }
 
     for (difficulty in 1..5) {
       val count = puzzlesPerDifficulty(difficulty)
+      setProgress(
+        workDataOf(
+          KEY_CURRENT_DIFFICULTY to difficulty,
+          KEY_GENERATED_COUNT to totalGenerated,
+          KEY_TOTAL_EXPECTED to totalExpected,
+        )
+      )
       try {
         val puzzles =
           puzzleGenerator.generateBatch(
@@ -163,6 +172,9 @@ constructor(
   companion object {
     const val WORK_NAME = "puzzle_generation"
     const val KEY_MODEL_ID = "model_id"
+    const val KEY_CURRENT_DIFFICULTY = "current_difficulty"
+    const val KEY_GENERATED_COUNT = "generated_count"
+    const val KEY_TOTAL_EXPECTED = "total_expected"
     const val REPLENISHMENT_THRESHOLD = 10
     private const val CHANNEL_ID = "puzzle_generation"
     private const val NOTIFICATION_ID = 1001

@@ -10,8 +10,21 @@ enum class GenerationWorkState {
   IDLE,
 }
 
+data class GenerationProgress(
+  val currentDifficulty: Int = 0,
+  val generatedCount: Int = 0,
+  val totalExpected: Int = 0,
+)
+
+data class GenerationInfo(
+  val state: GenerationWorkState = GenerationWorkState.IDLE,
+  val progress: GenerationProgress = GenerationProgress(),
+)
+
 interface PuzzleGenerationScheduler {
   fun scheduleGeneration(modelId: ModelId)
 
   fun observeGenerationState(): Flow<GenerationWorkState>
+
+  fun observeGenerationInfo(): Flow<GenerationInfo>
 }
