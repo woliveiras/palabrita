@@ -129,7 +129,10 @@ class DesignSystemTest {
 
   // --- Helpers ---
 
-  private fun contrastRatio(fg: androidx.compose.ui.graphics.Color, bg: androidx.compose.ui.graphics.Color): Double {
+  private fun contrastRatio(
+    fg: androidx.compose.ui.graphics.Color,
+    bg: androidx.compose.ui.graphics.Color,
+  ): Double {
     val l1 = relativeLuminance(fg)
     val l2 = relativeLuminance(bg)
     val lighter = maxOf(l1, l2)

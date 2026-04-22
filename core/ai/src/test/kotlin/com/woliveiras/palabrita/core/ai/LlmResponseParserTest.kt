@@ -11,9 +11,11 @@ class LlmResponseParserTest {
 
   @Test
   fun `parses valid JSON response`() {
-    val json = """
+    val json =
+      """
       {"word":"gatos","category":"animal","difficulty":2,"hints":["Dica 1","Dica 2","Dica 3","Dica 4","Dica 5"]}
-    """.trimIndent()
+    """
+        .trimIndent()
 
     val result = parser.parsePuzzle(json)
 
@@ -27,7 +29,8 @@ class LlmResponseParserTest {
 
   @Test
   fun `parses pretty-printed JSON`() {
-    val json = """
+    val json =
+      """
       {
         "word": "campo",
         "category": "lugar",
@@ -40,7 +43,8 @@ class LlmResponseParserTest {
           "Zona rural"
         ]
       }
-    """.trimIndent()
+    """
+        .trimIndent()
 
     val result = parser.parsePuzzle(json)
 
@@ -52,11 +56,13 @@ class LlmResponseParserTest {
 
   @Test
   fun `extracts JSON from response with surrounding text`() {
-    val raw = """
+    val raw =
+      """
       Here is the word for the game:
       {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"]}
       I hope this helps!
-    """.trimIndent()
+    """
+        .trimIndent()
 
     val result = parser.parsePuzzle(raw)
 
@@ -66,11 +72,13 @@ class LlmResponseParserTest {
 
   @Test
   fun `extracts JSON from response with markdown code blocks`() {
-    val raw = """
+    val raw =
+      """
       ```json
       {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"]}
       ```
-    """.trimIndent()
+    """
+        .trimIndent()
 
     val result = parser.parsePuzzle(raw)
 
@@ -117,9 +125,11 @@ class LlmResponseParserTest {
 
   @Test
   fun `handles JSON with extra fields gracefully`() {
-    val json = """
+    val json =
+      """
       {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"],"extra":"ignored"}
-    """.trimIndent()
+    """
+        .trimIndent()
 
     val result = parser.parsePuzzle(json)
 

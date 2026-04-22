@@ -1,8 +1,5 @@
 package com.woliveiras.palabrita
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
@@ -18,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -27,8 +23,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.woliveiras.palabrita.core.data.preferences.AppPreferences
 import com.woliveiras.palabrita.core.common.R as CommonR
+import com.woliveiras.palabrita.core.data.preferences.AppPreferences
 import com.woliveiras.palabrita.feature.chat.ChatScreen
 import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen
@@ -36,7 +32,6 @@ import com.woliveiras.palabrita.feature.onboarding.GenerationScreen
 import com.woliveiras.palabrita.feature.onboarding.OnboardingScreen
 import com.woliveiras.palabrita.feature.settings.AiInfoScreen
 import com.woliveiras.palabrita.feature.settings.SettingsScreen
-import com.woliveiras.palabrita.feature.settings.StatsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable data object OnboardingRoute
@@ -44,10 +39,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object HomeRoute
 
 @Serializable
-data class GenerationRoute(
-  val modelId: String = "",
-  val isRegeneration: Boolean = false,
-)
+data class GenerationRoute(val modelId: String = "", val isRegeneration: Boolean = false)
 
 @Serializable data object GameRoute
 
@@ -55,43 +47,37 @@ data class GenerationRoute(
 
 @Serializable data object SettingsRoute
 
-@Serializable data object StatsRoute
-
 @Serializable data object AiInfoRoute
 
-private data class BottomNavItem(
-  val route: Any,
-  val icon: ImageVector,
-  val labelRes: Int,
-)
+private data class BottomNavItem(val route: Any, val icon: ImageVector, val labelRes: Int)
 
 @Composable
 fun PalabritaNavGraph(appPreferences: AppPreferences) {
   val isOnboardingComplete by appPreferences.isOnboardingComplete.collectAsState(initial = false)
   val navController = rememberNavController()
   val startDestination: Any = if (isOnboardingComplete) HomeRoute else OnboardingRoute
-  val context = LocalContext.current
 
-  val bottomNavItems = listOf(
-    BottomNavItem(HomeRoute, Icons.Rounded.Home, CommonR.string.home_tab),
-    BottomNavItem(AiInfoRoute, Icons.Rounded.SmartToy, CommonR.string.ai_tab),
-    BottomNavItem(SettingsRoute, Icons.Rounded.MoreHoriz, CommonR.string.more_tab),
-  )
+  val bottomNavItems =
+    listOf(
+      BottomNavItem(HomeRoute, Icons.Rounded.Home, CommonR.string.home_tab),
+      BottomNavItem(AiInfoRoute, Icons.Rounded.SmartToy, CommonR.string.ai_tab),
+      BottomNavItem(SettingsRoute, Icons.Rounded.MoreHoriz, CommonR.string.more_tab),
+    )
 
   val navBackStackEntry by navController.currentBackStackEntryAsState()
   val currentDestination = navBackStackEntry?.destination
-  val showBottomBar = bottomNavItems.any { item ->
-    currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
-  }
+  val showBottomBar =
+    bottomNavItems.any { item ->
+      currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
+    }
 
   Scaffold(
     bottomBar = {
       if (showBottomBar) {
         NavigationBar {
           bottomNavItems.forEach { item ->
-            val selected = currentDestination?.hierarchy?.any {
-              it.hasRoute(item.route::class)
-            } == true
+            val selected =
+              currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
             NavigationBarItem(
               selected = selected,
               onClick = {
@@ -107,7 +93,7 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
           }
         }
       }
-    },
+    }
   ) { innerPadding ->
     NavHost(
       navController = navController,
@@ -117,9 +103,7 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
       composable<OnboardingRoute> {
         OnboardingScreen(
           onComplete = {
-            navController.navigate(HomeRoute) {
-              popUpTo(OnboardingRoute) { inclusive = true }
-            }
+            navController.navigate(HomeRoute) { popUpTo(OnboardingRoute) { inclusive = true } }
           },
           onNavigateToGeneration = { modelId ->
             navController.navigate(GenerationRoute(modelId = modelId.name)) {
@@ -130,9 +114,12 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
       }
       composable<GenerationRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<GenerationRoute>()
-        val modelId = try {
-          com.woliveiras.palabrita.core.model.ModelId.valueOf(route.modelId)
-        } catch (_: Exception) { null }
+        val modelId =
+          try {
+            com.woliveiras.palabrita.core.model.ModelId.valueOf(route.modelId)
+          } catch (_: Exception) {
+            null
+          }
         GenerationScreen(
           modelId = modelId,
           isRegeneration = route.isRegeneration,
@@ -167,24 +154,8 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
         val route = backStackEntry.toRoute<ChatRoute>()
         ChatScreen(puzzleId = route.puzzleId, onBack = { navController.popBackStack() })
       }
-      composable<SettingsRoute> {
-        SettingsScreen(
-          onBack = { navController.popBackStack() },
-          onNavigateToStats = { navController.navigate(StatsRoute) },
-        )
-      }
-      composable<StatsRoute> {
-        StatsScreen(
-          onBack = { navController.popBackStack() },
-          onShareStats = { text ->
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("Palabrita Stats", text))
-          },
-        )
-      }
-      composable<AiInfoRoute> {
-        AiInfoScreen()
-      }
+      composable<SettingsRoute> { SettingsScreen(onBack = { navController.popBackStack() }) }
+      composable<AiInfoRoute> { AiInfoScreen() }
     }
   }
 }

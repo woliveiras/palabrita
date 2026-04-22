@@ -13,15 +13,12 @@ import kotlinx.serialization.json.Json
 private val json = Json { ignoreUnknownKeys = true }
 
 @Singleton
-class GameSessionRepositoryImpl @Inject constructor(
-  private val dao: GameSessionDao,
-) : GameSessionRepository {
+class GameSessionRepositoryImpl @Inject constructor(private val dao: GameSessionDao) :
+  GameSessionRepository {
 
-  override suspend fun create(session: GameSession): Long =
-    dao.insert(session.toEntity())
+  override suspend fun create(session: GameSession): Long = dao.insert(session.toEntity())
 
-  override suspend fun update(session: GameSession) =
-    dao.update(session.toEntity())
+  override suspend fun update(session: GameSession) = dao.update(session.toEntity())
 
   override suspend fun completeSession(
     puzzleId: Long,
@@ -29,20 +26,19 @@ class GameSessionRepositoryImpl @Inject constructor(
     completedAt: Long,
     hintsUsed: Int,
     won: Boolean,
-  ) = dao.completeSession(
-    puzzleId = puzzleId,
-    attempts = json.encodeToString(attempts),
-    completedAt = completedAt,
-    hintsUsed = hintsUsed,
-    won = won,
-  )
+  ) =
+    dao.completeSession(
+      puzzleId = puzzleId,
+      attempts = json.encodeToString(attempts),
+      completedAt = completedAt,
+      hintsUsed = hintsUsed,
+      won = won,
+    )
 
   override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
     dao.getByPuzzleId(puzzleId)?.toDomain()
 
-  override suspend fun hasActiveGame(): Boolean =
-    dao.hasActiveGame()
+  override suspend fun hasActiveGame(): Boolean = dao.hasActiveGame()
 
-  override suspend fun deleteAll() =
-    dao.deleteAll()
+  override suspend fun deleteAll() = dao.deleteAll()
 }

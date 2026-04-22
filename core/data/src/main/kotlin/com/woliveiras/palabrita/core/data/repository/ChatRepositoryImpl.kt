@@ -11,23 +11,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ChatRepositoryImpl @Inject constructor(
-  private val chatDao: ChatMessageDao,
-  private val puzzleDao: PuzzleDao,
-) : ChatRepository {
+class ChatRepositoryImpl
+@Inject
+constructor(private val chatDao: ChatMessageDao, private val puzzleDao: PuzzleDao) :
+  ChatRepository {
 
   override suspend fun getMessages(puzzleId: Long): List<ChatMessage> =
     chatDao.getByPuzzleId(puzzleId).map { it.toDomain() }
 
-  override suspend fun saveMessage(message: ChatMessage) =
-    chatDao.insert(message.toEntity())
+  override suspend fun saveMessage(message: ChatMessage) = chatDao.insert(message.toEntity())
 
-  override suspend fun countUserMessages(puzzleId: Long): Int =
-    chatDao.countUserMessages(puzzleId)
+  override suspend fun countUserMessages(puzzleId: Long): Int = chatDao.countUserMessages(puzzleId)
 
-  override suspend fun getPuzzle(puzzleId: Long): Puzzle? =
-    puzzleDao.getById(puzzleId)?.toDomain()
+  override suspend fun getPuzzle(puzzleId: Long): Puzzle? = puzzleDao.getById(puzzleId)?.toDomain()
 
-  override suspend fun deleteAll() =
-    chatDao.deleteAll()
+  override suspend fun deleteAll() = chatDao.deleteAll()
 }

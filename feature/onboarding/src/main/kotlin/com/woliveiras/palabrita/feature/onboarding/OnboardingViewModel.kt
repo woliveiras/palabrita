@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class OnboardingViewModel @Inject constructor(
+class OnboardingViewModel
+@Inject
+constructor(
   deviceTier: DeviceTier,
   private val statsRepository: StatsRepository,
   private val modelRepository: ModelRepository,
@@ -31,13 +33,14 @@ class OnboardingViewModel @Inject constructor(
   private val generationScheduler: PuzzleGenerationScheduler,
 ) : ViewModel() {
 
-  private val _state = MutableStateFlow(
-    OnboardingState(
-      currentStep = OnboardingStep.WELCOME,
-      deviceTier = deviceTier,
-      selectedLanguage = java.util.Locale.getDefault().language,
+  private val _state =
+    MutableStateFlow(
+      OnboardingState(
+        currentStep = OnboardingStep.WELCOME,
+        deviceTier = deviceTier,
+        selectedLanguage = java.util.Locale.getDefault().language,
+      )
     )
-  )
   val state: StateFlow<OnboardingState> = _state.asStateFlow()
 
   init {
@@ -78,9 +81,7 @@ class OnboardingViewModel @Inject constructor(
               )
             }
           is ModelDownloadProgress.Completed -> {
-            _state.update {
-              it.copy(downloadProgress = 1f, downloadFailed = false)
-            }
+            _state.update { it.copy(downloadProgress = 1f, downloadFailed = false) }
             initializeEngineAndGenerate(progress.modelPath)
           }
           is ModelDownloadProgress.Failed ->
@@ -94,14 +95,15 @@ class OnboardingViewModel @Inject constructor(
 
   private fun navigateNext() {
     _state.update { current ->
-      val nextStep = when (current.currentStep) {
-        OnboardingStep.WELCOME -> OnboardingStep.LANGUAGE
-        OnboardingStep.LANGUAGE -> OnboardingStep.MODEL_SELECTION
-        OnboardingStep.MODEL_SELECTION -> OnboardingStep.DOWNLOAD
-        OnboardingStep.DOWNLOAD -> OnboardingStep.COMPLETE
-        OnboardingStep.GENERATION -> OnboardingStep.GENERATION
-        OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
-      }
+      val nextStep =
+        when (current.currentStep) {
+          OnboardingStep.WELCOME -> OnboardingStep.LANGUAGE
+          OnboardingStep.LANGUAGE -> OnboardingStep.MODEL_SELECTION
+          OnboardingStep.MODEL_SELECTION -> OnboardingStep.DOWNLOAD
+          OnboardingStep.DOWNLOAD -> OnboardingStep.COMPLETE
+          OnboardingStep.GENERATION -> OnboardingStep.GENERATION
+          OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
+        }
       if (nextStep == OnboardingStep.DOWNLOAD && current.selectedModel != null) {
         startDownloadForModel(current.selectedModel)
       }
@@ -117,17 +119,18 @@ class OnboardingViewModel @Inject constructor(
 
   private fun navigateBack() {
     _state.update { current ->
-      val prevStep = when (current.currentStep) {
-        OnboardingStep.WELCOME -> OnboardingStep.WELCOME
-        OnboardingStep.LANGUAGE -> OnboardingStep.WELCOME
-        OnboardingStep.MODEL_SELECTION -> OnboardingStep.LANGUAGE
-        OnboardingStep.DOWNLOAD -> {
-          downloadManager.cancelDownload()
-          OnboardingStep.MODEL_SELECTION
+      val prevStep =
+        when (current.currentStep) {
+          OnboardingStep.WELCOME -> OnboardingStep.WELCOME
+          OnboardingStep.LANGUAGE -> OnboardingStep.WELCOME
+          OnboardingStep.MODEL_SELECTION -> OnboardingStep.LANGUAGE
+          OnboardingStep.DOWNLOAD -> {
+            downloadManager.cancelDownload()
+            OnboardingStep.MODEL_SELECTION
+          }
+          OnboardingStep.GENERATION -> OnboardingStep.GENERATION
+          OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
         }
-        OnboardingStep.GENERATION -> OnboardingStep.GENERATION
-        OnboardingStep.COMPLETE -> OnboardingStep.COMPLETE
-      }
       current.copy(currentStep = prevStep)
     }
   }
@@ -138,21 +141,21 @@ class OnboardingViewModel @Inject constructor(
 
   private fun selectModel(modelId: ModelId) {
     val tier = _state.value.deviceTier
-    val requiresTierWarning = when {
-      modelId == ModelId.GEMMA4_E2B && tier != DeviceTier.HIGH -> true
-      else -> false
-    }
-    _state.update {
-      it.copy(selectedModel = modelId, showTierWarning = requiresTierWarning)
-    }
+    val requiresTierWarning =
+      when {
+        modelId == ModelId.GEMMA4_E2B && tier != DeviceTier.HIGH -> true
+        else -> false
+      }
+    _state.update { it.copy(selectedModel = modelId, showTierWarning = requiresTierWarning) }
   }
 
   private fun autoSelectModel() {
-    val model = when (_state.value.deviceTier) {
-      DeviceTier.HIGH -> ModelId.GEMMA4_E2B
-      DeviceTier.MEDIUM -> ModelId.QWEN3_0_6B
-      DeviceTier.LOW -> ModelId.QWEN3_0_6B
-    }
+    val model =
+      when (_state.value.deviceTier) {
+        DeviceTier.HIGH -> ModelId.GEMMA4_E2B
+        DeviceTier.MEDIUM -> ModelId.QWEN3_0_6B
+        DeviceTier.LOW -> ModelId.QWEN3_0_6B
+      }
     _state.update { it.copy(selectedModel = model, showTierWarning = false) }
     navigateNext()
   }
@@ -200,7 +203,9 @@ class OnboardingViewModel @Inject constructor(
               _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
               return@collect
             }
-            else -> { /* waiting */ }
+            else -> {
+              /* waiting */
+            }
           }
         }
       } catch (e: Exception) {

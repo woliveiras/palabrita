@@ -113,8 +113,6 @@
     <string name="settings_word_size">Tamanho das palavras</string>
     <string name="settings_word_size_default">Padrão</string>
     <string name="settings_word_size_locked">Desbloqueado no Astuto</string>
-    <string name="settings_stats">Estatísticas</string>
-    <string name="settings_stats_summary">%1$d jogos · %2$d%% vitórias</string>
     <string name="settings_section_ai">Inteligência Artificial</string>
     <string name="settings_current_model">Modelo atual</string>
     <string name="settings_model_gemma4">Gemma 4 E2B</string>
@@ -133,18 +131,6 @@
     <string name="settings_reset_confirm">Resetar</string>
     <string name="settings_error_active_game">Termine o jogo atual antes de trocar</string>
     <string name="settings_error_download_soon">Download de modelos disponível em breve</string>
-
-    <!-- Stats -->
-    <string name="stats_title">Estatísticas</string>
-    <string name="stats_games">Jogos</string>
-    <string name="stats_wins">Vitórias</string>
-    <string name="stats_xp">XP total</string>
-    <string name="stats_tier">Tier</string>
-    <string name="stats_distribution">Distribuição de tentativas</string>
-    <string name="stats_share">Compartilhar estatísticas</string>
-    <string name="stats_share_text_header">Palabrita</string>
-    <string name="stats_share_text_summary">%1$d jogos · %2$d%% vitórias</string>
-    <string name="stats_share_text_xp">XP: %d</string>
 
     <!-- Word Size Options -->
     <string name="word_size_default_label">Padrão</string>

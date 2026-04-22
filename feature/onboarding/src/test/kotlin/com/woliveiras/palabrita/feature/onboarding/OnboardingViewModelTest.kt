@@ -165,9 +165,7 @@ class OnboardingViewModelTest {
 
   // --- Helpers ---
 
-  private fun createViewModel(
-    deviceTier: DeviceTier = DeviceTier.HIGH,
-  ): OnboardingViewModel =
+  private fun createViewModel(deviceTier: DeviceTier = DeviceTier.HIGH): OnboardingViewModel =
     OnboardingViewModel(
       deviceTier = deviceTier,
       statsRepository = FakeStatsRepository(),
@@ -184,7 +182,12 @@ private class FakeStatsRepository : StatsRepository {
 
   override suspend fun getStats(): PlayerStats = stats
 
-  override suspend fun updateAfterGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int) {
+  override suspend fun updateAfterGame(
+    won: Boolean,
+    attempts: Int,
+    difficulty: Int,
+    hintsUsed: Int,
+  ) {
     // no-op for onboarding tests
   }
 
@@ -249,7 +252,9 @@ private class FakeLlmEngineManager : LlmEngineManager {
   override suspend fun createChatSession(systemPrompt: String): LlmSession =
     object : LlmSession {
       override suspend fun sendMessage(message: String): String = "response"
+
       override fun sendMessageStreaming(message: String): Flow<String> = flowOf("response")
+
       override fun close() {}
     }
 
@@ -262,8 +267,11 @@ private class FakeLlmEngineManager : LlmEngineManager {
 
 private class FakeGenerationScheduler : PuzzleGenerationScheduler {
   var scheduledModelId: ModelId? = null
+
   override fun scheduleGeneration(modelId: ModelId) {
     scheduledModelId = modelId
   }
-  override fun observeGenerationState(): Flow<GenerationWorkState> = flowOf(GenerationWorkState.IDLE)
+
+  override fun observeGenerationState(): Flow<GenerationWorkState> =
+    flowOf(GenerationWorkState.IDLE)
 }

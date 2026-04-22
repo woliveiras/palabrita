@@ -19,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -56,7 +55,12 @@ class SettingsViewModelTest {
 
   @Test
   fun `loads current model config on init`() = runTest {
-    val config = ModelConfig(modelId = ModelId.GEMMA4_E2B, downloadState = DownloadState.DOWNLOADED, sizeBytes = 2_600_000_000)
+    val config =
+      ModelConfig(
+        modelId = ModelId.GEMMA4_E2B,
+        downloadState = DownloadState.DOWNLOADED,
+        sizeBytes = 2_600_000_000,
+      )
     val vm = createViewModel(modelConfig = config)
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.currentModel.modelId).isEqualTo(ModelId.GEMMA4_E2B)
@@ -174,9 +178,10 @@ class SettingsViewModelTest {
 
   @Test
   fun `reset progress clears stats`() = runTest {
-    val statsRepo = FakeStatsRepository(
-      PlayerStats(totalPlayed = 42, totalWon = 36, totalXp = 500, preferredLanguage = "es"),
-    )
+    val statsRepo =
+      FakeStatsRepository(
+        PlayerStats(totalPlayed = 42, totalWon = 36, totalXp = 500, preferredLanguage = "es")
+      )
     val vm = createViewModel(statsRepo = statsRepo)
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.ResetProgress)
@@ -188,9 +193,7 @@ class SettingsViewModelTest {
 
   @Test
   fun `reset progress preserves language preference`() = runTest {
-    val statsRepo = FakeStatsRepository(
-      PlayerStats(totalPlayed = 42, preferredLanguage = "es"),
-    )
+    val statsRepo = FakeStatsRepository(PlayerStats(totalPlayed = 42, preferredLanguage = "es"))
     val vm = createViewModel(statsRepo = statsRepo)
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.ResetProgress)
@@ -223,7 +226,9 @@ class SettingsViewModelTest {
   @Test
   fun `reset progress clears chat messages`() = runTest {
     val chatRepo = FakeChatRepository()
-    chatRepo.savedMessages.add(ChatMessage(1, 1L, com.woliveiras.palabrita.core.model.MessageRole.USER, "test", 1000))
+    chatRepo.savedMessages.add(
+      ChatMessage(1, 1L, com.woliveiras.palabrita.core.model.MessageRole.USER, "test", 1000)
+    )
     val vm = createViewModel(chatRepo = chatRepo)
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.ResetProgress)
@@ -246,9 +251,10 @@ class SettingsViewModelTest {
 
   @Test
   fun `delete model switches to none`() = runTest {
-    val modelRepo = FakeModelRepository(
-      ModelConfig(modelId = ModelId.GEMMA4_E2B, downloadState = DownloadState.DOWNLOADED),
-    )
+    val modelRepo =
+      FakeModelRepository(
+        ModelConfig(modelId = ModelId.GEMMA4_E2B, downloadState = DownloadState.DOWNLOADED)
+      )
     val vm = createViewModel(modelRepo = modelRepo)
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.DeleteModel)
@@ -261,12 +267,14 @@ class SettingsViewModelTest {
   fun `delete model clears unplayed AI puzzles`() = runTest {
     val puzzleRepo = FakePuzzleRepository()
     puzzleRepo.unplayedAiPuzzlesCleared = false
-    val vm = createViewModel(
-      modelRepo = FakeModelRepository(
-        ModelConfig(modelId = ModelId.GEMMA4_E2B, downloadState = DownloadState.DOWNLOADED),
-      ),
-      puzzleRepo = puzzleRepo,
-    )
+    val vm =
+      createViewModel(
+        modelRepo =
+          FakeModelRepository(
+            ModelConfig(modelId = ModelId.GEMMA4_E2B, downloadState = DownloadState.DOWNLOADED)
+          ),
+        puzzleRepo = puzzleRepo,
+      )
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.DeleteModel)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -318,51 +326,67 @@ class SettingsViewModelTest {
     sessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(),
     chatRepo: FakeChatRepository = FakeChatRepository(),
     puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(),
-  ): SettingsViewModel = SettingsViewModel(
-    statsRepository = statsRepo,
-    modelRepository = modelRepo,
-    gameSessionRepository = sessionRepo,
-    chatRepository = chatRepo,
-    puzzleRepository = puzzleRepo,
-    deviceTier = deviceTier,
-  )
+  ): SettingsViewModel =
+    SettingsViewModel(
+      statsRepository = statsRepo,
+      modelRepository = modelRepo,
+      gameSessionRepository = sessionRepo,
+      chatRepository = chatRepo,
+      puzzleRepository = puzzleRepo,
+      deviceTier = deviceTier,
+    )
 }
 
 // --- Fakes ---
 
-private class FakeStatsRepository(
-  private var stats: PlayerStats = PlayerStats(),
-) : StatsRepository {
+private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()) :
+  StatsRepository {
   private val _flow = MutableStateFlow(stats)
 
   override suspend fun getStats(): PlayerStats = stats
-  override suspend fun updateAfterGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int) {}
+
+  override suspend fun updateAfterGame(
+    won: Boolean,
+    attempts: Int,
+    difficulty: Int,
+    hintsUsed: Int,
+  ) {}
+
   override suspend fun checkAndPromoteDifficulty(): Int = stats.currentDifficulty
+
   override suspend fun updateLanguage(language: String) {
     stats = stats.copy(preferredLanguage = language)
     _flow.value = stats
   }
+
   override suspend fun updateWordSizePreference(preference: String) {
     stats = stats.copy(wordSizePreference = preference)
     _flow.value = stats
   }
+
   override suspend fun resetProgress() {
-    stats = PlayerStats(preferredLanguage = stats.preferredLanguage, wordSizePreference = stats.wordSizePreference)
+    stats =
+      PlayerStats(
+        preferredLanguage = stats.preferredLanguage,
+        wordSizePreference = stats.wordSizePreference,
+      )
     _flow.value = stats
   }
+
   override fun observeStats(): Flow<PlayerStats> = _flow
 }
 
-private class FakeModelRepository(
-  private var config: ModelConfig = ModelConfig(),
-) : ModelRepository {
+private class FakeModelRepository(private var config: ModelConfig = ModelConfig()) :
+  ModelRepository {
   private val _flow = MutableStateFlow(config)
 
   override suspend fun getConfig(): ModelConfig = config
+
   override suspend fun updateConfig(config: ModelConfig) {
     this.config = config
     _flow.value = config
   }
+
   override fun observeConfig(): Flow<ModelConfig> = _flow
 }
 
@@ -373,14 +397,17 @@ private class FakeGameSessionRepository : GameSessionRepository {
     sessions.add(session)
     return session.id
   }
+
   override suspend fun update(session: GameSession) {
     sessions.removeAll { it.puzzleId == session.puzzleId }
     sessions.add(session)
   }
+
   override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
     sessions.find { it.puzzleId == puzzleId }
-  override suspend fun hasActiveGame(): Boolean =
-    sessions.any { it.completedAt == null }
+
+  override suspend fun hasActiveGame(): Boolean = sessions.any { it.completedAt == null }
+
   override suspend fun completeSession(
     puzzleId: Long,
     attempts: List<String>,
@@ -392,6 +419,7 @@ private class FakeGameSessionRepository : GameSessionRepository {
     sessions.remove(session)
     sessions.add(session.copy(completedAt = completedAt, won = won))
   }
+
   override suspend fun deleteAll() {
     sessions.clear()
   }
@@ -400,11 +428,23 @@ private class FakeGameSessionRepository : GameSessionRepository {
 private class FakeChatRepository : ChatRepository {
   val savedMessages = mutableListOf<ChatMessage>()
 
-  override suspend fun getMessages(puzzleId: Long): List<ChatMessage> = savedMessages.filter { it.puzzleId == puzzleId }
-  override suspend fun saveMessage(message: ChatMessage) { savedMessages.add(message) }
-  override suspend fun countUserMessages(puzzleId: Long): Int = savedMessages.count { it.puzzleId == puzzleId && it.role == com.woliveiras.palabrita.core.model.MessageRole.USER }
+  override suspend fun getMessages(puzzleId: Long): List<ChatMessage> =
+    savedMessages.filter { it.puzzleId == puzzleId }
+
+  override suspend fun saveMessage(message: ChatMessage) {
+    savedMessages.add(message)
+  }
+
+  override suspend fun countUserMessages(puzzleId: Long): Int =
+    savedMessages.count {
+      it.puzzleId == puzzleId && it.role == com.woliveiras.palabrita.core.model.MessageRole.USER
+    }
+
   override suspend fun getPuzzle(puzzleId: Long): Puzzle? = null
-  override suspend fun deleteAll() { savedMessages.clear() }
+
+  override suspend fun deleteAll() {
+    savedMessages.clear()
+  }
 }
 
 private class FakePuzzleRepository : PuzzleRepository {
@@ -412,13 +452,26 @@ private class FakePuzzleRepository : PuzzleRepository {
   var allUnplayed = false
 
   override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? = null
+
   override suspend fun countUnplayed(language: String, difficulty: Int): Int = 0
+
   override suspend fun countAllUnplayed(language: String): Int = 0
+
   override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
+
   override suspend fun getRecentWords(limit: Int): List<String> = emptyList()
+
   override suspend fun savePuzzle(puzzle: Puzzle): Long = 0
+
   override suspend fun savePuzzles(puzzles: List<Puzzle>) {}
+
   override suspend fun markAsPlayed(puzzleId: Long) {}
-  override suspend fun deleteUnplayedAiPuzzles() { unplayedAiPuzzlesCleared = true }
-  override suspend fun markAllUnplayed() { allUnplayed = true }
+
+  override suspend fun deleteUnplayedAiPuzzles() {
+    unplayedAiPuzzlesCleared = true
+  }
+
+  override suspend fun markAllUnplayed() {
+    allUnplayed = true
+  }
 }

@@ -21,9 +21,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 @Singleton
-class LlmEngineManagerImpl @Inject constructor(
-  @ApplicationContext private val context: Context,
-) : LlmEngineManager {
+class LlmEngineManagerImpl @Inject constructor(@ApplicationContext private val context: Context) :
+  LlmEngineManager {
 
   private var engine: Engine? = null
   private val mutex = Mutex()
@@ -55,19 +54,23 @@ class LlmEngineManagerImpl @Inject constructor(
         }
       }
     } catch (e: Exception) {
-      mutex.withLock { _engineState.value = EngineState.Error(e.message ?: context.getString(com.woliveiras.palabrita.core.common.R.string.error_engine_init)) }
+      mutex.withLock {
+        _engineState.value =
+          EngineState.Error(
+            e.message
+              ?: context.getString(com.woliveiras.palabrita.core.common.R.string.error_engine_init)
+          )
+      }
     }
   }
 
   override suspend fun generateSingleTurn(systemPrompt: String?, userPrompt: String): String {
-    val currentEngine =
-      engine ?: throw IllegalStateException("Engine not initialized")
+    val currentEngine = engine ?: throw IllegalStateException("Engine not initialized")
 
     return withContext(Dispatchers.IO) {
       val conversationConfig =
         ConversationConfig(
-          systemInstruction =
-            systemPrompt?.let { Contents.of(it) },
+          systemInstruction = systemPrompt?.let { Contents.of(it) },
           samplerConfig = SamplerConfig(topK = 40, topP = 0.95, temperature = 0.8),
         )
 
@@ -79,8 +82,7 @@ class LlmEngineManagerImpl @Inject constructor(
   }
 
   override suspend fun createChatSession(systemPrompt: String): LlmSession {
-    val currentEngine =
-      engine ?: throw IllegalStateException("Engine not initialized")
+    val currentEngine = engine ?: throw IllegalStateException("Engine not initialized")
 
     return withContext(Dispatchers.IO) {
       val conversationConfig =
@@ -103,9 +105,8 @@ class LlmEngineManagerImpl @Inject constructor(
   override fun isReady(): Boolean = _engineState.value is EngineState.Ready
 }
 
-private class LlmSessionImpl(
-  private val conversation: com.google.ai.edge.litertlm.Conversation,
-) : LlmSession {
+private class LlmSessionImpl(private val conversation: com.google.ai.edge.litertlm.Conversation) :
+  LlmSession {
 
   override suspend fun sendMessage(message: String): String {
     return withContext(Dispatchers.IO) {
@@ -115,9 +116,7 @@ private class LlmSessionImpl(
   }
 
   override fun sendMessageStreaming(message: String): Flow<String> {
-    return conversation.sendMessageAsync(message).map { msg ->
-      msg.toString()
-    }
+    return conversation.sendMessageAsync(message).map { msg -> msg.toString() }
   }
 
   override fun close() {

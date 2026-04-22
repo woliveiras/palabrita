@@ -13,9 +13,8 @@ import kotlinx.coroutines.flow.map
 private val Context.dataStore by preferencesDataStore(name = "palabrita_prefs")
 
 @Singleton
-class AppPreferencesImpl @Inject constructor(
-  @ApplicationContext private val context: Context,
-) : AppPreferences {
+class AppPreferencesImpl @Inject constructor(@ApplicationContext private val context: Context) :
+  AppPreferences {
 
   private val onboardingCompleteKey = booleanPreferencesKey("onboarding_complete")
 

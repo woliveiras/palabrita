@@ -7,10 +7,8 @@ class GameLogicKeyboardStateTest {
 
   @Test
   fun `correct letter updates keyboard to CORRECT`() {
-    val feedback = listOf(
-      LetterFeedback('a', LetterState.CORRECT),
-      LetterFeedback('b', LetterState.ABSENT),
-    )
+    val feedback =
+      listOf(LetterFeedback('a', LetterState.CORRECT), LetterFeedback('b', LetterState.ABSENT))
     val result = GameLogic.updateKeyboardState(emptyMap(), feedback)
     assertThat(result['a']).isEqualTo(LetterState.CORRECT)
   }
@@ -63,13 +61,14 @@ class GameLogicKeyboardStateTest {
 
   @Test
   fun `multiple letters update correctly in one pass`() {
-    val feedback = listOf(
-      LetterFeedback('a', LetterState.CORRECT),
-      LetterFeedback('b', LetterState.PRESENT),
-      LetterFeedback('c', LetterState.ABSENT),
-      LetterFeedback('d', LetterState.CORRECT),
-      LetterFeedback('e', LetterState.ABSENT),
-    )
+    val feedback =
+      listOf(
+        LetterFeedback('a', LetterState.CORRECT),
+        LetterFeedback('b', LetterState.PRESENT),
+        LetterFeedback('c', LetterState.ABSENT),
+        LetterFeedback('d', LetterState.CORRECT),
+        LetterFeedback('e', LetterState.ABSENT),
+      )
     val result = GameLogic.updateKeyboardState(emptyMap(), feedback)
     assertThat(result['a']).isEqualTo(LetterState.CORRECT)
     assertThat(result['b']).isEqualTo(LetterState.PRESENT)

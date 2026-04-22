@@ -85,8 +85,7 @@ constructor(
       return
     }
 
-    val availableBytes =
-      android.os.StatFs(context.filesDir.absolutePath).availableBytes
+    val availableBytes = android.os.StatFs(context.filesDir.absolutePath).availableBytes
     if (availableBytes < info.sizeBytes + 100_000_000L) {
       _progress.value =
         ModelDownloadProgress.Failed(
@@ -100,22 +99,28 @@ constructor(
     }
 
     coroutineScope {
-      downloadJob =
-        launch {
-          try {
-            downloadFile(info.downloadUrl, targetFile)
-            completeDownload(modelId, targetFile)
-          } catch (e: kotlin.coroutines.cancellation.CancellationException) {
-            _progress.value = ModelDownloadProgress.Idle
-            throw e
-          } catch (_: ModelGatedException) {
-            _progress.value =
-              ModelDownloadProgress.Failed(context.getString(com.woliveiras.palabrita.core.common.R.string.error_model_gated))
-          } catch (e: Exception) {
-            _progress.value =
-              ModelDownloadProgress.Failed(e.message ?: context.getString(com.woliveiras.palabrita.core.common.R.string.error_download_unknown))
-          }
+      downloadJob = launch {
+        try {
+          downloadFile(info.downloadUrl, targetFile)
+          completeDownload(modelId, targetFile)
+        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+          _progress.value = ModelDownloadProgress.Idle
+          throw e
+        } catch (_: ModelGatedException) {
+          _progress.value =
+            ModelDownloadProgress.Failed(
+              context.getString(com.woliveiras.palabrita.core.common.R.string.error_model_gated)
+            )
+        } catch (e: Exception) {
+          _progress.value =
+            ModelDownloadProgress.Failed(
+              e.message
+                ?: context.getString(
+                  com.woliveiras.palabrita.core.common.R.string.error_download_unknown
+                )
+            )
         }
+      }
       downloadJob?.join()
     }
   }
@@ -163,8 +168,7 @@ constructor(
               if (bytesRead == -1) break
               output.write(buffer, 0, bytesRead)
               downloadedBytes += bytesRead
-              val progress =
-                if (totalBytes > 0) downloadedBytes.toFloat() / totalBytes else 0f
+              val progress = if (totalBytes > 0) downloadedBytes.toFloat() / totalBytes else 0f
               _progress.value =
                 ModelDownloadProgress.Downloading(progress, downloadedBytes, totalBytes)
             }

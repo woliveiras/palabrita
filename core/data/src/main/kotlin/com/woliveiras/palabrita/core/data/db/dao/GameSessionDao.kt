@@ -21,8 +21,7 @@ interface GameSessionDao {
   @Query("SELECT EXISTS(SELECT 1 FROM game_sessions WHERE completedAt IS NULL)")
   suspend fun hasActiveGame(): Boolean
 
-  @Query("DELETE FROM game_sessions")
-  suspend fun deleteAll()
+  @Query("DELETE FROM game_sessions") suspend fun deleteAll()
 
   @Query(
     """
@@ -32,7 +31,7 @@ interface GameSessionDao {
       hintsUsed = :hintsUsed,
       won = :won
     WHERE puzzleId = :puzzleId
-    """,
+    """
   )
   suspend fun completeSession(
     puzzleId: Long,

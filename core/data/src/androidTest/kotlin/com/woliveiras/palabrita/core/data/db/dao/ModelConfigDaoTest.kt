@@ -36,10 +36,7 @@ class ModelConfigDaoTest {
     database.close()
   }
 
-  @Test
-  fun get_returnsNullWhenEmpty() = runTest {
-    assertThat(dao.get()).isNull()
-  }
+  @Test fun get_returnsNullWhenEmpty() = runTest { assertThat(dao.get()).isNull() }
 
   @Test
   fun upsert_createsNewConfig() = runTest {
@@ -83,9 +80,7 @@ class ModelConfigDaoTest {
 
   @Test
   fun observe_emitsConfigAfterUpsert() = runTest {
-    dao.upsert(
-      createTestModelConfigEntity(modelId = "gemma4_e2b", downloadState = "DOWNLOADING")
-    )
+    dao.upsert(createTestModelConfigEntity(modelId = "gemma4_e2b", downloadState = "DOWNLOADING"))
 
     val result = dao.observe().first()
 
@@ -96,9 +91,7 @@ class ModelConfigDaoTest {
 
   @Test
   fun upsert_persistsDownloadStateBetweenReads() = runTest {
-    dao.upsert(
-      createTestModelConfigEntity(modelId = "qwen3_0_6b", downloadState = "DOWNLOADING")
-    )
+    dao.upsert(createTestModelConfigEntity(modelId = "qwen3_0_6b", downloadState = "DOWNLOADING"))
 
     val first = dao.get()
     assertThat(first!!.downloadState).isEqualTo("DOWNLOADING")

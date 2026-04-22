@@ -40,25 +40,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelId
-import androidx.compose.ui.res.stringResource
-import com.woliveiras.palabrita.core.common.R as CommonR
 
-private val LANGUAGES = listOf(
-  "pt" to "Português (BR)",
-  "en" to "English",
-  "es" to "Español",
-)
+private val LANGUAGES = listOf("pt" to "Português (BR)", "en" to "English", "es" to "Español")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
   onBack: () -> Unit,
-  onNavigateToStats: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -84,7 +79,10 @@ fun SettingsScreen(
         title = { Text(stringResource(CommonR.string.settings)) },
         navigationIcon = {
           IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(CommonR.string.back))
+            Icon(
+              Icons.AutoMirrored.Rounded.ArrowBack,
+              contentDescription = stringResource(CommonR.string.back),
+            )
           }
         },
       )
@@ -92,17 +90,18 @@ fun SettingsScreen(
     snackbarHost = { SnackbarHost(snackbarHostState) },
   ) { padding ->
     Column(
-      modifier = modifier
-        .fillMaxSize()
-        .padding(padding)
-        .verticalScroll(rememberScrollState()),
+      modifier = modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
     ) {
       // --- JOGO ---
       SectionHeader(stringResource(CommonR.string.settings_section_game))
 
       ListItem(
         headlineContent = { Text(stringResource(CommonR.string.settings_language)) },
-        supportingContent = { Text(LANGUAGES.find { it.first == state.currentLanguage }?.second ?: state.currentLanguage) },
+        supportingContent = {
+          Text(
+            LANGUAGES.find { it.first == state.currentLanguage }?.second ?: state.currentLanguage
+          )
+        },
         leadingContent = { Icon(Icons.Rounded.Language, contentDescription = null) },
         modifier = Modifier.clickable { showLanguageDialog = true },
       )
@@ -112,7 +111,10 @@ fun SettingsScreen(
         supportingContent = {
           if (state.isWordSizeUnlocked) {
             val opt = WORD_SIZE_OPTIONS.find { it.key == state.wordSizePreference }
-            Text(opt?.let { stringResource(it.labelRes) } ?: stringResource(CommonR.string.settings_word_size_default))
+            Text(
+              opt?.let { stringResource(it.labelRes) }
+                ?: stringResource(CommonR.string.settings_word_size_default)
+            )
           } else {
             Text(stringResource(CommonR.string.settings_word_size_locked))
           }
@@ -121,18 +123,13 @@ fun SettingsScreen(
           if (state.isWordSizeUnlocked) {
             Icon(Icons.Rounded.SortByAlpha, contentDescription = null)
           } else {
-            Icon(Icons.Rounded.Lock, contentDescription = stringResource(CommonR.string.settings_word_size_locked))
+            Icon(
+              Icons.Rounded.Lock,
+              contentDescription = stringResource(CommonR.string.settings_word_size_locked),
+            )
           }
         },
-        modifier = Modifier.clickable {
-          if (state.isWordSizeUnlocked) showWordSizeDialog = true
-        },
-      )
-
-      ListItem(
-        headlineContent = { Text(stringResource(CommonR.string.settings_stats)) },
-        supportingContent = { Text(stringResource(CommonR.string.settings_stats_summary, state.stats.totalPlayed, state.winRate)) },
-        modifier = Modifier.clickable { onNavigateToStats() },
+        modifier = Modifier.clickable { if (state.isWordSizeUnlocked) showWordSizeDialog = true },
       )
 
       HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -140,19 +137,21 @@ fun SettingsScreen(
       // --- INTELIGÊNCIA ARTIFICIAL ---
       SectionHeader(stringResource(CommonR.string.settings_section_ai))
 
-      val modelName = when (state.currentModel.modelId) {
-        ModelId.GEMMA4_E2B -> stringResource(CommonR.string.settings_model_gemma4)
-        ModelId.QWEN3_0_6B -> stringResource(CommonR.string.settings_model_qwen3)
-        ModelId.NONE -> stringResource(CommonR.string.settings_model_none)
-      }
+      val modelName =
+        when (state.currentModel.modelId) {
+          ModelId.GEMMA4_E2B -> stringResource(CommonR.string.settings_model_gemma4)
+          ModelId.QWEN3_0_6B -> stringResource(CommonR.string.settings_model_qwen3)
+          ModelId.NONE -> stringResource(CommonR.string.settings_model_none)
+        }
       ListItem(
         headlineContent = { Text(stringResource(CommonR.string.settings_current_model)) },
         supportingContent = { Text(modelName) },
         leadingContent = { Icon(Icons.Rounded.Memory, contentDescription = null) },
       )
 
-      if (state.currentModel.modelId != ModelId.NONE &&
-        state.currentModel.downloadState == DownloadState.DOWNLOADED
+      if (
+        state.currentModel.modelId != ModelId.NONE &&
+          state.currentModel.downloadState == DownloadState.DOWNLOADED
       ) {
         ListItem(
           headlineContent = { Text(stringResource(CommonR.string.settings_storage)) },
@@ -186,7 +185,10 @@ fun SettingsScreen(
 
       ListItem(
         headlineContent = {
-          Text(stringResource(CommonR.string.settings_reset_progress), color = MaterialTheme.colorScheme.error)
+          Text(
+            stringResource(CommonR.string.settings_reset_progress),
+            color = MaterialTheme.colorScheme.error,
+          )
         },
         supportingContent = { Text(stringResource(CommonR.string.settings_reset_hint)) },
         leadingContent = {
@@ -232,21 +234,24 @@ fun SettingsScreen(
     AlertDialog(
       onDismissRequest = { showDeleteModelDialog = false },
       title = { Text(stringResource(CommonR.string.settings_delete_model)) },
-      text = {
-        Text(
-          stringResource(CommonR.string.settings_delete_model_message),
-        )
-      },
+      text = { Text(stringResource(CommonR.string.settings_delete_model_message)) },
       confirmButton = {
-        TextButton(onClick = {
-          viewModel.onAction(SettingsAction.DeleteModel)
-          showDeleteModelDialog = false
-        }) {
-          Text(stringResource(CommonR.string.settings_delete_confirm), color = MaterialTheme.colorScheme.error)
+        TextButton(
+          onClick = {
+            viewModel.onAction(SettingsAction.DeleteModel)
+            showDeleteModelDialog = false
+          }
+        ) {
+          Text(
+            stringResource(CommonR.string.settings_delete_confirm),
+            color = MaterialTheme.colorScheme.error,
+          )
         }
       },
       dismissButton = {
-        TextButton(onClick = { showDeleteModelDialog = false }) { Text(stringResource(CommonR.string.cancel)) }
+        TextButton(onClick = { showDeleteModelDialog = false }) {
+          Text(stringResource(CommonR.string.cancel))
+        }
       },
     )
   }
@@ -255,21 +260,24 @@ fun SettingsScreen(
     AlertDialog(
       onDismissRequest = { showResetDialog = false },
       title = { Text(stringResource(CommonR.string.settings_reset_progress)) },
-      text = {
-        Text(
-          stringResource(CommonR.string.settings_reset_message),
-        )
-      },
+      text = { Text(stringResource(CommonR.string.settings_reset_message)) },
       confirmButton = {
-        TextButton(onClick = {
-          viewModel.onAction(SettingsAction.ResetProgress)
-          showResetDialog = false
-        }) {
-          Text(stringResource(CommonR.string.settings_reset_confirm), color = MaterialTheme.colorScheme.error)
+        TextButton(
+          onClick = {
+            viewModel.onAction(SettingsAction.ResetProgress)
+            showResetDialog = false
+          }
+        ) {
+          Text(
+            stringResource(CommonR.string.settings_reset_confirm),
+            color = MaterialTheme.colorScheme.error,
+          )
         }
       },
       dismissButton = {
-        TextButton(onClick = { showResetDialog = false }) { Text(stringResource(CommonR.string.cancel)) }
+        TextButton(onClick = { showResetDialog = false }) {
+          Text(stringResource(CommonR.string.cancel))
+        }
       },
     )
   }
@@ -286,11 +294,7 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
-private fun LanguageDialog(
-  current: String,
-  onSelect: (String) -> Unit,
-  onDismiss: () -> Unit,
-) {
+private fun LanguageDialog(current: String, onSelect: (String) -> Unit, onDismiss: () -> Unit) {
   AlertDialog(
     onDismissRequest = onDismiss,
     title = { Text(stringResource(CommonR.string.settings_language)) },
@@ -298,10 +302,10 @@ private fun LanguageDialog(
       Column {
         LANGUAGES.forEach { (code, name) ->
           Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .clickable { onSelect(code) }
-              .padding(vertical = 12.dp, horizontal = 8.dp),
+            modifier =
+              Modifier.fillMaxWidth()
+                .clickable { onSelect(code) }
+                .padding(vertical = 12.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
           ) {
             Text(name)
@@ -325,7 +329,8 @@ private fun WordSizeDialog(
   onSelect: (String) -> Unit,
   onDismiss: () -> Unit,
 ) {
-  val options = if (isEpicAvailable) WORD_SIZE_OPTIONS else WORD_SIZE_OPTIONS.filter { it.key != "EPIC" }
+  val options =
+    if (isEpicAvailable) WORD_SIZE_OPTIONS else WORD_SIZE_OPTIONS.filter { it.key != "EPIC" }
 
   AlertDialog(
     onDismissRequest = onDismiss,
@@ -334,10 +339,10 @@ private fun WordSizeDialog(
       Column {
         options.forEach { option ->
           Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .clickable { onSelect(option.key) }
-              .padding(vertical = 12.dp, horizontal = 8.dp),
+            modifier =
+              Modifier.fillMaxWidth()
+                .clickable { onSelect(option.key) }
+                .padding(vertical = 12.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
           ) {
             Column(modifier = Modifier.weight(1f)) {

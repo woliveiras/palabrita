@@ -48,9 +48,30 @@ class ChatMessageDaoTest {
 
   @Test
   fun getByPuzzleId_returnsMessagesOrderedByTimestamp() = runTest {
-    dao.insert(createTestChatMessageEntity(puzzleId = 1, role = "user", content = "Primeiro", timestamp = 100))
-    dao.insert(createTestChatMessageEntity(puzzleId = 1, role = "model", content = "Segundo", timestamp = 200))
-    dao.insert(createTestChatMessageEntity(puzzleId = 1, role = "user", content = "Terceiro", timestamp = 300))
+    dao.insert(
+      createTestChatMessageEntity(
+        puzzleId = 1,
+        role = "user",
+        content = "Primeiro",
+        timestamp = 100,
+      )
+    )
+    dao.insert(
+      createTestChatMessageEntity(
+        puzzleId = 1,
+        role = "model",
+        content = "Segundo",
+        timestamp = 200,
+      )
+    )
+    dao.insert(
+      createTestChatMessageEntity(
+        puzzleId = 1,
+        role = "user",
+        content = "Terceiro",
+        timestamp = 300,
+      )
+    )
 
     val messages = dao.getByPuzzleId(1)
 

@@ -14,8 +14,7 @@ import kotlinx.coroutines.flow.map
 class ModelRepositoryImpl @Inject constructor(private val configDao: ModelConfigDao) :
   ModelRepository {
 
-  override suspend fun getConfig(): ModelConfig =
-    configDao.get()?.toDomain() ?: ModelConfig()
+  override suspend fun getConfig(): ModelConfig = configDao.get()?.toDomain() ?: ModelConfig()
 
   override suspend fun updateConfig(config: ModelConfig) {
     configDao.upsert(config.toEntity())

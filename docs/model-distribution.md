@@ -27,7 +27,7 @@ palabrita/
 │   ├── build.gradle.kts
 │   └── src/main/assets/
 │       └── (modelo baixado durante build ou CI)
-├── gemma3-1b-pack/           ← Asset pack para Gemma 3 1B
+├── qwen3-06b-pack/             ← Asset pack para Qwen3 0.6B
 │   ├── build.gradle.kts
 │   └── src/main/assets/
 │       └── (modelo baixado durante build ou CI)
@@ -51,13 +51,13 @@ assetPack {
 ```
 
 ```kotlin
-// gemma3-1b-pack/build.gradle.kts
+// qwen3-06b-pack/build.gradle.kts
 plugins {
     id("com.android.asset-pack")
 }
 
 assetPack {
-    packName.set("gemma3_1b")
+    packName.set("qwen3_0_6b")
     dynamicDelivery {
         deliveryType.set("on-demand")
     }
@@ -68,7 +68,7 @@ assetPack {
 
 ```kotlin
 android {
-    assetPacks += listOf(":gemma4-e2b-pack", ":gemma3-1b-pack")
+    assetPacks += listOf(":gemma4-e2b-pack", ":qwen3-06b-pack")
 }
 ```
 
@@ -76,7 +76,7 @@ android {
 
 ```kotlin
 include(":gemma4-e2b-pack")
-include(":gemma3-1b-pack")
+include(":qwen3-06b-pack")
 ```
 
 ## Download Flow no App

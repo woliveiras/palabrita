@@ -29,7 +29,9 @@ data class AiInfoState(
 )
 
 @HiltViewModel
-class AiInfoViewModel @Inject constructor(
+class AiInfoViewModel
+@Inject
+constructor(
   private val modelRepository: ModelRepository,
   private val engineManager: LlmEngineManager,
 ) : ViewModel() {
@@ -52,18 +54,20 @@ class AiInfoViewModel @Inject constructor(
             modelId = config.modelId,
             modelPath = config.modelPath,
             puzzleSystemPrompt = PromptTemplates.puzzleSystemPromptGemma4(),
-            puzzleSamplePrompt = PromptTemplates.puzzleUserPromptGemma4(
-              language = "pt",
-              difficulty = 3,
-              minLength = 4,
-              maxLength = 7,
-              recentWords = listOf("gatos", "mesa"),
-            ),
-            chatSamplePrompt = PromptTemplates.chatSystemPrompt(
-              word = "gatos",
-              category = "animal",
-              language = "pt",
-            ),
+            puzzleSamplePrompt =
+              PromptTemplates.puzzleUserPromptGemma4(
+                language = "pt",
+                difficulty = 3,
+                minLength = 4,
+                maxLength = 7,
+                recentWords = listOf("gatos", "mesa"),
+              ),
+            chatSamplePrompt =
+              PromptTemplates.chatSystemPrompt(
+                word = "gatos",
+                category = "animal",
+                language = "pt",
+              ),
             isLoading = false,
           )
         }

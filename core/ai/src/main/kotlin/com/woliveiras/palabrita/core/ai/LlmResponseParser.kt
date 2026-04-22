@@ -15,12 +15,16 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
     }
 
     // Attempt 1: direct parse
-    tryDecode(rawResponse)?.let { return ParseResult.Success(it) }
+    tryDecode(rawResponse)?.let {
+      return ParseResult.Success(it)
+    }
 
     // Attempt 2: extract JSON via regex
     val extracted = jsonObjectRegex.find(rawResponse)?.value
     if (extracted != null) {
-      tryDecode(extracted)?.let { return ParseResult.Success(it) }
+      tryDecode(extracted)?.let {
+        return ParseResult.Success(it)
+      }
     }
 
     return ParseResult.Error("could not parse JSON from response", rawResponse)

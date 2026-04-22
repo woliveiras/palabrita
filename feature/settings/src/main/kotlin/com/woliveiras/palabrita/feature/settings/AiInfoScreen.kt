@@ -39,10 +39,7 @@ import com.woliveiras.palabrita.core.ai.EngineState
 import com.woliveiras.palabrita.core.common.R as CommonR
 
 @Composable
-fun AiInfoScreen(
-  modifier: Modifier = Modifier,
-  viewModel: AiInfoViewModel = hiltViewModel(),
-) {
+fun AiInfoScreen(modifier: Modifier = Modifier, viewModel: AiInfoViewModel = hiltViewModel()) {
   val state by viewModel.state.collectAsStateWithLifecycle()
 
   if (state.isLoading) {
@@ -56,12 +53,7 @@ fun AiInfoScreen(
     return
   }
 
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .verticalScroll(rememberScrollState())
-      .padding(16.dp),
-  ) {
+  Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
     // Header
     Row(verticalAlignment = Alignment.CenterVertically) {
       Icon(
@@ -118,9 +110,7 @@ fun AiInfoScreen(
 private fun ModelInfoCard(state: AiInfoState) {
   Card(
     modifier = Modifier.fillMaxWidth(),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.primaryContainer,
-    ),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     shape = RoundedCornerShape(16.dp),
   ) {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -150,37 +140,36 @@ private fun ModelInfoCard(state: AiInfoState) {
 
 @Composable
 private fun EngineStatusCard(engineState: EngineState) {
-  val (icon, label, color) = when (engineState) {
-    is EngineState.Ready -> Triple(
-      Icons.Rounded.CheckCircle,
-      stringResource(CommonR.string.ai_info_engine_ready),
-      MaterialTheme.colorScheme.primary,
-    )
-    is EngineState.Initializing -> Triple(
-      Icons.Rounded.HourglassTop,
-      stringResource(CommonR.string.ai_info_engine_loading),
-      MaterialTheme.colorScheme.tertiary,
-    )
-    is EngineState.Error -> Triple(
-      Icons.Rounded.ErrorOutline,
-      stringResource(CommonR.string.ai_info_engine_error),
-      MaterialTheme.colorScheme.error,
-    )
-    is EngineState.Uninitialized -> Triple(
-      Icons.Rounded.HourglassTop,
-      stringResource(CommonR.string.ai_info_engine_off),
-      MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-  }
+  val (icon, label, color) =
+    when (engineState) {
+      is EngineState.Ready ->
+        Triple(
+          Icons.Rounded.CheckCircle,
+          stringResource(CommonR.string.ai_info_engine_ready),
+          MaterialTheme.colorScheme.primary,
+        )
+      is EngineState.Initializing ->
+        Triple(
+          Icons.Rounded.HourglassTop,
+          stringResource(CommonR.string.ai_info_engine_loading),
+          MaterialTheme.colorScheme.tertiary,
+        )
+      is EngineState.Error ->
+        Triple(
+          Icons.Rounded.ErrorOutline,
+          stringResource(CommonR.string.ai_info_engine_error),
+          MaterialTheme.colorScheme.error,
+        )
+      is EngineState.Uninitialized ->
+        Triple(
+          Icons.Rounded.HourglassTop,
+          stringResource(CommonR.string.ai_info_engine_off),
+          MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 
-  OutlinedCard(
-    modifier = Modifier.fillMaxWidth(),
-    shape = RoundedCornerShape(12.dp),
-  ) {
-    Row(
-      modifier = Modifier.padding(16.dp),
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
+  OutlinedCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
       Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
       Spacer(Modifier.width(12.dp))
       Column {
@@ -197,16 +186,9 @@ private fun EngineStatusCard(engineState: EngineState) {
 
 @Composable
 private fun PromptCard(title: String, content: String) {
-  OutlinedCard(
-    modifier = Modifier.fillMaxWidth(),
-    shape = RoundedCornerShape(12.dp),
-  ) {
+  OutlinedCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
     Column(modifier = Modifier.padding(12.dp)) {
-      Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.Bold,
-      )
+      Text(text = title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
       Spacer(Modifier.height(4.dp))
       Text(
         text = content,

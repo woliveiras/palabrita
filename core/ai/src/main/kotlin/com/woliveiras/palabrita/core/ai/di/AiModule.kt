@@ -36,5 +36,7 @@ abstract class AiModule {
 
   @Binds
   @Singleton
-  abstract fun bindPuzzleGenerationScheduler(impl: PuzzleGenerationSchedulerImpl): PuzzleGenerationScheduler
+  abstract fun bindPuzzleGenerationScheduler(
+    impl: PuzzleGenerationSchedulerImpl
+  ): PuzzleGenerationScheduler
 }

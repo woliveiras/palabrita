@@ -83,8 +83,14 @@ class PuzzleMapperTest {
   fun `source AI roundtrips correctly`() {
     val entity =
       PuzzleEntity(
-        word = "gatos", wordDisplay = "gatos", language = "pt", difficulty = 2,
-        category = "animal", hints = "[]", source = "AI", generatedAt = 0,
+        word = "gatos",
+        wordDisplay = "gatos",
+        language = "pt",
+        difficulty = 2,
+        category = "animal",
+        hints = "[]",
+        source = "AI",
+        generatedAt = 0,
       )
 
     assertThat(entity.toDomain().toEntity().source).isEqualTo("AI")

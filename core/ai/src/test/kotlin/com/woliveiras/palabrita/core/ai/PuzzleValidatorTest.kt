@@ -21,7 +21,8 @@ class PuzzleValidatorTest {
     val puzzle = createTestPuzzleResponse(word = "gato") // 4 chars
     val result = validator.validate(puzzle, emptySet(), 5..6)
     assertThat(result).isInstanceOf(ValidationResult.Invalid::class.java)
-    assertThat((result as ValidationResult.Invalid).reasons).contains("word length 4 not in range 5..6")
+    assertThat((result as ValidationResult.Invalid).reasons)
+      .contains("word length 4 not in range 5..6")
   }
 
   @Test
@@ -52,7 +53,8 @@ class PuzzleValidatorTest {
     val puzzle = createTestPuzzleResponse(word = "café")
     val result = validator.validate(puzzle, emptySet(), 4..6)
     assertThat(result).isInstanceOf(ValidationResult.Invalid::class.java)
-    assertThat((result as ValidationResult.Invalid).reasons.any { "invalid characters" in it }).isTrue()
+    assertThat((result as ValidationResult.Invalid).reasons.any { "invalid characters" in it })
+      .isTrue()
   }
 
   @Test
@@ -121,16 +123,24 @@ class PuzzleValidatorTest {
 
   @Test
   fun `hint containing the word is rejected`() {
-    val puzzle = createTestPuzzleResponse(word = "gatos", hints = listOf(
-      "Tem quatro patas",
-      "É um animal doméstico",
-      "Os gatos ronronam",
-      "Persegue ratos",
-      "Mia",
-    ))
+    val puzzle =
+      createTestPuzzleResponse(
+        word = "gatos",
+        hints =
+          listOf(
+            "Tem quatro patas",
+            "É um animal doméstico",
+            "Os gatos ronronam",
+            "Persegue ratos",
+            "Mia",
+          ),
+      )
     val result = validator.validate(puzzle, emptySet(), 5..5)
     assertThat(result).isInstanceOf(ValidationResult.Invalid::class.java)
-    assertThat((result as ValidationResult.Invalid).reasons.any { "hint" in it && "contains" in it }).isTrue()
+    assertThat(
+        (result as ValidationResult.Invalid).reasons.any { "hint" in it && "contains" in it }
+      )
+      .isTrue()
   }
 
   @Test
@@ -185,12 +195,13 @@ class PuzzleValidatorTest {
 
   @Test
   fun `multiple failures are all reported`() {
-    val puzzle = PuzzleResponse(
-      word = "café",
-      category = "",
-      difficulty = 3,
-      hints = listOf("Dica 1", "Dica 2"),
-    )
+    val puzzle =
+      PuzzleResponse(
+        word = "café",
+        category = "",
+        difficulty = 3,
+        hints = listOf("Dica 1", "Dica 2"),
+      )
     val result = validator.validate(puzzle, emptySet(), 5..8)
     assertThat(result).isInstanceOf(ValidationResult.Invalid::class.java)
     val reasons = (result as ValidationResult.Invalid).reasons
@@ -202,11 +213,12 @@ private fun createTestPuzzleResponse(
   word: String = "gatos",
   category: String = "animal",
   difficulty: Int = 2,
-  hints: List<String> = listOf(
-    "Tem quatro patas",
-    "Mia quando quer comida",
-    "Persegue ratos",
-    "Ronrona feliz",
-    "Felino domestico",
-  ),
+  hints: List<String> =
+    listOf(
+      "Tem quatro patas",
+      "Mia quando quer comida",
+      "Persegue ratos",
+      "Ronrona feliz",
+      "Felino domestico",
+    ),
 ) = PuzzleResponse(word = word, category = category, difficulty = difficulty, hints = hints)

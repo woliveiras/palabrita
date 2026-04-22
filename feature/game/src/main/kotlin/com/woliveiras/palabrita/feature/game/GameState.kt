@@ -26,16 +26,21 @@ data class DifficultyOption(
   val isRecommended: Boolean,
 )
 
-data class Attempt(
-  val word: String,
-  val feedback: List<LetterFeedback>,
-)
+data class Attempt(val word: String, val feedback: List<LetterFeedback>)
 
-data class LetterFeedback(
-  val letter: Char,
-  val state: LetterState,
-)
+data class LetterFeedback(val letter: Char, val state: LetterState)
 
-enum class LetterState { CORRECT, PRESENT, ABSENT, UNUSED }
+enum class LetterState {
+  CORRECT,
+  PRESENT,
+  ABSENT,
+  UNUSED,
+}
 
-enum class GameStatus { CHOOSING_DIFFICULTY, PLAYING, WON, LOST, LOADING }
+enum class GameStatus {
+  CHOOSING_DIFFICULTY,
+  PLAYING,
+  WON,
+  LOST,
+  LOADING,
+}

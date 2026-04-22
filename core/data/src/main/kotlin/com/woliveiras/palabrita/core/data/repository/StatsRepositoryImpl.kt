@@ -15,8 +15,7 @@ import kotlinx.coroutines.flow.map
 class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsDao) :
   StatsRepository {
 
-  override suspend fun getStats(): PlayerStats =
-    statsDao.get()?.toDomain() ?: PlayerStats()
+  override suspend fun getStats(): PlayerStats = statsDao.get()?.toDomain() ?: PlayerStats()
 
   override suspend fun updateAfterGame(
     won: Boolean,
@@ -58,16 +57,17 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
       }
 
     val winsAtDifficulty = newWonByDiff[difficulty] ?: 0
-    val gamesAtDifficulty = (current.winRateByDifficulty[difficulty]?.let {
-      if (it > 0f) ((current.gamesWonByDifficulty[difficulty] ?: 0) / it).toInt() else 0
-    } ?: 0) + 1
+    val gamesAtDifficulty =
+      (current.winRateByDifficulty[difficulty]?.let {
+        if (it > 0f) ((current.gamesWonByDifficulty[difficulty] ?: 0) / it).toInt() else 0
+      } ?: 0) + 1
     val newWinRate =
       current.winRateByDifficulty.toMutableMap().apply {
-        this[difficulty] = if (gamesAtDifficulty > 0) winsAtDifficulty.toFloat() / gamesAtDifficulty else 0f
+        this[difficulty] =
+          if (gamesAtDifficulty > 0) winsAtDifficulty.toFloat() / gamesAtDifficulty else 0f
       }
 
-    val newConsecutiveLosses =
-      if (won) 0 else current.consecutiveLossesAtCurrent + 1
+    val newConsecutiveLosses = if (won) 0 else current.consecutiveLossesAtCurrent + 1
 
     val updated =
       current.copy(
@@ -128,20 +128,16 @@ class StatsRepositoryImpl @Inject constructor(private val statsDao: PlayerStatsD
 
   override suspend fun resetProgress() {
     val current = getStats()
-    val reset = PlayerStats(
-      preferredLanguage = current.preferredLanguage,
-      wordSizePreference = current.wordSizePreference,
-    )
+    val reset =
+      PlayerStats(
+        preferredLanguage = current.preferredLanguage,
+        wordSizePreference = current.wordSizePreference,
+      )
     statsDao.upsert(reset.toEntity())
   }
 }
 
-fun calculateXpForGame(
-  won: Boolean,
-  attempts: Int,
-  difficulty: Int,
-  hintsUsed: Int,
-): Int {
+fun calculateXpForGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int): Int {
   if (!won) return 0
 
   val baseXp =

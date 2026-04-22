@@ -16,16 +16,25 @@ data class SettingsState(
   @StringRes val errorRes: Int? = null,
   val hasActiveGame: Boolean = false,
 ) {
-  val currentLanguage: String get() = stats.preferredLanguage
-  val wordSizePreference: String get() = stats.wordSizePreference
-  val isWordSizeUnlocked: Boolean get() = stats.playerTier >= PlayerTier.ASTUTO
-  val isEpicWordSizeAvailable: Boolean get() = stats.playerTier >= PlayerTier.EPICO
+  val currentLanguage: String
+    get() = stats.preferredLanguage
+
+  val wordSizePreference: String
+    get() = stats.wordSizePreference
+
+  val isWordSizeUnlocked: Boolean
+    get() = stats.playerTier >= PlayerTier.ASTUTO
+
+  val isEpicWordSizeAvailable: Boolean
+    get() = stats.playerTier >= PlayerTier.EPICO
+
   val winRate: Int
-    get() = if (stats.totalPlayed > 0) {
-      (stats.totalWon * 100 / stats.totalPlayed)
-    } else {
-      0
-    }
+    get() =
+      if (stats.totalPlayed > 0) {
+        (stats.totalWon * 100 / stats.totalPlayed)
+      } else {
+        0
+      }
 }
 
 data class StorageInfo(
@@ -41,22 +50,26 @@ data class WordSizeOption(
   @androidx.annotation.StringRes val descriptionRes: Int,
 )
 
-val WORD_SIZE_OPTIONS = listOf(
-  WordSizeOption("DEFAULT", com.woliveiras.palabrita.core.common.R.string.word_size_default_label, com.woliveiras.palabrita.core.common.R.string.word_size_default_desc),
-  WordSizeOption("SHORT", com.woliveiras.palabrita.core.common.R.string.word_size_short_label, com.woliveiras.palabrita.core.common.R.string.word_size_short_desc),
-  WordSizeOption("LONG", com.woliveiras.palabrita.core.common.R.string.word_size_long_label, com.woliveiras.palabrita.core.common.R.string.word_size_long_desc),
-  WordSizeOption("EPIC", com.woliveiras.palabrita.core.common.R.string.word_size_epic_label, com.woliveiras.palabrita.core.common.R.string.word_size_epic_desc),
-)
-
-fun generateShareStatsText(stats: PlayerStats, context: android.content.Context): String {
-  val winRate = if (stats.totalPlayed > 0) {
-    stats.totalWon * 100 / stats.totalPlayed
-  } else {
-    0
-  }
-  return buildString {
-    appendLine(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_header))
-    appendLine(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_summary, stats.totalPlayed, winRate))
-    append(context.getString(com.woliveiras.palabrita.core.common.R.string.stats_share_text_xp, stats.totalXp))
-  }
-}
+val WORD_SIZE_OPTIONS =
+  listOf(
+    WordSizeOption(
+      "DEFAULT",
+      com.woliveiras.palabrita.core.common.R.string.word_size_default_label,
+      com.woliveiras.palabrita.core.common.R.string.word_size_default_desc,
+    ),
+    WordSizeOption(
+      "SHORT",
+      com.woliveiras.palabrita.core.common.R.string.word_size_short_label,
+      com.woliveiras.palabrita.core.common.R.string.word_size_short_desc,
+    ),
+    WordSizeOption(
+      "LONG",
+      com.woliveiras.palabrita.core.common.R.string.word_size_long_label,
+      com.woliveiras.palabrita.core.common.R.string.word_size_long_desc,
+    ),
+    WordSizeOption(
+      "EPIC",
+      com.woliveiras.palabrita.core.common.R.string.word_size_epic_label,
+      com.woliveiras.palabrita.core.common.R.string.word_size_epic_desc,
+    ),
+  )

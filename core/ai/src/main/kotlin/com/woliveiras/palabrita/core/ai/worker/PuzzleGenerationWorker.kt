@@ -20,7 +20,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
 @HiltWorker
-class PuzzleGenerationWorker @AssistedInject constructor(
+class PuzzleGenerationWorker
+@AssistedInject
+constructor(
   @Assisted appContext: Context,
   @Assisted workerParams: WorkerParameters,
   private val puzzleRepository: PuzzleRepository,
@@ -42,11 +44,14 @@ class PuzzleGenerationWorker @AssistedInject constructor(
       return Result.retry()
     }
 
-    val modelId = inputData.getString(KEY_MODEL_ID)?.let {
-      try {
-        com.woliveiras.palabrita.core.model.ModelId.valueOf(it)
-      } catch (_: Exception) { null }
-    } ?: return Result.failure()
+    val modelId =
+      inputData.getString(KEY_MODEL_ID)?.let {
+        try {
+          com.woliveiras.palabrita.core.model.ModelId.valueOf(it)
+        } catch (_: Exception) {
+          null
+        }
+      } ?: return Result.failure()
 
     val existingWords = puzzleRepository.getAllGeneratedWords()
     val recentWords = puzzleRepository.getRecentWords(50)
@@ -55,14 +60,15 @@ class PuzzleGenerationWorker @AssistedInject constructor(
     for (difficulty in 1..5) {
       val count = puzzlesPerDifficulty(difficulty)
       try {
-        val puzzles = puzzleGenerator.generateBatch(
-          count = count,
-          language = language,
-          targetDifficulty = difficulty,
-          recentWords = recentWords,
-          allExistingWords = existingWords,
-          modelId = modelId,
-        )
+        val puzzles =
+          puzzleGenerator.generateBatch(
+            count = count,
+            language = language,
+            targetDifficulty = difficulty,
+            recentWords = recentWords,
+            allExistingWords = existingWords,
+            modelId = modelId,
+          )
         puzzleRepository.savePuzzles(puzzles)
         totalGenerated += puzzles.size
       } catch (_: Exception) {
@@ -77,44 +83,53 @@ class PuzzleGenerationWorker @AssistedInject constructor(
     return Result.success()
   }
 
-  private fun puzzlesPerDifficulty(difficulty: Int): Int = when (difficulty) {
-    1 -> 8
-    2 -> 7
-    3 -> 6
-    4 -> 5
-    5 -> 4
-    else -> 6
-  }
+  private fun puzzlesPerDifficulty(difficulty: Int): Int =
+    when (difficulty) {
+      1 -> 8
+      2 -> 7
+      3 -> 6
+      4 -> 5
+      5 -> 4
+      else -> 6
+    }
 
   private fun showCompletionNotification(count: Int) {
     createNotificationChannel()
 
-    if (ContextCompat.checkSelfPermission(
-        applicationContext, Manifest.permission.POST_NOTIFICATIONS
+    if (
+      ContextCompat.checkSelfPermission(
+        applicationContext,
+        Manifest.permission.POST_NOTIFICATIONS,
       ) != PackageManager.PERMISSION_GRANTED
     ) {
       return
     }
 
-    val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-      .setSmallIcon(CommonR.drawable.ic_notification)
-      .setContentTitle(applicationContext.getString(CommonR.string.notification_generation_title))
-      .setContentText(applicationContext.getString(CommonR.string.notification_generation_body, count))
-      .setPriority(NotificationCompat.PRIORITY_HIGH)
-      .setAutoCancel(true)
-      .build()
+    val notification =
+      NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        .setSmallIcon(CommonR.drawable.ic_notification)
+        .setContentTitle(applicationContext.getString(CommonR.string.notification_generation_title))
+        .setContentText(
+          applicationContext.getString(CommonR.string.notification_generation_body, count)
+        )
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
+        .build()
 
     NotificationManagerCompat.from(applicationContext).notify(NOTIFICATION_ID, notification)
   }
 
   private fun createNotificationChannel() {
-    val channel = NotificationChannel(
-      CHANNEL_ID,
-      applicationContext.getString(CommonR.string.notification_channel_name),
-      NotificationManager.IMPORTANCE_LOW,
-    ).apply {
-      description = applicationContext.getString(CommonR.string.notification_channel_description)
-    }
+    val channel =
+      NotificationChannel(
+          CHANNEL_ID,
+          applicationContext.getString(CommonR.string.notification_channel_name),
+          NotificationManager.IMPORTANCE_LOW,
+        )
+        .apply {
+          description =
+            applicationContext.getString(CommonR.string.notification_channel_description)
+        }
     val manager = applicationContext.getSystemService(NotificationManager::class.java)
     manager.createNotificationChannel(channel)
   }

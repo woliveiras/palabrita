@@ -36,9 +36,7 @@ fun GenerationScreen(
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
 
-  LaunchedEffect(modelId) {
-    modelId?.let { viewModel.triggerGeneration(it) }
-  }
+  LaunchedEffect(modelId) { modelId?.let { viewModel.triggerGeneration(it) } }
 
   LaunchedEffect(state.isComplete) {
     if (state.isComplete && !isRegeneration) {
@@ -47,9 +45,7 @@ fun GenerationScreen(
   }
 
   Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(32.dp),
+    modifier = modifier.fillMaxSize().padding(32.dp),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
@@ -84,10 +80,7 @@ fun GenerationScreen(
         textAlign = TextAlign.Center,
       )
       Spacer(Modifier.height(24.dp))
-      Button(
-        onClick = onComplete,
-        modifier = Modifier.fillMaxWidth(),
-      ) {
+      Button(onClick = onComplete, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(CommonR.string.generation_continue))
       }
     } else if (state.failed) {

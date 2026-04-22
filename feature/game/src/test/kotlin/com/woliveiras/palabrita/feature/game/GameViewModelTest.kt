@@ -207,8 +207,8 @@ class GameViewModelTest {
     val feedback = vm.state.value.attempts[0].feedback
     assertThat(feedback[0].state).isEqualTo(LetterState.CORRECT) // g
     assertThat(feedback[1].state).isEqualTo(LetterState.CORRECT) // a
-    assertThat(feedback[2].state).isEqualTo(LetterState.ABSENT)  // l
-    assertThat(feedback[3].state).isEqualTo(LetterState.ABSENT)  // h
+    assertThat(feedback[2].state).isEqualTo(LetterState.ABSENT) // l
+    assertThat(feedback[3].state).isEqualTo(LetterState.ABSENT) // h
     assertThat(feedback[4].state).isEqualTo(LetterState.PRESENT) // o
   }
 
@@ -298,37 +298,40 @@ class GameViewModelTest {
   private fun createTestPuzzle(
     word: String = "gatos",
     hints: List<String> = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
-  ) = Puzzle(
-    id = 1,
-    word = word,
-    wordDisplay = word.uppercase(),
-    language = "pt",
-    difficulty = 1,
-    category = "Animal",
-    hints = hints,
-    source = PuzzleSource.AI,
-    generatedAt = System.currentTimeMillis(),
-  )
+  ) =
+    Puzzle(
+      id = 1,
+      word = word,
+      wordDisplay = word.uppercase(),
+      language = "pt",
+      difficulty = 1,
+      category = "Animal",
+      hints = hints,
+      source = PuzzleSource.AI,
+      generatedAt = System.currentTimeMillis(),
+    )
 
   private fun createViewModel(
     stats: PlayerStats = PlayerStats(),
     puzzle: Puzzle? = createTestPuzzle(),
     puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(puzzle),
-  ): GameViewModel = GameViewModel(
-    puzzleRepository = puzzleRepo,
-    statsRepository = FakeStatsRepository(stats),
-    gameSessionRepository = FakeGameSessionRepository(),
-  )
+  ): GameViewModel =
+    GameViewModel(
+      puzzleRepository = puzzleRepo,
+      statsRepository = FakeStatsRepository(stats),
+      gameSessionRepository = FakeGameSessionRepository(),
+    )
 
   private fun createPlayingViewModel(
     word: String = "gatos",
     puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(createTestPuzzle(word = word)),
   ): GameViewModel {
-    val vm = GameViewModel(
-      puzzleRepository = puzzleRepo,
-      statsRepository = FakeStatsRepository(),
-      gameSessionRepository = FakeGameSessionRepository(),
-    )
+    val vm =
+      GameViewModel(
+        puzzleRepository = puzzleRepo,
+        statsRepository = FakeStatsRepository(),
+        gameSessionRepository = FakeGameSessionRepository(),
+      )
     vm.loadDifficultyOptions()
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(GameAction.StartGame)
@@ -341,24 +344,48 @@ private class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleR
   val markedPlayed = mutableListOf<Long>()
 
   override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? = puzzle
-  override suspend fun countUnplayed(language: String, difficulty: Int): Int = if (puzzle != null) 1 else 0
+
+  override suspend fun countUnplayed(language: String, difficulty: Int): Int =
+    if (puzzle != null) 1 else 0
+
   override suspend fun countAllUnplayed(language: String): Int = if (puzzle != null) 1 else 0
+
   override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
+
   override suspend fun getRecentWords(limit: Int): List<String> = emptyList()
+
   override suspend fun savePuzzle(puzzle: Puzzle): Long = puzzle.id
+
   override suspend fun savePuzzles(puzzles: List<Puzzle>) {}
-  override suspend fun markAsPlayed(puzzleId: Long) { markedPlayed.add(puzzleId) }
+
+  override suspend fun markAsPlayed(puzzleId: Long) {
+    markedPlayed.add(puzzleId)
+  }
+
   override suspend fun deleteUnplayedAiPuzzles() {}
+
   override suspend fun markAllUnplayed() {}
 }
 
-private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()) : StatsRepository {
+private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()) :
+  StatsRepository {
   override suspend fun getStats(): PlayerStats = stats
-  override suspend fun updateAfterGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int) {}
+
+  override suspend fun updateAfterGame(
+    won: Boolean,
+    attempts: Int,
+    difficulty: Int,
+    hintsUsed: Int,
+  ) {}
+
   override suspend fun checkAndPromoteDifficulty(): Int = stats.currentDifficulty
+
   override suspend fun updateLanguage(language: String) {}
+
   override suspend fun updateWordSizePreference(preference: String) {}
+
   override suspend fun resetProgress() {}
+
   override fun observeStats(): Flow<PlayerStats> = flowOf(stats)
 }
 
@@ -378,8 +405,7 @@ private class FakeGameSessionRepository : GameSessionRepository {
   override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
     sessions.find { it.puzzleId == puzzleId }
 
-  override suspend fun hasActiveGame(): Boolean =
-    sessions.any { it.completedAt == null }
+  override suspend fun hasActiveGame(): Boolean = sessions.any { it.completedAt == null }
 
   override suspend fun completeSession(
     puzzleId: Long,

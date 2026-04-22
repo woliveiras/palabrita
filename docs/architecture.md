@@ -178,7 +178,7 @@ engineSM.transition(EngineEvent.Initialize)   // Ready + Initialize → ignorado
 |---|---|---|---|
 | Engine lifecycle | Uninitialized, Initializing, Ready, Error | Initialize, Success, Failure, Destroy, Retry | `core/ai` |
 | Download de modelo | Idle, Checking, WaitingForWifi, Downloading, Completed, Failed | StartDownload, SpaceOk, WifiRequired, Done, Fail, Retry, Cancel | `feature/onboarding` |
-| Fluxo de onboarding | Welcome, Language, ModelSelection, Download, Generation, Complete | Next, Back, SkipToLight, DownloadComplete, GenerationComplete | `feature/onboarding` |
+| Fluxo de onboarding | Welcome, Language, ModelSelection, Download, Generation, Complete | Next, Back, DownloadComplete, GenerationComplete | `feature/onboarding` |
 
 **Onde NÃO usamos (sealed class + when é suficiente):**
 
@@ -222,22 +222,26 @@ Navigation Compose com type-safe routes (Kotlin Serialization):
 
 ```kotlin
 @Serializable data object OnboardingRoute
+@Serializable data object HomeRoute
+@Serializable data class GenerationRoute(val modelId: String, val isRegeneration: Boolean)
 @Serializable data object GameRoute
 @Serializable data class ChatRoute(val puzzleId: Long)
 @Serializable data object SettingsRoute
-@Serializable data object StatsRoute
+@Serializable data object AiInfoRoute
 ```
 
 Fluxo de navegação:
 
 ```
-Start ──→ Onboarding completado? ──→ Sim ──→ Game
-                                  └──→ Não ──→ Onboarding ──→ Game
+Start ──→ Onboarding completado? ──→ Sim ──→ Home
+                                  └──→ Não ──→ Onboarding ──→ Generation ──→ Home
 
-Game ──→ Win/Lose ──→ Chat (se AI mode)
-Game ──→ Settings
-Settings ──→ Stats
-Settings ──→ Model Switch ──→ Download (se necessário)
+Home ──→ Jogar ──→ Game
+Home ──→ Gerar Mais ──→ Generation (re-gen)
+Game ──→ Win/Lose ──→ Chat (post-game)
+Game ──→ No Puzzles Left ──→ Generation (re-gen)
+
+Bottom Nav: Home | IA (AiInfoScreen) | Mais (Settings)
 ```
 
 ## Gestão de Estado de Longo Prazo

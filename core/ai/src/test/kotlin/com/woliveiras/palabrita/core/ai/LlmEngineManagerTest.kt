@@ -28,12 +28,13 @@ class EngineStateTest {
 
   @Test
   fun `all states are distinct`() {
-    val states: Set<EngineState> = setOf(
-      EngineState.Uninitialized,
-      EngineState.Initializing,
-      EngineState.Ready,
-      EngineState.Error("err"),
-    )
+    val states: Set<EngineState> =
+      setOf(
+        EngineState.Uninitialized,
+        EngineState.Initializing,
+        EngineState.Ready,
+        EngineState.Error("err"),
+      )
     assertThat(states).hasSize(4)
   }
 }

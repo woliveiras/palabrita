@@ -25,7 +25,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -38,14 +37,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.DeviceTier
-import com.woliveiras.palabrita.core.model.ModelId
-import androidx.compose.ui.res.stringResource
 import com.woliveiras.palabrita.core.common.R as CommonR
+import com.woliveiras.palabrita.core.model.ModelId
 
 @Composable
 fun OnboardingScreen(
@@ -69,12 +68,14 @@ fun OnboardingScreen(
   AnimatedContent(
     targetState = state.currentStep,
     transitionSpec = {
-      (slideInHorizontally { it } + fadeIn()) togetherWith (slideOutHorizontally { -it } + fadeOut())
+      (slideInHorizontally { it } + fadeIn()) togetherWith
+        (slideOutHorizontally { -it } + fadeOut())
     },
     label = "onboarding-step",
   ) { step ->
     when (step) {
-      OnboardingStep.WELCOME -> WelcomeScreen(onNext = { viewModel.onAction(OnboardingAction.Next) })
+      OnboardingStep.WELCOME ->
+        WelcomeScreen(onNext = { viewModel.onAction(OnboardingAction.Next) })
       OnboardingStep.LANGUAGE ->
         LanguageScreen(
           selectedLanguage = state.selectedLanguage,
@@ -104,8 +105,12 @@ fun OnboardingScreen(
           onRetry = { viewModel.onAction(OnboardingAction.RetryDownload) },
           onCancel = { viewModel.onAction(OnboardingAction.CancelDownload) },
         )
-      OnboardingStep.COMPLETE -> { /* handled above */ }
-      OnboardingStep.GENERATION -> { /* handled above */ }
+      OnboardingStep.COMPLETE -> {
+        /* handled above */
+      }
+      OnboardingStep.GENERATION -> {
+        /* handled above */
+      }
     }
   }
 
@@ -201,8 +206,7 @@ private fun LanguageCard(
   onSelect: (String) -> Unit,
 ) {
   val isSelected = code == selected
-  val border =
-    if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
+  val border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
   val colors =
     if (isSelected)
       CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -221,16 +225,18 @@ private fun LanguageCard(
     ) {
       Surface(
         shape = CircleShape,
-        color = if (code == selected) MaterialTheme.colorScheme.primary
-        else MaterialTheme.colorScheme.surfaceVariant,
+        color =
+          if (code == selected) MaterialTheme.colorScheme.primary
+          else MaterialTheme.colorScheme.surfaceVariant,
         modifier = Modifier.size(40.dp),
       ) {
         Box(contentAlignment = Alignment.Center) {
           Text(
             text = flag,
             style = MaterialTheme.typography.labelMedium,
-            color = if (code == selected) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurfaceVariant,
+            color =
+              if (code == selected) MaterialTheme.colorScheme.onPrimary
+              else MaterialTheme.colorScheme.onSurfaceVariant,
           )
         }
       }
@@ -325,8 +331,7 @@ private fun ModelCard(
   isSelected: Boolean,
   onClick: () -> Unit,
 ) {
-  val border =
-    if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
+  val border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
   val colors =
     if (isSelected)
       CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -341,7 +346,7 @@ private fun ModelCard(
     Column(modifier = Modifier.padding(16.dp)) {
       if (isRecommended) {
         Card(
-          colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
+          colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary)
         ) {
           Text(
             text = stringResource(CommonR.string.recommended),
@@ -397,12 +402,16 @@ private fun DownloadScreen(
       color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
     Spacer(Modifier.height(8.dp))
-    val modelName = when (modelId) {
-      ModelId.GEMMA4_E2B -> stringResource(CommonR.string.download_model_gemma4)
-      ModelId.QWEN3_0_6B -> stringResource(CommonR.string.download_model_qwen3)
-      else -> stringResource(CommonR.string.download_model_unknown)
-    }
-    Text(text = stringResource(CommonR.string.download_model_label, modelName), style = MaterialTheme.typography.bodyMedium)
+    val modelName =
+      when (modelId) {
+        ModelId.GEMMA4_E2B -> stringResource(CommonR.string.download_model_gemma4)
+        ModelId.QWEN3_0_6B -> stringResource(CommonR.string.download_model_qwen3)
+        else -> stringResource(CommonR.string.download_model_unknown)
+      }
+    Text(
+      text = stringResource(CommonR.string.download_model_label, modelName),
+      style = MaterialTheme.typography.bodyMedium,
+    )
     Spacer(Modifier.height(32.dp))
 
     if (downloadFailed) {
@@ -434,42 +443,36 @@ private fun DownloadScreen(
       )
       Spacer(Modifier.height(12.dp))
       val percentText = "${(downloadProgress * 100).toInt()}%"
-      val sizeText = if (totalBytes > 0) {
-        "${formatBytes(downloadedBytes)} / ${formatBytes(totalBytes)}"
-      } else {
-        stringResource(CommonR.string.download_checking)
-      }
+      val sizeText =
+        if (totalBytes > 0) {
+          "${formatBytes(downloadedBytes)} / ${formatBytes(totalBytes)}"
+        } else {
+          stringResource(CommonR.string.download_checking)
+        }
       Text(
         text = "$percentText — $sizeText",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       Spacer(Modifier.height(32.dp))
-      OutlinedButton(onClick = onCancel) {
-        Text(stringResource(CommonR.string.cancel))
-      }
+      OutlinedButton(onClick = onCancel) { Text(stringResource(CommonR.string.cancel)) }
     }
   }
 }
 
 @Composable
-private fun TierWarningDialog(
-  onConfirm: () -> Unit,
-  onChooseOther: () -> Unit,
-) {
+private fun TierWarningDialog(onConfirm: () -> Unit, onChooseOther: () -> Unit) {
   AlertDialog(
     onDismissRequest = onChooseOther,
     title = { Text(stringResource(CommonR.string.warning)) },
-    text = {
-      Text(
-        stringResource(CommonR.string.tier_warning_message)
-      )
-    },
+    text = { Text(stringResource(CommonR.string.tier_warning_message)) },
     confirmButton = {
       TextButton(onClick = onConfirm) { Text(stringResource(CommonR.string.tier_warning_confirm)) }
     },
     dismissButton = {
-      TextButton(onClick = onChooseOther) { Text(stringResource(CommonR.string.tier_warning_choose_other)) }
+      TextButton(onClick = onChooseOther) {
+        Text(stringResource(CommonR.string.tier_warning_choose_other))
+      }
     },
   )
 }
@@ -478,4 +481,3 @@ private fun formatBytes(bytes: Long): String {
   val gb = bytes / 1_000_000_000.0
   return if (gb >= 1.0) "%.1f GB".format(gb) else "%.0f MB".format(bytes / 1_000_000.0)
 }
-

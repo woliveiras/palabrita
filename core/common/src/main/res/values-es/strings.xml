@@ -113,8 +113,7 @@
     <string name="settings_word_size">Tamaño de las palabras</string>
     <string name="settings_word_size_default">Predeterminado</string>
     <string name="settings_word_size_locked">Se desbloquea en Desafiante</string>
-    <string name="settings_stats">Estadísticas</string>
-    <string name="settings_stats_summary">%1$d juegos · %2$d%% victorias</string>
+
     <string name="settings_section_ai">Inteligencia Artificial</string>
     <string name="settings_current_model">Modelo actual</string>
     <string name="settings_model_gemma4">Gemma 4 E2B</string>
@@ -133,18 +132,6 @@
     <string name="settings_reset_confirm">Reiniciar</string>
     <string name="settings_error_active_game">Termina el juego actual antes de cambiar</string>
     <string name="settings_error_download_soon">Descarga de modelos disponible pronto</string>
-
-    <!-- Stats -->
-    <string name="stats_title">Estadísticas</string>
-    <string name="stats_games">Juegos</string>
-    <string name="stats_wins">Victorias</string>
-    <string name="stats_xp">XP total</string>
-    <string name="stats_tier">Tier</string>
-    <string name="stats_distribution">Distribución de intentos</string>
-    <string name="stats_share">Compartir estadísticas</string>
-    <string name="stats_share_text_header">Palabrita</string>
-    <string name="stats_share_text_summary">%1$d juegos · %2$d%% victorias</string>
-    <string name="stats_share_text_xp">XP: %d</string>
 
     <!-- Word Size Options -->
     <string name="word_size_default_label">Predeterminado</string>

@@ -16,6 +16,5 @@ interface ChatMessageDao {
   @Query("SELECT COUNT(*) FROM chat_messages WHERE puzzleId = :puzzleId AND role = 'user'")
   suspend fun countUserMessages(puzzleId: Long): Int
 
-  @Query("DELETE FROM chat_messages")
-  suspend fun deleteAll()
+  @Query("DELETE FROM chat_messages") suspend fun deleteAll()
 }

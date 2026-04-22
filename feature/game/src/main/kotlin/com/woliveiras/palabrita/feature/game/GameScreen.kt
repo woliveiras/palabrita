@@ -53,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -60,7 +61,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.LocalGameColors
-import androidx.compose.ui.res.stringResource
 import com.woliveiras.palabrita.core.common.R as CommonR
 
 @Composable
@@ -97,42 +97,46 @@ fun GameScreen(
     label = "game-status",
   ) { status ->
     when (status) {
-      GameStatus.CHOOSING_DIFFICULTY -> DifficultyPickerScreen(
-        options = state.availableDifficulties,
-        chosen = state.chosenDifficulty,
-        onSelect = { viewModel.onAction(GameAction.SelectDifficulty(it)) },
-        onStart = { viewModel.onAction(GameAction.StartGame) },
-        onSettings = onNavigateToSettings,
-      )
+      GameStatus.CHOOSING_DIFFICULTY ->
+        DifficultyPickerScreen(
+          options = state.availableDifficulties,
+          chosen = state.chosenDifficulty,
+          onSelect = { viewModel.onAction(GameAction.SelectDifficulty(it)) },
+          onStart = { viewModel.onAction(GameAction.StartGame) },
+          onSettings = onNavigateToSettings,
+        )
       GameStatus.LOADING -> LoadingScreen()
-      GameStatus.PLAYING -> PlayingScreen(
-        state = state,
-        onTypeLetter = { viewModel.onAction(GameAction.TypeLetter(it)) },
-        onDelete = { viewModel.onAction(GameAction.DeleteLetter) },
-        onSubmit = { viewModel.onAction(GameAction.SubmitAttempt) },
-        onRevealHint = { viewModel.onAction(GameAction.RevealHint) },
-        onBack = { viewModel.onAction(GameAction.BackPressed) },
-      )
-      GameStatus.WON -> ResultScreen(
-        won = true,
-        puzzle = state.puzzle,
-        attempts = state.attempts,
-        hintsUsed = state.revealedHints.size,
-        onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
-        onShare = { viewModel.onAction(GameAction.ShareResult) },
-        onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
-        onHome = onNavigateToHome,
-      )
-      GameStatus.LOST -> ResultScreen(
-        won = false,
-        puzzle = state.puzzle,
-        attempts = state.attempts,
-        hintsUsed = state.revealedHints.size,
-        onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
-        onShare = { viewModel.onAction(GameAction.ShareResult) },
-        onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
-        onHome = onNavigateToHome,
-      )
+      GameStatus.PLAYING ->
+        PlayingScreen(
+          state = state,
+          onTypeLetter = { viewModel.onAction(GameAction.TypeLetter(it)) },
+          onDelete = { viewModel.onAction(GameAction.DeleteLetter) },
+          onSubmit = { viewModel.onAction(GameAction.SubmitAttempt) },
+          onRevealHint = { viewModel.onAction(GameAction.RevealHint) },
+          onBack = { viewModel.onAction(GameAction.BackPressed) },
+        )
+      GameStatus.WON ->
+        ResultScreen(
+          won = true,
+          puzzle = state.puzzle,
+          attempts = state.attempts,
+          hintsUsed = state.revealedHints.size,
+          onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
+          onShare = { viewModel.onAction(GameAction.ShareResult) },
+          onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
+          onHome = onNavigateToHome,
+        )
+      GameStatus.LOST ->
+        ResultScreen(
+          won = false,
+          puzzle = state.puzzle,
+          attempts = state.attempts,
+          hintsUsed = state.revealedHints.size,
+          onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
+          onShare = { viewModel.onAction(GameAction.ShareResult) },
+          onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
+          onHome = onNavigateToHome,
+        )
     }
   }
 }
@@ -148,21 +152,12 @@ private fun DifficultyPickerScreen(
   onSettings: () -> Unit,
 ) {
   Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .windowInsetsPadding(WindowInsets.statusBars)
-      .padding(32.dp),
+    modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).padding(32.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Row(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.End,
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
       IconButton(onClick = onSettings) {
-        Icon(
-          Icons.Rounded.Settings,
-          contentDescription = stringResource(CommonR.string.settings),
-        )
+        Icon(Icons.Rounded.Settings, contentDescription = stringResource(CommonR.string.settings))
       }
     }
     Spacer(Modifier.height(16.dp))
@@ -182,25 +177,19 @@ private fun DifficultyPickerScreen(
     }
 
     Spacer(Modifier.weight(1f))
-    Button(
-      onClick = onStart,
-      modifier = Modifier.fillMaxWidth(),
-    ) {
+    Button(onClick = onStart, modifier = Modifier.fillMaxWidth()) {
       Text(stringResource(CommonR.string.play))
     }
   }
 }
 
 @Composable
-private fun DifficultyCard(
-  option: DifficultyOption,
-  isChosen: Boolean,
-  onClick: () -> Unit,
-) {
+private fun DifficultyCard(option: DifficultyOption, isChosen: Boolean, onClick: () -> Unit) {
   val border = if (isChosen) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
-  val colors = if (isChosen)
-    CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-  else CardDefaults.outlinedCardColors()
+  val colors =
+    if (isChosen)
+      CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+    else CardDefaults.outlinedCardColors()
 
   OutlinedCard(
     onClick = onClick,
@@ -228,15 +217,13 @@ private fun DifficultyCard(
             Icons.Rounded.Star,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = if (option.isSelectable) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.onSurfaceVariant,
+            tint =
+              if (option.isSelectable) MaterialTheme.colorScheme.primary
+              else MaterialTheme.colorScheme.onSurfaceVariant,
           )
         }
         Spacer(Modifier.width(8.dp))
-        Text(
-          text = stringResource(option.labelRes),
-          style = MaterialTheme.typography.titleSmall,
-        )
+        Text(text = stringResource(option.labelRes), style = MaterialTheme.typography.titleSmall)
       }
       Text(
         text = "${option.baseXp} XP",
@@ -245,10 +232,7 @@ private fun DifficultyCard(
       )
       if (option.isRecommended) {
         Spacer(Modifier.width(8.dp))
-        Surface(
-          shape = RoundedCornerShape(4.dp),
-          color = MaterialTheme.colorScheme.tertiary,
-        ) {
+        Surface(shape = RoundedCornerShape(4.dp), color = MaterialTheme.colorScheme.tertiary) {
           Text(
             text = stringResource(CommonR.string.recommended),
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -265,14 +249,14 @@ private fun DifficultyCard(
 
 @Composable
 private fun LoadingScreen() {
-  Box(
-    modifier = Modifier.fillMaxSize(),
-    contentAlignment = Alignment.Center,
-  ) {
+  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
       CircularProgressIndicator()
       Spacer(Modifier.height(16.dp))
-      Text(stringResource(CommonR.string.loading_puzzle), style = MaterialTheme.typography.bodyLarge)
+      Text(
+        stringResource(CommonR.string.loading_puzzle),
+        style = MaterialTheme.typography.bodyLarge,
+      )
     }
   }
 }
@@ -287,7 +271,10 @@ private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int)
     verticalAlignment = Alignment.CenterVertically,
   ) {
     IconButton(onClick = onBack) {
-      Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(CommonR.string.back))
+      Icon(
+        Icons.AutoMirrored.Rounded.ArrowBack,
+        contentDescription = stringResource(CommonR.string.back),
+      )
     }
 
     Text(
@@ -299,10 +286,7 @@ private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int)
     Row(verticalAlignment = Alignment.CenterVertically) {
       Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(16.dp))
       Spacer(Modifier.width(2.dp))
-      Text(
-        text = "$hintsRemaining/$totalHints",
-        style = MaterialTheme.typography.labelMedium,
-      )
+      Text(text = "$hintsRemaining/$totalHints", style = MaterialTheme.typography.labelMedium)
       Spacer(Modifier.width(8.dp))
     }
   }
@@ -325,19 +309,15 @@ private fun PlayingScreen(
   val hintsRemaining = puzzle.hints.size - state.revealedHints.size
 
   Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .windowInsetsPadding(WindowInsets.statusBars)
-      .windowInsetsPadding(WindowInsets.navigationBars)
-      .padding(horizontal = 8.dp, vertical = 8.dp),
+    modifier =
+      Modifier.fillMaxSize()
+        .windowInsetsPadding(WindowInsets.statusBars)
+        .windowInsetsPadding(WindowInsets.navigationBars)
+        .padding(horizontal = 8.dp, vertical = 8.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     // Top Bar — contextual header
-    GameTopBar(
-      onBack = onBack,
-      hintsRemaining = hintsRemaining,
-      totalHints = puzzle.hints.size,
-    )
+    GameTopBar(onBack = onBack, hintsRemaining = hintsRemaining, totalHints = puzzle.hints.size)
     Spacer(Modifier.height(8.dp))
 
     // Word Grid — fluid, edge-to-edge
@@ -373,8 +353,7 @@ private fun PlayingScreen(
       Text(
         if (state.revealedHints.isNotEmpty() && hintsRemaining == 0)
           stringResource(CommonR.string.hint_view_all)
-        else
-          stringResource(CommonR.string.hint_button, hintsRemaining, puzzle.hints.size)
+        else stringResource(CommonR.string.hint_button, hintsRemaining, puzzle.hints.size)
       )
     }
 
@@ -392,10 +371,7 @@ private fun PlayingScreen(
 
   // Hints dialog
   if (showHintsDialog && state.revealedHints.isNotEmpty()) {
-    HintsDialog(
-      hints = state.revealedHints,
-      onDismiss = { showHintsDialog = false },
-    )
+    HintsDialog(hints = state.revealedHints, onDismiss = { showHintsDialog = false })
   }
 }
 
@@ -446,20 +422,18 @@ private fun WordGrid(
 @Composable
 private fun LetterCell(letter: Char?, state: LetterState, size: Dp) {
   val gameColors = LocalGameColors.current
-  val bgColor = when (state) {
-    LetterState.CORRECT -> gameColors.correct
-    LetterState.PRESENT -> gameColors.present
-    LetterState.ABSENT -> gameColors.absent
-    LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
-  }
-  val textColor = if (state == LetterState.UNUSED)
-    MaterialTheme.colorScheme.onSurface
-  else gameColors.onFeedback
+  val bgColor =
+    when (state) {
+      LetterState.CORRECT -> gameColors.correct
+      LetterState.PRESENT -> gameColors.present
+      LetterState.ABSENT -> gameColors.absent
+      LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
+    }
+  val textColor =
+    if (state == LetterState.UNUSED) MaterialTheme.colorScheme.onSurface else gameColors.onFeedback
 
   Box(
-    modifier = Modifier
-      .size(size)
-      .background(bgColor, RoundedCornerShape(6.dp)),
+    modifier = Modifier.size(size).background(bgColor, RoundedCornerShape(6.dp)),
     contentAlignment = Alignment.Center,
   ) {
     Text(
@@ -474,10 +448,7 @@ private fun LetterCell(letter: Char?, state: LetterState, size: Dp) {
 // --- Hints Dialog ---
 
 @Composable
-private fun HintsDialog(
-  hints: List<String>,
-  onDismiss: () -> Unit,
-) {
+private fun HintsDialog(hints: List<String>, onDismiss: () -> Unit) {
   AlertDialog(
     onDismissRequest = onDismiss,
     title = { Text(stringResource(CommonR.string.hints_dialog_title)) },
@@ -486,9 +457,8 @@ private fun HintsDialog(
         hints.forEachIndexed { index, hint ->
           Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-              containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
+            colors =
+              CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
           ) {
             Text(
               text = stringResource(CommonR.string.hint_label, index + 1, hint),
@@ -500,9 +470,7 @@ private fun HintsDialog(
       }
     },
     confirmButton = {
-      TextButton(onClick = onDismiss) {
-        Text(stringResource(CommonR.string.close))
-      }
+      TextButton(onClick = onDismiss) { Text(stringResource(CommonR.string.close)) }
     },
   )
 }
@@ -527,10 +495,7 @@ private fun GameKeyboard(
   ) {
     KeyRow(ROW1, keyboardState, onKey)
     KeyRow(ROW2, keyboardState, onKey)
-    Row(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
       // Backspace
       Surface(
         onClick = onDelete,
@@ -539,11 +504,20 @@ private fun GameKeyboard(
         modifier = Modifier.height(56.dp).weight(1.3f),
       ) {
         Box(contentAlignment = Alignment.Center) {
-          Icon(Icons.Rounded.Backspace, contentDescription = stringResource(CommonR.string.delete_action), modifier = Modifier.size(24.dp))
+          Icon(
+            Icons.Rounded.Backspace,
+            contentDescription = stringResource(CommonR.string.delete_action),
+            modifier = Modifier.size(24.dp),
+          )
         }
       }
       ROW3.forEach { letter ->
-        KeyButton(letter = letter, state = keyboardState[letter], onClick = { onKey(letter) }, modifier = Modifier.weight(1f).height(56.dp))
+        KeyButton(
+          letter = letter,
+          state = keyboardState[letter],
+          onClick = { onKey(letter) },
+          modifier = Modifier.weight(1f).height(56.dp),
+        )
       }
       // Enter
       Surface(
@@ -571,28 +545,37 @@ private fun KeyRow(
   keyboardState: Map<Char, LetterState>,
   onKey: (Char) -> Unit,
 ) {
-  Row(
-    modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.spacedBy(4.dp),
-  ) {
+  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
     letters.forEach { letter ->
-      KeyButton(letter = letter, state = keyboardState[letter], onClick = { onKey(letter) }, modifier = Modifier.weight(1f).height(56.dp))
+      KeyButton(
+        letter = letter,
+        state = keyboardState[letter],
+        onClick = { onKey(letter) },
+        modifier = Modifier.weight(1f).height(56.dp),
+      )
     }
   }
 }
 
 @Composable
-private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun KeyButton(
+  letter: Char,
+  state: LetterState?,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   val gameColors = LocalGameColors.current
-  val bgColor = when (state) {
-    LetterState.CORRECT -> gameColors.correct
-    LetterState.PRESENT -> gameColors.present
-    LetterState.ABSENT -> gameColors.absent
-    null, LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
-  }
-  val textColor = if (state != null && state != LetterState.UNUSED)
-    gameColors.onFeedback
-  else MaterialTheme.colorScheme.onSurface
+  val bgColor =
+    when (state) {
+      LetterState.CORRECT -> gameColors.correct
+      LetterState.PRESENT -> gameColors.present
+      LetterState.ABSENT -> gameColors.absent
+      null,
+      LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
+    }
+  val textColor =
+    if (state != null && state != LetterState.UNUSED) gameColors.onFeedback
+    else MaterialTheme.colorScheme.onSurface
 
   Surface(
     onClick = onClick,
@@ -614,18 +597,13 @@ private fun KeyButton(letter: Char, state: LetterState?, onClick: () -> Unit, mo
 // --- Abandon Dialog ---
 
 @Composable
-private fun AbandonDialog(
-  onContinue: () -> Unit,
-  onAbandon: () -> Unit,
-) {
+private fun AbandonDialog(onContinue: () -> Unit, onAbandon: () -> Unit) {
   AlertDialog(
     onDismissRequest = onContinue,
     title = { Text(stringResource(CommonR.string.abandon_title)) },
     text = { Text(stringResource(CommonR.string.abandon_message)) },
     confirmButton = {
-      Button(onClick = onContinue) {
-        Text(stringResource(CommonR.string.abandon_continue))
-      }
+      Button(onClick = onContinue) { Text(stringResource(CommonR.string.abandon_continue)) }
     },
     dismissButton = {
       TextButton(onClick = onAbandon) {
@@ -652,15 +630,14 @@ private fun ResultScreen(
   onHome: () -> Unit,
 ) {
   Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .windowInsetsPadding(WindowInsets.statusBars)
-      .padding(32.dp),
+    modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).padding(32.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
     Text(
-      text = if (won) stringResource(CommonR.string.result_won) else stringResource(CommonR.string.result_lost),
+      text =
+        if (won) stringResource(CommonR.string.result_won)
+        else stringResource(CommonR.string.result_lost),
       style = MaterialTheme.typography.headlineMedium,
     )
     Spacer(Modifier.height(16.dp))
@@ -700,10 +677,7 @@ private fun ResultScreen(
 
     // Chat Card — CTA principal
     if (puzzle != null) {
-      ChatCardCta(
-        word = puzzle.wordDisplay,
-        onExplore = onExplore,
-      )
+      ChatCardCta(word = puzzle.wordDisplay, onExplore = onExplore)
       Spacer(Modifier.height(16.dp))
     }
 
@@ -713,44 +687,40 @@ private fun ResultScreen(
     }
 
     Spacer(Modifier.height(8.dp))
-    TextButton(onClick = onShare) {
-      Text(stringResource(CommonR.string.share))
-    }
+    TextButton(onClick = onShare) { Text(stringResource(CommonR.string.share)) }
   }
 }
 
 // --- Chat Card CTA ---
 
 @Composable
-private fun ChatCardCta(
-  word: String,
-  onExplore: () -> Unit,
-) {
+private fun ChatCardCta(word: String, onExplore: () -> Unit) {
   Card(
     modifier = Modifier.fillMaxWidth(),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.primaryContainer,
-    ),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
     shape = RoundedCornerShape(16.dp),
   ) {
-    Column(
-      modifier = Modifier.padding(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
       Text(
         text = "\uD83D\uDCAC ${stringResource(CommonR.string.chat_card_title, word)}",
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
       )
       Spacer(Modifier.height(8.dp))
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-      ) {
-        Text("\uD83E\uDDEC ${stringResource(CommonR.string.chat_suggestion_etymology)}", style = MaterialTheme.typography.labelMedium)
-        Text("\uD83C\uDF0E ${stringResource(CommonR.string.chat_suggestion_curiosity)}", style = MaterialTheme.typography.labelMedium)
-        Text("\uD83D\uDCDD ${stringResource(CommonR.string.chat_suggestion_examples)}", style = MaterialTheme.typography.labelMedium)
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        Text(
+          "\uD83E\uDDEC ${stringResource(CommonR.string.chat_suggestion_etymology)}",
+          style = MaterialTheme.typography.labelMedium,
+        )
+        Text(
+          "\uD83C\uDF0E ${stringResource(CommonR.string.chat_suggestion_curiosity)}",
+          style = MaterialTheme.typography.labelMedium,
+        )
+        Text(
+          "\uD83D\uDCDD ${stringResource(CommonR.string.chat_suggestion_examples)}",
+          style = MaterialTheme.typography.labelMedium,
+        )
       }
       Spacer(Modifier.height(8.dp))
       Text(

@@ -49,11 +49,12 @@ fun HomeScreen(
   }
 
   Column(
-    modifier = modifier
-      .fillMaxSize()
-      .windowInsetsPadding(WindowInsets.statusBars)
-      .verticalScroll(rememberScrollState())
-      .padding(horizontal = 16.dp, vertical = 16.dp),
+    modifier =
+      modifier
+        .fillMaxSize()
+        .windowInsetsPadding(WindowInsets.statusBars)
+        .verticalScroll(rememberScrollState())
+        .padding(horizontal = 16.dp, vertical = 16.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Text(
@@ -78,10 +79,7 @@ fun HomeScreen(
 
     // Play button
     if (state.unplayedCount > 0) {
-      Button(
-        onClick = onNavigateToGame,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-      ) {
+      Button(onClick = onNavigateToGame, modifier = Modifier.fillMaxWidth().height(56.dp)) {
         Text(
           text = stringResource(CommonR.string.home_play),
           style = MaterialTheme.typography.titleMedium,
@@ -94,10 +92,7 @@ fun HomeScreen(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     } else if (!state.isGeneratingPuzzles) {
-      Button(
-        onClick = onNavigateToGeneration,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-      ) {
+      Button(onClick = onNavigateToGeneration, modifier = Modifier.fillMaxWidth().height(56.dp)) {
         Text(
           text = stringResource(CommonR.string.home_generate_more),
           style = MaterialTheme.typography.titleMedium,
@@ -132,22 +127,17 @@ private fun LoadingHome() {
 // --- Quick Stats ---
 
 @Composable
-private fun QuickStatsRow(
-  totalPlayed: Int,
-  winRate: Float,
-  playerTier: String,
-  totalXp: Int,
-) {
-  Surface(
-    shape = RoundedCornerShape(16.dp),
-    color = MaterialTheme.colorScheme.surfaceVariant,
-  ) {
+private fun QuickStatsRow(totalPlayed: Int, winRate: Float, playerTier: String, totalXp: Int) {
+  Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
     Row(
       modifier = Modifier.fillMaxWidth().padding(12.dp),
       horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
       StatItem(value = "$totalPlayed", label = stringResource(CommonR.string.home_stats_games))
-      StatItem(value = "${(winRate * 100).toInt()}%", label = stringResource(CommonR.string.home_stats_wins))
+      StatItem(
+        value = "${(winRate * 100).toInt()}%",
+        label = stringResource(CommonR.string.home_stats_wins),
+      )
       StatItem(value = playerTier, label = stringResource(CommonR.string.home_stats_tier))
       StatItem(value = "$totalXp", label = stringResource(CommonR.string.home_stats_xp))
     }
@@ -157,11 +147,7 @@ private fun QuickStatsRow(
 @Composable
 private fun StatItem(value: String, label: String) {
   Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    Text(
-      text = value,
-      style = MaterialTheme.typography.titleMedium,
-      fontWeight = FontWeight.Bold,
-    )
+    Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     Text(
       text = label,
       style = MaterialTheme.typography.labelMedium,
@@ -174,10 +160,7 @@ private fun StatItem(value: String, label: String) {
 
 @Composable
 private fun GenerationIndicator(isGenerating: Boolean, isComplete: Boolean) {
-  OutlinedCard(
-    modifier = Modifier.fillMaxWidth(),
-    shape = RoundedCornerShape(12.dp),
-  ) {
+  OutlinedCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
     Row(
       modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,

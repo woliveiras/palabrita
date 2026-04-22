@@ -36,14 +36,15 @@ object GameLogic {
     for (fb in feedback) {
       val existing = result[fb.letter]
       val newState = fb.state
-      result[fb.letter] = when {
-        existing == null -> newState
-        existing == LetterState.CORRECT -> LetterState.CORRECT
-        newState == LetterState.CORRECT -> LetterState.CORRECT
-        existing == LetterState.PRESENT -> LetterState.PRESENT
-        newState == LetterState.PRESENT -> LetterState.PRESENT
-        else -> newState
-      }
+      result[fb.letter] =
+        when {
+          existing == null -> newState
+          existing == LetterState.CORRECT -> LetterState.CORRECT
+          newState == LetterState.CORRECT -> LetterState.CORRECT
+          existing == LetterState.PRESENT -> LetterState.PRESENT
+          newState == LetterState.PRESENT -> LetterState.PRESENT
+          else -> newState
+        }
     }
     return result
   }
@@ -58,16 +59,17 @@ object GameLogic {
   ): String {
     val stars = "⭐".repeat(difficulty)
     val score = if (won) "${attempts.size}/6" else "X/6"
-    val emojiGrid = attempts.joinToString("\n") { attempt ->
-      attempt.feedback.joinToString("") { fb ->
-        when (fb.state) {
-          LetterState.CORRECT -> "🟦"
-          LetterState.PRESENT -> "🟧"
-          LetterState.ABSENT -> "🟥"
-          LetterState.UNUSED -> "⬜"
+    val emojiGrid =
+      attempts.joinToString("\n") { attempt ->
+        attempt.feedback.joinToString("") { fb ->
+          when (fb.state) {
+            LetterState.CORRECT -> "🟦"
+            LetterState.PRESENT -> "🟧"
+            LetterState.ABSENT -> "🟥"
+            LetterState.UNUSED -> "⬜"
+          }
         }
       }
-    }
 
     val footer = buildString {
       append("A palavra era: $word")
@@ -87,13 +89,14 @@ object GameLogic {
     currentDifficulty: Int,
     maxUnlockedDifficulty: Int,
   ): List<DifficultyOption> {
-    val labelRes = listOf(
-      com.woliveiras.palabrita.core.common.R.string.difficulty_easy,
-      com.woliveiras.palabrita.core.common.R.string.difficulty_normal,
-      com.woliveiras.palabrita.core.common.R.string.difficulty_hard,
-      com.woliveiras.palabrita.core.common.R.string.difficulty_challenging,
-      com.woliveiras.palabrita.core.common.R.string.difficulty_expert,
-    )
+    val labelRes =
+      listOf(
+        com.woliveiras.palabrita.core.common.R.string.difficulty_easy,
+        com.woliveiras.palabrita.core.common.R.string.difficulty_normal,
+        com.woliveiras.palabrita.core.common.R.string.difficulty_hard,
+        com.woliveiras.palabrita.core.common.R.string.difficulty_challenging,
+        com.woliveiras.palabrita.core.common.R.string.difficulty_expert,
+      )
     val baseXps = listOf(1, 2, 3, 5, 8)
 
     return (1..5).map { level ->
@@ -113,14 +116,15 @@ object GameLogic {
       "SHORT" -> 5..6
       "LONG" -> 7..9
       "EPIC" -> 8..10
-      else -> when (difficulty) {
-        1 -> 5..5
-        2 -> 5..6
-        3 -> 6..7
-        4 -> 7..8
-        5 -> 7..8
-        else -> 5..6
-      }
+      else ->
+        when (difficulty) {
+          1 -> 5..5
+          2 -> 5..6
+          3 -> 6..7
+          4 -> 7..8
+          5 -> 7..8
+          else -> 5..6
+        }
     }
   }
 }

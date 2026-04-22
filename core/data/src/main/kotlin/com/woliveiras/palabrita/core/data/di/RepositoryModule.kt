@@ -28,7 +28,9 @@ abstract class RepositoryModule {
 
   @Binds @Singleton abstract fun bindModelRepository(impl: ModelRepositoryImpl): ModelRepository
 
-  @Binds @Singleton abstract fun bindGameSessionRepository(impl: GameSessionRepositoryImpl): GameSessionRepository
+  @Binds
+  @Singleton
+  abstract fun bindGameSessionRepository(impl: GameSessionRepositoryImpl): GameSessionRepository
 
   @Binds @Singleton abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
 

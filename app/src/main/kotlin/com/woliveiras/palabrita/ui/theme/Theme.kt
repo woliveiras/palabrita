@@ -9,39 +9,38 @@ import androidx.compose.runtime.CompositionLocalProvider
 import com.woliveiras.palabrita.core.common.GameColors
 import com.woliveiras.palabrita.core.common.LocalGameColors
 
-private val LightColorScheme = lightColorScheme(
-  primary = LightPrimary,
-  onPrimary = LightOnPrimary,
-  primaryContainer = LightPrimaryContainer,
-  onPrimaryContainer = LightOnPrimaryContainer,
-  surface = LightSurface,
-  onSurface = LightOnSurface,
-  surfaceVariant = LightSurfaceVariant,
-  onSurfaceVariant = LightOnSurfaceVariant,
-  error = LightError,
-  onError = LightOnError,
-  outline = LightOutline,
-)
+private val LightColorScheme =
+  lightColorScheme(
+    primary = LightPrimary,
+    onPrimary = LightOnPrimary,
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = LightOnPrimaryContainer,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    error = LightError,
+    onError = LightOnError,
+    outline = LightOutline,
+  )
 
-private val DarkColorScheme = darkColorScheme(
-  primary = DarkPrimary,
-  onPrimary = DarkOnPrimary,
-  primaryContainer = DarkPrimaryContainer,
-  onPrimaryContainer = DarkOnPrimaryContainer,
-  surface = DarkSurface,
-  onSurface = DarkOnSurface,
-  surfaceVariant = DarkSurfaceVariant,
-  onSurfaceVariant = DarkOnSurfaceVariant,
-  error = DarkError,
-  onError = DarkOnError,
-  outline = DarkOutline,
-)
+private val DarkColorScheme =
+  darkColorScheme(
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    error = DarkError,
+    onError = DarkOnError,
+    outline = DarkOutline,
+  )
 
 @Composable
-fun PalabritaTheme(
-  darkTheme: Boolean = isSystemInDarkTheme(),
-  content: @Composable () -> Unit,
-) {
+fun PalabritaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
   val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
   CompositionLocalProvider(LocalGameColors provides GameColors()) {

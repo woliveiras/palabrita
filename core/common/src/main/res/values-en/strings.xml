@@ -113,8 +113,7 @@
     <string name="settings_word_size">Word size</string>
     <string name="settings_word_size_default">Default</string>
     <string name="settings_word_size_locked">Unlocked at Challenging</string>
-    <string name="settings_stats">Statistics</string>
-    <string name="settings_stats_summary">%1$d games · %2$d%% wins</string>
+
     <string name="settings_section_ai">Artificial Intelligence</string>
     <string name="settings_current_model">Current model</string>
     <string name="settings_model_gemma4">Gemma 4 E2B</string>
@@ -133,18 +132,6 @@
     <string name="settings_reset_confirm">Reset</string>
     <string name="settings_error_active_game">Finish the current game before switching</string>
     <string name="settings_error_download_soon">Model download coming soon</string>
-
-    <!-- Stats -->
-    <string name="stats_title">Statistics</string>
-    <string name="stats_games">Games</string>
-    <string name="stats_wins">Wins</string>
-    <string name="stats_xp">Total XP</string>
-    <string name="stats_tier">Tier</string>
-    <string name="stats_distribution">Guess distribution</string>
-    <string name="stats_share">Share statistics</string>
-    <string name="stats_share_text_header">Palabrita</string>
-    <string name="stats_share_text_summary">%1$d games · %2$d%% wins</string>
-    <string name="stats_share_text_xp">XP: %d</string>
 
     <!-- Word Size Options -->
     <string name="word_size_default_label">Default</string>

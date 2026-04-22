@@ -158,7 +158,7 @@ class ChatSessionImpl(
 2. **Pedir formato exato** — JSON, sem texto extra
 3. **Dar exemplos negativos** — "NÃO inclua a palavra nas dicas"
 4. **Limitar output** — "máximo 3 parágrafos"
-5. **Adaptar ao modelo** — Gemma 4 tem system role + function calling; Gemma 3 não
+5. **Adaptar ao modelo** — Gemma 4 tem system role + function calling; Qwen3 não
 
 ### ConversationConfig por Modelo
 
@@ -178,10 +178,10 @@ fun buildConversationConfigGemma4(params: PuzzleParams): ConversationConfig {
 }
 ```
 
-**Gemma 3 1B:**
+**Qwen3 0.6B:**
 
 ```kotlin
-fun buildConversationConfigGemma3(): ConversationConfig {
+fun buildConversationConfigQwen3(): ConversationConfig {
     return ConversationConfig(
         // Sem system instruction (não suportado nativamente)
         samplerConfig = SamplerConfig(

@@ -22,7 +22,9 @@ data class GenerationState(
 )
 
 @HiltViewModel
-class GenerationViewModel @Inject constructor(
+class GenerationViewModel
+@Inject
+constructor(
   private val generationScheduler: PuzzleGenerationScheduler,
   private val appPreferences: AppPreferences,
   private val modelRepository: ModelRepository,
@@ -66,8 +68,6 @@ class GenerationViewModel @Inject constructor(
   }
 
   fun markOnboardingComplete() {
-    viewModelScope.launch {
-      appPreferences.setOnboardingComplete()
-    }
+    viewModelScope.launch { appPreferences.setOnboardingComplete() }
   }
 }

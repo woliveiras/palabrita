@@ -10,19 +10,27 @@ class GameLogicLetterFeedbackTest {
   @Test
   fun `all correct letters return CORRECT`() {
     val feedback = GameLogic.calculateLetterFeedback("gatos", "gatos")
-    assertThat(feedback.map { it.state }).containsExactly(
-      LetterState.CORRECT, LetterState.CORRECT, LetterState.CORRECT,
-      LetterState.CORRECT, LetterState.CORRECT,
-    )
+    assertThat(feedback.map { it.state })
+      .containsExactly(
+        LetterState.CORRECT,
+        LetterState.CORRECT,
+        LetterState.CORRECT,
+        LetterState.CORRECT,
+        LetterState.CORRECT,
+      )
   }
 
   @Test
   fun `all wrong letters return ABSENT`() {
     val feedback = GameLogic.calculateLetterFeedback("fuwxy", "gatos")
-    assertThat(feedback.map { it.state }).containsExactly(
-      LetterState.ABSENT, LetterState.ABSENT, LetterState.ABSENT,
-      LetterState.ABSENT, LetterState.ABSENT,
-    )
+    assertThat(feedback.map { it.state })
+      .containsExactly(
+        LetterState.ABSENT,
+        LetterState.ABSENT,
+        LetterState.ABSENT,
+        LetterState.ABSENT,
+        LetterState.ABSENT,
+      )
   }
 
   @Test
@@ -33,10 +41,14 @@ class GameLogicLetterFeedbackTest {
     // g: position 2, target has g at 0 → PRESENT
     // s: position 3, target has s at 4 → PRESENT
     // a: position 4, target has a at 1 → PRESENT
-    assertThat(feedback.map { it.state }).containsExactly(
-      LetterState.PRESENT, LetterState.PRESENT, LetterState.PRESENT,
-      LetterState.PRESENT, LetterState.PRESENT,
-    )
+    assertThat(feedback.map { it.state })
+      .containsExactly(
+        LetterState.PRESENT,
+        LetterState.PRESENT,
+        LetterState.PRESENT,
+        LetterState.PRESENT,
+        LetterState.PRESENT,
+      )
   }
 
   @Test
@@ -47,13 +59,14 @@ class GameLogicLetterFeedbackTest {
     // l → ABSENT
     // h → ABSENT
     // o → PRESENT (exists at pos 3 in target)
-    assertThat(feedback).containsExactly(
-      LetterFeedback('g', LetterState.CORRECT),
-      LetterFeedback('a', LetterState.CORRECT),
-      LetterFeedback('l', LetterState.ABSENT),
-      LetterFeedback('h', LetterState.ABSENT),
-      LetterFeedback('o', LetterState.PRESENT),
-    )
+    assertThat(feedback)
+      .containsExactly(
+        LetterFeedback('g', LetterState.CORRECT),
+        LetterFeedback('a', LetterState.CORRECT),
+        LetterFeedback('l', LetterState.ABSENT),
+        LetterFeedback('h', LetterState.ABSENT),
+        LetterFeedback('o', LetterState.PRESENT),
+      )
   }
 
   // --- Duplicate letters (spec algorithm) ---
@@ -61,15 +74,17 @@ class GameLogicLetterFeedbackTest {
   @Test
   fun `duplicate letter in guess - first correct, second absent`() {
     // Spec example: target = "gatos", guess = "gagas"
-    // g[0] → CORRECT, a[1] → CORRECT, g[2] → ABSENT (g used), a[3] → ABSENT (a used), s[4] → CORRECT
+    // g[0] → CORRECT, a[1] → CORRECT, g[2] → ABSENT (g used), a[3] → ABSENT (a used), s[4] →
+    // CORRECT
     val feedback = GameLogic.calculateLetterFeedback("gagas", "gatos")
-    assertThat(feedback).containsExactly(
-      LetterFeedback('g', LetterState.CORRECT),
-      LetterFeedback('a', LetterState.CORRECT),
-      LetterFeedback('g', LetterState.ABSENT),
-      LetterFeedback('a', LetterState.ABSENT),
-      LetterFeedback('s', LetterState.CORRECT),
-    )
+    assertThat(feedback)
+      .containsExactly(
+        LetterFeedback('g', LetterState.CORRECT),
+        LetterFeedback('a', LetterState.CORRECT),
+        LetterFeedback('g', LetterState.ABSENT),
+        LetterFeedback('a', LetterState.ABSENT),
+        LetterFeedback('s', LetterState.CORRECT),
+      )
   }
 
   @Test
@@ -84,7 +99,8 @@ class GameLogicLetterFeedbackTest {
   @Test
   fun `duplicate letter in target - both can be marked`() {
     // target = "aabcd", guess = "axayz"
-    // a[0] → CORRECT, x → ABSENT, a[2] → PRESENT (second a in target at pos 1), y → ABSENT, z → ABSENT
+    // a[0] → CORRECT, x → ABSENT, a[2] → PRESENT (second a in target at pos 1), y → ABSENT, z →
+    // ABSENT
     val feedback = GameLogic.calculateLetterFeedback("axayz", "aabcd")
     assertThat(feedback[0]).isEqualTo(LetterFeedback('a', LetterState.CORRECT))
     assertThat(feedback[2]).isEqualTo(LetterFeedback('a', LetterState.PRESENT))

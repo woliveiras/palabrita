@@ -17,11 +17,14 @@ import kotlinx.coroutines.launch
 
 sealed class GameEvent {
   data object NavigateToHome : GameEvent()
+
   data object NoPuzzlesLeft : GameEvent()
 }
 
 @HiltViewModel
-class GameViewModel @Inject constructor(
+class GameViewModel
+@Inject
+constructor(
   private val puzzleRepository: PuzzleRepository,
   private val statsRepository: StatsRepository,
   private val gameSessionRepository: GameSessionRepository,
@@ -45,24 +48,30 @@ class GameViewModel @Inject constructor(
       is GameAction.DeleteLetter -> deleteLetter()
       is GameAction.SubmitAttempt -> submitAttempt()
       is GameAction.RevealHint -> revealHint()
-      is GameAction.ShareResult -> { /* handled by UI */ }
-      is GameAction.NavigateToChat -> { /* handled by UI */ }
-      is GameAction.NavigateToStats -> { /* handled by UI */ }
+      is GameAction.ShareResult -> {
+        /* handled by UI */
+      }
+      is GameAction.NavigateToChat -> {
+        /* handled by UI */
+      }
+      is GameAction.NavigateToStats -> {
+        /* handled by UI */
+      }
       is GameAction.LoadNextPuzzle -> loadDifficultyOptions()
       is GameAction.BackPressed -> handleBackPressed()
       is GameAction.ConfirmAbandon -> confirmAbandon()
-      is GameAction.DismissAbandonDialog ->
-        _state.update { it.copy(showAbandonDialog = false) }
+      is GameAction.DismissAbandonDialog -> _state.update { it.copy(showAbandonDialog = false) }
     }
   }
 
   fun loadDifficultyOptions() {
     viewModelScope.launch {
       val stats = statsRepository.getStats()
-      val options = GameLogic.buildDifficultyOptions(
-        currentDifficulty = stats.currentDifficulty,
-        maxUnlockedDifficulty = stats.maxUnlockedDifficulty,
-      )
+      val options =
+        GameLogic.buildDifficultyOptions(
+          currentDifficulty = stats.currentDifficulty,
+          maxUnlockedDifficulty = stats.maxUnlockedDifficulty,
+        )
       _state.update {
         it.copy(
           availableDifficulties = options,
@@ -83,7 +92,8 @@ class GameViewModel @Inject constructor(
     viewModelScope.launch {
       _state.update { it.copy(gameStatus = GameStatus.LOADING) }
       val stats = statsRepository.getStats()
-      val puzzle = puzzleRepository.getNextUnplayed(stats.preferredLanguage, _state.value.chosenDifficulty)
+      val puzzle =
+        puzzleRepository.getNextUnplayed(stats.preferredLanguage, _state.value.chosenDifficulty)
       if (puzzle != null) {
         _state.update {
           it.copy(
@@ -101,7 +111,7 @@ class GameViewModel @Inject constructor(
           com.woliveiras.palabrita.core.model.GameSession(
             puzzleId = puzzle.id,
             startedAt = System.currentTimeMillis(),
-          ),
+          )
         )
       } else {
         _state.update { it.copy(gameStatus = GameStatus.CHOOSING_DIFFICULTY, isLoading = false) }
@@ -138,11 +148,12 @@ class GameViewModel @Inject constructor(
     val won = feedback.all { it.state == LetterState.CORRECT }
     val lost = !won && newAttempts.size >= 6
 
-    val newStatus = when {
-      won -> GameStatus.WON
-      lost -> GameStatus.LOST
-      else -> GameStatus.PLAYING
-    }
+    val newStatus =
+      when {
+        won -> GameStatus.WON
+        lost -> GameStatus.LOST
+        else -> GameStatus.PLAYING
+      }
 
     _state.update {
       it.copy(
@@ -178,9 +189,7 @@ class GameViewModel @Inject constructor(
     if (_state.value.gameStatus != GameStatus.PLAYING) return
     val revealed = _state.value.revealedHints.size
     if (revealed >= puzzle.hints.size) return
-    _state.update {
-      it.copy(revealedHints = it.revealedHints + puzzle.hints[revealed])
-    }
+    _state.update { it.copy(revealedHints = it.revealedHints + puzzle.hints[revealed]) }
   }
 
   private fun handleBackPressed() {

@@ -12,5 +12,6 @@ enum class GenerationWorkState {
 
 interface PuzzleGenerationScheduler {
   fun scheduleGeneration(modelId: ModelId)
+
   fun observeGenerationState(): Flow<GenerationWorkState>
 }

@@ -97,7 +97,10 @@ constructor(
         systemPrompt = PromptTemplates.puzzleSystemPromptGemma4()
         val basePrompt =
           PromptTemplates.puzzleUserPromptGemma4(
-            language, difficulty, wordLength.first, wordLength.last,
+            language,
+            difficulty,
+            wordLength.first,
+            wordLength.last,
             if (attempt < 2) recentWords else emptyList(),
           )
         userPrompt =
@@ -108,7 +111,11 @@ constructor(
                 "Please try again with a different word."
             else ->
               PromptTemplates.puzzleUserPromptGemma4(
-                language, difficulty, wordLength.first, wordLength.last, emptyList(),
+                language,
+                difficulty,
+                wordLength.first,
+                wordLength.last,
+                emptyList(),
               )
           }
       }
@@ -116,7 +123,10 @@ constructor(
         systemPrompt = null
         val basePrompt =
           PromptTemplates.puzzlePromptGemma3(
-            language, difficulty, wordLength.first, wordLength.last,
+            language,
+            difficulty,
+            wordLength.first,
+            wordLength.last,
             if (attempt < 2) recentWords else emptyList(),
           )
         userPrompt =
@@ -127,7 +137,11 @@ constructor(
                 "Please try again with a different word."
             else ->
               PromptTemplates.puzzlePromptGemma3(
-                language, difficulty, wordLength.first, wordLength.last, emptyList(),
+                language,
+                difficulty,
+                wordLength.first,
+                wordLength.last,
+                emptyList(),
               )
           }
       }

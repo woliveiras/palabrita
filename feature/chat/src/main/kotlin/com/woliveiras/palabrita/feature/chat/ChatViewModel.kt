@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class ChatViewModel @Inject constructor(
-  savedStateHandle: SavedStateHandle,
-  private val chatRepository: ChatRepository,
-) : ViewModel() {
+class ChatViewModel
+@Inject
+constructor(savedStateHandle: SavedStateHandle, private val chatRepository: ChatRepository) :
+  ViewModel() {
 
   private val puzzleId: Long = savedStateHandle["puzzleId"] ?: 0L
 
@@ -34,7 +34,9 @@ class ChatViewModel @Inject constructor(
       is ChatAction.UpdateInput -> updateInput(action.text)
       is ChatAction.SendMessage -> sendMessage()
       is ChatAction.SelectSuggestion -> selectSuggestion(action.suggestion)
-      is ChatAction.GoBack -> { /* handled by UI */ }
+      is ChatAction.GoBack -> {
+        /* handled by UI */
+      }
     }
   }
 
@@ -49,9 +51,7 @@ class ChatViewModel @Inject constructor(
           word = puzzle.word,
           category = puzzle.category,
           language = puzzle.language,
-          messages = existing.map { msg ->
-            UiChatMessage(role = msg.role, content = msg.content)
-          },
+          messages = existing.map { msg -> UiChatMessage(role = msg.role, content = msg.content) },
           userMessageCount = userCount,
           isAtLimit = userCount >= it.maxMessages,
           suggestionsVisible = existing.isEmpty(),
@@ -70,16 +70,18 @@ class ChatViewModel @Inject constructor(
     viewModelScope.launch {
       val current = _state.value
       // V1: simulate model response (real LLM integration pending)
-      val response = "\"${current.word.replaceFirstChar { it.uppercase() }}\" " +
-        "é uma palavra da categoria ${current.category}. " +
-        "Pergunte qualquer coisa sobre ela!"
+      val response =
+        "\"${current.word.replaceFirstChar { it.uppercase() }}\" " +
+          "é uma palavra da categoria ${current.category}. " +
+          "Pergunte qualquer coisa sobre ela!"
 
-      val message = ChatMessage(
-        puzzleId = puzzleId,
-        role = MessageRole.MODEL,
-        content = response,
-        timestamp = System.currentTimeMillis(),
-      )
+      val message =
+        ChatMessage(
+          puzzleId = puzzleId,
+          role = MessageRole.MODEL,
+          content = response,
+          timestamp = System.currentTimeMillis(),
+        )
       chatRepository.saveMessage(message)
 
       _state.update {
@@ -111,7 +113,7 @@ class ChatViewModel @Inject constructor(
           role = MessageRole.USER,
           content = userText,
           timestamp = System.currentTimeMillis(),
-        ),
+        )
       )
 
       _state.update {
@@ -126,15 +128,16 @@ class ChatViewModel @Inject constructor(
       }
 
       // V1: simulate model response
-      val response = "Boa pergunta sobre \"${_state.value.word}\"! " +
-        "Essa é uma resposta simulada enquanto a integração com o LLM está pendente."
+      val response =
+        "Boa pergunta sobre \"${_state.value.word}\"! " +
+          "Essa é uma resposta simulada enquanto a integração com o LLM está pendente."
       chatRepository.saveMessage(
         ChatMessage(
           puzzleId = puzzleId,
           role = MessageRole.MODEL,
           content = response,
           timestamp = System.currentTimeMillis(),
-        ),
+        )
       )
 
       _state.update {

@@ -36,10 +36,7 @@ class PlayerStatsDaoTest {
     database.close()
   }
 
-  @Test
-  fun get_returnsNullWhenEmpty() = runTest {
-    assertThat(dao.get()).isNull()
-  }
+  @Test fun get_returnsNullWhenEmpty() = runTest { assertThat(dao.get()).isNull() }
 
   @Test
   fun upsert_createsNewStats() = runTest {
@@ -82,7 +79,10 @@ class PlayerStatsDaoTest {
     val winsPerDiff = """{"1":45,"2":30,"3":12}"""
 
     dao.upsert(
-      createTestPlayerStatsEntity(guessDistribution = distribution, gamesWonByDifficulty = winsPerDiff)
+      createTestPlayerStatsEntity(
+        guessDistribution = distribution,
+        gamesWonByDifficulty = winsPerDiff,
+      )
     )
 
     val result = dao.get()

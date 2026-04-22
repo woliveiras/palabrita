@@ -20,7 +20,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel
+@Inject
+constructor(
   private val statsRepository: StatsRepository,
   private val modelRepository: ModelRepository,
   private val gameSessionRepository: GameSessionRepository,
@@ -35,9 +37,7 @@ class SettingsViewModel @Inject constructor(
   init {
     loadData()
     viewModelScope.launch {
-      statsRepository.observeStats().collect { stats ->
-        _state.update { it.copy(stats = stats) }
-      }
+      statsRepository.observeStats().collect { stats -> _state.update { it.copy(stats = stats) } }
     }
   }
 
@@ -48,7 +48,6 @@ class SettingsViewModel @Inject constructor(
       is SettingsAction.SwitchModel -> switchModel(action.newModelId)
       is SettingsAction.DeleteModel -> deleteModel()
       is SettingsAction.ResetProgress -> resetProgress()
-      is SettingsAction.ShareStats -> { /* handled by UI via generateShareStatsText */ }
       is SettingsAction.DismissError -> _state.update { it.copy(errorRes = null) }
     }
   }
@@ -86,34 +85,43 @@ class SettingsViewModel @Inject constructor(
 
   private fun switchModel(newModelId: ModelId) {
     if (_state.value.hasActiveGame) {
-      _state.update { it.copy(errorRes = com.woliveiras.palabrita.core.common.R.string.settings_error_active_game) }
+      _state.update {
+        it.copy(errorRes = com.woliveiras.palabrita.core.common.R.string.settings_error_active_game)
+      }
       return
     }
     viewModelScope.launch {
       _state.update { it.copy(isModelSwitching = true) }
       if (newModelId == ModelId.NONE) {
-        val config = ModelConfig(
-          modelId = ModelId.NONE,
-          downloadState = DownloadState.NOT_DOWNLOADED,
-          selectedAt = System.currentTimeMillis(),
-        )
+        val config =
+          ModelConfig(
+            modelId = ModelId.NONE,
+            downloadState = DownloadState.NOT_DOWNLOADED,
+            selectedAt = System.currentTimeMillis(),
+          )
         modelRepository.updateConfig(config)
         puzzleRepository.deleteUnplayedAiPuzzles()
         _state.update { it.copy(currentModel = config, isModelSwitching = false) }
       } else {
         // V2: actual download flow
-        _state.update { it.copy(isModelSwitching = false, errorRes = com.woliveiras.palabrita.core.common.R.string.settings_error_download_soon) }
+        _state.update {
+          it.copy(
+            isModelSwitching = false,
+            errorRes = com.woliveiras.palabrita.core.common.R.string.settings_error_download_soon,
+          )
+        }
       }
     }
   }
 
   private fun deleteModel() {
     viewModelScope.launch {
-      val config = ModelConfig(
-        modelId = ModelId.NONE,
-        downloadState = DownloadState.NOT_DOWNLOADED,
-        selectedAt = System.currentTimeMillis(),
-      )
+      val config =
+        ModelConfig(
+          modelId = ModelId.NONE,
+          downloadState = DownloadState.NOT_DOWNLOADED,
+          selectedAt = System.currentTimeMillis(),
+        )
       modelRepository.updateConfig(config)
       puzzleRepository.deleteUnplayedAiPuzzles()
       _state.update { it.copy(currentModel = config) }

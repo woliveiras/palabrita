@@ -66,12 +66,14 @@ class ChatViewModelTest {
 
   @Test
   fun `restores existing messages from repository`() = runTest {
-    val repo = FakeChatRepository(
-      existingMessages = listOf(
-        ChatMessage(1, 1L, MessageRole.MODEL, "Olá!", 1000),
-        ChatMessage(2, 1L, MessageRole.USER, "Oi", 2000),
-      ),
-    )
+    val repo =
+      FakeChatRepository(
+        existingMessages =
+          listOf(
+            ChatMessage(1, 1L, MessageRole.MODEL, "Olá!", 1000),
+            ChatMessage(2, 1L, MessageRole.USER, "Oi", 2000),
+          )
+      )
     val vm = createViewModel(chatRepo = repo)
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.messages).hasSize(2)
@@ -81,11 +83,10 @@ class ChatViewModelTest {
 
   @Test
   fun `does not send initial message when history exists`() = runTest {
-    val repo = FakeChatRepository(
-      existingMessages = listOf(
-        ChatMessage(1, 1L, MessageRole.MODEL, "Already here", 1000),
-      ),
-    )
+    val repo =
+      FakeChatRepository(
+        existingMessages = listOf(ChatMessage(1, 1L, MessageRole.MODEL, "Already here", 1000))
+      )
     val vm = createViewModel(chatRepo = repo)
     testDispatcher.scheduler.advanceUntilIdle()
     // Should have exactly 1 message (the existing one), not 2
@@ -104,13 +105,15 @@ class ChatViewModelTest {
 
   @Test
   fun `suggestions hidden when history exists`() = runTest {
-    val repo = FakeChatRepository(
-      existingMessages = listOf(
-        ChatMessage(1, 1L, MessageRole.MODEL, "Hi", 1000),
-        ChatMessage(2, 1L, MessageRole.USER, "Hello", 2000),
-      ),
-      userMessageCount = 1,
-    )
+    val repo =
+      FakeChatRepository(
+        existingMessages =
+          listOf(
+            ChatMessage(1, 1L, MessageRole.MODEL, "Hi", 1000),
+            ChatMessage(2, 1L, MessageRole.USER, "Hello", 2000),
+          ),
+        userMessageCount = 1,
+      )
     val vm = createViewModel(chatRepo = repo)
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.suggestionsVisible).isFalse()
@@ -254,39 +257,43 @@ class ChatViewModelTest {
 
   // --- Helpers ---
 
-  private fun createTestPuzzle() = Puzzle(
-    id = 1,
-    word = "gatos",
-    wordDisplay = "GATOS",
-    language = "pt",
-    difficulty = 1,
-    category = "Animal",
-    hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
-    source = PuzzleSource.AI,
-    generatedAt = 1000,
-  )
+  private fun createTestPuzzle() =
+    Puzzle(
+      id = 1,
+      word = "gatos",
+      wordDisplay = "GATOS",
+      language = "pt",
+      difficulty = 1,
+      category = "Animal",
+      hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
+      source = PuzzleSource.AI,
+      generatedAt = 1000,
+    )
 
   private fun createViewModel(
     chatRepo: FakeChatRepository = FakeChatRepository(),
     puzzleId: Long = 1L,
   ): ChatViewModel {
     val savedState = SavedStateHandle(mapOf("puzzleId" to puzzleId))
-    return ChatViewModel(
-      savedStateHandle = savedState,
-      chatRepository = chatRepo,
-    )
+    return ChatViewModel(savedStateHandle = savedState, chatRepository = chatRepo)
   }
 }
 
 private class FakeChatRepository(
   private val existingMessages: List<ChatMessage> = emptyList(),
   private var userMessageCount: Int = existingMessages.count { it.role == MessageRole.USER },
-  private val puzzle: Puzzle = Puzzle(
-    id = 1, word = "gatos", wordDisplay = "GATOS", language = "pt",
-    difficulty = 1, category = "Animal",
-    hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
-    source = PuzzleSource.AI, generatedAt = 1000,
-  ),
+  private val puzzle: Puzzle =
+    Puzzle(
+      id = 1,
+      word = "gatos",
+      wordDisplay = "GATOS",
+      language = "pt",
+      difficulty = 1,
+      category = "Animal",
+      hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
+      source = PuzzleSource.AI,
+      generatedAt = 1000,
+    ),
 ) : ChatRepository {
   val savedMessages = mutableListOf<ChatMessage>()
 

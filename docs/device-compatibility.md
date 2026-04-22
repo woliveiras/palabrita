@@ -9,8 +9,8 @@ Palabrita roda LLM on-device, o que exige hardware capaz. Este documento detalha
 | Tier | RAM | Modelo | Modo | Features |
 |---|---|---|---|---|
 | **HIGH** | ≥ 8 GB | Gemma 4 E2B (~2.6GB) | AI Premium | Geração, chat, system prompt, function calling, thinking |
-| **MEDIUM** | 4-7 GB | Gemma 3 1B (~529MB) | AI Compacto | Geração, chat (prompt-only) |
-| **LOW** | < 4 GB | Nenhum | Light | Dataset estático, sem chat (card de curiosidade) |
+| **MEDIUM** | 4-7 GB | Qwen3 0.6B (~614MB) | AI Compacto | Geração, chat (prompt-only) |
+| **LOW** | < 4 GB | Qwen3 0.6B (~614MB) | AI Compacto | Geração, chat (prompt-only) |
 
 ## Detecção de RAM
 
@@ -41,8 +41,8 @@ class DeviceCapabilities @Inject constructor(
     fun getRecommendedModel(): ModelId {
         return when (getDeviceTier()) {
             DeviceTier.HIGH -> ModelId.GEMMA4_E2B
-            DeviceTier.MEDIUM -> ModelId.GEMMA3_1B
-            DeviceTier.LOW -> ModelId.NONE
+            DeviceTier.MEDIUM -> ModelId.QWEN3_0_6B
+            DeviceTier.LOW -> ModelId.QWEN3_0_6B
         }
     }
 
@@ -50,7 +50,7 @@ class DeviceCapabilities @Inject constructor(
         val tier = getDeviceTier()
         return when (modelId) {
             ModelId.GEMMA4_E2B -> tier == DeviceTier.HIGH
-            ModelId.GEMMA3_1B -> tier >= DeviceTier.MEDIUM
+            ModelId.QWEN3_0_6B -> true
             ModelId.NONE -> true
         }
     }
@@ -60,7 +60,7 @@ enum class DeviceTier { LOW, MEDIUM, HIGH }
 
 enum class ModelId {
     GEMMA4_E2B,
-    GEMMA3_1B,
+    QWEN3_0_6B,
     NONE
 }
 ```
@@ -76,13 +76,13 @@ enum class ModelId {
 | RAM total recomendada (device) | ≥ 8 GB |
 | RAM real disponível para app (com OS + outros apps) | ~4-5 GB |
 
-### Gemma 3 1B
+### Qwen3 0.6B
 
 | Recurso | Valor |
 |---|---|
-| Arquivo em disco | ~529 MB |
+| Arquivo em disco | ~614 MB |
 | RAM (modelo carregado, INT4) | ~1 GB |
-| RAM total recomendada (device) | ≥ 4 GB |
+| RAM total recomendada (device) | ≥ 2 GB |
 | RAM real disponível para app (com OS + outros apps) | ~2-3 GB |
 
 > **Nota**: o Android OS + system services consomem 2-3 GB de RAM. O app precisa que o modelo + app + OS caibam na RAM total. Por isso os requisitos são maiores que o tamanho do modelo.
@@ -99,7 +99,7 @@ enum class ModelId {
 | Pixel 8 Pro | 2023 | 12 GB | GPU | ~1500 | ~35 | ~8s |
 | Pixel 7 Pro | 2022 | 12 GB | CPU | ~400 | ~30 | ~10s |
 
-### Gemma 3 1B
+### Qwen3 0.6B
 
 | Device | Ano | RAM | Backend | Prefill (tok/s) | Decode (tok/s) | Init Time |
 |---|---|---|---|---|---|---|
@@ -112,7 +112,7 @@ enum class ModelId {
 
 ### Implicações para UX
 
-| Operação | Gemma 4 (high-end) | Gemma 3 (mid-range) | Gemma 3 (low-end 4GB) |
+| Operação | Gemma 4 (high-end) | Qwen3 (mid-range) | Qwen3 (low-end) |
 |---|---|---|---|
 | Gerar 1 puzzle (~50 tokens) | ~1-2s | ~1-2s | ~3-5s |
 | Gerar 7 puzzles | ~10-15s | ~10-15s | ~25-35s |
