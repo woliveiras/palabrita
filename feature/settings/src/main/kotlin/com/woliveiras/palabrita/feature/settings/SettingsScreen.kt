@@ -143,7 +143,6 @@ fun SettingsScreen(
       val modelName = when (state.currentModel.modelId) {
         ModelId.GEMMA4_E2B -> stringResource(CommonR.string.settings_model_gemma4)
         ModelId.QWEN3_0_6B -> stringResource(CommonR.string.settings_model_qwen3)
-        ModelId.GEMMA3_1B -> stringResource(CommonR.string.settings_model_gemma3)
         ModelId.NONE -> stringResource(CommonR.string.settings_model_none)
       }
       ListItem(

@@ -64,21 +64,21 @@ class ModelConfigDaoTest {
   @Test
   fun upsert_updatesDownloadState() = runTest {
     dao.upsert(
-      createTestModelConfigEntity(modelId = "gemma3_1b", downloadState = "NOT_DOWNLOADED")
+      createTestModelConfigEntity(modelId = "qwen3_0_6b", downloadState = "NOT_DOWNLOADED")
     )
 
     dao.upsert(
       createTestModelConfigEntity(
-        modelId = "gemma3_1b",
+        modelId = "qwen3_0_6b",
         downloadState = "DOWNLOADED",
-        modelPath = "/data/models/gemma3",
+        modelPath = "/data/models/qwen3",
         sizeBytes = 529_000_000,
       )
     )
 
     val result = dao.get()
     assertThat(result!!.downloadState).isEqualTo("DOWNLOADED")
-    assertThat(result.modelPath).isEqualTo("/data/models/gemma3")
+    assertThat(result.modelPath).isEqualTo("/data/models/qwen3")
   }
 
   @Test
@@ -97,7 +97,7 @@ class ModelConfigDaoTest {
   @Test
   fun upsert_persistsDownloadStateBetweenReads() = runTest {
     dao.upsert(
-      createTestModelConfigEntity(modelId = "gemma3_1b", downloadState = "DOWNLOADING")
+      createTestModelConfigEntity(modelId = "qwen3_0_6b", downloadState = "DOWNLOADING")
     )
 
     val first = dao.get()

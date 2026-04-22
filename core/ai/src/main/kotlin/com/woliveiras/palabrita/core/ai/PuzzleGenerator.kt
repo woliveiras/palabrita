@@ -112,9 +112,7 @@ constructor(
               )
           }
       }
-      ModelId.GEMMA3_1B,
-      ModelId.QWEN3_0_6B,
-      -> {
+      ModelId.QWEN3_0_6B -> {
         systemPrompt = null
         val basePrompt =
           PromptTemplates.puzzlePromptGemma3(

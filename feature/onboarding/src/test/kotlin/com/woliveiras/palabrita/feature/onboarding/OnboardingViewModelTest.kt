@@ -119,19 +119,19 @@ class OnboardingViewModelTest {
   }
 
   @Test
-  fun `auto-select picks GEMMA3_1B for MEDIUM tier`() = runTest {
+  fun `auto-select picks QWEN3_0_6B for MEDIUM tier`() = runTest {
     val vm = createViewModel(deviceTier = DeviceTier.MEDIUM)
     vm.onAction(OnboardingAction.AutoSelectModel)
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.selectedModel).isEqualTo(ModelId.GEMMA3_1B)
+    assertThat(vm.state.value.selectedModel).isEqualTo(ModelId.QWEN3_0_6B)
   }
 
   @Test
   fun `manual model selection updates state`() = runTest {
     val vm = createViewModel(deviceTier = DeviceTier.HIGH)
-    vm.onAction(OnboardingAction.SelectModel(ModelId.GEMMA3_1B))
+    vm.onAction(OnboardingAction.SelectModel(ModelId.QWEN3_0_6B))
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.selectedModel).isEqualTo(ModelId.GEMMA3_1B)
+    assertThat(vm.state.value.selectedModel).isEqualTo(ModelId.QWEN3_0_6B)
   }
 
   @Test

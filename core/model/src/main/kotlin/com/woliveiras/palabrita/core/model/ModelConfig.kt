@@ -11,7 +11,6 @@ data class ModelConfig(
 
 enum class ModelId {
   GEMMA4_E2B,
-  GEMMA3_1B,
   QWEN3_0_6B,
   NONE,
 }

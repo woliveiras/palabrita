@@ -292,7 +292,7 @@ class SettingsViewModelTest {
     sessionRepo.create(GameSession(puzzleId = 1, startedAt = 1000))
     val vm = createViewModel(sessionRepo = sessionRepo)
     testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(SettingsAction.SwitchModel(ModelId.GEMMA3_1B))
+    vm.onAction(SettingsAction.SwitchModel(ModelId.QWEN3_0_6B))
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.errorRes).isNotNull()
   }
@@ -303,7 +303,7 @@ class SettingsViewModelTest {
     sessionRepo.create(GameSession(puzzleId = 1, startedAt = 1000))
     val vm = createViewModel(sessionRepo = sessionRepo)
     testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(SettingsAction.SwitchModel(ModelId.GEMMA3_1B))
+    vm.onAction(SettingsAction.SwitchModel(ModelId.QWEN3_0_6B))
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.DismissError)
     assertThat(vm.state.value.errorRes).isNull()
