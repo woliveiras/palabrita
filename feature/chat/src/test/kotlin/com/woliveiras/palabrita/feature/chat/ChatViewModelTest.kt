@@ -6,10 +6,14 @@ import com.woliveiras.palabrita.core.ai.EngineState
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.LlmSession
 import com.woliveiras.palabrita.core.model.ChatMessage
+import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.MessageRole
+import com.woliveiras.palabrita.core.model.ModelConfig
+import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.PuzzleSource
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
+import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -266,12 +270,23 @@ class ChatViewModelTest {
   // --- Engine state ---
 
   @Test
-  fun `shows error when engine not ready`() = runTest {
+  fun `shows error when engine not ready and no model path`() = runTest {
+    val engine = FakeLlmEngineManager(initialState = EngineState.Uninitialized)
+    val modelRepo = FakeModelRepository(modelPath = null)
+    val vm = createViewModel(engineManager = engine, modelRepo = modelRepo)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.error).isNotNull()
+    assertThat(vm.state.value.isEngineLoading).isFalse()
+  }
+
+  @Test
+  fun `initializes engine and sends initial message when uninitialized`() = runTest {
     val engine = FakeLlmEngineManager(initialState = EngineState.Uninitialized)
     val vm = createViewModel(engineManager = engine)
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.error).isNotNull()
-    assertThat(vm.state.value.isModelResponding).isFalse()
+    assertThat(vm.state.value.messages).isNotEmpty()
+    assertThat(vm.state.value.messages[0].role).isEqualTo(MessageRole.MODEL)
+    assertThat(vm.state.value.isEngineLoading).isFalse()
   }
 
   // --- Helpers ---
@@ -292,6 +307,7 @@ class ChatViewModelTest {
   private fun createViewModel(
     chatRepo: FakeChatRepository = FakeChatRepository(),
     engineManager: FakeLlmEngineManager = FakeLlmEngineManager(),
+    modelRepo: FakeModelRepository = FakeModelRepository(),
     puzzleId: Long = 1L,
   ): ChatViewModel {
     val savedState = SavedStateHandle(mapOf("puzzleId" to puzzleId))
@@ -299,6 +315,7 @@ class ChatViewModelTest {
       savedStateHandle = savedState,
       chatRepository = chatRepo,
       engineManager = engineManager,
+      modelRepository = modelRepo,
     )
   }
 }
@@ -365,4 +382,24 @@ private class FakeChatRepository(
   override suspend fun getPuzzle(puzzleId: Long): Puzzle? = puzzle
 
   override suspend fun deleteAll() {}
+}
+
+private class FakeModelRepository(
+  private val modelPath: String? = "/fake/model/path",
+) : ModelRepository {
+  private var config =
+    ModelConfig(
+      modelId = ModelId.GEMMA4_E2B,
+      downloadState = DownloadState.DOWNLOADED,
+      modelPath = modelPath,
+    )
+
+  override suspend fun getConfig(): ModelConfig = config
+
+  override suspend fun updateConfig(config: ModelConfig) {
+    this.config = config
+  }
+
+  override fun observeConfig(): kotlinx.coroutines.flow.Flow<ModelConfig> =
+    kotlinx.coroutines.flow.flowOf(config)
 }

@@ -10,17 +10,20 @@ import com.woliveiras.palabrita.core.ai.PromptTemplates
 import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
+import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
 private const val RESPONSE_TIMEOUT_MS = 60_000L
+private const val ENGINE_INIT_TIMEOUT_MS = 120_000L
 private const val INITIAL_PROMPT = "Conte uma curiosidade interessante sobre a palavra '{word}'"
 
 @HiltViewModel
@@ -30,6 +33,7 @@ constructor(
   savedStateHandle: SavedStateHandle,
   private val chatRepository: ChatRepository,
   private val engineManager: LlmEngineManager,
+  private val modelRepository: ModelRepository,
 ) : ViewModel() {
 
   private val puzzleId: Long = savedStateHandle["puzzleId"] ?: 0L
@@ -97,12 +101,39 @@ constructor(
 
   private suspend fun ensureSession(): Boolean {
     if (session != null) return true
-    if (engineManager.engineState.value !is EngineState.Ready) {
-      _state.update {
-        it.copy(error = "AI engine not ready. Please wait for model initialization.")
+
+    val currentEngineState = engineManager.engineState.value
+    if (currentEngineState !is EngineState.Ready) {
+      _state.update { it.copy(isEngineLoading = true, error = null) }
+
+      if (currentEngineState is EngineState.Uninitialized) {
+        val config = modelRepository.getConfig()
+        val modelPath = config.modelPath
+        if (modelPath == null) {
+          _state.update {
+            it.copy(isEngineLoading = false, error = "No AI model configured.")
+          }
+          return false
+        }
+        engineManager.initialize(modelPath)
       }
-      return false
+
+      val ready =
+        withTimeoutOrNull(ENGINE_INIT_TIMEOUT_MS) {
+          engineManager.engineState.first { it is EngineState.Ready || it is EngineState.Error }
+        }
+
+      _state.update { it.copy(isEngineLoading = false) }
+
+      if (ready == null || ready is EngineState.Error) {
+        val errorMsg =
+          if (ready is EngineState.Error) ready.message
+          else "AI engine initialization timed out."
+        _state.update { it.copy(error = errorMsg) }
+        return false
+      }
     }
+
     val current = _state.value
     val systemPrompt =
       PromptTemplates.chatSystemPrompt(current.word, current.category, current.language)

@@ -95,6 +95,22 @@ fun ChatScreen(
     }
   ) { padding ->
     Column(modifier = modifier.fillMaxSize().padding(padding)) {
+      if (state.isEngineLoading) {
+        Box(
+          modifier = Modifier.weight(1f).fillMaxWidth(),
+          contentAlignment = Alignment.Center,
+        ) {
+          Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            androidx.compose.material3.CircularProgressIndicator()
+            Spacer(Modifier.height(16.dp))
+            Text(
+              text = stringResource(CommonR.string.chat_engine_loading),
+              style = MaterialTheme.typography.bodyMedium,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+          }
+        }
+      } else {
       // Messages
       LazyColumn(
         state = listState,
@@ -191,6 +207,7 @@ fun ChatScreen(
           )
         }
       }
+      } // else (not loading)
     }
   }
 }

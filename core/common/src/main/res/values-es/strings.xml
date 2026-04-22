@@ -111,6 +111,7 @@
     <string name="chat_suggestion_sentence">¿Cómo usarla en una frase?</string>
     <string name="chat_suggestion_english">¿Cómo se dice en inglés?</string>
     <string name="chat_suggestion_trivia">¿Alguna curiosidad?</string>
+    <string name="chat_engine_loading">Cargando modelo de IA…</string>
 
     <!-- Settings -->
     <string name="settings_section_game">Juego</string>

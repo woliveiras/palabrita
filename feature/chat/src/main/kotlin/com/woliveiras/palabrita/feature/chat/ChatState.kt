@@ -10,6 +10,7 @@ data class ChatState(
   val messages: List<UiChatMessage> = emptyList(),
   val currentInput: String = "",
   val isModelResponding: Boolean = false,
+  val isEngineLoading: Boolean = false,
   val userMessageCount: Int = 0,
   val maxMessages: Int = 10,
   val isAtLimit: Boolean = false,
