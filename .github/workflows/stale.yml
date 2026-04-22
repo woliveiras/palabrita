@@ -1,0 +1,29 @@
+name: Stale Issues
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    name: Mark & Close Stale Issues
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: 30
+          days-before-issue-close: 7
+          stale-issue-label: stale
+          stale-issue-message: >
+            Esta issue ficou sem atividade por 30 dias.
+            Ela será fechada automaticamente em 7 dias se não houver novas interações.
+            Sinta-se à vontade para comentar se ainda for relevante.
+          close-issue-message: >
+            Issue fechada por inatividade.
+            Sinta-se à vontade para reabrir se ainda for relevante.
+          days-before-pr-stale: -1
+          days-before-pr-close: -1

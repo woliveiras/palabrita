@@ -7,6 +7,7 @@ plugins {
   alias(libs.plugins.hilt) apply false
   alias(libs.plugins.ksp) apply false
   alias(libs.plugins.spotless)
+  alias(libs.plugins.detekt)
 }
 
 spotless {
@@ -19,5 +20,25 @@ spotless {
     target("**/*.gradle.kts")
     targetExclude("**/build/**")
     ktfmt(libs.versions.ktfmt.get()).googleStyle()
+  }
+}
+
+detekt {
+  buildUponDefaultConfig = true
+  parallel = true
+  source.setFrom(
+    fileTree(rootProject.projectDir) {
+      include("**/src/**/*.kt")
+      exclude("**/build/**")
+    }
+  )
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+  jvmTarget = "21"
+  reports {
+    html.required.set(true)
+    xml.required.set(false)
+    txt.required.set(false)
   }
 }

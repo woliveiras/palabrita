@@ -5,6 +5,7 @@ plugins {
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.ksp)
   alias(libs.plugins.hilt)
+  alias(libs.plugins.dependency.guard)
 }
 
 android {
@@ -79,4 +80,8 @@ dependencies {
   androidTestImplementation(libs.androidx.test.core)
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.compose.ui.test.junit4)
+}
+
+dependencyGuard {
+  configuration("releaseRuntimeClasspath")
 }
