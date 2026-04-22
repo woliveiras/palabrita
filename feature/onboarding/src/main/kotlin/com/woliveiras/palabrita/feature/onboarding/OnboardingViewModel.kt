@@ -51,7 +51,6 @@ class OnboardingViewModel @Inject constructor(
       is OnboardingAction.SelectLanguage -> selectLanguage(action.language)
       is OnboardingAction.SelectModel -> selectModel(action.modelId)
       is OnboardingAction.AutoSelectModel -> autoSelectModel()
-      is OnboardingAction.SkipToLightMode -> {}
       is OnboardingAction.DismissTierWarning -> _state.update { it.copy(showTierWarning = false) }
       is OnboardingAction.StartDownload -> startDownload()
       is OnboardingAction.CancelDownload -> cancelDownload()

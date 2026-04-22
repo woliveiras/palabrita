@@ -170,7 +170,6 @@
     <string name="error_download_http">Download error (HTTP %1$d)</string>
 
     <!-- Game: Header -->
-    <string name="game_header_daily">CHALLENGE %1$d/%2$d</string>
     <string name="game_header_free">FREE PLAY</string>
 
     <!-- Game: Abandon Dialog -->
@@ -190,7 +189,7 @@
 
     <!-- Home -->
     <string name="home_tab">Home</string>
-    <string name="stats_tab">Stats</string>
+    <string name="ai_tab">AI</string>
     <string name="more_tab">More</string>
     <string name="home_title">PALABRITA</string>
     <string name="home_play">PLAY</string>
@@ -202,4 +201,21 @@
     <string name="home_stats_xp">XP</string>
     <string name="home_generating">Generating new puzzles…</string>
     <string name="home_generation_complete">✓ New puzzles ready!</string>
+
+    <!-- AI Info -->
+    <string name="ai_info_title">Artificial Intelligence</string>
+    <string name="ai_info_model_section">Model</string>
+    <string name="ai_info_model_name">Name</string>
+    <string name="ai_info_model_size">Size</string>
+    <string name="ai_info_model_ram">Required RAM</string>
+    <string name="ai_info_model_file">File</string>
+    <string name="ai_info_no_model">No model selected</string>
+    <string name="ai_info_engine_section">AI Engine</string>
+    <string name="ai_info_engine_ready">Ready</string>
+    <string name="ai_info_engine_loading">Initializing…</string>
+    <string name="ai_info_engine_error">Error</string>
+    <string name="ai_info_engine_off">Off</string>
+    <string name="ai_info_system_prompt">System Prompt</string>
+    <string name="ai_info_puzzle_prompt">Generation Prompt (example)</string>
+    <string name="ai_info_chat_prompt">Chat Prompt (example)</string>
 </resources>

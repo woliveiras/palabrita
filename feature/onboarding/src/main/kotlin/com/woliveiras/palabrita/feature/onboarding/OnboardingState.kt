@@ -44,8 +44,6 @@ sealed class OnboardingAction {
 
   data object AutoSelectModel : OnboardingAction()
 
-  data object SkipToLightMode : OnboardingAction()
-
   data object StartDownload : OnboardingAction()
 
   data object CancelDownload : OnboardingAction()

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.MoreHoriz
-import androidx.compose.material.icons.rounded.QueryStats
+import androidx.compose.material.icons.rounded.SmartToy
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -34,6 +34,7 @@ import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen
 import com.woliveiras.palabrita.feature.onboarding.GenerationScreen
 import com.woliveiras.palabrita.feature.onboarding.OnboardingScreen
+import com.woliveiras.palabrita.feature.settings.AiInfoScreen
 import com.woliveiras.palabrita.feature.settings.SettingsScreen
 import com.woliveiras.palabrita.feature.settings.StatsScreen
 import kotlinx.serialization.Serializable
@@ -56,6 +57,8 @@ data class GenerationRoute(
 
 @Serializable data object StatsRoute
 
+@Serializable data object AiInfoRoute
+
 private data class BottomNavItem(
   val route: Any,
   val icon: ImageVector,
@@ -71,7 +74,7 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
 
   val bottomNavItems = listOf(
     BottomNavItem(HomeRoute, Icons.Rounded.Home, CommonR.string.home_tab),
-    BottomNavItem(StatsRoute, Icons.Rounded.QueryStats, CommonR.string.stats_tab),
+    BottomNavItem(AiInfoRoute, Icons.Rounded.SmartToy, CommonR.string.ai_tab),
     BottomNavItem(SettingsRoute, Icons.Rounded.MoreHoriz, CommonR.string.more_tab),
   )
 
@@ -178,6 +181,9 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
             clipboard.setPrimaryClip(ClipData.newPlainText("Palabrita Stats", text))
           },
         )
+      }
+      composable<AiInfoRoute> {
+        AiInfoScreen()
       }
     }
   }

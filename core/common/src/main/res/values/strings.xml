@@ -170,7 +170,6 @@
     <string name="error_download_http">Erro no download (HTTP %1$d)</string>
 
     <!-- Game: Header -->
-    <string name="game_header_daily">DESAFIO %1$d/%2$d</string>
     <string name="game_header_free">LIVRE</string>
 
     <!-- Game: Abandon Dialog -->
@@ -190,7 +189,7 @@
 
     <!-- Home -->
     <string name="home_tab">Home</string>
-    <string name="stats_tab">Stats</string>
+    <string name="ai_tab">IA</string>
     <string name="more_tab">Mais</string>
     <string name="home_title">PALABRITA</string>
     <string name="home_play">JOGAR</string>
@@ -202,4 +201,21 @@
     <string name="home_stats_xp">XP</string>
     <string name="home_generating">Gerando novos puzzles…</string>
     <string name="home_generation_complete">✓ Novos puzzles prontos!</string>
+
+    <!-- AI Info -->
+    <string name="ai_info_title">Inteligência Artificial</string>
+    <string name="ai_info_model_section">Modelo</string>
+    <string name="ai_info_model_name">Nome</string>
+    <string name="ai_info_model_size">Tamanho</string>
+    <string name="ai_info_model_ram">RAM necessária</string>
+    <string name="ai_info_model_file">Arquivo</string>
+    <string name="ai_info_no_model">Nenhum modelo selecionado</string>
+    <string name="ai_info_engine_section">Motor de IA</string>
+    <string name="ai_info_engine_ready">Pronto</string>
+    <string name="ai_info_engine_loading">Inicializando…</string>
+    <string name="ai_info_engine_error">Erro</string>
+    <string name="ai_info_engine_off">Desligado</string>
+    <string name="ai_info_system_prompt">Prompt do Sistema</string>
+    <string name="ai_info_puzzle_prompt">Prompt de Geração (exemplo)</string>
+    <string name="ai_info_chat_prompt">Prompt do Chat (exemplo)</string>
 </resources>

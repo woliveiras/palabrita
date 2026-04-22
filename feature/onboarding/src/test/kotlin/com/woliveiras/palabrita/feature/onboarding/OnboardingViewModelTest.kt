@@ -150,18 +150,6 @@ class OnboardingViewModelTest {
     assertThat(vm.state.value.showTierWarning).isFalse()
   }
 
-  // --- SkipToLightMode is a no-op ---
-
-  @Test
-  fun `SkipToLightMode is a no-op and stays on model selection`() = runTest {
-    val vm = createViewModel(deviceTier = DeviceTier.LOW)
-    vm.onAction(OnboardingAction.Next) // → LANGUAGE
-    vm.onAction(OnboardingAction.Next) // → MODEL_SELECTION
-    vm.onAction(OnboardingAction.SkipToLightMode)
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.currentStep).isEqualTo(OnboardingStep.MODEL_SELECTION)
-  }
-
   // --- State observation via Flow ---
 
   @Test

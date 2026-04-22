@@ -89,7 +89,6 @@ fun OnboardingScreen(
           showTierWarning = state.showTierWarning,
           onSelectModel = { viewModel.onAction(OnboardingAction.SelectModel(it)) },
           onAutoSelect = { viewModel.onAction(OnboardingAction.AutoSelectModel) },
-          onSkipToLight = { viewModel.onAction(OnboardingAction.SkipToLightMode) },
           onDismissWarning = { viewModel.onAction(OnboardingAction.DismissTierWarning) },
           onNext = { viewModel.onAction(OnboardingAction.Next) },
           onBack = { viewModel.onAction(OnboardingAction.Back) },
@@ -247,7 +246,6 @@ private fun ModelSelectionScreen(
   showTierWarning: Boolean,
   onSelectModel: (ModelId) -> Unit,
   onAutoSelect: () -> Unit,
-  onSkipToLight: () -> Unit,
   onDismissWarning: () -> Unit,
   onNext: () -> Unit,
   onBack: () -> Unit,
@@ -272,7 +270,7 @@ private fun ModelSelectionScreen(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       Spacer(Modifier.weight(1f))
-      Button(onClick = onSkipToLight, modifier = Modifier.fillMaxWidth()) {
+      Button(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(CommonR.string.model_low_tier_button))
       }
     } else {
