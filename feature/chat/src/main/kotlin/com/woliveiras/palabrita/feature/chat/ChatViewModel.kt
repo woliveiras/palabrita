@@ -3,27 +3,42 @@ package com.woliveiras.palabrita.feature.chat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.woliveiras.palabrita.core.ai.EngineState
+import com.woliveiras.palabrita.core.ai.LlmEngineManager
+import com.woliveiras.palabrita.core.ai.LlmSession
+import com.woliveiras.palabrita.core.ai.PromptTemplates
 import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+
+private const val RESPONSE_TIMEOUT_MS = 60_000L
+private const val INITIAL_PROMPT = "Conte uma curiosidade interessante sobre a palavra '{word}'"
 
 @HiltViewModel
 class ChatViewModel
 @Inject
-constructor(savedStateHandle: SavedStateHandle, private val chatRepository: ChatRepository) :
-  ViewModel() {
+constructor(
+  savedStateHandle: SavedStateHandle,
+  private val chatRepository: ChatRepository,
+  private val engineManager: LlmEngineManager,
+) : ViewModel() {
 
   private val puzzleId: Long = savedStateHandle["puzzleId"] ?: 0L
 
   private val _state = MutableStateFlow(ChatState(puzzleId = puzzleId))
   val state: StateFlow<ChatState> = _state.asStateFlow()
+
+  private var session: LlmSession? = null
+  private var streamingJob: Job? = null
 
   init {
     loadChat()
@@ -59,38 +74,123 @@ constructor(savedStateHandle: SavedStateHandle, private val chatRepository: Chat
       }
 
       if (existing.isEmpty()) {
-        sendInitialModelMessage()
+        ensureSessionAndSend(INITIAL_PROMPT.replace("{word}", puzzle.word), isInitial = true)
+      } else {
+        replayHistoryIntoSession(existing)
       }
     }
   }
 
-  private fun sendInitialModelMessage() {
-    _state.update { it.copy(isModelResponding = true) }
-
-    viewModelScope.launch {
-      val current = _state.value
-      // V1: simulate model response (real LLM integration pending)
-      val response =
-        "\"${current.word.replaceFirstChar { it.uppercase() }}\" " +
-          "é uma palavra da categoria ${current.category}. " +
-          "Pergunte qualquer coisa sobre ela!"
-
-      val message =
-        ChatMessage(
-          puzzleId = puzzleId,
-          role = MessageRole.MODEL,
-          content = response,
-          timestamp = System.currentTimeMillis(),
-        )
-      chatRepository.saveMessage(message)
-
-      _state.update {
-        it.copy(
-          messages = it.messages + UiChatMessage(role = MessageRole.MODEL, content = response),
-          isModelResponding = false,
-        )
+  private suspend fun replayHistoryIntoSession(messages: List<ChatMessage>) {
+    if (!ensureSession()) return
+    val currentSession = session ?: return
+    for (msg in messages) {
+      try {
+        if (msg.role == MessageRole.USER) {
+          currentSession.sendMessage(msg.content)
+        }
+      } catch (_: Exception) {
+        break
       }
     }
+  }
+
+  private suspend fun ensureSession(): Boolean {
+    if (session != null) return true
+    if (engineManager.engineState.value !is EngineState.Ready) {
+      _state.update {
+        it.copy(error = "AI engine not ready. Please wait for model initialization.")
+      }
+      return false
+    }
+    val current = _state.value
+    val systemPrompt =
+      PromptTemplates.chatSystemPrompt(current.word, current.category, current.language)
+    session = engineManager.createChatSession(systemPrompt)
+    return true
+  }
+
+  private fun ensureSessionAndSend(userText: String, isInitial: Boolean = false) {
+    _state.update { it.copy(isModelResponding = true, error = null) }
+
+    streamingJob =
+      viewModelScope.launch {
+        if (!ensureSession()) {
+          _state.update { it.copy(isModelResponding = false) }
+          return@launch
+        }
+
+        val currentSession = session ?: return@launch
+
+        try {
+          val accumulated = StringBuilder()
+
+          _state.update {
+            it.copy(
+              messages =
+                it.messages +
+                  UiChatMessage(role = MessageRole.MODEL, content = "", isStreaming = true)
+            )
+          }
+
+          val completed =
+            withTimeoutOrNull(RESPONSE_TIMEOUT_MS) {
+              currentSession.sendMessageStreaming(userText).collect { token ->
+                accumulated.append(token)
+                val text = accumulated.toString()
+                _state.update {
+                  val updated = it.messages.toMutableList()
+                  updated[updated.lastIndex] =
+                    UiChatMessage(role = MessageRole.MODEL, content = text, isStreaming = true)
+                  it.copy(messages = updated)
+                }
+              }
+            }
+
+          val finalText = accumulated.toString()
+
+          if (completed == null && finalText.isBlank()) {
+            _state.update {
+              val updated = it.messages.toMutableList()
+              updated.removeAt(updated.lastIndex)
+              it.copy(
+                messages = updated,
+                isModelResponding = false,
+                error = "Response timed out. Try again.",
+              )
+            }
+            return@launch
+          }
+
+          _state.update {
+            val updated = it.messages.toMutableList()
+            updated[updated.lastIndex] =
+              UiChatMessage(role = MessageRole.MODEL, content = finalText, isStreaming = false)
+            it.copy(messages = updated, isModelResponding = false)
+          }
+
+          chatRepository.saveMessage(
+            ChatMessage(
+              puzzleId = puzzleId,
+              role = MessageRole.MODEL,
+              content = finalText,
+              timestamp = System.currentTimeMillis(),
+            )
+          )
+        } catch (e: Exception) {
+          _state.update {
+            val updated = it.messages.toMutableList()
+            if (updated.isNotEmpty() && updated.last().isStreaming) {
+              updated.removeAt(updated.lastIndex)
+            }
+            it.copy(
+              messages = updated,
+              isModelResponding = false,
+              error = "Failed to get response: ${e.message}",
+            )
+          }
+        }
+      }
   }
 
   private fun updateInput(text: String) {
@@ -123,34 +223,24 @@ constructor(savedStateHandle: SavedStateHandle, private val chatRepository: Chat
           userMessageCount = newUserCount,
           isAtLimit = newUserCount >= it.maxMessages,
           suggestionsVisible = false,
-          isModelResponding = true,
         )
       }
 
-      // V1: simulate model response
-      val response =
-        "Boa pergunta sobre \"${_state.value.word}\"! " +
-          "Essa é uma resposta simulada enquanto a integração com o LLM está pendente."
-      chatRepository.saveMessage(
-        ChatMessage(
-          puzzleId = puzzleId,
-          role = MessageRole.MODEL,
-          content = response,
-          timestamp = System.currentTimeMillis(),
-        )
-      )
-
-      _state.update {
-        it.copy(
-          messages = it.messages + UiChatMessage(role = MessageRole.MODEL, content = response),
-          isModelResponding = false,
-        )
-      }
+      ensureSessionAndSend(userText)
     }
   }
 
   private fun selectSuggestion(suggestion: String) {
     _state.update { it.copy(currentInput = suggestion, suggestionsVisible = false) }
     sendMessage()
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    streamingJob?.cancel()
+    try {
+      session?.close()
+    } catch (_: Exception) {}
+    session = null
   }
 }

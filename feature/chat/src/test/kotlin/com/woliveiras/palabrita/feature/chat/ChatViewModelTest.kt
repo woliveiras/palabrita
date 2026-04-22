@@ -2,6 +2,9 @@ package com.woliveiras.palabrita.feature.chat
 
 import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.assertThat
+import com.woliveiras.palabrita.core.ai.EngineState
+import com.woliveiras.palabrita.core.ai.LlmEngineManager
+import com.woliveiras.palabrita.core.ai.LlmSession
 import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.Puzzle
@@ -9,6 +12,11 @@ import com.woliveiras.palabrita.core.model.PuzzleSource
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -255,6 +263,17 @@ class ChatViewModelTest {
     assertThat(vm.state.value.suggestionsVisible).isFalse()
   }
 
+  // --- Engine state ---
+
+  @Test
+  fun `shows error when engine not ready`() = runTest {
+    val engine = FakeLlmEngineManager(initialState = EngineState.Uninitialized)
+    val vm = createViewModel(engineManager = engine)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.error).isNotNull()
+    assertThat(vm.state.value.isModelResponding).isFalse()
+  }
+
   // --- Helpers ---
 
   private fun createTestPuzzle() =
@@ -272,11 +291,48 @@ class ChatViewModelTest {
 
   private fun createViewModel(
     chatRepo: FakeChatRepository = FakeChatRepository(),
+    engineManager: FakeLlmEngineManager = FakeLlmEngineManager(),
     puzzleId: Long = 1L,
   ): ChatViewModel {
     val savedState = SavedStateHandle(mapOf("puzzleId" to puzzleId))
-    return ChatViewModel(savedStateHandle = savedState, chatRepository = chatRepo)
+    return ChatViewModel(
+      savedStateHandle = savedState,
+      chatRepository = chatRepo,
+      engineManager = engineManager,
+    )
   }
+}
+
+private class FakeLlmSession(private val response: String = "Fake LLM response") : LlmSession {
+  override suspend fun sendMessage(message: String): String = response
+
+  override fun sendMessageStreaming(message: String): Flow<String> = flowOf(response)
+
+  override fun close() {}
+}
+
+private class FakeLlmEngineManager(
+  initialState: EngineState = EngineState.Ready,
+  private val sessionResponse: String = "Fake LLM response",
+) : LlmEngineManager {
+  private val _engineState = MutableStateFlow(initialState)
+  override val engineState: StateFlow<EngineState> = _engineState.asStateFlow()
+
+  override suspend fun initialize(modelPath: String) {
+    _engineState.value = EngineState.Ready
+  }
+
+  override suspend fun generateSingleTurn(systemPrompt: String?, userPrompt: String): String =
+    sessionResponse
+
+  override suspend fun createChatSession(systemPrompt: String): LlmSession =
+    FakeLlmSession(sessionResponse)
+
+  override fun destroy() {
+    _engineState.value = EngineState.Uninitialized
+  }
+
+  override fun isReady(): Boolean = _engineState.value is EngineState.Ready
 }
 
 private class FakeChatRepository(

@@ -64,7 +64,9 @@ fun ChatScreen(
   val state by viewModel.state.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
 
-  LaunchedEffect(state.messages.size) {
+  val streamingContent = state.messages.lastOrNull()?.let { if (it.isStreaming) it.content else null }
+
+  LaunchedEffect(state.messages.size, streamingContent) {
     if (state.messages.isNotEmpty()) {
       listState.animateScrollToItem(state.messages.size - 1)
     }
@@ -101,7 +103,8 @@ fun ChatScreen(
       ) {
         items(state.messages) { message -> MessageBubble(message) }
 
-        if (state.isModelResponding) {
+        val hasStreamingMessage = state.messages.any { it.isStreaming }
+        if (state.isModelResponding && !hasStreamingMessage) {
           item { TypingIndicator() }
         }
       }
@@ -142,6 +145,17 @@ fun ChatScreen(
       if (state.isAtLimit) {
         Text(
           text = stringResource(CommonR.string.chat_limit_reached),
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.error,
+          modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+      }
+
+      // Error
+      val errorMessage = state.error
+      if (errorMessage != null) {
+        Text(
+          text = errorMessage,
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.error,
           modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
