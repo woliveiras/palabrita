@@ -1,136 +1,136 @@
 # Spec 04 — Onboarding
 
-## Resumo
+## Summary
 
-O onboarding é o primeiro contato do usuário com o app. Guia o jogador pela explicação do jogo, escolha de idioma, seleção (ou auto-detecção) do modelo de IA e download. O fluxo adapta-se ao hardware do dispositivo.
+The onboarding is the user's first contact with the app. It guides the player through the game explanation, language choice, AI model selection (or auto-detection), and download. The flow adapts to the device hardware.
 
-## Fluxo Geral
+## General Flow
 
 ```
-App abre (primeira vez)
+App opens (first time)
     │
     ▼
 Screen 1: Welcome
     │
     ▼
-Screen 2: Idioma
+Screen 2: Language
     │
     ▼
-Screen 3: Seleção de IA ──── RAM < 4GB ────→ Light mode (auto) ──→ Screen 5
+Screen 3: AI Selection ──── RAM < 4GB ────→ Light mode (auto) ──→ Screen 5
     │                                                                    
-    ├── "Sim, quero escolher" ──→ Model Picker ──→ Screen 4
+    ├── "Yes, I want to choose" ──→ Model Picker ──→ Screen 4
     │
-    └── "Não, escolha pra mim" ──→ Auto-select ──→ Screen 4
+    └── "No, choose for me" ──→ Auto-select ──→ Screen 4
                                                         │
                                                         ▼
                                                   Screen 4: Download
                                                         │
                                                         ▼
-                                                  Screen 5: Geração inicial
+                                                  Screen 5: Initial Generation
                                                         │
                                                         ▼
                                                   Game screen
 ```
 
-## Telas
+## Screens
 
 ### Screen 1 — Welcome
 
-**Conteúdo:**
-- Logo do Palabrita
-- Título: "Descubra a palavra do dia"
-- Subtítulo: "Um jogo de palavras com inteligência artificial, direto no seu celular"
-- Ilustração ou animação simples (placeholder na V1)
-- Botão: "Começar"
+**Content:**
+- Palabrita logo
+- Title: "Discover the word of the day"
+- Subtitle: "A word game with artificial intelligence, directly on your phone"
+- Illustration or simple animation (placeholder in V1)
+- Button: "Start"
 
-**Regras:**
-- Se o usuário já completou o onboarding (flag em DataStore), pular direto para o game
-- Animação de entrada suave (fade in)
+**Rules:**
+- If the user has already completed onboarding (flag in DataStore), skip directly to the game
+- Smooth entry animation (fade in)
 
-### Screen 2 — Escolha de Idioma
+### Screen 2 — Language Selection
 
-**Conteúdo:**
-- Título: "Em qual idioma você quer jogar?"
-- Cards selecionáveis:
+**Content:**
+- Title: "Which language do you want to play in?"
+- Selectable cards:
   - 🇧🇷 Português
   - 🇺🇸 English
   - 🇪🇸 Español
-- Texto auxiliar: "Você pode mudar isso depois nas configurações"
-- Botão: "Continuar"
+- Auxiliary text: "You can change this later in settings"
+- Button: "Continue"
 
-**Regras:**
-- Idioma padrão pré-selecionado baseado no locale do device
-- Salvar em `PlayerStatsEntity.preferredLanguage`
-- Este é o idioma das **PALAVRAS do jogo**, não da UI
-- A UI segue o idioma do sistema operacional (locale do device) via `res/values-pt`, `res/values-en`, `res/values-es` ou usar en fallback
-- O jogador pode mudar o idioma da UI nas configurações (independente do idioma do jogo)
-- Exemplo: celular em inglês → UI em inglês, mas jogador escolhe palavras em português
+**Rules:**
+- Default language pre-selected based on device locale
+- Save to `PlayerStatsEntity.preferredLanguage`
+- This is the language of the **GAME WORDS**, not the UI
+- The UI follows the operating system language (device locale) via `res/values-pt`, `res/values-en`, `res/values-es` or use en fallback
+- The player can change the UI language in settings (independently of the game language)
+- Example: phone in English → UI in English, but player chooses Portuguese words
 
-### Screen 3 — Seleção de IA
+### Screen 3 — AI Selection
 
-**Caso A — Device com RAM < 4GB (tier LOW):**
+**Case A — Device with RAM < 4GB (tier LOW):**
 
-- Título: "Seu dispositivo"
-- Mensagem: "Seu dispositivo não suporta IA local. Mas não se preocupe! Você jogará com nosso banco de palavras que é super divertido igual!"
-- Ícone informativo (não erro)
-- Botão: "Entendi, vamos jogar!" → navega para Screen 5 (geração pula direto, carrega dataset estático)
-- Salvar `ModelConfig(modelId = "none")`
+- Title: "Your device"
+- Message: "Your device does not support local AI. But don't worry! You'll play with our word bank, which is just as fun!"
+- Informational icon (not error)
+- Button: "Got it, let's play!" → navigates to Screen 5 (generation skips directly, loads static dataset)
+- Save `ModelConfig(modelId = "none")`
 
-**Caso B — Device com RAM ≥ 4GB:**
+**Case B — Device with RAM ≥ 4GB:**
 
-- Título: "Você quer escolher sua IA?"
-- Dois botões:
-  - **"Sim, quero escolher"** → expande Model Picker (inline ou nova tela)
-  - **"Não, escolha pra mim"** → auto-select e navega para Screen 4
+- Title: "Do you want to choose your AI?"
+- Two buttons:
+  - **"Yes, I want to choose"** → expands Model Picker (inline or new screen)
+  - **"No, choose for me"** → auto-select and navigate to Screen 4
 
-**Model Picker (expandido do "Sim"):**
+**Model Picker (expanded from "Yes"):**
 
-- Título: "Escolha como sua IA deve se comportar!"
-- Card 1: **"Não preciso economizar espaço"**
-  - Subtítulo: "Gemma 4 E2B · ~2,6 GB de download"
-  - Info: "Requer 8 GB de RAM"
-  - Badge: "Recomendado" (se tier HIGH)
-  - Ícone: estrela ou foguete
-- Card 2: **"Preciso economizar espaço"**
-  - Subtítulo: "Gemma 3 1B · ~529 MB de download"
-  - Info: "Requer 4 GB de RAM"
-  - Badge: "Recomendado" (se tier MEDIUM)
-  - Ícone: folha ou leve
-- Botão: "Continuar"
+- Title: "Choose how your AI should behave!"
+- Card 1: **"I don't need to save space"**
+  - Subtitle: "Gemma 4 E2B · ~2.6 GB download"
+  - Info: "Requires 8 GB of RAM"
+  - Badge: "Recommended" (if tier HIGH)
+  - Icon: star or rocket
+- Card 2: **"I need to save space"**
+  - Subtitle: "Gemma 3 1B · ~529 MB download"
+  - Info: "Requires 4 GB of RAM"
+  - Badge: "Recommended" (if tier MEDIUM)
+  - Icon: leaf or lightweight
+- Button: "Continue"
 
-**Warning (se user escolher modelo acima do tier):**
-- Dialog: "Seu dispositivo tem {X} GB de RAM. O modelo selecionado requer {Y} GB. A performance pode ser ruim ou o app pode travar. Deseja continuar?"
-- Botões: "Continuar mesmo assim" / "Escolher outro"
+**Warning (if user chooses model above tier):**
+- Dialog: "Your device has {X} GB of RAM. The selected model requires {Y} GB. Performance may be poor or the app may crash. Do you want to continue?"
+- Buttons: "Continue anyway" / "Choose another"
 
-**Auto-select lógica:**
+**Auto-select logic:**
 - RAM ≥ 8GB → Gemma 4 E2B
 - 4GB ≤ RAM < 8GB → Gemma 3 1B
 
-### Screen 4 — Download do Modelo
+### Screen 4 — Model Download
 
-**Conteúdo:**
-- Título: "Preparando sua IA"
-- Info box: "O modelo de inteligência artificial será baixado para o seu celular. Depois disso, tudo funcionará offline!"
-- Detalhes:
-  - Modelo: {nome}
-  - Tamanho: {size}
-  - Espaço disponível: {available}
-- Progress bar (determinada, com %)
-- Velocidade estimada / tempo restante (se possível)
-- Botão "Cancelar"
+**Content:**
+- Title: "Preparing your AI"
+- Info box: "The AI model will be downloaded to your phone. After that, everything will work offline!"
+- Details:
+  - Model: {name}
+  - Size: {size}
+  - Available space: {available}
+- Progress bar (determinate, with %)
+- Estimated speed / remaining time (if possible)
+- Button "Cancel"
 
-**Regras:**
-- Verificar conexão antes de iniciar
-  - Se Wi-Fi: iniciar automaticamente
-  - Se dados móveis + modelo > 500MB: dialog "O download é de {size}. Deseja baixar usando dados móveis?"
-  - Se sem conexão: "Conecte-se à internet para baixar o modelo"
-- Se espaço insuficiente: "Espaço insuficiente. Você precisa de pelo menos {size + margem} disponíveis."
-- Download via Play Asset Delivery (Play Store) ou download direto (dev)
-- Salvar progress em `ModelConfigEntity.downloadState`
-- Se app for fechado durante download: retomar ao reabrir (PAD suporta resume)
-- Se download falhar: botão "Tentar novamente" + opção "Escolher modelo menor"
+**Rules:**
+- Check connection before starting
+  - If Wi-Fi: start automatically
+  - If mobile data + model > 500MB: dialog "The download is {size}. Do you want to download using mobile data?"
+  - If no connection: "Connect to the internet to download the model"
+- If insufficient space: "Insufficient space. You need at least {size + margin} available."
+- Download via Play Asset Delivery (Play Store) or direct download (dev)
+- Save progress to `ModelConfigEntity.downloadState`
+- If app is closed during download: resume on reopen (PAD supports resume)
+- If download fails: button "Try again" + option "Choose smaller model"
 
-**State Machine — Download do Modelo:**
+**State Machine — Model Download:**
 
 ```
 ┌─────────┐
@@ -158,7 +158,7 @@ Screen 3: Seleção de IA ──── RAM < 4GB ────→ Light mode (aut
 ```
 
 ```kotlin
-// State machine do download
+// Download state machine
 sealed class DownloadState {
     data object Idle : DownloadState()
     data object Checking : DownloadState()
@@ -181,47 +181,47 @@ sealed class DownloadEvent {
 }
 ```
 
-### Screen 5 — Geração Inicial de Puzzles
+### Screen 5 — Initial Puzzle Generation
 
-**Conteúdo (modo AI):**
-- Título: "Gerando seus primeiros desafios..."
-- Subtítulo: "Isso acontece apenas na primeira vez"
-- Progress: "Puzzle 3 de 7..."
-- Animação sutil (loading com personalidade)
+**Content (AI mode):**
+- Title: "Generating your first challenges..."
+- Subtitle: "This only happens the first time"
+- Progress: "Puzzle 3 of 7..."
+- Subtle animation (loading with personality)
 
-**Conteúdo (modo Light):**
-- Título: "Preparando o jogo..."
-- Subtítulo: "Carregando palavras do banco curado"
-- Progress rápido (< 1s, carregamento de assets)
+**Content (Light mode):**
+- Title: "Preparing the game..."
+- Subtitle: "Loading words from the curated database"
+- Quick progress (< 1s, asset loading)
 
-**Regras (modo AI):**
-- Gerar 7 puzzles no idioma selecionado
-- Usar `PuzzleGenerator.generateBatch(count=7, ...)`
-- Mostrar progresso por puzzle
-- Se puzzle falhar validação após 3 retries: pular e continuar
-- Mínimo aceitável: 3 puzzles válidos (se < 3, mostrar erro e oferecer retry ou Light mode)
-- Ao completar: salvar puzzles em Room, navegar para Game
+**Rules (AI mode):**
+- Generate 7 puzzles in the selected language
+- Use `PuzzleGenerator.generateBatch(count=7, ...)`
+- Show progress per puzzle
+- If a puzzle fails validation after 3 retries: skip and continue
+- Minimum acceptable: 3 valid puzzles (if < 3, show error and offer retry or Light mode)
+- On completion: save puzzles to Room, navigate to Game
 
-**Regras (modo Light):**
-- Carregar dataset estático do assets
-- Filtrar por idioma selecionado
-- Salvar em Room com `source = STATIC`
-- Navegação imediata para Game
+**Rules (Light mode):**
+- Load static dataset from assets
+- Filter by selected language
+- Save to Room with `source = STATIC`
+- Immediate navigation to Game
 
 ## OnboardingViewModel
 
-**State Machine — Fluxo de Onboarding:**
+**State Machine — Onboarding Flow:**
 
 ```
 WELCOME ──→ LANGUAGE ──→ MODEL_SELECTION ──→ DOWNLOAD ──→ GENERATION ──→ COMPLETE
                               │                                ▲
                               │ (tier LOW)                     │
                               └────────────────────────────────┘
-                                (pula download, vai direto para geração/load estático)
+                                (skips download, goes directly to generation/static load)
 ```
 
 ```kotlin
-// State machine do onboarding
+// Onboarding state machine
 val onboardingStateMachine = StateMachine<OnboardingStep, OnboardingEvent>(
     initialState = OnboardingStep.WELCOME,
     transitions = mapOf(
@@ -280,27 +280,27 @@ sealed class OnboardingAction {
 
 ## Edge Cases
 
-| Cenário | Comportamento |
+| Scenario | Behavior |
 |---|---|
-| App fechado durante download | PAD retoma; direct download recomeça (mostrar progresso salvo) |
-| App fechado durante geração | Puzzles parciais ficam em Room; ao reabrir, verificar se tem ≥3 e completar se necessário |
-| Sem internet | Bloquear Screen 4; oferecer Light mode como alternativa |
-| Download completo mas modelo corrompido | Detectar na inicialização do Engine; oferecer re-download |
-| Usuário volta para tela anterior | Cancelar download/geração em progresso |
-| Espaço acaba durante download | PAD trata; direct download: detectar IOException, alertar |
+| App closed during download | PAD resumes; direct download restarts (show saved progress) |
+| App closed during generation | Partial puzzles remain in Room; on reopen, check if ≥3 exist and complete if necessary |
+| No internet | Block Screen 4; offer Light mode as an alternative |
+| Download complete but corrupted model | Detected on Engine initialization; offer re-download |
+| User goes back to previous screen | Cancel in-progress download/generation |
+| Space runs out during download | PAD handles it; direct download: detect IOException, alert user |
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Onboarding completo funciona em device tier HIGH (Gemma 4 download + geração)
-- [ ] Onboarding completo funciona em device tier MEDIUM (Gemma 3 download + geração)
-- [ ] Onboarding completo funciona em device tier LOW (Light mode, sem download)
-- [ ] Auto-select escolhe modelo correto baseado na RAM
-- [ ] Warning aparece quando user escolhe modelo acima do tier
-- [ ] Download mostra progresso real (não fake)
-- [ ] Download pode ser cancelado
-- [ ] Download retoma após app ser fechado (PAD)
-- [ ] Geração produz ≥3 puzzles válidos
-- [ ] Se geração falhar completamente, oferece Light mode como fallback
-- [ ] Onboarding não reaparece após ser completado
-- [ ] Idioma selecionado persiste em PlayerStats
-- [ ] Wi-Fi warning aparece para downloads >500MB em dados móveis
+- [ ] Full onboarding works on tier HIGH device (Gemma 4 download + generation)
+- [ ] Full onboarding works on tier MEDIUM device (Gemma 3 download + generation)
+- [ ] Full onboarding works on tier LOW device (Light mode, no download)
+- [ ] Auto-select chooses the correct model based on RAM
+- [ ] Warning appears when user chooses model above tier
+- [ ] Download shows real progress (not fake)
+- [ ] Download can be cancelled
+- [ ] Download resumes after app is closed (PAD)
+- [ ] Generation produces ≥3 valid puzzles
+- [ ] If generation fails completely, offers Light mode as fallback
+- [ ] Onboarding does not reappear after being completed
+- [ ] Selected language persists in PlayerStats
+- [ ] Wi-Fi warning appears for downloads >500MB on mobile data

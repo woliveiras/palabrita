@@ -1,123 +1,123 @@
 # Spec 05 — Game
 
-## Resumo
+## Summary
 
-A tela de jogo é o core do Palabrita. O jogador tenta descobrir a palavra do dia em até 6 tentativas, estilo Wordle. As letras recebem feedback visual por posição. O jogador pode revelar dicas progressivas. A dificuldade se adapta ao histórico do jogador.
+The game screen is the core of Palabrita. The player tries to discover the word of the day in up to 6 attempts, Wordle-style. Letters receive visual feedback by position. The player can reveal progressive hints. Difficulty adapts to the player's history.
 
-## Mecânica do Jogo
+## Game Mechanics
 
-### Regras Básicas
+### Basic Rules
 
-- O jogador tem **6 tentativas** para descobrir a palavra
-- A palavra tem entre **5 e 8 letras** (dinâmico por puzzle)
-- Cada tentativa deve ser uma palavra completa (com o mesmo número de letras)
-- Após cada tentativa, cada letra recebe um feedback de cor:
-  - � **Mint/Teal** (`#4ECDC4`): letra correta na posição correta
-  - 🟧 **Amber/Gold** (`#FFB347`): letra existe na palavra mas está na posição errada
-  - 🟥 **Coral** (`#FF6B6B`): letra não existe na palavra
-- O jogador pode revelar **dicas** (máximo 5, progressivas da mais vaga à mais específica)
-- **Vitória**: acertar a palavra em qualquer tentativa
-- **Derrota**: usar todas as 6 tentativas sem acertar
+- The player has **6 attempts** to discover the word
+- The word has between **5 and 8 letters** (dynamic per puzzle)
+- Each attempt must be a complete word (with the same number of letters)
+- After each attempt, each letter receives a color feedback:
+  - 🟦 **Mint/Teal** (`#4ECDC4`): correct letter in the correct position
+  - 🟧 **Amber/Gold** (`#FFB347`): letter exists in the word but is in the wrong position
+  - 🟥 **Coral** (`#FF6B6B`): letter does not exist in the word
+- The player can reveal **hints** (maximum 5, progressive from vaguest to most specific)
+- **Win**: guessing the word in any attempt
+- **Loss**: using all 6 attempts without guessing correctly
 
-**Regras de recompensa:**
-- Vitória: ganha XP (varia com dificuldade, tentativas e dicas usadas)
-- Derrota: não ganha XP, não perde nada
-- Streak: conta **dias jogados consecutivamente**, independente de vitória/derrota. Jogou hoje = streak mantida.
+**Reward rules:**
+- Win: earns XP (varies with difficulty, attempts, and hints used)
+- Loss: no XP earned, nothing lost
+- Streak: counts **consecutive days played**, regardless of win/loss. Played today = streak maintained.
 
-### Algoritmo de Feedback de Letras
+### Letter Feedback Algorithm
 
-Para cada tentativa, o feedback é calculado assim:
+For each attempt, the feedback is calculated as follows:
 
 ```
-1. Marcar todas as letras na posição correta como CORRECT (mint)
-2. Para cada letra não marcada como CORRECT:
-   a. Contar quantas vezes essa letra aparece na palavra-alvo
-   b. Subtrair quantas vezes ela já foi marcada como CORRECT
-   c. Se ainda há ocorrências restantes: PRESENT (amber)
-   d. Se não: ABSENT (coral)
-3. Processar da esquerda para a direita (para letras duplicadas)
+1. Mark all letters in the correct position as CORRECT (mint)
+2. For each letter not marked as CORRECT:
+   a. Count how many times that letter appears in the target word
+   b. Subtract how many times it has already been marked as CORRECT
+   c. If there are still remaining occurrences: PRESENT (amber)
+   d. If not: ABSENT (coral)
+3. Process left to right (for duplicate letters)
 ```
 
-Exemplo: palavra = "gatos", tentativa = "gagas"
+Example: word = "gatos", attempt = "gagas"
 - g[0] → CORRECT (mint)
 - a[1] → CORRECT (mint)
-- g[2] → ABSENT (coral — 'g' só aparece 1x e já foi usada)
-- a[3] → ABSENT (coral — 'a' só aparece 1x e já foi usada)
+- g[2] → ABSENT (coral — 'g' only appears once and has already been used)
+- a[3] → ABSENT (coral — 'a' only appears once and has already been used)
 - s[4] → CORRECT (mint)
 
-### Seleção de Dificuldade (apenas Modo Livre)
+### Difficulty Selection (Free Play Mode only)
 
-> **Nota (Spec 11):** Nos Daily Challenges, a dificuldade é automática (progressiva). O DifficultyPicker só aparece no Modo Livre.
+> **Note (Spec 11):** In Daily Challenges, difficulty is automatic (progressive). The DifficultyPicker only appears in Free Play Mode.
 
-Antes de cada partida no Modo Livre, o jogador escolhe a dificuldade:
+Before each game in Free Play Mode, the player chooses the difficulty:
 
 ```
 ┌──────────────────────────────┐
-│ Escolha a dificuldade          │
+│ Choose difficulty              │
 │                              │
-│  ● ⭐      Fácil        1 XP │
+│  ● ⭐      Easy         1 XP │
 │  ○ ⭐⭐    Normal       2 XP │
-│  ○ ⭐⭐⭐  Difícil      3 XP │
-│  🔒 ⭐⭐⭐⭐ Desafiante  5 XP │
+│  ○ ⭐⭐⭐  Hard         3 XP │
+│  🔒 ⭐⭐⭐⭐ Challenging  5 XP │
 │  🔒 ⭐⭐⭐⭐⭐ Expert    8 XP │
 │                              │
-│  Recomendado: ⭐⭐ Normal       │
+│  Recommended: ⭐⭐ Normal      │
 │                              │
-│  [Jogar]                     │
+│  [Play]                      │
 └──────────────────────────────┘
 ```
 
-**Regras:**
-- Níveis disponíveis: até `maxUnlockedDifficulty + 1` (pode tentar 1 acima do que já desbloqueou)
-- Níveis bloqueados (🔒): mostram "Desbloqueie vencendo no nível anterior"
-- "Recomendado": sempre `currentDifficulty` (o nível em que a progressão automática colocou o jogador)
-- Promoção automática continua funcionando — desbloqueia níveis, não força o jogador
-- Rebaixamento automático só muda a recomendação, não bloqueia níveis já desbloqueados
-- Novo jogador: só nível 1 disponível (nível 2 aparece com 🔒 mas clicando mostra "Vence 5 jogos no Fácil para desbloquear")
-- O jogador pode jogar abaixo do nível recomendado (ganha menos XP, mas acelera streak bônus)
-- Escolher acima do recomendado: mais risco de perder, mas mais XP se ganhar
+**Rules:**
+- Available levels: up to `maxUnlockedDifficulty + 1` (can try 1 above what they have already unlocked)
+- Locked levels (🔒): show "Unlock by winning at the previous level"
+- "Recommended": always `currentDifficulty` (the level the automatic progression placed the player at)
+- Automatic promotion continues working — unlocks levels, does not force the player
+- Automatic demotion only changes the recommendation, does not lock already unlocked levels
+- New player: only level 1 available (level 2 appears with 🔒 but clicking shows "Win 5 Easy games to unlock")
+- The player can play below the recommended level (earns less XP, but accelerates streak bonus)
+- Choosing above the recommended: more risk of losing, but more XP if winning
 
-### Seleção do Puzzle
+### Puzzle Selection
 
 ```
-1. Jogador escolhe dificuldade (chosenDifficulty)
-2. Calcular wordLength via difficultyToWordLength(chosenDifficulty, wordSizePreference)
-3. Buscar puzzle não jogado: PuzzleDao.getNextUnplayed(language, chosenDifficulty)
-4. Se existe: usar esse puzzle
-5. Se não existe (sem puzzles pré-gerados nessa dificuldade):
-   a. Modo AI: gerar inline via PuzzleGenerator (mostrar loading)
-   b. Modo Light: buscar do dataset estático pela dificuldade mais próxima
-6. Marcar puzzle como "em jogo" (criar GameSessionEntity)
+1. Player chooses difficulty (chosenDifficulty)
+2. Calculate wordLength via difficultyToWordLength(chosenDifficulty, wordSizePreference)
+3. Fetch unplayed puzzle: PuzzleDao.getNextUnplayed(language, chosenDifficulty)
+4. If exists: use this puzzle
+5. If not found (no pre-generated puzzles at this difficulty):
+   a. AI Mode: generate inline via PuzzleGenerator (show loading)
+   b. Light Mode: fetch from static dataset by nearest difficulty
+6. Mark puzzle as "in game" (create GameSessionEntity)
 ```
 
-### Validação de Tentativa
+### Attempt Validation
 
-Antes de aceitar uma tentativa:
-- Deve ter exatamente o mesmo número de letras que a palavra-alvo
-- Deve conter apenas caracteres `[a-z]`
-- **NÃO** é necessário validar se é uma palavra real (V1 — sem dicionário local)
+Before accepting an attempt:
+- Must have exactly the same number of letters as the target word
+- Must contain only `[a-z]` characters
+- **NOT** necessary to validate if it is a real word (V1 — no local dictionary)
 
 ## UI — Compose
 
-### Layout Geral
+### General Layout
 
 ```
 ┌──────────────────────────────┐
-│ ← │ DESAFIO 2/3 │ 💡 3/5    │  ← Header contextual
+│ ← │ CHALLENGE 2/3 │ 💡 3/5  │  ← Contextual header
 ├──────────────────────────────┤
 │                              │
 │     ┌─┬─┬─┬─┬─┬─┐          │
-│     │ │ │ │ │ │ │  ← tentativa 1 (preenchida)
+│     │ │ │ │ │ │ │  ← attempt 1 (filled)
 │     ├─┼─┼─┼─┼─┼─┤          │
-│     │ │ │ │ │ │ │  ← tentativa 2 (preenchida)
+│     │ │ │ │ │ │ │  ← attempt 2 (filled)
 │     ├─┼─┼─┼─┼─┼─┤          │
-│     │ │ │ │ │ │ │  ← tentativa 3 (ativa)
+│     │ │ │ │ │ │ │  ← attempt 3 (active)
 │     ├─┼─┼─┼─┼─┼─┤          │
-│     │ │ │ │ │ │ │  ← vazia
+│     │ │ │ │ │ │ │  ← empty
 │     ├─┼─┼─┼─┼─┼─┤          │
-│     │ │ │ │ │ │ │  ← vazia
+│     │ │ │ │ │ │ │  ← empty
 │     ├─┼─┼─┼─┼─┼─┤          │
-│     │ │ │ │ │ │ │  ← vazia
+│     │ │ │ │ │ │ │  ← empty
 │     └─┴─┴─┴─┴─┴─┘          │
 │                              │
 
@@ -129,147 +129,149 @@ Antes de aceitar uma tentativa:
 └──────────────────────────────┘
 ```
 
-### Componentes
+### Components
 
 **WordGrid**
-- Rows: 6 (fixo — tentativas máximas)
-- Columns: dinâmico (5-8, baseado no tamanho da palavra)
-- Cada célula: `Box` com `Text` centralizado + background de cor
-- Animação de flip ao revelar feedback (após confirmar tentativa)
-- Animação de shake na row se tentativa inválida (tamanho errado)
-- Animação de bounce/pop ao acertar (todas as células mint)
+- Rows: 6 (fixed — maximum attempts)
+- Columns: dynamic (5-8, based on word length)
+- Each cell: `Box` with centered `Text` + color background
+- Flip animation when revealing feedback (after submitting attempt)
+- Shake animation on row if attempt is invalid (wrong length)
+- Bounce/pop animation on correct guess (all cells mint)
 
 **GameKeyboard**
-- Layout QWERTY (adaptado ao locale se necessário — V1 usa QWERTY padrão)
-- Cada tecla mostra estado de cor baseado nas tentativas:
-  - Sem uso: cor neutra
-  - CORRECT em alguma tentativa: mint (`#4ECDC4`)
-  - PRESENT em alguma tentativa: amber (`#FFB347`)
-  - ABSENT em todas as tentativas: coral (`#FF6B6B`)
-- Teclas especiais: Backspace (⌫) e Enter (↵)
-- Teclas com tamanho acessível para touch
+- QWERTY layout (adapted to locale if necessary — V1 uses standard QWERTY)
+- Each key shows color state based on attempts:
+  - Unused: neutral color
+  - CORRECT in any attempt: mint (`#4ECDC4`)
+  - PRESENT in any attempt: amber (`#FFB347`)
+  - ABSENT in all attempts: coral (`#FF6B6B`)
+- Special keys: Backspace (⌫) and Enter (↵)
+- Keys with accessible touch size
 
 **HintButton**
-- Floating ou fixo abaixo do grid
-- Mostra: ícone de lâmpada + "Dica (X/5)"
-- Ao clicar: revela a próxima dica (animação de slide-in de card)
-- Dica revelada fica visível até o fim do jogo
-- Se todas as 5 dicas reveladas: botão desabilitado
+- Floating or fixed below the grid
+- Shows: lightbulb icon + "Hint (X/5)"
+- On click: reveals the next hint (card slide-in animation)
+- Revealed hint stays visible until the end of the game
+- If all 5 hints revealed: button disabled
 
 **HintCard**
-- Card com a dica revelada
-- Numeração: "Dica 1:", "Dica 2:", etc.
-- Posição: entre o grid e o teclado (scrollável se necessário)
-- Animação: fade-in + slide de baixo
+- Card with the revealed hint
+- Numbering: "Hint 1:", "Hint 2:", etc.
+- Position: between the grid and the keyboard (scrollable if necessary)
+- Animation: fade-in + slide from bottom
 
-### Header Contextual
+### Contextual Header
 
-O header do jogo mostra contexto diferente para dailies vs free play:
+The game header shows different context for dailies vs free play:
 
-| Modo | Header | Exemplo |
+| Mode | Header | Example |
 |------|--------|---------|
-| Daily Challenge | "DESAFIO N/3" | "DESAFIO 2/3" |
-| Free Play | "LIVRE" | "LIVRE" |
+| Daily Challenge | "CHALLENGE N/3" | "CHALLENGE 2/3" |
+| Free Play | "FREE" | "FREE" |
 
-**Elementos do header:**
-- **Esquerda**: botão voltar (←) com confirmação "Abandonar partida?"
-- **Centro**: contexto do jogo ("DESAFIO N/3" ou "LIVRE")
-- **Direita**: contador de dicas (💡 3/5)
+**Header elements:**
+- **Left**: back button (←) with confirmation "Abandon game?"
+- **Center**: game context ("CHALLENGE N/3" or "FREE")
+- **Right**: hints counter (💡 3/5)
 
-### Botão Voltar — Confirmação
+### Back Button — Confirmation
 
-Ao pressionar ← ou back do sistema durante um jogo ativo:
+When pressing ← or system back during an active game:
 
 ```
 ┌──────────────────────────────┐
 │                              │
-│    Abandonar partida?        │
+│    Abandon game?             │
 │                              │
-│    Seu progresso neste       │
-│    jogo será perdido.        │
+│    Your progress in this     │
+│    game will be lost.        │
 │                              │
-│    [Continuar jogando]       │  ← primary
-│    [Abandonar]               │  ← destructive
+│    [Continue playing]        │  ← primary
+│    [Abandon]                 │  ← destructive
 │                              │
 └──────────────────────────────┘
 ```
 
-- "Continuar jogando" → fecha dialog, volta ao jogo
-- "Abandonar" → GameSession marcada como abandoned, navega para Home
-- Se o jogo já terminou (WON/LOST): back navega direto sem confirmação
+- "Continue playing" → closes dialog, returns to game
+- "Abandon" → GameSession marked as abandoned, navigates to Home
+- If the game is already over (WON/LOST): back navigates directly without confirmation
 
-### Tela de Resultado (Vitória e Derrota)
+### Result Screen (Win and Loss)
 
-> **Mudança (Spec 12):** O Chat Card é agora o CTA principal do ResultScreen. Ver Spec 12 para detalhes do Chat IA Engagement.
+> **Change (Spec 12):** The Chat Card is now the main CTA of the ResultScreen. See Spec 12 for details on Chat AI Engagement.
 
 ```
 ┌──────────────────────────────┐
 │                              │
-│     🎉 Parabéns!             │  ← ou "😔 Não foi dessa vez"
-│     Você descobriu em 3/6   │  ← ou "A palavra era: GATOS"
+│     🎉 Congratulations!      │  ← or "😔 Not this time"
+│     You discovered it in 3/6 │  ← or "The word was: GATOS"
 │                              │
-│     Palavra: GATOS           │
-│     Categoria: Animal        │
+│     Word: GATOS              │
+│     Category: Animal         │
 │     +8 XP ✨                 │
 │                              │
 │  ┌────────────────────────┐  │
-│  │  💬 Explore "GATOS"    │  │  ← CTA PRINCIPAL (Spec 12)
+│  │  💬 Explore "GATOS"    │  │  ← MAIN CTA (Spec 12)
 │  │                        │  │
-│  │  🧬 Etimologia         │  │
-│  │  🌎 Curiosidade        │  │
-│  │  📝 Frases de exemplo  │  │
+│  │  🧬 Etymology          │  │
+│  │  🌎 Fun fact           │  │
+│  │  📝 Example sentences  │  │
 │  │                        │  │
-│  │  +1 XP bônus ✨        │  │
+│  │  +1 XP bonus ✨        │  │
 │  │                        │  │
-│  │  [ EXPLORAR AGORA ]    │  │
+│  │  [ EXPLORE NOW ]       │  │
 │  └────────────────────────┘  │
 │                              │
-│  [▶ Jogar de novo]           │  ← secundário
-│  [📤 Compartilhar]           │  ← terciário
+│  [▶ Play again]              │  ← secondary
+│  [📤 Share]                  │  ← tertiary
 │                              │
 └──────────────────────────────┘
 ```
 
-**Hierarquia visual:**
-1. Resultado (parabéns/derrota + palavra + XP ganho)
-2. **Chat Card** (CTA principal — `primaryContainer` bg, borda `primary`)
-3. Jogar de novo (botão secundário)
-4. Compartilhar (botão ghost)
+**Visual hierarchy:**
+1. Result (congratulations/loss + word + XP earned)
+2. **Chat Card** (main CTA — `primaryContainer` bg, `primary` border)
+3. Play again (secondary button)
+4. Share (ghost button)
 
-**Modo Light:** Chat Card substituído por curiosidade estática inline (sem navegação).
+**Light Mode:** Chat Card replaced by inline static curiosity (no navigation).
 
-**"Jogar de novo":**
-- Em daily: navega para o próximo daily (se houver) ou para Home
-- Em free play: volta ao DifficultyPicker
+**"Play again":**
+- In daily: navigates to the next daily (if available) or to Home
+- In free play: returns to DifficultyPicker
+
+```
 │                              │
-│    Próximo puzzle em XX:XX   │
+│    Next puzzle in XX:XX      │
 │                              │
 └──────────────────────────────┘
 ```
 
-### Formato de Compartilhamento
+### Share Format
 
-> **Mudança (Spec 11):** Puzzles são únicos por jogador (IA local). Não há "puzzle do dia #123". O share destaca streak, tier e XP — identidade do jogador, não do puzzle.
+> **Change (Spec 11):** Puzzles are unique per player (local AI). There is no "puzzle of the day #123". The share highlights streak, tier, and XP — player identity, not puzzle identity.
 
-**Vitória:**
+**Win:**
 
 ```
 Palabrita 🔥12 · Astuto · 350 XP
 
-Desafio 1 ⭐ — 3/6
+Challenge 1 ⭐ — 3/6
 🟦🟦🟧⬜⬜
 🟦🟦🟦⬜🟦
 🟦🟦🟦🟦🟦
 
-💡 1 dica usada · +8 XP hoje
+💡 1 hint used · +8 XP today
 ```
 
-**Derrota:**
+**Loss:**
 
 ```
 Palabrita 🔥12 · Astuto · 350 XP
 
-Desafio 2 ⭐⭐ — X/6
+Challenge 2 ⭐⭐ — X/6
 🟥🟧🟥🟥🟥🟥
 🟥🟥🟦🟥🟥🟥
 🟥🟦🟦🟥🟦🟥
@@ -277,7 +279,7 @@ Desafio 2 ⭐⭐ — X/6
 🟦🟦🟦🟥🟦🟥
 🟥🟦🟦🟦🟦🟥
 
-💡 3 dicas usadas
+💡 3 hints used
 ```
 
 **Free play:**
@@ -285,30 +287,30 @@ Desafio 2 ⭐⭐ — X/6
 ```
 Palabrita 🔥12 · Astuto · 350 XP
 
-Livre ⭐⭐⭐ — 4/6
+Free ⭐⭐⭐ — 4/6
 🟦🟧🟥🟥🟥🟥
 🟦🟦🟧🟥🟥🟥
 🟦🟦🟦🟥🟦🟥
 🟦🟦🟦🟦🟦🟦
 
-A palavra era: GATOS 🐱
-💡 2 dicas · +4 XP
+The word was: GATOS 🐱
+💡 2 hints · +4 XP
 ```
 
-**Detalhes:**
-- Header: streak + tier + XP total (identidade do jogador)
-- Contexto: "Desafio N/3" ou "Livre" + estrelas de dificuldade
-- Palavra exibida no share (cada jogador tem palavra única, sem spoiler)
-- Emoji temático da categoria (opcional, fallback sem emoji)
-- XP ganho no rodapé
+**Details:**
+- Header: streak + tier + total XP (player identity)
+- Context: "Challenge N/3" or "Free" + difficulty stars
+- Word shown in share (each player has a unique word, no spoiler)
+- Category-themed emoji (optional, emoji-free fallback)
+- XP earned in the footer
 
-## Dificuldade Adaptativa
+## Adaptive Difficulty
 
-### Sistema de XP e Progressão
+### XP and Progression System
 
-O jogador acumula XP ao ganhar jogos. XP nunca decresce. O tier (ranking) é derivado do XP total e nunca rebaixa — é recompensa, não punição. A **dificuldade**, por outro lado, pode subir e descer com base na performance.
+The player accumulates XP by winning games. XP never decreases. The tier (ranking) is derived from total XP and never decreases — it is a reward, not a punishment. **Difficulty**, on the other hand, can go up and down based on performance.
 
-### Cálculo de XP por Jogo
+### XP Calculation per Game
 
 ```kotlin
 fun calculateXpForGame(
@@ -341,22 +343,22 @@ fun calculateXpForGame(
         else -> 0
     }
 
-    // Penalidade por dicas: -1 XP por dica usada (não pode zerar o base)
+    // Hint penalty: -1 XP per hint used (cannot zero out the base)
     val hintPenalty = hintsUsed
 
     return (baseXp + attemptBonus + streakBonus - hintPenalty).coerceAtLeast(1)
 }
 ```
 
-**Penalidade de dicas:**
-- Cada dica usada reduz **1 XP** do total
-- O XP mínimo por vitória é sempre **1** (nunca zero — o jogador ganhou, merece algo)
-- Dicas não afetam streak bônus (bônus de streak é separado)
+**Hint penalty:**
+- Each hint used reduces **1 XP** from the total
+- The minimum XP per win is always **1** (never zero — the player won, they deserve something)
+- Hints do not affect the streak bonus (streak bonus is separate)
 
-Exemplo: vitória no nível 3 (base 3 XP) + 1ª tentativa (+3) + 2 dicas usadas (-2) = **4 XP**
-Exemplo: vitória no nível 1 (base 1 XP) + 5 dicas usadas (-5) = **1 XP** (mínimo)
+Example: win at level 3 (base 3 XP) + 1st attempt (+3) + 2 hints used (-2) = **4 XP**
+Example: win at level 1 (base 1 XP) + 5 hints used (-5) = **1 XP** (minimum)
 
-### Tier (Ranking) — derivado do XP
+### Tier (Ranking) — derived from XP
 
 ```kotlin
 enum class PlayerTier(val minXp: Int, val displayName: String) {
@@ -374,11 +376,11 @@ enum class PlayerTier(val minXp: Int, val displayName: String) {
 }
 ```
 
-Tier **nunca desce**. Se o jogador para de jogar por meses e volta, mantém o tier.
+Tier **never decreases**. If the player stops playing for months and returns, they keep their tier.
 
-### Promoção / Rebaixamento de Dificuldade
+### Difficulty Promotion / Demotion
 
-A dificuldade do próximo puzzle é ajustada automaticamente:
+The difficulty of the next puzzle is automatically adjusted:
 
 ```kotlin
 fun checkDifficultyProgression(stats: PlayerStats): Int {
@@ -387,45 +389,45 @@ fun checkDifficultyProgression(stats: PlayerStats): Int {
     val winRateAtCurrent = stats.winRateByDifficulty[current] ?: 0f
     val requiredWins = if (stats.currentStreak >= 7) 4 else 5
 
-    // Promoção: ganhou N+ jogos no nível atual com winRate ≥ 70%
+    // Promotion: won N+ games at current level with winRate ≥ 70%
     if (winsAtCurrent >= requiredWins && winRateAtCurrent >= 0.70f && current < 5) {
         return current + 1
     }
 
-    // Rebaixamento: perdeu 3 seguidos no nível atual
+    // Demotion: lost 3 in a row at current level
     if (stats.consecutiveLossesAtCurrent >= 3 && current > 1) {
         return current - 1
     }
 
-    return current  // sem mudança
+    return current  // no change
 }
 ```
 
-**Regras:**
-- Promoção requer **5 vitórias** no nível atual com **winRate ≥ 70%** (4 vitórias se streak ≥ 7 dias)
-- Rebaixamento após **3 derrotas seguidas** no nível atual
-- Novo jogador começa no **nível 1**
-- Ao promover/rebaixar: `consecutiveLossesAtCurrent` reseta para 0
-- Ao promover: `gamesWonByDifficulty[novoNível]` começa a contar do 0 que já tinha (histórico preservado)
+**Rules:**
+- Promotion requires **5 wins** at the current level with **winRate ≥ 70%** (4 wins if streak ≥ 7 days)
+- Demotion after **3 consecutive losses** at the current level
+- New player starts at **level 1**
+- On promotion/demotion: `consecutiveLossesAtCurrent` resets to 0
+- On promotion: `gamesWonByDifficulty[novoNível]` starts counting from 0 already stored (history preserved)
 
-### Como Dificuldade Afeta o Puzzle
+### How Difficulty Affects the Puzzle
 
-| Dificuldade | Tamanho | Tipo de Palavra | Estilo das Dicas |
+| Difficulty | Size | Word Type | Hint Style |
 |---|---|---|---|
-| 1 (fácil) | 5 letras | Muito comum, cotidiana | Dicas diretas |
-| 2 | 5-6 letras | Comum | Dicas claras |
-| 3 (média) | 6-7 letras | Menos frequente | Dicas moderadas |
-| 4 | 7-8 letras | Incomum | Dicas mais vagas |
-| 5 (difícil) | 7-8 letras | Raro, técnico | Dicas abstratas |
+| 1 (easy) | 5 letters | Very common, everyday | Direct hints |
+| 2 | 5-6 letters | Common | Clear hints |
+| 3 (medium) | 6-7 letters | Less frequent | Moderate hints |
+| 4 | 7-8 letters | Uncommon | Vaguer hints |
+| 5 (hard) | 7-8 letters | Rare, technical | Abstract hints |
 
 ```kotlin
 fun difficultyToWordLength(difficulty: Int, wordSizePreference: String): IntRange {
-    // Se o jogador escolheu um tamanho fixo nas configurações (tier Astuto+)
+    // If the player chose a fixed size in settings (Astuto+ tier)
     return when (wordSizePreference) {
         "SHORT" -> 5..6
         "LONG" -> 7..9
         "EPIC" -> 8..10
-        else -> when (difficulty) {  // "DEFAULT" — dinâmico por dificuldade
+        else -> when (difficulty) {  // "DEFAULT" — dynamic by difficulty
             1 -> 5..5
             2 -> 5..6
             3 -> 6..7
@@ -437,11 +439,11 @@ fun difficultyToWordLength(difficulty: Int, wordSizePreference: String): IntRang
 }
 ```
 
-Quando o jogador usa um range fixo, a dificuldade ainda afeta a **raridade da palavra** e o **estilo das dicas** (controlados pelo prompt), mas não o tamanho.
+When the player uses a fixed range, difficulty still affects the **word rarity** and **hint style** (controlled by the prompt), but not the length.
 
-Dificuldade 4 e 5 têm mesmo range de letras, mas diferem na **raridade da palavra** (controlada pelo prompt: "uncommon" vs "rare/technical").
+Difficulty 4 and 5 have the same letter range, but differ in **word rarity** (controlled by the prompt: "uncommon" vs "rare/technical").
 
-Esses parâmetros são passados no prompt do LLM como `min_length`, `max_length`, `target_difficulty`.
+These parameters are passed in the LLM prompt as `min_length`, `max_length`, `target_difficulty`.
 
 ## GameViewModel
 
@@ -459,7 +461,7 @@ data class GameState(
     val gameStatus: GameStatus,
     val isLoading: Boolean,
     val error: String?,
-    // Novos campos (Spec 10, 11):
+    // New fields (Spec 10, 11):
     val gameContext: GameContext = GameContext.FreePlay,
     val showAbandonDialog: Boolean = false,
 )
@@ -471,7 +473,7 @@ sealed class GameContext {
 
 data class DifficultyOption(
     val level: Int,
-    val label: String,        // "Fácil", "Normal", etc.
+    val label: String,        // "Easy", "Normal", etc.
     val baseXp: Int,
     val isUnlocked: Boolean,
     val isRecommended: Boolean
@@ -505,58 +507,58 @@ sealed class GameAction {
     data object NavigateToChat : GameAction()
     data object NavigateToStats : GameAction()
     data object LoadNextPuzzle : GameAction()
-    data object BackPressed : GameAction()         // Novo: confirmar abandono
-    data object ConfirmAbandon : GameAction()       // Novo: confirmar dialog
-    data object DismissAbandonDialog : GameAction() // Novo: cancelar dialog
+    data object BackPressed : GameAction()         // New: confirm abandon
+    data object ConfirmAbandon : GameAction()       // New: confirm dialog
+    data object DismissAbandonDialog : GameAction() // New: cancel dialog
 }
 ```
 
 ## PuzzleGenerationWorker (WorkManager)
 
-- **Trigger**: periodic diário (mínimo 15 min interval do WorkManager, mas setado para 24h)
-- **Constraint**: device idle ou charging (para não impactar UX)
-- **Lógica**:
-  1. Checar `PuzzleDao.countUnplayed(language)`
-  2. Se < 3: gerar 7 novos puzzles via `PuzzleGenerator`
-  3. Se Light mode: não fazer nada (dataset estático é finito)
-- **Retry**: se falhar, WorkManager faz retry com backoff exponencial
+- **Trigger**: daily periodic (minimum 15 min WorkManager interval, but set to 24h)
+- **Constraint**: device idle or charging (to not impact UX)
+- **Logic**:
+  1. Check `PuzzleDao.countUnplayed(language)`
+  2. If < 3: generate 7 new puzzles via `PuzzleGenerator`
+  3. If Light mode: do nothing (static dataset is finite)
+- **Retry**: if it fails, WorkManager retries with exponential backoff
 
 ## Edge Cases
 
-| Cenário | Comportamento |
+| Scenario | Behavior |
 |---|---|
-| Usuário digita menos letras e aperta Enter | Shake animation na row + ignorar |
-| Palavra duplicada (mesma tentativa 2x) | Permitir (V1 — sem restrição) |
-| Todos os puzzles jogados (AI mode) | Mostrar loading, gerar inline via PuzzleGenerator |
-| Todos os puzzles jogados (Light mode) | Mensagem "Aguarde atualização do app" |
-| App fechado durante jogo | Salvar state em GameSessionEntity, restaurar ao reabrir |
-| Rotação de tela | Compose handles automaticamente (ViewModel preserva state) |
-| Teclado físico | Capturar key events e mapear para GameAction |
+| User types fewer letters and presses Enter | Shake animation on row + ignore |
+| Duplicate word (same attempt twice) | Allow (V1 — no restriction) |
+| All puzzles played (AI mode) | Show loading, generate inline via PuzzleGenerator |
+| All puzzles played (Light mode) | Message "Wait for app update" |
+| App closed during game | Save state to GameSessionEntity, restore on reopen |
+| Screen rotation | Compose handles automatically (ViewModel preserves state) |
+| Physical keyboard | Capture key events and map to GameAction |
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Grid renderiza corretamente para palavras de 5, 6, 7 e 8 letras
-- [ ] Feedback de cores está correto para letras duplicadas (conforme algoritmo)
-- [ ] Teclado atualiza cores corretamente após cada tentativa
-- [ ] Animação de flip funciona ao revelar feedback
-- [ ] Animação de shake funciona para tentativa inválida
-- [ ] Dicas revelam progressivamente (1 a 5)
-- [ ] Vitória detectada corretamente e navega para tela de resultado
-- [ ] Derrota detectada corretamente após 6 tentativas
-- [ ] Compartilhamento gera grid de emojis correto
-- [ ] State persiste entre app kills (via GameSessionEntity)
-- [ ] Dificuldade adaptativa muda baseado no histórico
-- [ ] Seletor de dificuldade mostra níveis desbloqueados corretamente
-- [ ] Níveis bloqueados não são selecionáveis
-- [ ] Nível recomendado é destacado
-- [ ] "Explorar a palavra" só aparece em modo AI
-- [ ] WorkManager gera puzzles em background quando estoque < 3
-- [ ] Header mostra "DESAFIO N/3" para dailies e "LIVRE" para free play
-- [ ] Botão voltar durante jogo ativo mostra "Abandonar partida?"
-- [ ] "Continuar jogando" fecha dialog e retorna ao jogo
-- [ ] "Abandonar" marca GameSession como abandoned e navega para Home
-- [ ] Back sem confirmação se jogo já terminou (WON/LOST)
-- [ ] Chat Card é o CTA principal no ResultScreen (acima de "jogar de novo")
-- [ ] Compartilhamento mostra streak + tier + XP no header
-- [ ] Compartilhamento mostra contexto ("Desafio N/3" ou "Livre")
-- [ ] DifficultyPicker só aparece no Modo Livre (não nos dailies)
+- [ ] Grid renders correctly for words of 5, 6, 7, and 8 letters
+- [ ] Color feedback is correct for duplicate letters (per algorithm)
+- [ ] Keyboard updates colors correctly after each attempt
+- [ ] Flip animation works when revealing feedback
+- [ ] Shake animation works for invalid attempt
+- [ ] Hints reveal progressively (1 to 5)
+- [ ] Win correctly detected and navigates to result screen
+- [ ] Loss correctly detected after 6 attempts
+- [ ] Share generates correct emoji grid
+- [ ] State persists between app kills (via GameSessionEntity)
+- [ ] Adaptive difficulty changes based on history
+- [ ] Difficulty selector shows unlocked levels correctly
+- [ ] Locked levels are not selectable
+- [ ] Recommended level is highlighted
+- [ ] "Explore the word" only appears in AI mode
+- [ ] WorkManager generates puzzles in background when stock < 3
+- [ ] Header shows "CHALLENGE N/3" for dailies and "FREE" for free play
+- [ ] Back button during active game shows "Abandon game?"
+- [ ] "Continue playing" closes dialog and returns to game
+- [ ] "Abandon" marks GameSession as abandoned and navigates to Home
+- [ ] Back without confirmation if game is already over (WON/LOST)
+- [ ] Chat Card is the main CTA in ResultScreen (above "play again")
+- [ ] Share shows streak + tier + XP in the header
+- [ ] Share shows context ("Challenge N/3" or "Free")
+- [ ] DifficultyPicker only appears in Free Play Mode (not in dailies)

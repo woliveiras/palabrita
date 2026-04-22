@@ -2,16 +2,16 @@
 
 ## Overview
 
-Palabrita usa LiteRT-LM para executar inferência de LLM diretamente no dispositivo Android. Este documento detalha como integrar, configurar e usar o runtime, incluindo lifecycle management, prompt engineering, parsing de respostas e estratégias de fallback.
+Palabrita uses LiteRT-LM to run LLM inference directly on Android devices. This document details how to integrate, configure, and use the runtime, including lifecycle management, prompt engineering, response parsing, and fallback strategies.
 
 ## LiteRT-LM SDK
 
-### Dependência Gradle
+### Gradle Dependency
 
 ```kotlin
 // gradle/libs.versions.toml
 [versions]
-litertlm = "latest.release"  // Fixar versão específica antes de publicar
+litertlm = "latest.release"  // Pin a specific version before publishing
 
 [libraries]
 litertlm-android = { module = "com.google.ai.edge.litertlm:litertlm-android", version.ref = "litertlm" }
@@ -24,19 +24,19 @@ dependencies {
 }
 ```
 
-### Manifest (para GPU backend)
+### Manifest (for GPU backend)
 
 ```xml
-<!-- AndroidManifest.xml do módulo app -->
+<!-- AndroidManifest.xml of the app module -->
 <uses-native-library android:name="libOpenCL.so" android:required="false"/>
 <uses-native-library android:name="libvndksupport.so" android:required="false"/>
 ```
 
-`android:required="false"` garante que o app funciona em devices sem GPU OpenCL (fallback para CPU).
+`android:required="false"` ensures the app works on devices without OpenCL GPU (falls back to CPU).
 
 ## Engine Lifecycle
 
-### Inicialização
+### Initialization
 
 ```kotlin
 class LlmEngineManagerImpl @Inject constructor(
@@ -65,7 +65,7 @@ class LlmEngineManagerImpl @Inject constructor(
     }
 
     private fun selectBackend(): Backend {
-        // GPU preferido, CPU como fallback
+        // GPU preferred, CPU as fallback
         return try {
             Backend.GPU()
         } catch (e: Exception) {
@@ -86,19 +86,19 @@ class LlmEngineManagerImpl @Inject constructor(
 }
 ```
 
-### Pontos Críticos
+### Critical Notes
 
-1. **`initialize()` pode levar 5-15 segundos** — NUNCA chamar na main thread
-2. **Engine e Conversation são `AutoCloseable`** — usar `use {}` ou fechar explicitamente
-3. **Um Engine por vez** — ao trocar de modelo, destruir o anterior primeiro
-4. **GPU pode não estar disponível** — sempre ter fallback para CPU
-5. **Modelo deve existir no filesystem** — verificar antes de inicializar
+1. **`initialize()` may take 5-15 seconds** --- NEVER call on the main thread
+2. **Engine and Conversation are `AutoCloseable`** --- use `use {}` or close explicitly
+3. **One Engine at a time** --- when switching models, destroy the previous one first
+4. **GPU may not be available** --- always have CPU fallback
+5. **Model must exist on the filesystem** --- verify before initializing
 
 ## Conversation Management
 
-### Para Geração de Puzzles
+### For Puzzle Generation
 
-Criar uma nova Conversation por puzzle (evita contaminação entre gerações):
+Create a new Conversation per puzzle (prevents contamination between generations):
 
 ```kotlin
 suspend fun generateSinglePuzzle(params: PuzzleParams): PuzzleResponse? {
@@ -121,9 +121,9 @@ suspend fun generateSinglePuzzle(params: PuzzleParams): PuzzleResponse? {
 }
 ```
 
-### Para Chat Pós-Jogo
+### For Post-Game Chat
 
-O `ChatViewModel` usa `LlmSession` para chat multi-turn com streaming. O engine é auto-inicializado se necessário.
+The `ChatViewModel` uses `LlmSession` for multi-turn chat with streaming. The engine is auto-initialized if necessary.
 
 ```kotlin
 @HiltViewModel
@@ -136,7 +136,7 @@ class ChatViewModel @Inject constructor(
 
     private var session: LlmSession? = null
 
-    // Garante engine pronto antes de criar sessão
+    // Ensures engine is ready before creating session
     private suspend fun ensureSession(): Boolean {
         if (session != null) return true
 
@@ -144,13 +144,13 @@ class ChatViewModel @Inject constructor(
         if (currentState !is EngineState.Ready) {
             _state.update { it.copy(isEngineLoading = true) }
 
-            // Auto-inicializa se Uninitialized
+            // Auto-initialize if Uninitialized
             if (currentState is EngineState.Uninitialized) {
                 val modelPath = modelRepository.getConfig().modelPath ?: return false
                 engineManager.initialize(modelPath)
             }
 
-            // Observa e aguarda Ready (timeout 120s)
+            // Observe and wait for Ready (timeout 120s)
             val ready = withTimeoutOrNull(ENGINE_INIT_TIMEOUT_MS) {
                 engineManager.engineState.first { it is EngineState.Ready || it is EngineState.Error }
             }
@@ -165,27 +165,27 @@ class ChatViewModel @Inject constructor(
 }
 ```
 
-**Fluxo do chat:**
+**Chat flow:**
 
 ```
-ChatScreen aberta
-    │
-    ├── Engine Ready? ──→ Sim ──→ Cria LlmSession com chatSystemPrompt
-    │                  └──→ Não ──→ Mostra loading, auto-inicializa engine
-    │
-    ▼
-Envia prompt inicial: "Conte uma curiosidade sobre a palavra '{word}'"
-    │
-    ▼
-LlmSession.sendMessageStreaming() → Flow<String>
-    │
-    ├── Tokens chegam → atualiza UiChatMessage.content progressivamente
-    ├── isStreaming = true enquanto tokens fluem
-    ├── Timeout 60s → remove mensagem, mostra erro
-    └── Completo → salva no Room, isStreaming = false
+ChatScreen opened
+    |
+    +-- Engine Ready? ---> Yes ---> Create LlmSession with chatSystemPrompt
+    |                  `---> No ---> Show loading, auto-initialize engine
+    |
+    v
+Send initial prompt: "Tell me a fun fact about the word '{word}'"
+    |
+    v
+LlmSession.sendMessageStreaming() -> Flow<String>
+    |
+    +-- Tokens arrive -> progressively update UiChatMessage.content
+    +-- isStreaming = true while tokens flow
+    +-- Timeout 60s -> remove message, show error
+    `-- Complete -> save to Room, isStreaming = false
 ```
 
-**Streaming de resposta:**
+**Response streaming:**
 
 ```kotlin
 currentSession.sendMessageStreaming(userText).collect { token ->
@@ -202,33 +202,32 @@ currentSession.sendMessageStreaming(userText).collect { token ->
 }
 ```
 
-**Estado do chat:**
+**Chat state:**
 
 ```kotlin
 data class ChatState(
-    val isEngineLoading: Boolean = false,  // loading do engine
-    val isModelResponding: Boolean = false, // streaming de resposta
+    val isEngineLoading: Boolean = false,  // engine loading
+    val isModelResponding: Boolean = false, // response streaming
     val messages: List<UiChatMessage>,
-    val userMessageCount: Int,             // limite: 10 mensagens do user
-    val suggestionsVisible: Boolean,       // chips desaparecem após 1ª mensagem
+    val userMessageCount: Int,             // limit: 10 user messages
+    val suggestionsVisible: Boolean,       // chips disappear after 1st message
     // ...
 )
 ```
 
-**Restauração de histórico:** quando o chat reabre com histórico existente, as mensagens USER são re-enviadas ao `LlmSession` para reconstruir o contexto do modelo.
-```
+**History restoration:** when the chat reopens with existing history, USER messages are re-sent to `LlmSession` to reconstruct the model's context.
 
 ## Prompt Engineering
 
-### Princípios
+### Principles
 
-1. **Ser extremamente específico** — modelos pequenos precisam de instruções claras
-2. **Pedir formato exato** — JSON, sem texto extra
-3. **Dar exemplos negativos** — "NÃO inclua a palavra nas dicas"
-4. **Limitar output** — "máximo 3 parágrafos"
-5. **Adaptar ao modelo** — Gemma 4 tem system role + function calling; Qwen3 não
+1. **Be extremely specific** --- small models need clear instructions
+2. **Request exact format** --- JSON, no extra text
+3. **Give negative examples** --- "DO NOT include the word in the hints"
+4. **Limit output** --- "maximum 3 paragraphs"
+5. **Adapt to the model** --- Gemma 4 has system role + function calling; Qwen3 does not
 
-### ConversationConfig por Modelo
+### ConversationConfig by Model
 
 **Gemma 4 E2B:**
 
@@ -241,7 +240,7 @@ fun buildConversationConfigGemma4(params: PuzzleParams): ConversationConfig {
             topK = 64,
             topP = 0.95f
         )
-        // Function calling via ToolSet (ver abaixo)
+        // Function calling via ToolSet (see below)
     )
 }
 ```
@@ -251,7 +250,7 @@ fun buildConversationConfigGemma4(params: PuzzleParams): ConversationConfig {
 ```kotlin
 fun buildConversationConfigQwen3(): ConversationConfig {
     return ConversationConfig(
-        // Sem system instruction (não suportado nativamente)
+        // No system instruction (not natively supported)
         samplerConfig = SamplerConfig(
             temperature = 0.7f,
             topK = 40,
@@ -263,7 +262,7 @@ fun buildConversationConfigQwen3(): ConversationConfig {
 
 ### Function Calling (Gemma 4)
 
-LiteRT-LM suporta function calling via annotations `@Tool` e `@ToolParam`:
+LiteRT-LM supports function calling via `@Tool` and `@ToolParam` annotations:
 
 ```kotlin
 class PuzzleToolSet : ToolSet {
@@ -271,23 +270,23 @@ class PuzzleToolSet : ToolSet {
     var lastResult: PuzzleResponse? = null
         private set
 
-    @Tool("Gera um puzzle de palavra para o jogo de adivinhação")
+    @Tool("Generates a word puzzle for the guessing game")
     fun generatePuzzle(
-        @ToolParam("Palavra gerada: substantivo comum, sem acentos, minúscula, 5-8 letras")
+        @ToolParam("Generated word: common noun, no accents, lowercase, 5-8 letters")
         word: String,
-        @ToolParam("Categoria da palavra (ex: animal, fruta, objeto)")
+        @ToolParam("Word category (e.g., animal, fruit, object)")
         category: String,
-        @ToolParam("Nível de dificuldade de 1 (fácil) a 5 (difícil)")
+        @ToolParam("Difficulty level from 1 (easy) to 5 (hard)")
         difficulty: Int,
-        @ToolParam("Lista de 5 dicas progressivas, da mais vaga à mais específica")
+        @ToolParam("List of 5 progressive hints, from vaguest to most specific")
         hint1: String,
-        @ToolParam("Segunda dica")
+        @ToolParam("Second hint")
         hint2: String,
-        @ToolParam("Terceira dica")
+        @ToolParam("Third hint")
         hint3: String,
-        @ToolParam("Quarta dica")
+        @ToolParam("Fourth hint")
         hint4: String,
-        @ToolParam("Quinta dica, mais específica")
+        @ToolParam("Fifth hint, most specific")
         hint5: String
     ): String {
         lastResult = PuzzleResponse(
@@ -301,54 +300,55 @@ class PuzzleToolSet : ToolSet {
 }
 ```
 
-Usar com `automaticToolCalling = true` no `ConversationConfig` para que o modelo chame a função automaticamente.
+Use with `automaticToolCalling = true` in `ConversationConfig` so the model calls the function automatically.
 
 ### Thinking Mode (Gemma 4)
 
-Para geração de puzzles, ativar thinking mode para dicas mais elaboradas:
+For puzzle generation, activate thinking mode for more elaborate hints:
 
 ```
 System: <|think|>
-Você é um gerador de palavras para um jogo de adivinhação.
+You are a word generator for a guessing game.
 ...
 ```
 
-O token `<|think|>` no início do system prompt ativa o raciocínio interno do modelo. O output de "pensamento" (`<|channel>thought\n...<channel|>`) é separado automaticamente da resposta final pelo SDK.
+The `<|think|>` token at the start of the system prompt activates the model's internal reasoning. The "thought" output (`<|channel>thought\n...<channel|>`) is automatically separated from the final response by the SDK.
 
-Para chat: **NÃO** usar thinking mode (priorizar velocidade de resposta).
+For chat: **DO NOT** use thinking mode (prioritize response speed).
 
-## Parsing de Respostas
+## Response Parsing
 
-### Estratégia em Camadas
+### Layered Strategy
 
 ```
-Resposta bruta do LLM
-    │
-    ▼
-1. Tentar JSON.decodeFromString<PuzzleResponse>()
-    │
-    ├── Sucesso → ParseResult.Success
-    │
-    └── Falha ──→ 2. Extrair JSON via regex
-                      │
-                      ├── Encontrou JSON → tentar decode novamente
-                      │   ├── Sucesso → ParseResult.Success
-                      │   └── Falha → ParseResult.Error
-                      │
-                      └── Não encontrou → ParseResult.Error
+Raw LLM Response
+    |
+    v
+1. Try JSON.decodeFromString<PuzzleResponse>()
+    |
+    +-- Success -> ParseResult.Success
+    |
+    `-- Failure --->  2. Extract JSON via regex
+                      |
+                      +-- Found JSON -> try decode again
+                      |   +-- Success -> ParseResult.Success
+                      |   `-- Failure -> ParseResult.Error
+                      |
+                      `-- Not found -> ParseResult.Error
 ```
 
-### Regex de Extração
+### Extraction Regex
 
 ```kotlin
 private val JSON_REGEX = Regex("""\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}""", RegexOption.DOT_MATCHES_ALL)
+
 
 fun extractJson(raw: String): String? {
     return JSON_REGEX.find(raw)?.value
 }
 ```
 
-### Serialização
+### Serialization
 
 ```kotlin
 @Serializable
@@ -366,38 +366,38 @@ val json = Json {
 }
 ```
 
-`ignoreUnknownKeys` e `isLenient` são essenciais porque LLMs frequentemente adicionam campos extras ou usam formatting inconsistente.
+`ignoreUnknownKeys` and `isLenient` are essential because LLMs frequently add extra fields or use inconsistent formatting.
 
-## Validação
+## Validation
 
 ### Pipeline
 
 ```
-PuzzleResponse (do parser)
-    │
-    ▼
+PuzzleResponse (from parser)
+    |
+    v
 PuzzleValidator.validate()
-    │
-    ├── word.length in 5..8
-    ├── word.matches(Regex("[a-z]+"))
-    ├── word !in existingWords
-    ├── hints.size == 5
-    ├── hints.none { it.contains(word, ignoreCase = true) }
-    ├── category.isNotBlank()
-    └── difficulty in 1..5
-    │
-    ├── Tudo ok → ValidationResult.Valid
-    └── Qualquer falha → ValidationResult.Invalid(reasons)
+    |
+    +-- word.length in 5..8
+    +-- word.matches(Regex("[a-z]+"))
+    +-- word !in existingWords
+    +-- hints.size == 5
+    +-- hints.none { it.contains(word, ignoreCase = true) }
+    +-- category.isNotBlank()
+    `-- difficulty in 1..5
+    |
+    +-- All ok -> ValidationResult.Valid
+    `-- Any failure -> ValidationResult.Invalid(reasons)
 ```
 
 ### Blacklist
 
-Manter lista de palavras proibidas (ofensivas, ambíguas, problemáticas):
+Maintain a list of forbidden words (offensive, ambiguous, problematic):
 
 ```kotlin
 private val BLACKLIST = setOf(
-    // palavras ofensivas ou problemáticas
-    // atualizar conforme necessário
+    // offensive or problematic words
+    // update as necessary
 )
 
 fun isBlacklisted(word: String): Boolean = word in BLACKLIST
@@ -406,36 +406,36 @@ fun isBlacklisted(word: String): Boolean = word in BLACKLIST
 ## Retry Strategy
 
 ```
-Tentativa 1: prompt padrão
-    │
-    └── Falha → Tentativa 2: prompt + "A resposta anterior foi inválida. Tente novamente com uma palavra diferente."
-                    │
-                    └── Falha → Tentativa 3: prompt simplificado (sem exclusion list, constraints relaxadas)
-                                    │
-                                    └── Falha → Pular este puzzle
+Attempt 1: default prompt
+    |
+    `-- Failure -> Attempt 2: prompt + "The previous response was invalid. Try again with a different word."
+                    |
+                    `-- Failure -> Attempt 3: simplified prompt (no exclusion list, relaxed constraints)
+                                    |
+                                    `-- Failure -> Skip this puzzle
 ```
 
-Entre retries: criar nova Conversation (limpa o contexto).
+Between retries: create new Conversation (clears the context).
 
-## Performance Esperada
+## Expected Performance
 
-| Operação | Gemma 4 E2B | Gemma 3 1B |
+| Operation | Gemma 4 E2B | Gemma 3 1B |
 |---|---|---|
 | Engine init | 5-15s | 3-10s |
-| Gerar 1 puzzle | 3-8s | 2-5s |
-| Gerar batch de 7 | 30-60s | 15-35s |
-| Chat: primeira resposta (TTFT) | 1-3s | 0.5-2s |
-| Chat: velocidade de streaming | 47-52 tok/s | 47 tok/s |
+| Generate 1 puzzle | 3-8s | 2-5s |
+| Generate batch of 7 | 30-60s | 15-35s |
+| Chat: first response (TTFT) | 1-3s | 0.5-2s |
+| Chat: streaming speed | 47-52 tok/s | 47 tok/s |
 
-Esses valores variam significativamente por device e backend (CPU vs GPU).
+These values vary significantly by device and backend (CPU vs GPU).
 
 ## Troubleshooting
 
-| Problema | Causa provável | Solução |
+| Problem | Likely Cause | Solution |
 |---|---|---|
-| `LiteRtLmJniException` na init | Modelo corrompido ou path errado | Verificar path, oferecer re-download |
-| Resposta vazia | Prompt muito restritivo | Relaxar constraints no retry |
-| JSON inválido consistente | Modelo não entende o formato | Usar function calling (Gemma 4) ou simplificar schema |
-| OOM durante inferência | Modelo grande demais para o device | Verificar RAM antes de inicializar, sugerir modelo menor |
-| Resposta em idioma errado | Modelo ignora instrução de idioma | Adicionar "[Responda em {language}]" no fim do prompt |
-| GPU backend crash | OpenCL não suportado | Catch exception, fallback para CPU |
+| `LiteRtLmJniException` on init | Corrupted model or wrong path | Check path, offer re-download |
+| Empty response | Prompt too restrictive | Relax constraints on retry |
+| Consistently invalid JSON | Model doesn't understand the format | Use function calling (Gemma 4) or simplify schema |
+| OOM during inference | Model too large for the device | Check RAM before initializing, suggest smaller model |
+| Response in wrong language | Model ignores language instruction | Add "[Respond in {language}]" at the end of the prompt |
+| GPU backend crash | OpenCL not supported | Catch exception, fall back to CPU |

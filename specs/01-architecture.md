@@ -1,45 +1,45 @@
-# Spec 01 — Arquitetura
+# Spec 01 — Architecture
 
-## Resumo
+## Summary
 
-Palabrita é um app Android nativo (Kotlin + Jetpack Compose) com arquitetura multi-módulo Gradle. O app roda um LLM local via LiteRT-LM para gerar puzzles de palavras e oferecer chat educacional pós-acerto. Dispositivos com pouca RAM recebem um modo Light com dataset estático.
+Palabrita is a native Android app (Kotlin + Jetpack Compose) with a multi-module Gradle architecture. The app runs a local LLM via LiteRT-LM to generate word puzzles and offer post-guess educational chat. Devices with low RAM receive a Light mode with a static dataset.
 
-## Stack Técnica
+## Tech Stack
 
-| Camada | Tecnologia |
+| Layer | Technology |
 |---|---|
 | UI | Jetpack Compose + Material 3 |
-| Navegação | Navigation Compose (type-safe routes) |
+| Navigation | Navigation Compose (type-safe routes) |
 | DI | Hilt |
-| Persistência | Room + DataStore (preferences) |
+| Persistence | Room + DataStore (preferences) |
 | LLM Runtime | LiteRT-LM Android (`com.google.ai.edge.litertlm:litertlm-android`) |
 | Background | WorkManager |
-| Serialização | Kotlin Serialization (JSON) |
+| Serialization | Kotlin Serialization (JSON) |
 | Build | Gradle Kotlin DSL + Version Catalog |
 | Min SDK | Android 12 (API 31) |
-| Target SDK | Último estável |
-| Linguagem | Kotlin 2.x |
+| Target SDK | Latest stable |
+| Language | Kotlin 2.x |
 
-## Estrutura de Módulos
+## Module Structure
 
 ```
 palabrita/
-├── app/                        → Entry point, navegação, DI root
+├── app/                        → Entry point, navigation, DI root
 ├── core/
-│   ├── model/                  → Data classes, enums, interfaces de repositório
-│   ├── data/                   → Room DB, DAOs, implementações de repositório, dataset estático
-│   ├── ai/                     → LiteRT-LM wrapper, prompts, parser, validador
-│   └── common/                 → Device capabilities, storage checker, extensões
+│   ├── model/                  → Data classes, enums, repository interfaces
+│   ├── data/                   → Room DB, DAOs, repository implementations, static dataset
+│   ├── ai/                     → LiteRT-LM wrapper, prompts, parser, validator
+│   └── common/                 → Device capabilities, storage checker, extensions
 ├── feature/
-│   ├── onboarding/             → Onboarding, seleção de modelo, download
-│   ├── game/                   → Tela do jogo (Wordle-style)
-│   ├── chat/                   → Chat pós-acerto
-│   └── settings/               → Configurações, troca de modelo, estatísticas
+│   ├── onboarding/             → Onboarding, model selection, download
+│   ├── game/                   → Game screen (Wordle-style)
+│   ├── chat/                   → Post-guess chat
+│   └── settings/               → Settings, model switching, statistics
 └── gradle/
     └── libs.versions.toml      → Version catalog
 ```
 
-## Grafo de Dependências
+## Dependency Graph
 
 ```
 app ──→ feature/onboarding
@@ -54,72 +54,72 @@ feature/settings   ──→ core/ai, core/data, core/model, core/common
 
 core/data ──→ core/model
 core/ai   ──→ core/model
-core/common ──→ (nenhuma dependência interna)
-core/model  ──→ (nenhuma dependência interna)
+core/common ──→ (no internal dependencies)
+core/model  ──→ (no internal dependencies)
 ```
 
-**Regra**: nenhum módulo `feature/*` depende de outro `feature/*`.
+**Rule**: no `feature/*` module depends on another `feature/*`.
 
-## Responsabilidades por Módulo
+## Module Responsibilities
 
 ### `app`
 - `MainActivity` (single activity)
 - `PalabritaApp` (Application class, Hilt entry point)
-- `NavGraph` (rotas: Onboarding → Game → Chat → Settings)
-- Hilt modules de nível app
+- `NavGraph` (routes: Onboarding → Game → Chat → Settings)
+- App-level Hilt modules
 
 ### `core/model`
-- Data classes puros: `Puzzle`, `PlayerStats`, `GameSession`, `ChatMessage`, `ModelConfig`, `DeviceTier`
-- Interfaces de repositório: `PuzzleRepository`, `StatsRepository`, `ModelRepository`
+- Pure data classes: `Puzzle`, `PlayerStats`, `GameSession`, `ChatMessage`, `ModelConfig`, `DeviceTier`
+- Repository interfaces: `PuzzleRepository`, `StatsRepository`, `ModelRepository`
 - Enums: `PuzzleSource (AI, STATIC)`, `ModelId (GEMMA4_E2B, GEMMA3_1B, NONE)`, `DownloadState`
 
 ### `core/data`
 - Room database (`PalabritaDatabase`)
 - Entities: `PuzzleEntity`, `PlayerStatsEntity`, `GameSessionEntity`, `ChatMessageEntity`, `ModelConfigEntity`
 - DAOs: `PuzzleDao`, `PlayerStatsDao`, `GameSessionDao`, `ChatMessageDao`, `ModelConfigDao`
-- Implementações de repositório
-- `StaticPuzzleProvider`: carrega puzzles do dataset pré-bundled (assets JSON)
+- Repository implementations
+- `StaticPuzzleProvider`: loads puzzles from the pre-bundled dataset (assets JSON)
 
 ### `core/ai`
-- `LlmEngineManager`: singleton, lifecycle do Engine (init/destroy)
-- `PuzzleGenerator`: geração em batch com prompts por modelo
-- `ChatEngine`: conversa pós-acerto
-- `PromptTemplates`: constantes de prompt, variantes por modelo
-- `LlmResponseParser`: parse JSON, fallback regex
-- `PuzzleValidator`: validação determinística
-- `StaticPuzzleProvider` (se não acoplado em data)
+- `LlmEngineManager`: singleton, Engine lifecycle (init/destroy)
+- `PuzzleGenerator`: batch generation with model-specific prompts
+- `ChatEngine`: post-guess conversation
+- `PromptTemplates`: prompt constants, model variants
+- `LlmResponseParser`: JSON parse, regex fallback
+- `PuzzleValidator`: deterministic validation
+- `StaticPuzzleProvider` (if not coupled in data)
 
 ### `core/common`
-- `DeviceCapabilities`: detecção de RAM, classificação em tiers
-- `StorageChecker`: espaço disponível
-- `StateMachine<S, E>`: mini state machine genérica (~30 linhas), usada em fluxos complexos
-- Extension functions compartilhadas
+- `DeviceCapabilities`: RAM detection, tier classification
+- `StorageChecker`: available storage
+- `StateMachine<S, E>`: generic mini state machine (~30 lines), used in complex flows
+- Shared extension functions
 
-**Onde usar StateMachine vs sealed class + when:**
-- **StateMachine formal**: Engine lifecycle, download de modelo, fluxo de onboarding (muitos estados, transições condicionais)
-- **Sealed class + when**: Game status, chat status (poucos estados, transições simples)
+**When to use StateMachine vs sealed class + when:**
+- **Formal StateMachine**: Engine lifecycle, model download, onboarding flow (many states, conditional transitions)
+- **Sealed class + when**: Game status, chat status (few states, simple transitions)
 
 ### `feature/onboarding`
-- Telas de boas-vindas, seleção de idioma, seleção de modelo, download, geração inicial
+- Welcome screens, language selection, model selection, download, initial generation
 - `OnboardingViewModel`
 
 ### `feature/game`
-- Tela do jogo, grid de letras, teclado virtual, sistema de dicas
+- Game screen, letter grid, virtual keyboard, hints system
 - `GameViewModel`
 
 ### `feature/chat`
-- Chat pós-acerto com LLM, fallback estático para Light mode
+- Post-guess chat with LLM, static fallback for Light mode
 - `ChatViewModel`
 
 ### `feature/settings`
-- Configurações: idioma, modelo, estatísticas, storage
+- Settings: language, model, statistics, storage
 - `SettingsViewModel`
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Projeto compila com todos os módulos
-- [ ] Grafo de dependências respeita as regras (sem feature→feature)
-- [ ] Hilt injeta dependências corretamente entre módulos
-- [ ] Navigation Compose navega entre todas as rotas
-- [ ] Version catalog centraliza todas as versões de dependências
-- [ ] Build incremental funciona (alterar um módulo não recompila tudo)
+- [ ] Project compiles with all modules
+- [ ] Dependency graph respects the rules (no feature→feature)
+- [ ] Hilt injects dependencies correctly across modules
+- [ ] Navigation Compose navigates between all routes
+- [ ] Version catalog centralizes all dependency versions
+- [ ] Incremental build works (changing one module does not recompile everything)

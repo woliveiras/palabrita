@@ -5,7 +5,7 @@
 
 ## Context
 
-Palabrita is a portfolio-grade Android app that will grow to include multiple features (onboarding, game, chat, settings) plus core infrastructure (AI engine, data persistence, device capabilities). We need a project structure that enforces separation of concerns, enables incremental builds, and demonstrates architectural maturity.
+Palabrita is an Android app that will grow to include multiple features (onboarding, game, chat, settings) plus core infrastructure (AI engine, data persistence, device capabilities). We need a project structure that enforces separation of concerns, enables incremental builds, and supports long-term maintainability.
 
 ## Decision
 
@@ -47,6 +47,6 @@ feature/settings/     → Settings screen (Compose + Hilt)
 
 ## Consequences
 
-- **Positive**: Enforced module boundaries, faster incremental builds, testable in isolation, impressive for portfolio
+- **Positive**: Enforced module boundaries, faster incremental builds, testable in isolation, scalable for new features
 - **Negative**: More boilerplate (build files per module), initial setup cost
-- **Trade-off**: Accepted — the project will grow to justify the structure, and it demonstrates senior-level architecture skills
+- **Trade-off**: Accepted — the structure scales well as the project grows and keeps each module independently maintainable

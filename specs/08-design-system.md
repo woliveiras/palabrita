@@ -1,139 +1,139 @@
 # Spec 08 — Design System
 
-## Resumo
+## Summary
 
-Paleta de cores, tipografia, espaçamento e componentes visuais do Palabrita. Todas as cores são definidas como `Color` no Compose Theme e referenciadas por tokens semânticos, nunca hardcoded.
+Color palette, typography, spacing, and visual components of Palabrita. All colors are defined as `Color` in the Compose Theme and referenced by semantic tokens, never hardcoded.
 
-## Paleta de Cores
+## Color Palette
 
-### Cores de Feedback do Jogo
+### Game Feedback Colors
 
-| Token | Nome | Hex | Uso |
+| Token | Name | Hex | Usage |
 |---|---|---|---|
-| `correct` | Mint/Teal | `#4ECDC4` | Letra correta na posição certa (grid + teclado) |
-| `present` | Amber/Gold | `#FFB347` | Letra existe mas posição errada (grid + teclado) |
-| `absent` | Coral | `#FF6B6B` | Letra não existe na palavra (grid + teclado) |
-| `unused` | Cinza Neutro | `#787C7E` | Tecla não usada no teclado |
+| `correct` | Mint/Teal | `#4ECDC4` | Correct letter in the right position (grid + keyboard) |
+| `present` | Amber/Gold | `#FFB347` | Letter exists but wrong position (grid + keyboard) |
+| `absent` | Coral | `#FF6B6B` | Letter does not exist in the word (grid + keyboard) |
+| `unused` | Neutral Gray | `#787C7E` | Unused key on keyboard |
 
-### Cores de UI — Light Theme
+### UI Colors — Light Theme
 
-| Token | Hex | Uso |
+| Token | Hex | Usage |
 |---|---|---|
-| `surface` | `#FAFAFA` | Background principal |
-| `surfaceVariant` | `#F0F0F0` | Cards, inputs, cells vazias |
-| `onSurface` | `#1A1A2E` | Texto primário |
-| `onSurfaceVariant` | `#6B7280` | Texto secundário, labels |
-| `primary` | `#4ECDC4` | Botões primários, accent, links |
-| `onPrimary` | `#FFFFFF` | Texto sobre botão primário |
-| `primaryContainer` | `#D4F5F2` | Background de badges, chips |
-| `error` | `#FF6B6B` | Erros, estados destrutivos |
-| `outline` | `#D1D5DB` | Bordas de cells, dividers |
-| `cellBorder` | `#878A8C` | Borda de cell com letra digitada (antes do submit) |
+| `surface` | `#FAFAFA` | Main background |
+| `surfaceVariant` | `#F0F0F0` | Cards, inputs, empty cells |
+| `onSurface` | `#1A1A2E` | Primary text |
+| `onSurfaceVariant` | `#6B7280` | Secondary text, labels |
+| `primary` | `#4ECDC4` | Primary buttons, accent, links |
+| `onPrimary` | `#FFFFFF` | Text on primary button |
+| `primaryContainer` | `#D4F5F2` | Badge and chip backgrounds |
+| `error` | `#FF6B6B` | Errors, destructive states |
+| `outline` | `#D1D5DB` | Cell borders, dividers |
+| `cellBorder` | `#878A8C` | Cell border with typed letter (before submit) |
 
-### Cores de UI — Dark Theme
+### UI Colors — Dark Theme
 
-| Token | Hex | Uso |
+| Token | Hex | Usage |
 |---|---|---|
-| `surface` | `#121213` | Background principal |
-| `surfaceVariant` | `#1E1E20` | Cards, inputs, cells vazias |
-| `onSurface` | `#F5F5F5` | Texto primário |
-| `onSurfaceVariant` | `#9CA3AF` | Texto secundário |
-| `primary` | `#4ECDC4` | Accent (mesmo em ambos os themes) |
-| `onPrimary` | `#1A1A2E` | Texto sobre botão primário |
-| `primaryContainer` | `#1A3A38` | Background de badges, chips |
-| `error` | `#FF6B6B` | Erros (mesmo em ambos os themes) |
-| `outline` | `#3A3A3C` | Bordas |
-| `cellBorder` | `#565758` | Borda de cell com letra |
+| `surface` | `#121213` | Main background |
+| `surfaceVariant` | `#1E1E20` | Cards, inputs, empty cells |
+| `onSurface` | `#F5F5F5` | Primary text |
+| `onSurfaceVariant` | `#9CA3AF` | Secondary text |
+| `primary` | `#4ECDC4` | Accent (same in both themes) |
+| `onPrimary` | `#1A1A2E` | Text on primary button |
+| `primaryContainer` | `#1A3A38` | Badge and chip backgrounds |
+| `error` | `#FF6B6B` | Errors (same in both themes) |
+| `outline` | `#3A3A3C` | Borders |
+| `cellBorder` | `#565758` | Cell border with letter |
 
-### Cores de Feedback — ajuste Dark Theme
+### Feedback Colors — Dark Theme Adjustment
 
-As cores de feedback (correct, present, absent) **não mudam** entre light e dark. São vibrantes o suficiente para ambos os fundos. Isso garante que prints e compartilhamentos sejam consistentes.
+The feedback colors (correct, present, absent) **do not change** between light and dark. They are vibrant enough for both backgrounds. This ensures that screenshots and shares are consistent.
 
-### Cores de Tier
+### Tier Colors
 
-| Tier | Cor | Hex | Uso |
+| Tier | Color | Hex | Usage |
 |---|---|---|---|
-| Novato | Cinza | `#9CA3AF` | Badge, borda de perfil |
-| Curioso | Teal | `#4ECDC4` | Badge, borda de perfil |
-| Astuto | Amber | `#FFB347` | Badge, borda de perfil |
-| Sábio | Roxo | `#A78BFA` | Badge, borda de perfil |
-| Épico | Rosa | `#F472B6` | Badge, borda de perfil |
-| Lendário | Dourado gradiente | `#FFD700` → `#FFA500` | Badge com brilho, borda animada |
+| Novice | Gray | `#9CA3AF` | Badge, profile border |
+| Curious | Teal | `#4ECDC4` | Badge, profile border |
+| Cunning | Amber | `#FFB347` | Badge, profile border |
+| Wise | Purple | `#A78BFA` | Badge, profile border |
+| Epic | Pink | `#F472B6` | Badge, profile border |
+| Legendary | Golden gradient | `#FFD700` → `#FFA500` | Badge with shimmer, animated border |
 
-## Tipografia
+## Typography
 
-Material 3 type scale com Compose `Typography`. Font padrão: sistema (Roboto no Android).
+Material 3 type scale with Compose `Typography`. Default font: system (Roboto on Android).
 
-| Token | Size | Weight | Uso |
+| Token | Size | Weight | Usage |
 |---|---|---|---|
-| `displayLarge` | 32sp | Bold | Tela de resultado ("Parabéns!") |
-| `headlineMedium` | 24sp | SemiBold | Títulos de seção (onboarding, settings) |
-| `titleLarge` | 20sp | SemiBold | Header do jogo ("Palabrita") |
-| `titleMedium` | 16sp | Medium | Subtítulos, labels de card |
-| `bodyLarge` | 16sp | Regular | Texto principal, dicas |
-| `bodyMedium` | 14sp | Regular | Texto secundário |
-| `labelLarge` | 14sp | Medium | Botões |
-| `labelMedium` | 12sp | Medium | Badges, chips, contadores |
-| `gridLetter` | 24sp | Bold | Letra dentro da célula do grid |
-| `keyboardLetter` | 14sp | SemiBold | Letra na tecla do teclado |
+| `displayLarge` | 32sp | Bold | Result screen ("Congratulations!") |
+| `headlineMedium` | 24sp | SemiBold | Section titles (onboarding, settings) |
+| `titleLarge` | 20sp | SemiBold | Game header ("Palabrita") |
+| `titleMedium` | 16sp | Medium | Subtitles, card labels |
+| `bodyLarge` | 16sp | Regular | Main text, hints |
+| `bodyMedium` | 14sp | Regular | Secondary text |
+| `labelLarge` | 14sp | Medium | Buttons |
+| `labelMedium` | 12sp | Medium | Badges, chips, counters |
+| `gridLetter` | 24sp | Bold | Letter inside grid cell |
+| `keyboardLetter` | 14sp | SemiBold | Letter on keyboard key |
 
-## Espaçamento
+## Spacing
 
-Baseado em múltiplos de 4dp (Material 3):
+Based on multiples of 4dp (Material 3):
 
-| Token | Valor | Uso |
+| Token | Value | Usage |
 |---|---|---|
-| `spacingXs` | 4dp | Entre ícone e texto inline |
-| `spacingSm` | 8dp | Padding interno de chips/badges |
-| `spacingMd` | 16dp | Padding de cards, gap entre rows |
-| `spacingLg` | 24dp | Margem lateral da tela |
-| `spacingXl` | 32dp | Gap entre seções |
-| `spacingXxl` | 48dp | Topo/fundo de telas de onboarding |
+| `spacingXs` | 4dp | Between inline icon and text |
+| `spacingSm` | 8dp | Internal padding for chips/badges |
+| `spacingMd` | 16dp | Card padding, gap between rows |
+| `spacingLg` | 24dp | Screen side margin |
+| `spacingXl` | 32dp | Gap between sections |
+| `spacingXxl` | 48dp | Top/bottom of onboarding screens |
 
-## Cantos (Shape)
+## Corners (Shape)
 
-| Componente | Radius |
+| Component | Radius |
 |---|---|
-| Botão primário | 12dp (rounded) |
+| Primary button | 12dp (rounded) |
 | Card | 16dp |
 | Grid cell | 4dp |
-| Tecla do teclado | 6dp |
-| Badge de tier | 8dp |
+| Keyboard key | 6dp |
+| Tier badge | 8dp |
 | Dialog | 28dp (Material 3 default) |
 | Bottom sheet | 28dp top corners |
 
-## Elevação
+## Elevation
 
-| Componente | Elevation |
+| Component | Elevation |
 |---|---|
-| Surface principal | 0dp |
+| Main surface | 0dp |
 | Cards | 1dp |
-| Teclado | 2dp |
-| Hint card (revelada) | 3dp |
+| Keyboard | 2dp |
+| Hint card (revealed) | 3dp |
 | Dialog/Bottom sheet | 6dp |
 
-## Animações
+## Animations
 
-| Animação | Duração | Easing | Onde |
+| Animation | Duration | Easing | Where |
 |---|---|---|---|
-| Flip da célula | 300ms por célula, 100ms stagger | FastOutSlowIn | Após submeter tentativa |
-| Shake da row | 300ms | Linear (oscilação) | Tentativa inválida |
-| Bounce/pop | 400ms | OvershootInterpolator | Vitória (todas corretas) |
-| Fade in | 200ms | FastOutSlowIn | Transições de tela, dica revelada |
-| Slide up | 250ms | FastOutSlowIn | Hint card aparecendo |
-| Progress bar | Contínuo | Linear | Download, geração |
-| Tier badge brilho | 2s loop | EaseInOut | Lendário badge (shimmer) |
+| Cell flip | 300ms per cell, 100ms stagger | FastOutSlowIn | After submitting attempt |
+| Row shake | 300ms | Linear (oscillation) | Invalid attempt |
+| Bounce/pop | 400ms | OvershootInterpolator | Victory (all correct) |
+| Fade in | 200ms | FastOutSlowIn | Screen transitions, hint revealed |
+| Slide up | 250ms | FastOutSlowIn | Hint card appearing |
+| Progress bar | Continuous | Linear | Download, generation |
+| Tier badge shimmer | 2s loop | EaseInOut | Legendary badge (shimmer) |
 
-## Componentes Reutilizáveis
+## Reusable Components
 
 ### PalabritaButton
 
 ```kotlin
-// Variantes:
-// - Primary: background mint, texto branco
-// - Secondary: outlined, borda mint, texto mint
-// - Destructive: background coral, texto branco
-// - Ghost: sem background, texto mint (para ações terciárias)
+// Variants:
+// - Primary: mint background, white text
+// - Secondary: outlined, mint border, mint text
+// - Destructive: coral background, white text
+// - Ghost: no background, mint text (for tertiary actions)
 ```
 
 ### PalabritaCard
@@ -143,27 +143,27 @@ Baseado em múltiplos de 4dp (Material 3):
 // Border: outline (1dp)
 // Padding: spacingMd (16dp)
 // Corner: 16dp
-// Selecionável: borda muda para primary (mint) quando selecionado
+// Selectable: border changes to primary (mint) when selected
 ```
 
 ### TierBadge
 
 ```kotlin
-// Chip com cor do tier + ícone
+// Chip with tier color + icon
 // Corner: 8dp
-// Texto: labelMedium
-// Lendário: efeito shimmer no background
+// Text: labelMedium
+// Legendary: shimmer effect on background
 ```
 
-## Novos Componentes (Spec 10-12)
+## New Components (Spec 10-12)
 
 ### BottomNavigation
 
 ```kotlin
-// 3 tabs: Home (🏠), Stats (📊), Mais (⚙️)
+// 3 tabs: Home (🏠), Stats (📊), More (⚙️)
 // Background: surface
-// Indicador ativo: primary (mint) pill shape
-// Ícones: Material Icons (Home, BarChart, MoreHoriz)
+// Active indicator: primary (mint) pill shape
+// Icons: Material Icons (Home, BarChart, MoreHoriz)
 // Labels: labelMedium
 // Elevation: 2dp
 // Height: 80dp (include bottom inset)
@@ -171,15 +171,15 @@ Baseado em múltiplos de 4dp (Material 3):
 
 ### HomeCards
 
-Todos os cards do HomeScreen seguem o padrão `PalabritaCard` com variações:
+All HomeScreen cards follow the `PalabritaCard` pattern with variations:
 
 **StreakCard**
 ```kotlin
 // Background: primaryContainer (#D4F5F2 light / #1A3A38 dark)
-// Ícone: 🔥 (emoji inline)
-// Barra de progresso: primary (#4ECDC4) sobre outline (#D1D5DB)
-// Texto do streak: titleMedium, bold
-// Texto do marco: bodyMedium, onSurfaceVariant
+// Icon: 🔥 (inline emoji)
+// Progress bar: primary (#4ECDC4) over outline (#D1D5DB)
+// Streak text: titleMedium, bold
+// Milestone text: bodyMedium, onSurfaceVariant
 // Padding: spacingMd (16dp)
 // Corner: 16dp
 ```
@@ -187,13 +187,13 @@ Todos os cards do HomeScreen seguem o padrão `PalabritaCard` com variações:
 **DailyChallengesCard**
 ```kotlin
 // Background: surfaceVariant
-// Header: "⭐ DESAFIOS DO DIA (N/3)" — titleMedium
-// Cada desafio: Row com número + ícone estado + categoria + dificuldade
-// Estados:
-//   ✅ COMPLETED: texto onSurface, ícone correct (#4ECDC4)
-//   🔓 AVAILABLE: texto onSurface, ícone primary
-//   🔒 LOCKED: texto onSurfaceVariant (dimmed), ícone outline
-// CTA "JOGAR #N": PalabritaButton Primary
+// Header: "⭐ DAILY CHALLENGES (N/3)" — titleMedium
+// Each challenge: Row with number + state icon + category + difficulty
+// States:
+//   ✅ COMPLETED: onSurface text, correct icon (#4ECDC4)
+//   🔓 AVAILABLE: onSurface text, primary icon
+//   🔒 LOCKED: onSurfaceVariant text (dimmed), outline icon
+// CTA "PLAY #N": PalabritaButton Primary
 // Corner: 16dp
 // Elevation: 1dp
 ```
@@ -201,18 +201,18 @@ Todos os cards do HomeScreen seguem o padrão `PalabritaCard` com variações:
 **FreePlayCard**
 ```kotlin
 // Background: surfaceVariant
-// Ícone: 🎲 (emoji inline)
-// Título: "MODO LIVRE" — titleMedium
-// Descrição: bodyMedium, onSurfaceVariant
+// Icon: 🎲 (inline emoji)
+// Title: "FREE MODE" — titleMedium
+// Description: bodyMedium, onSurfaceVariant
 // CTA: PalabritaButton Secondary (outlined)
 // Corner: 16dp
 ```
 
 **QuickStatsRow**
 ```kotlin
-// 2×2 grid de mini-cards
-// Cada mini-card: surfaceVariant, corner 12dp, padding spacingSm
-// Valor: titleMedium, bold, onSurface
+// 2×2 grid of mini-cards
+// Each mini-card: surfaceVariant, corner 12dp, padding spacingSm
+// Value: titleMedium, bold, onSurface
 // Label: labelMedium, onSurfaceVariant
 // Gap: spacingSm (8dp)
 ```
@@ -220,10 +220,10 @@ Todos os cards do HomeScreen seguem o padrão `PalabritaCard` com variações:
 ### GenerationIndicator
 
 ```kotlin
-// Background: surfaceVariant com borda outline
-// Ícone: animação de loading (CircularProgressIndicator, size 16dp)
-// Texto: bodyMedium, onSurfaceVariant
-// Estado "pronto": ícone ✓ (correct color), auto-dismiss 3s
+// Background: surfaceVariant with outline border
+// Icon: loading animation (CircularProgressIndicator, size 16dp)
+// Text: bodyMedium, onSurfaceVariant
+// "Ready" state: ✓ icon (correct color), auto-dismiss 3s
 // Corner: 12dp
 // Padding: spacingSm vertical, spacingMd horizontal
 ```
@@ -232,28 +232,28 @@ Todos os cards do HomeScreen seguem o padrão `PalabritaCard` com variações:
 
 ```kotlin
 // Background: primaryContainer (#D4F5F2 light / #1A3A38 dark)
-// Borda: 2dp, primary (#4ECDC4)
+// Border: 2dp, primary (#4ECDC4)
 // Corner: 16dp
 // Elevation: 2dp
-// Header: "💬 Explore '{palavra}'" — titleMedium
-// Sugestões: chips horizontais scrolláveis
-//   Cada chip: surfaceVariant bg, corner 8dp, labelMedium
-//   Ícone: emoji da categoria + texto
-// Bônus: "+1 XP bônus ✨" — labelMedium, primary color
-// CTA: PalabritaButton Primary "EXPLORAR AGORA"
-// Modo Light: substitui por StaticCuriosityCard
+// Header: "💬 Explore '{word}'" — titleMedium
+// Suggestions: horizontally scrollable chips
+//   Each chip: surfaceVariant bg, corner 8dp, labelMedium
+//   Icon: category emoji + text
+// Bonus: "+1 XP bonus ✨" — labelMedium, primary color
+// CTA: PalabritaButton Primary "EXPLORE NOW"
+// Light Mode: replaced by StaticCuriosityCard
 ```
 
-### StaticCuriosityCard (Modo Light)
+### StaticCuriosityCard (Light Mode)
 
 ```kotlin
 // Background: surfaceVariant
-// Borda: 1dp, outline
+// Border: 1dp, outline
 // Corner: 16dp
-// Ícone: 📖
-// Título: "Sobre '{palavra}'" — titleMedium
-// Texto: bodyMedium, onSurface — curiosidade estática do puzzle
-// Rodapé: "— Curiosidade do dia" — labelMedium, onSurfaceVariant, italic
+// Icon: 📖
+// Title: "About '{word}'" — titleMedium
+// Text: bodyMedium, onSurface — static curiosity from puzzle
+// Footer: "— Curiosity of the day" — labelMedium, onSurfaceVariant, italic
 ```
 
 ### ChatNudge
@@ -261,71 +261,71 @@ Todos os cards do HomeScreen seguem o padrão `PalabritaCard` com variações:
 ```kotlin
 // Background: primaryContainer
 // Corner: 12dp
-// Texto: "💬 Quer saber mais sobre '{palavra}'?" — bodyMedium
-// CTA: "Explorar agora" — labelLarge, primary
-// Dismiss: IconButton "✕" no canto superior direito
-// Animação: slide-in de baixo, 250ms
+// Text: "💬 Want to know more about '{word}'?" — bodyMedium
+// CTA: "Explore now" — labelLarge, primary
+// Dismiss: IconButton "✕" in top-right corner
+// Animation: slide-in from bottom, 250ms
 ```
 
 ### ConfirmAbandonDialog
 
 ```kotlin
-// Dialog padrão Material 3 (AlertDialog)
-// Título: "Abandonar partida?" — headlineMedium
-// Body: "Seu progresso neste jogo será perdido." — bodyLarge
-// Botão primário: "Continuar jogando" — PalabritaButton Primary
-// Botão destrutivo: "Abandonar" — PalabritaButton Destructive
+// Standard Material 3 Dialog (AlertDialog)
+// Title: "Abandon game?" — headlineMedium
+// Body: "Your progress in this game will be lost." — bodyLarge
+// Primary button: "Keep playing" — PalabritaButton Primary
+// Destructive button: "Abandon" — PalabritaButton Destructive
 // Corner: 28dp (Material 3 default)
 ```
 
-### SharingCard (compartilhamento visual — futuro)
+### SharingCard (visual sharing — future)
 
 ```kotlin
 // Background: surface
 // Header: "Palabrita 🔥N · Tier · XP" — titleLarge
-// Contexto: "Desafio N/3 ⭐⭐" ou "Livre ⭐⭐⭐" — bodyMedium
-// Grid de emojis: monospaced, bodyLarge
-// Rodapé: dicas + XP — labelMedium, onSurfaceVariant
+// Context: "Challenge N/3 ⭐⭐" or "Free ⭐⭐⭐" — bodyMedium
+// Emoji grid: monospaced, bodyLarge
+// Footer: hints + XP — labelMedium, onSurfaceVariant
 // Corner: 16dp
-// Borda: 1dp, outline
+// Border: 1dp, outline
 ```
 
 ### Confetti Animation
 
 ```kotlin
-// Trigger: vitória no jogo (todas as células correct)
-// Partículas: 50-80 retângulos/quadrados coloridos
-// Cores: correct (#4ECDC4), present (#FFB347), absent (#FF6B6B), primary
-// Duração: 2s
-// Origem: topo da tela, gravidade para baixo
-// Easing: EaseOut para gravidade
-// Biblioteca sugerida: nl.dionsegijn:konfetti-compose (leve, Compose-native)
-// Fallback: se performance < 60fps, reduzir partículas ou desabilitar
+// Trigger: game victory (all cells correct)
+// Particles: 50-80 colored rectangles/squares
+// Colors: correct (#4ECDC4), present (#FFB347), absent (#FF6B6B), primary
+// Duration: 2s
+// Origin: top of screen, gravity downward
+// Easing: EaseOut for gravity
+// Suggested library: nl.dionsegijn:konfetti-compose (lightweight, Compose-native)
+// Fallback: if performance < 60fps, reduce particles or disable
 ```
 
 ### Badge Component
 
 ```kotlin
-// Tamanhos: Small (24dp), Medium (32dp), Large (48dp)
-// Earned: ícone colorido + background tier color
-// Not earned: ícone cinza (unused #787C7E) + background surfaceVariant
-// Progresso: "7/10" — labelMedium abaixo do ícone
+// Sizes: Small (24dp), Medium (32dp), Large (48dp)
+// Earned: colored icon + tier color background
+// Not earned: gray icon (unused #787C7E) + surfaceVariant background
+// Progress: "7/10" — labelMedium below icon
 // Corner: 50% (circular)
-// Lendário: efeito shimmer (mesmo do TierBadge)
+// Legendary: shimmer effect (same as TierBadge)
 ```
 
-## Acessibilidade
+## Accessibility
 
-- **Contraste mínimo**: WCAG AA (4.5:1 para texto, 3:1 para UI)
-  - Mint `#4ECDC4` sobre `#1A1A2E` (dark text) → 4.6:1 ✅
-  - Coral `#FF6B6B` sobre `#FFFFFF` → 3.9:1 (usar texto dark `#1A1A2E` sobre coral)
-  - Amber `#FFB347` sobre `#FFFFFF` → 2.1:1 (usar texto dark `#1A1A2E` sobre amber)
-- **Texto sobre cores de feedback**: sempre `#1A1A2E` (dark) para garantir contraste
-- **Modo alto contraste**: respeitar `isHighContrastEnabled` do sistema, aumentar borda das cells
-- **Content descriptions**: todas as células do grid e teclas com TalkBack labels
-- **Não depender só de cor**: adicionar bordas/ícones para diferenciar estados (acessível a daltônicos)
+- **Minimum contrast**: WCAG AA (4.5:1 for text, 3:1 for UI)
+  - Mint `#4ECDC4` on `#1A1A2E` (dark text) → 4.6:1 ✅
+  - Coral `#FF6B6B` on `#FFFFFF` → 3.9:1 (use dark text `#1A1A2E` on coral)
+  - Amber `#FFB347` on `#FFFFFF` → 2.1:1 (use dark text `#1A1A2E` on amber)
+- **Text on feedback colors**: always `#1A1A2E` (dark) to ensure contrast
+- **High contrast mode**: respect `isHighContrastEnabled` from system, increase cell borders
+- **Content descriptions**: all grid cells and keys with TalkBack labels
+- **Don't rely on color alone**: add borders/icons to differentiate states (accessible to colorblind users)
 
-## Implementação — Theme Compose
+## Implementation — Compose Theme
 
 ```kotlin
 // PalabritaTheme.kt
@@ -344,7 +344,7 @@ fun PalabritaTheme(
     )
 }
 
-// Cores de feedback como CompositionLocal (não mudam com theme)
+// Feedback colors as CompositionLocal (do not change with theme)
 val LocalGameColors = staticCompositionLocalOf { GameColors() }
 
 data class GameColors(
@@ -352,25 +352,25 @@ data class GameColors(
     val present: Color = Color(0xFFFFB347),
     val absent: Color = Color(0xFFFF6B6B),
     val unused: Color = Color(0xFF787C7E),
-    val onFeedback: Color = Color(0xFF1A1A2E)  // texto sobre qualquer cor de feedback
+    val onFeedback: Color = Color(0xFF1A1A2E)  // text on any feedback color
 )
 ```
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Todas as cores de feedback visíveis em light e dark theme
-- [ ] Contraste WCAG AA para texto sobre cores de feedback
-- [ ] Cores de tier aplicadas corretamente nos badges
-- [ ] Animações rodam a 60fps em dispositivos de referência
-- [ ] TalkBack descreve estados das células sem depender de cor
-- [ ] Theme switching (light/dark) não causa flash ou jank
-- [ ] Emojis de compartilhamento usam 🟦🟧🟥 (não 🟩🟨⬜)
-- [ ] BottomNavigation com 3 tabs e indicador ativo em mint
-- [ ] HomeCards (Streak, Daily, FreePlay, QuickStats) seguem padrão PalabritaCard
-- [ ] ChatCard no ResultScreen usa primaryContainer com borda primary
-- [ ] StaticCuriosityCard aparece em modo Light no lugar do ChatCard
-- [ ] ChatNudge com slide-in animation
-- [ ] ConfirmAbandonDialog segue padrão Material 3
-- [ ] Confetti animation na vitória a 60fps
-- [ ] GenerationIndicator com loading spinner e auto-dismiss
-- [ ] Badge component em 3 tamanhos com shimmer para Lendário
+- [ ] All feedback colors visible in both light and dark theme
+- [ ] WCAG AA contrast for text on feedback colors
+- [ ] Tier colors correctly applied to badges
+- [ ] Animations run at 60fps on reference devices
+- [ ] TalkBack describes cell states without relying on color
+- [ ] Theme switching (light/dark) causes no flash or jank
+- [ ] Share emojis use 🟦🟧🟥 (not 🟩🟨⬜)
+- [ ] BottomNavigation with 3 tabs and active indicator in mint
+- [ ] HomeCards (Streak, Daily, FreePlay, QuickStats) follow PalabritaCard pattern
+- [ ] ChatCard on ResultScreen uses primaryContainer with primary border
+- [ ] StaticCuriosityCard appears in Light mode in place of ChatCard
+- [ ] ChatNudge with slide-in animation
+- [ ] ConfirmAbandonDialog follows Material 3 standard
+- [ ] Confetti animation on victory at 60fps
+- [ ] GenerationIndicator with loading spinner and auto-dismiss
+- [ ] Badge component in 3 sizes with shimmer for Legendary

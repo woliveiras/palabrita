@@ -2,36 +2,36 @@
 
 ## Overview
 
-Os modelos LLM do Palabrita (~529MB a ~2.6GB) são grandes demais para o APK base (limite 200MB). Este documento detalha as estratégias de distribuição via Google Play e download direto, incluindo configuração de AI packs, device targeting e gestão do ciclo de vida do modelo no dispositivo.
+Palabrita's LLM models (~529 MB to ~2.6 GB) are too large for the base APK (200 MB limit). This document details distribution strategies via Google Play and direct download, including AI pack configuration, device targeting, and model lifecycle management on the device.
 
-## Estratégias de Distribuição
+## Distribution Strategies
 
-| Estratégia | Uso | Status |
+| Strategy | Use | Status |
 |---|---|---|
-| **Play Asset Delivery (PAD)** | Play Store — produção | GA (estável) |
-| **Play for On-device AI (AI packs)** | Play Store — com device targeting | Beta |
-| **Download direto (HuggingFace)** | Desenvolvimento / sideload | — |
+| **Play Asset Delivery (PAD)** | Play Store --- production | GA (stable) |
+| **Play for On-device AI (AI packs)** | Play Store --- with device targeting | Beta |
+| **Direct download (HuggingFace)** | Development / sideload | --- |
 
-### Decisão para V1
+### V1 Decision
 
-Usar **Play Asset Delivery (PAD)** com asset packs on-demand como estratégia primária. É GA, battle-tested, e suporta download + resume. Se Play for On-device AI sair de beta antes da publicação, migrar para AI packs pelo device targeting superior.
+Use **Play Asset Delivery (PAD)** with on-demand asset packs as the primary strategy. It is GA, battle-tested, and supports download + resume. If Play for On-device AI exits beta before release, migrate to AI packs for superior device targeting.
 
-## Play Asset Delivery — Configuração
+## Play Asset Delivery --- Configuration
 
-### Estrutura do Projeto
+### Project Structure
 
 ```
 palabrita/
-├── app/
-├── gemma4-e2b-pack/          ← Asset pack para Gemma 4 E2B
-│   ├── build.gradle.kts
-│   └── src/main/assets/
-│       └── (modelo baixado durante build ou CI)
-├── qwen3-06b-pack/             ← Asset pack para Qwen3 0.6B
-│   ├── build.gradle.kts
-│   └── src/main/assets/
-│       └── (modelo baixado durante build ou CI)
-└── ...
++-- app/
++-- gemma4-e2b-pack/          <- Asset pack for Gemma 4 E2B
+|   +-- build.gradle.kts
+|   `-- src/main/assets/
+|       `-- (model downloaded during build or CI)
++-- qwen3-06b-pack/             <- Asset pack for Qwen3 0.6B
+|   +-- build.gradle.kts
+|   `-- src/main/assets/
+|       `-- (model downloaded during build or CI)
+`-- ...
 ```
 
 ### Asset Pack build.gradle.kts
@@ -64,7 +64,7 @@ assetPack {
 }
 ```
 
-### Referência no app/build.gradle.kts
+### Reference in app/build.gradle.kts
 
 ```kotlin
 android {
@@ -79,9 +79,9 @@ include(":gemma4-e2b-pack")
 include(":qwen3-06b-pack")
 ```
 
-## Download Flow no App
+## Download Flow in the App
 
-### Usando AssetPackManager
+### Using AssetPackManager
 
 ```kotlin
 class ModelDownloader @Inject constructor(
@@ -119,7 +119,7 @@ class ModelDownloader @Inject constructor(
                     trySend(DownloadProgress.WaitingForWifi)
                 }
                 AssetPackStatus.REQUIRES_USER_CONFIRMATION -> {
-                    // Downloads grandes podem exigir confirmação
+                    // Large downloads may require confirmation
                     trySend(DownloadProgress.RequiresConfirmation(
                         packState.totalBytesToDownload()
                     ))
@@ -159,9 +159,9 @@ sealed class DownloadProgress {
 }
 ```
 
-### Verificação de Download Prévio
+### Previous Download Check
 
-Antes de iniciar download, verificar se já está baixado:
+Before starting a download, check if already downloaded:
 
 ```kotlin
 fun isModelDownloaded(packName: String): Boolean {
@@ -169,9 +169,9 @@ fun isModelDownloaded(packName: String): Boolean {
 }
 ```
 
-## Download Direto (Dev / Sideload)
+## Direct Download (Dev / Sideload)
 
-Para desenvolvimento sem Play Store, download via OkHttp:
+For development without Play Store, download via OkHttp:
 
 ```kotlin
 class DirectModelDownloader @Inject constructor(
@@ -210,18 +210,18 @@ class DirectModelDownloader @Inject constructor(
 }
 ```
 
-### URLs dos Modelos (HuggingFace)
+### Model URLs (HuggingFace)
 
 ```
 Gemma 4 E2B: https://huggingface.co/litert-community/Gemma4-E2B-it/resolve/main/Gemma4-E2B-it.litertlm
 Gemma 3 1B:  https://huggingface.co/litert-community/Gemma3-1B-it/resolve/main/Gemma3-1B-it.litertlm
 ```
 
-> **Nota**: verificar nomes exatos dos arquivos antes de implementar. Os nomes podem variar.
+> **Note**: verify exact file names before implementing. Names may vary.
 
-## Play for On-device AI (Futuro)
+## Play for On-device AI (Future)
 
-Quando sair de beta, migrar para AI packs com device targeting:
+When it exits beta, migrate to AI packs with device targeting:
 
 ### Device Groups (XML)
 
@@ -245,42 +245,42 @@ Quando sair de beta, migrar para AI packs com device targeting:
 </config:device-targeting-config>
 ```
 
-### AI Pack com Device Targeting
+### AI Pack with Device Targeting
 
 ```
 gemma4-e2b-aipack/
-├── build.gradle.kts
-└── src/main/ai/
-    ├── high_end/          ← Entregue só para devices com ≥8GB RAM
-    │   └── model.litertlm
-    └── default/           ← Vazio (devices que não se qualificam)
++-- build.gradle.kts
+`-- src/main/ai/
+    +-- high_end/          <- Delivered only to devices with >=8 GB RAM
+    |   `-- model.litertlm
+    `-- default/           <- Empty (devices that do not qualify)
 ```
 
-Benefício: o Play Store só entrega o modelo para devices compatíveis, economizando bandwidth e evitando frustração do usuário.
+Benefit: Play Store only delivers the model to compatible devices, saving bandwidth and avoiding user frustration.
 
-## Limites do Google Play
+## Google Play Limits
 
-| Componente | Limite |
+| Component | Limit |
 |---|---|
-| Base APK (comprimido) | 200 MB |
-| Asset pack individual | 1.5 GB |
+| Base APK (compressed) | 200 MB |
+| Individual asset pack | 1.5 GB |
 | Total install-time (base + asset packs) | 4 GB |
 | Total on-demand + fast-follow | 4 GB (standard) / 30 GB (Level Up) |
 
-Gemma 4 E2B (~2.6GB) cabe em um único asset pack on-demand (limite 1.5GB comprimido — modelo provavelmente comprime para menos que isso).
+Gemma 4 E2B (~2.6 GB) fits in a single on-demand asset pack (1.5 GB compressed limit --- the model likely compresses to less than that).
 
-> **Se o modelo comprimido exceder 1.5GB**: dividir em múltiplos asset packs ou usar Play for On-device AI (AI packs têm os mesmos limites).
+> **If the compressed model exceeds 1.5 GB**: split into multiple asset packs or use Play for On-device AI (AI packs have the same limits).
 
-## Armazenamento no Device
+## On-Device Storage
 
-### Localização dos Modelos
+### Model Location
 
-| Distribuição | Path |
+| Distribution | Path |
 |---|---|
 | Play Asset Delivery | `assetPackManager.getPackLocation(packName).assetsPath()` |
-| Download direto | `context.filesDir/models/{modelId}.litertlm` |
+| Direct download | `context.filesDir/models/{modelId}.litertlm` |
 
-### Gestão de Espaço
+### Space Management
 
 ```kotlin
 class StorageChecker @Inject constructor(
@@ -292,7 +292,7 @@ class StorageChecker @Inject constructor(
     }
 
     fun hasSpaceForModel(modelSizeBytes: Long): Boolean {
-        // Margem de 500MB além do tamanho do modelo
+        // 500 MB margin beyond the model size
         return getAvailableSpace() > modelSizeBytes + 500_000_000
     }
 
@@ -302,56 +302,56 @@ class StorageChecker @Inject constructor(
 }
 ```
 
-## Ciclo de Vida do Modelo
+## Model Lifecycle
 
 ```
-                    ┌──────────────┐
-                    │ NOT_DOWNLOADED│
-                    └──────┬───────┘
-                           │ Usuário seleciona modelo
-                           ▼
-                    ┌──────────────┐
-              ┌─────│ DOWNLOADING  │──────┐
-              │     └──────┬───────┘      │
-              │            │              │
+                    +--------------+
+                    | NOT_DOWNLOADED|
+                    +------+-------+
+                           |  User selects model
+                           v
+                    +--------------+
+              +-----| DOWNLOADING  |------+
+              |     +------+-------+      |
+              |            |              |
            Cancel        Done          Failed
-              │            │              │
-              ▼            ▼              ▼
-     ┌────────────┐ ┌────────────┐ ┌──────────┐
-     │NOT_DOWNLOADED│ │ DOWNLOADED │ │  FAILED  │
-     └────────────┘ └─────┬──────┘ └────┬─────┘
-                          │              │
+              |            |              |
+              v            v              v
+     +------------+ +------------+ +----------+
+     |NOT_DOWNLOADED| | DOWNLOADED | |  FAILED  |
+     +------------+ +-----+------+ +----+-----+
+                          |              |
                        Engine init    Retry
-                          │              │
-                          ▼              ▼
-                    ┌──────────┐   DOWNLOADING
-                    │  READY   │
-                    └──────────┘
+                          |              |
+                          v              v
+                    +----------+   DOWNLOADING
+                    |  READY   |
+                    +----------+
 ```
 
-## Testes
+## Testing
 
-### Teste de Download (PAD)
+### Download Test (PAD)
 
-PAD suporta testes locais via `bundletool`:
+PAD supports local testing via `bundletool`:
 
 ```bash
 # Build AAB
 ./gradlew bundleRelease
 
-# Gerar APKs com asset packs
+# Generate APKs with asset packs
 bundletool build-apks --bundle=app.aab --output=app.apks --local-testing
 
-# Instalar
+# Install
 bundletool install-apks --apks=app.apks
 ```
 
-Com `--local-testing`, asset packs on-demand ficam disponíveis localmente e não precisam de Play Store.
+With `--local-testing`, on-demand asset packs become available locally and do not require Play Store.
 
 ### Internal App Sharing
 
-Para testar download real via Play Store sem publicar:
-1. Upload AAB para Internal App Sharing no Play Console
-2. Gerar link de teste
-3. Instalar via link no device de teste
-4. Asset packs on-demand baixam via Play Store real
+To test real downloads via Play Store without publishing:
+1. Upload AAB to Internal App Sharing in Play Console
+2. Generate a test link
+3. Install via link on the test device
+4. On-demand asset packs download via the real Play Store

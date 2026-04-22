@@ -1,8 +1,8 @@
 # Spec 07 — Settings
 
-## Resumo
+## Summary
 
-A tela de configurações permite ao jogador: trocar idioma do jogo, trocar de modelo de IA, ver estatísticas, gerenciar armazenamento e ver informações do app. A troca de modelo é a feature mais complexa desta tela.
+The settings screen allows the player to: change the game language, switch the AI model, view statistics, manage storage, and view app information. Model switching is the most complex feature on this screen.
 
 ## Layout
 
@@ -42,41 +42,41 @@ A tela de configurações permite ao jogador: trocar idioma do jogo, trocar de m
 └──────────────────────────────┘
 ```
 
-## Seções
+## Sections
 
-### Idioma das Palavras
+### Word Language
 
-- Abre seletor com as mesmas opções do onboarding (PT/EN/ES)
-- Ao mudar: atualiza `PlayerStatsEntity.preferredLanguage`
-- Puzzles futuros serão gerados no novo idioma
-- Puzzles já gerados (cache) no idioma antigo NÃO são deletados (podem ser usados se voltar)
-- Não afeta o idioma da UI (segue locale do device, alterável nas configurações do Android)
+- Opens a selector with the same options as onboarding (PT/EN/ES)
+- On change: updates `PlayerStatsEntity.preferredLanguage`
+- Future puzzles will be generated in the new language
+- Already-generated puzzles (cache) in the old language are NOT deleted (can be used if the user switches back)
+- Does not affect the UI language (follows device locale, changeable in Android settings)
 
-### Tamanho das Palavras
+### Word Size
 
-**Bloqueado** até o tier **Astuto** (150 XP). Quando bloqueado:
-- Mostra ícone de cadeado (🔒)
-- Texto: "Desbloqueado no Astuto"
-- Tap mostra toast: "Continue jogando para desbloquear!"
+**Locked** until the **Astuto** tier (150 XP). When locked:
+- Shows lock icon (🔒)
+- Text: "Unlocked at Astuto"
+- Tap shows toast: "Keep playing to unlock!"
 
-**Desbloqueado** (tier ≥ Astuto):
-- Abre seletor com as opções:
+**Unlocked** (tier ≥ Astuto):
+- Opens a selector with the following options:
 
-| Opção | Range | Descrição |
+| Option | Range | Description |
 |---|---|---|
-| Padrão | Dinâmico por dificuldade (5-8) | Comportamento normal |
-| Palavras curtas | 5-6 letras (fixo) | Para quem prefere rapidez |
-| Palavras longas | 7-9 letras (fixo) | Para quem quer mais desafio |
-| Palavras épicas | 8-10 letras (fixo) | Máximo desafio, tier Épico+ |
+| Default | Dynamic by difficulty (5-8) | Normal behavior |
+| Short words | 5-6 letters (fixed) | For players who prefer speed |
+| Long words | 7-9 letters (fixed) | For players who want more challenge |
+| Epic words | 8-10 letters (fixed) | Maximum challenge, Epic+ tier |
 
-- "Palavras épicas" só aparece para tier ≥ Épico (1000 XP)
-- Salva em `PlayerStatsEntity.wordSizePreference`
-- Quando o jogador escolhe um range fixo, a dificuldade ainda afeta a **raridade** da palavra e o **estilo das dicas**, mas não o tamanho
-- Valor `"DEFAULT"` = comportamento dinâmico por dificuldade
+- "Epic words" only appears for tier ≥ Epic (1000 XP)
+- Saved in `PlayerStatsEntity.wordSizePreference`
+- When the player chooses a fixed range, difficulty still affects the word's **rarity** and **hint style**, but not the size
+- Value `"DEFAULT"` = dynamic behavior by difficulty
 
-### Estatísticas
+### Statistics
 
-Tela dedicada com:
+Dedicated screen with:
 
 ```
 ┌──────────────────────────────┐
@@ -103,9 +103,9 @@ Tela dedicada com:
 └──────────────────────────────┘
 ```
 
-- Dados de `PlayerStatsEntity`
-- Histograma de distribuição de tentativas
-- Botão "Compartilhar stats" gera texto para clipboard:
+- Data from `PlayerStatsEntity`
+- Attempt distribution histogram
+- "Share stats" button generates text to clipboard:
 
 ```
 Palabrita 📊
@@ -113,9 +113,9 @@ Palabrita 📊
 🔥 Sequência: 8
 ```
 
-### Trocar Modelo
+### Switch Model
 
-Tela/dialog com opções disponíveis:
+Screen/dialog with available options:
 
 ```
 ┌──────────────────────────────┐
@@ -151,7 +151,7 @@ Tela/dialog com opções disponíveis:
 └──────────────────────────────┘
 ```
 
-**Fluxo de troca:**
+**Switch flow:**
 
 ```
 1. Usuário seleciona novo modelo
@@ -173,40 +173,40 @@ Tela/dialog com opções disponíveis:
 7. Limpar cache de puzzles não jogados do modelo anterior (puzzles jogados permanecem no histórico)
 ```
 
-**Regras:**
-- Não permitir troca se há jogo em andamento (ou finalizar o jogo atual primeiro)
-- Download do novo modelo acontece ANTES de deletar o antigo (segurança)
-- Se o device não tem espaço para os dois modelos simultaneamente: avisar e oferecer deletar primeiro
-- Warning se trocar para modelo acima do tier do device
+**Rules:**
+- Do not allow switching if there is a game in progress (or finish the current game first)
+- New model download happens BEFORE deleting the old one (safety)
+- If the device does not have space for both models simultaneously: warn and offer to delete first
+- Warning if switching to a model above the device's tier
 
-### Espaço Usado
+### Storage Used
 
-Informação estática (sem ação):
-- Tamanho do modelo em disco
-- Tamanho do banco de dados (puzzles + stats + chat)
-- Espaço total usado pelo app
+Static information (no action):
+- Model size on disk
+- Database size (puzzles + stats + chat)
+- Total storage used by the app
 
-### Excluir Modelo
+### Delete Model
 
-- Dialog de confirmação: "Isso excluirá o modelo de IA ({size}). O app mudará para o modo Light com banco de palavras curado. Você pode baixar um modelo novamente a qualquer momento."
-- Botões: "Cancelar" / "Excluir"
-- Ao confirmar:
-  1. Destruir Engine
-  2. Deletar arquivo do modelo
-  3. Atualizar ModelConfig para `none`
-  4. Carregar dataset estático
-  5. Limpar puzzles AI não jogados
+- Confirmation dialog: "This will delete the AI model ({size}). The app will switch to Light mode with a curated word bank. You can download a model again at any time."
+- Buttons: "Cancel" / "Delete"
+- On confirm:
+  1. Destroy Engine
+  2. Delete model file
+  3. Update ModelConfig to `none`
+  4. Load static dataset
+  5. Clear unplayed AI puzzles
 
-### Resetar Progresso
+### Reset Progress
 
-- Dialog de confirmação: "Isso apagará todas as suas estatísticas, puzzles jogados e histórico de chat. Esta ação não pode ser desfeita."
-- Botões: "Cancelar" / "Resetar"
-- Ao confirmar:
-  1. Limpar `PlayerStatsEntity` (resetar para valores iniciais)
-  2. Limpar `GameSessionEntity` (todas)
-  3. Limpar `ChatMessageEntity` (todas)
-  4. Marcar todos os puzzles como não jogados
-  5. NÃO deleta o modelo (mantém a IA)
+- Confirmation dialog: "This will erase all your statistics, played puzzles, and chat history. This action cannot be undone."
+- Buttons: "Cancel" / "Reset"
+- On confirm:
+  1. Clear `PlayerStatsEntity` (reset to initial values)
+  2. Clear `GameSessionEntity` (all)
+  3. Clear `ChatMessageEntity` (all)
+  4. Mark all puzzles as unplayed
+  5. Does NOT delete the model (keeps AI)
 
 ## SettingsViewModel
 
@@ -246,24 +246,24 @@ sealed class SettingsAction {
 
 ## Edge Cases
 
-| Cenário | Comportamento |
+| Scenario | Behavior |
 |---|---|
-| Troca de modelo com jogo em andamento | Bloquear troca; mostrar "Termine o jogo atual antes de trocar" |
-| Espaço insuficiente para dois modelos simultâneos | Oferecer: "Excluir modelo atual primeiro?" |
-| Download do novo modelo falha | Manter modelo antigo intacto, mostrar erro + retry |
-| Troca para modelo que exige mais RAM que o device | Warning, permitir com confirmação |
-| Resetar progresso | Não afeta modelo nem preferências de idioma |
+| Model switch with game in progress | Block switch; show "Finish the current game before switching" |
+| Insufficient space for two models simultaneously | Offer: "Delete current model first?" |
+| New model download fails | Keep old model intact, show error + retry |
+| Switch to model requiring more RAM than device | Warning, allow with confirmation |
+| Reset progress | Does not affect model or language preferences |
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Idioma das palavras pode ser alterado e persiste
-- [ ] Estatísticas exibem dados corretos de PlayerStats
-- [ ] Histograma de tentativas renderiza proporcionalmente
-- [ ] Compartilhar stats gera texto correto no clipboard
-- [ ] Troca de modelo: download → verificação → exclusão do antigo funciona end-to-end
-- [ ] Troca para Light mode: deleta modelo, carrega dataset estático
-- [ ] Troca não perde puzzles já jogados (histórico mantido)
-- [ ] Excluir modelo libera espaço corretamente
-- [ ] Resetar progresso limpa stats sem afetar modelo
-- [ ] Warning de RAM aparece ao selecionar modelo acima do tier
-- [ ] Troca bloqueada durante jogo em andamento
+- [ ] Word language can be changed and persists
+- [ ] Statistics display correct data from PlayerStats
+- [ ] Attempt histogram renders proportionally
+- [ ] Share stats generates correct text to clipboard
+- [ ] Model switch: download → verification → deletion of old model works end-to-end
+- [ ] Switch to Light mode: deletes model, loads static dataset
+- [ ] Switch does not lose already-played puzzles (history preserved)
+- [ ] Delete model correctly frees storage
+- [ ] Reset progress clears stats without affecting model
+- [ ] RAM warning appears when selecting a model above the tier
+- [ ] Switch blocked during active game

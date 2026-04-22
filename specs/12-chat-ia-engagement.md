@@ -1,83 +1,83 @@
-# Spec 12 — Chat IA Engagement
+# Spec 12 — AI Chat Engagement
 
-## Resumo
+## Summary
 
-O Chat IA é o diferencial do Palabrita. Após cada jogo, o jogador pode conversar com a IA sobre a palavra, aprendendo etimologia, curiosidades e usos. Esta spec define o sistema de incentivos para que o jogador use o chat: XP bônus, sugestões contextuais, nudges na Home e badges de explorador.
+The AI Chat is Palabrita's differentiator. After each game, the player can chat with the AI about the word, learning etymology, trivia, and usage. This spec defines the incentive system to encourage players to use the chat: bonus XP, contextual suggestions, Home nudges, and explorer badges.
 
 ## Context & Motivation
 
-O Chat IA já existe (Spec 06), mas sem incentivos claros para uso, a maioria dos jogadores vai ignorá-lo. Jogos educacionais de sucesso (Duolingo, Quizlet) mostram que recompensas tangíveis por curiosidade aumentam engajamento. No Palabrita: **conhecimento = XP**.
+The AI Chat already exists (Spec 06), but without clear incentives for use, most players will ignore it. Successful educational games (Duolingo, Quizlet) show that tangible rewards for curiosity increase engagement. In Palabrita: **knowledge = XP**.
 
-## Fluxo de Entrada no Chat
+## Chat Entry Flow
 
-### CTA Principal — ResultScreen
+### Main CTA — ResultScreen
 
-O Chat Card é o **CTA principal** do ResultScreen (vitória ou derrota). Deve ser o elemento mais proeminente após o resultado.
+The Chat Card is the **main CTA** on the ResultScreen (win or loss). It should be the most prominent element after the result.
 
 ```
 ┌──────────────────────────────┐
-│         🎉 Parabéns!         │
-│    Você descobriu em 3/6     │
-│    Palavra: GATOS            │
+│         🎉 Congratulations!  │
+│    You discovered it in 3/6  │
+│    Word: GATOS               │
 │                              │
 │  ┌────────────────────────┐  │
-│  │  💬 Explore "GATOS"    │  │  ← CTA principal
+│  │  💬 Explore "GATOS"    │  │  ← Main CTA
 │  │                        │  │
-│  │  🧬 Etimologia         │  │
-│  │  🌎 Curiosidade        │  │
-│  │  📝 Frases de exemplo  │  │
+│  │  🧬 Etymology          │  │
+│  │  🌎 Trivia             │  │
+│  │  📝 Example sentences  │  │
 │  │                        │  │
-│  │  +1 XP bônus ✨        │  │
+│  │  +1 bonus XP ✨        │  │
 │  │                        │  │
-│  │  [ EXPLORAR AGORA ]    │  │
+│  │  [ EXPLORE NOW ]       │  │
 │  └────────────────────────┘  │
 │                              │
-│  [▶ Jogar de novo]           │
-│  [📤 Compartilhar]           │
+│  [▶ Play again]              │
+│  [📤 Share]                  │
 │                              │
 └──────────────────────────────┘
 ```
 
-**Hierarquia visual:**
-1. Resultado (parabéns/derrota + palavra)
-2. **Chat Card** (CTA principal, background `primaryContainer`, borda `primary`)
-3. Jogar de novo (secundário)
-4. Compartilhar (terciário)
+**Visual hierarchy:**
+1. Result (congratulations/defeat + word)
+2. **Chat Card** (main CTA, background `primaryContainer`, border `primary`)
+3. Play again (secondary)
+4. Share (tertiary)
 
-### Entradas Alternativas
+### Alternative Entry Points
 
-| Entrada | Contexto |
+| Entry Point | Context |
 |---|---|
-| ResultScreen Chat Card | CTA principal — após terminar qualquer jogo |
-| HomeScreen Chat Nudge | Se daily completado sem chat |
-| HomeScreen Daily Card | "💬 Explorar?" em daily completado sem chat |
-| StatsScreen (futuro) | Palavras exploradas vs não exploradas |
+| ResultScreen Chat Card | Main CTA — after finishing any game |
+| HomeScreen Chat Nudge | If daily completed without chat |
+| HomeScreen Daily Card | "💬 Explore?" on a completed daily without chat |
+| StatsScreen (future) | Explored vs unexplored words |
 
-## Sugestões Contextuais
+## Contextual Suggestions
 
-Ao abrir o chat, o jogador vê **sugestões rápidas** baseadas na palavra e na categoria:
+When opening the chat, the player sees **quick suggestions** based on the word and category:
 
-### Categorias de Sugestão
+### Suggestion Categories
 
 ```kotlin
 data class ChatSuggestion(
     val icon: String,       // emoji
-    val label: String,      // texto curto
-    val prompt: String,     // mensagem enviada ao LLM
+    val label: String,      // short text
+    val prompt: String,     // message sent to LLM
     val category: SuggestionCategory,
 )
 
 enum class SuggestionCategory {
-    ETYMOLOGY,      // 🧬 "De onde vem essa palavra?"
-    CURIOSITY,      // 🌎 "Curiosidade sobre {palavra}"
-    USAGE,          // 📝 "Frases com {palavra}"
-    RELATED,        // 🔗 "Palavras relacionadas"
-    CULTURAL,       // 🎭 "Expressões com {palavra}"
-    CHALLENGE,      // 🧩 "Me desafie com outra palavra parecida"
+    ETYMOLOGY,      // 🧬 "Where does this word come from?"
+    CURIOSITY,      // 🌎 "Trivia about {word}"
+    USAGE,          // 📝 "Sentences with {word}"
+    RELATED,        // 🔗 "Related words"
+    CULTURAL,       // 🎭 "Expressions with {word}"
+    CHALLENGE,      // 🧩 "Challenge me with another similar word"
 }
 ```
 
-### Geração de Sugestões
+### Suggestion Generation
 
 ```kotlin
 fun generateSuggestions(
@@ -85,65 +85,65 @@ fun generateSuggestions(
     category: String,
     language: String,
 ): List<ChatSuggestion> {
-    // Sempre incluir 3 sugestões fixas:
+    // Always include 3 fixed suggestions:
     val suggestions = mutableListOf(
-        ChatSuggestion("🧬", "Etimologia", "De onde vem '$word'?", ETYMOLOGY),
-        ChatSuggestion("🌎", "Curiosidade", "Me conte algo curioso sobre '$word'", CURIOSITY),
-        ChatSuggestion("📝", "Exemplos", "Crie 3 frases criativas com '$word'", USAGE),
+        ChatSuggestion("🧬", "Etymology", "Where does '$word' come from?", ETYMOLOGY),
+        ChatSuggestion("🌎", "Trivia", "Tell me something curious about '$word'", CURIOSITY),
+        ChatSuggestion("📝", "Examples", "Create 3 creative sentences with '$word'", USAGE),
     )
     
-    // Adicionar 1-2 sugestões baseadas na categoria:
+    // Add 1-2 suggestions based on category:
     when (category.lowercase()) {
         "animal" -> suggestions.add(
-            ChatSuggestion("🐾", "Habitat", "Onde vivem os '$word'?", CURIOSITY)
+            ChatSuggestion("🐾", "Habitat", "Where do '$word' live?", CURIOSITY)
         )
         "comida" -> suggestions.add(
-            ChatSuggestion("👨‍🍳", "Receita", "Como preparar '$word'?", CULTURAL)
+            ChatSuggestion("👨‍🍳", "Recipe", "How to prepare '$word'?", CULTURAL)
         )
-        // ... outras categorias
+        // ... other categories
     }
     
-    return suggestions.take(5)  // máximo 5 sugestões visíveis
+    return suggestions.take(5)  // maximum 5 visible suggestions
 }
 ```
 
-### UI no Chat
+### Chat UI
 
 ```
 ┌──────────────────────────────┐
-│  💬 Sobre "GATOS"            │
+│  💬 About "GATOS"            │
 │                              │
-│  Sugestões rápidas:          │
+│  Quick suggestions:          │
 │  ┌──────┐ ┌──────┐ ┌──────┐ │
 │  │🧬    │ │🌎    │ │📝    │ │
-│  │Etimo-│ │Curio-│ │Exem- │ │
-│  │logia │ │sidade│ │plos  │ │
+│  │Etym- │ │Triv- │ │Exam- │ │
+│  │ology │ │ia    │ │ples  │ │
 │  └──────┘ └──────┘ └──────┘ │
 │  ┌──────┐ ┌──────┐          │
 │  │🐾    │ │🧩    │          │
-│  │Habi- │ │Desa- │          │
-│  │tat   │ │fio   │          │
+│  │Habi- │ │Chal- │          │
+│  │tat   │ │lenge │          │
 │  └──────┘ └──────┘          │
 │                              │
-│  Ou digite sua pergunta...   │
+│  Or type your question...    │
 │  ┌────────────────────┬────┐ │
 │  │                    │ ➤  │ │
 │  └────────────────────┴────┘ │
 └──────────────────────────────┘
 ```
 
-Tap em sugestão → envia o prompt automaticamente → IA responde → sugestões desaparecem (chat livre a partir daí).
+Tap on a suggestion → automatically sends the prompt → AI responds → suggestions disappear (free chat from that point on).
 
-## XP Bônus — "Bônus de Curiosidade"
+## Bonus XP — "Curiosity Bonus"
 
-### Regra
+### Rule
 
-- Cada sessão de chat dá **+1 XP** ("Bônus de Curiosidade")
-- Máximo 1 bônus por puzzle (não acumula se abrir o chat 2x para o mesmo puzzle)
-- Requer mínimo **1 mensagem enviada** (abrir e fechar sem interagir não conta)
-- Vale para dailies E free play
+- Each chat session grants **+1 XP** ("Curiosity Bonus")
+- Maximum 1 bonus per puzzle (does not stack if the chat is opened twice for the same puzzle)
+- Requires a minimum of **1 message sent** (opening and closing without interacting does not count)
+- Applies to dailies AND free play
 
-### Cálculo
+### Calculation
 
 ```kotlin
 fun calculateChatBonusXp(
@@ -153,39 +153,39 @@ fun calculateChatBonusXp(
 ): Int {
     if (alreadyClaimed) return 0
     if (messagesExchanged < 1) return 0
-    return 1  // +1 XP fixo
+    return 1  // fixed +1 XP
 }
 ```
 
-### Feedback Visual
+### Visual Feedback
 
-Ao ganhar o bônus, mostrar inline no chat:
+When earning the bonus, show inline in the chat:
 
 ```
 ┌──────────────────────────────┐
-│  ✨ +1 XP — Bônus de         │
-│     Curiosidade!              │
+│  ✨ +1 XP — Curiosity        │
+│     Bonus!                   │
 │                              │
-│  "O conhecimento também é    │
-│   recompensa."               │
+│  "Knowledge is also          │
+│   a reward."                 │
 └──────────────────────────────┘
 ```
 
-Auto-dismiss após 3 segundos ou tap.
+Auto-dismiss after 3 seconds or on tap.
 
-## Badges de Exploração
+## Exploration Badges
 
-Badges complementam XP como incentivo visual de longo prazo.
+Badges complement XP as a long-term visual incentive.
 
-### Definições
+### Definitions
 
-| Badge | Nome | Condição | Ícone |
-|-------|------|----------|-------|
-| Explorador | "Explorador" | Usou chat IA 10x | 🔍 |
-| Linguista | "Linguista" | Usou chat IA 50x | 📚 |
-| Etimólogo | "Etimólogo" | Perguntou sobre etimologia 25x | 🧬 |
-| Curioso Insaciável | "Curioso Insaciável" | Usou chat IA 100x | 🌟 |
-| Polímata | "Polímata" | Todas as categorias de sugestão usadas | 🎓 |
+| Badge | Name | Condition | Icon |
+|-------|------|-----------|------|
+| Explorer | "Explorer" | Used AI chat 10x | 🔍 |
+| Linguist | "Linguist" | Used AI chat 50x | 📚 |
+| Etymologist | "Etymologist" | Asked about etymology 25x | 🧬 |
+| Insatiably Curious | "Insatiably Curious" | Used AI chat 100x | 🌟 |
+| Polymath | "Polymath" | All suggestion categories used | 🎓 |
 
 ### Data Model
 
@@ -194,36 +194,36 @@ data class BadgeProgress(
     val badgeId: String,
     val currentCount: Int,
     val targetCount: Int,
-    val earnedAt: Long?,  // null se não ganhou ainda
+    val earnedAt: Long?,  // null if not yet earned
 )
 ```
 
 ### Tracking
 
 ```kotlin
-// Incrementar ao enviar mensagem no chat
+// Increment when sending a message in chat
 fun trackChatInteraction(
     puzzleId: Long,
     suggestionCategory: SuggestionCategory?,
 ) {
-    // Incrementar total de sessões de chat (para Explorador, Linguista, etc.)
-    // Se usou sugestão: incrementar categoria específica (para Etimólogo, Polímata)
+    // Increment total chat sessions (for Explorer, Linguist, etc.)
+    // If suggestion used: increment specific category (for Etymologist, Polymath)
 }
 ```
 
-### Exibição
+### Display
 
-- Badges aparecem no perfil do jogador (StatsScreen)
-- Badge novo → notificação inline no chat: "🏅 Novo badge: Explorador!"
-- Badges não ganhos aparecem em cinza com progresso (ex: "🔍 7/10")
+- Badges appear on the player profile (StatsScreen)
+- New badge → inline notification in chat: "🏅 New badge: Explorer!"
+- Unearned badges appear in grey with progress (e.g. "🔍 7/10")
 
 ## Nudges — HomeScreen
 
 ### ChatNudge
 
-Aparece na HomeScreen se:
-- O jogador completou um daily mas **não** usou o chat para aquele puzzle
-- Modo AI ativo
+Appears on the HomeScreen if:
+- The player completed a daily but did **not** use the chat for that puzzle
+- AI mode is active
 
 ```kotlin
 data class ChatNudge(
@@ -249,85 +249,86 @@ fun shouldShowChatNudge(
 }
 ```
 
-### UI do Nudge
+### Nudge UI
 
 ```
 ┌──────────────────────────────┐
-│  💬 Quer saber mais sobre    │  ← Nudge card
-│     "GATOS"?                 │
+│  💬 Want to learn more       │  ← Nudge card
+│     about "GATOS"?           │
 │                              │
-│  [Explorar agora]    [✕]    │
+│  [Explore now]       [✕]    │
 └──────────────────────────────┘
 ```
 
-- Tap "Explorar agora" → navega para ChatRoute(puzzleId)
-- Tap "✕" → dismiss (não aparece de novo para esse puzzle)
-- Máximo 1 nudge por vez
+- Tap "Explore now" → navigates to ChatRoute(puzzleId)
+- Tap "✕" → dismiss (does not appear again for that puzzle)
+- Maximum 1 nudge at a time
 
-### Daily Card — "💬 Explorar?"
+### Daily Card — "💬 Explore?"
 
-Dentro do DailyChallengesCard, desafios completados sem chat mostram:
+Inside the DailyChallengesCard, completed challenges without chat show:
 
 ```
-① ✅ Animais   3/6  · 💬 Explorar?
+① ✅ Animals   3/6  · 💬 Explore?
 ```
 
-Tap em "💬 Explorar?" → navega para ChatRoute(puzzleId).
+Tap "💬 Explore?" → navigates to ChatRoute(puzzleId).
 
-## Modo Light
+## Light Mode
 
-No modo Light (sem IA):
-- Chat IA não está disponível
-- Chat Card no ResultScreen é substituído por **Card de Curiosidade Estática**:
+In Light mode (no AI):
+- AI Chat is not available
+- Chat Card on ResultScreen is replaced by a **Static Curiosity Card**:
 
 ```
 ┌──────────────────────────────┐
-│  📖 Sobre "GATOS"            │
+│  📖 About "GATOS"            │
 │                              │
-│  "Gato" vem do latim         │
-│  "cattus". Domesticados há   │
-│  ~10.000 anos no Oriente.    │
+│  "Gato" comes from the Latin │
+│  "cattus". Domesticated ~    │
+│  10,000 years ago in the     │
+│  Middle East.                │
 │                              │
-│  — Curiosidade do dia         │
+│  — Fact of the day           │
 └──────────────────────────────┘
 ```
 
-- Curiosidade estática vem do campo `staticCuriosity` do puzzle (dataset estático)
-- Sem XP bônus no modo Light (sem interação de chat)
-- Badges de chat não são trackáveis no modo Light
+- Static curiosity comes from the `staticCuriosity` field of the puzzle (static dataset)
+- No bonus XP in Light mode (no chat interaction)
+- Chat badges are not trackable in Light mode
 
-## ChatViewModel — Mudanças
+## ChatViewModel — Changes
 
-### State (novos campos)
+### State (new fields)
 
 ```kotlin
 data class ChatState(
-    // ... campos existentes
-    val suggestions: List<ChatSuggestion>,    // sugestões contextuais
-    val bonusXpClaimed: Boolean,              // se já ganhou +1 XP nesse puzzle
-    val newBadge: Badge?,                     // badge recém-desbloqueado (null se nenhum)
+    // ... existing fields
+    val suggestions: List<ChatSuggestion>,    // contextual suggestions
+    val bonusXpClaimed: Boolean,              // whether +1 XP was already claimed for this puzzle
+    val newBadge: Badge?,                     // newly unlocked badge (null if none)
 )
 ```
 
-### Actions (novas)
+### Actions (new)
 
 ```kotlin
 sealed class ChatAction {
-    // ... actions existentes
+    // ... existing actions
     data class SelectSuggestion(val suggestion: ChatSuggestion) : ChatAction()
     data object DismissBadgeNotification : ChatAction()
 }
 ```
 
-## Data Model — Mudanças
+## Data Model — Changes
 
-### GameSessionEntity (campo novo)
+### GameSessionEntity (new field)
 
 ```kotlin
-val chatExplored: Boolean = false  // true se jogador usou chat para esse puzzle
+val chatExplored: Boolean = false  // true if player used chat for this puzzle
 ```
 
-### ChatSessionEntity (nova)
+### ChatSessionEntity (new)
 
 ```kotlin
 @Entity(tableName = "chat_sessions")
@@ -343,7 +344,7 @@ data class ChatSessionEntity(
 )
 ```
 
-### BadgeEntity (nova)
+### BadgeEntity (new)
 
 ```kotlin
 @Entity(tableName = "badges")
@@ -357,50 +358,50 @@ data class BadgeEntity(
 
 ## Edge Cases
 
-| Cenário | Comportamento |
+| Scenario | Behavior |
 |---|---|
-| Jogador abre chat sem enviar mensagem | Sem bônus XP. `chatExplored` = false |
-| Jogador envia 1 mensagem e fecha | +1 XP bônus. `chatExplored` = true |
-| Jogador reabre chat do mesmo puzzle | Sugestões somem (já teve interação). Sem bônus duplo |
-| Modo Light: tap no chat card | Mostra curiosidade estática inline (sem navegar) |
-| IA offline / erro de geração | Mostra fallback estático + "IA indisponível no momento" |
-| Puzzle sem categoria | Sugestões genéricas (3 fixas, sem extras por categoria) |
-| Jogador ganha badge durante chat | Notificação inline, não interrompe o fluxo |
+| Player opens chat without sending a message | No XP bonus. `chatExplored` = false |
+| Player sends 1 message and closes | +1 XP bonus. `chatExplored` = true |
+| Player reopens chat for the same puzzle | Suggestions are gone (already interacted). No double bonus |
+| Light mode: tap on chat card | Shows static curiosity inline (no navigation) |
+| AI offline / generation error | Shows static fallback + "AI unavailable at the moment" |
+| Puzzle without category | Generic suggestions (3 fixed, no category extras) |
+| Player earns badge during chat | Inline notification, does not interrupt the flow |
 
-## Decisões
+## Decisions
 
-| Decisão | Escolha | Razão |
+| Decision | Choice | Reason |
 |---------|---------|-------|
-| XP bônus por chat | +1 XP fixo | Simples, previsível, não quebra economia |
-| Badges vs apenas XP | Ambos | XP = progressão, badges = colecionismo |
-| Chat como CTA principal | Sim | Diferencial do app, deve ser proeminente |
-| Sugestões desaparecem após 1ª | Sim | Guia entrada, libera chat para conversa livre |
-| Nudge no Home | 1 por vez | Não poluir, gentil reminder |
+| Bonus XP per chat | Fixed +1 XP | Simple, predictable, does not break economy |
+| Badges vs XP only | Both | XP = progression, badges = collectibles |
+| Chat as main CTA | Yes | App differentiator, should be prominent |
+| Suggestions disappear after 1st | Yes | Guides entry, frees chat for open conversation |
+| Home nudge | 1 at a time | Not intrusive, gentle reminder |
 
 ## Out of Scope
 
-- Chat com voz (futuro)
-- Compartilhar curiosidade aprendida (futuro)
-- Chat multiplayer / comparar respostas (futuro)
-- Streak de chat (dias consecutivos usando chat — futuro)
-- Recompensas cosméticas por badges (temas, avatares — futuro)
+- Voice chat (future)
+- Sharing learned curiosity (future)
+- Multiplayer chat / compare answers (future)
+- Chat streak (consecutive days using chat — future)
+- Cosmetic rewards for badges (themes, avatars — future)
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Chat Card é o CTA principal no ResultScreen (acima de "jogar de novo")
-- [ ] Chat Card mostra 3+ sugestões contextuais com ícones
-- [ ] Tap em sugestão envia mensagem automaticamente ao LLM
-- [ ] Sugestões desaparecem após a 1ª interação
-- [ ] +1 XP bônus ao enviar 1ª mensagem no chat (por puzzle)
-- [ ] Bônus não duplica se reabrir chat do mesmo puzzle
-- [ ] Feedback visual "✨ +1 XP — Bônus de Curiosidade" aparece no chat
-- [ ] Badge "Explorador" desbloqueado após 10 sessões de chat
-- [ ] Badge "Linguista" desbloqueado após 50 sessões de chat
-- [ ] Notificação inline ao ganhar novo badge
-- [ ] ChatNudge aparece no HomeScreen para daily completado sem chat
-- [ ] ChatNudge não aparece em modo Light
-- [ ] Daily card mostra "💬 Explorar?" para daily sem chat
-- [ ] Modo Light mostra curiosidade estática no ResultScreen
-- [ ] `chatExplored` salvo no GameSession
-- [ ] ChatSessionEntity registra mensagens e sugestões usadas
-- [ ] BadgeEntity persiste progresso entre sessões
+- [ ] Chat Card is the main CTA on ResultScreen (above "play again")
+- [ ] Chat Card shows 3+ contextual suggestions with icons
+- [ ] Tapping a suggestion automatically sends the message to the LLM
+- [ ] Suggestions disappear after the 1st interaction
+- [ ] +1 XP bonus when sending 1st message in chat (per puzzle)
+- [ ] Bonus does not duplicate if chat is reopened for the same puzzle
+- [ ] Visual feedback "✨ +1 XP — Curiosity Bonus" appears in chat
+- [ ] "Explorer" badge unlocked after 10 chat sessions
+- [ ] "Linguist" badge unlocked after 50 chat sessions
+- [ ] Inline notification when a new badge is earned
+- [ ] ChatNudge appears on HomeScreen for a completed daily without chat
+- [ ] ChatNudge does not appear in Light mode
+- [ ] Daily card shows "💬 Explore?" for daily without chat
+- [ ] Light mode shows static curiosity on ResultScreen
+- [ ] `chatExplored` saved in GameSession
+- [ ] ChatSessionEntity records messages and suggestions used
+- [ ] BadgeEntity persists progress across sessions

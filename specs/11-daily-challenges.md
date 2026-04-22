@@ -1,31 +1,31 @@
 # Spec 11 — Daily Challenges
 
-## Resumo
+## Summary
 
-O jogador recebe 3 desafios diários com dificuldade progressiva (fácil → normal → difícil). Completar desafios desbloqueia o próximo, gera XP com bônus de 2x, e manter streak exige apenas 1 jogo por dia. Puzzles são únicos por jogador (IA local), não determinísticos.
+The player receives 3 daily challenges with progressive difficulty (easy → normal → hard). Completing challenges unlocks the next one, generates XP with a 2x bonus, and maintaining streak requires only 1 game per day. Puzzles are unique per player (local AI), non-deterministic.
 
 ## Context & Motivation
 
-Sem desafios diários, o app não cria hábito. O Wordle provou que escassez + ritual = engajamento. Mas 1 puzzle por dia limita interação com o Chat IA (diferencial do Palabrita). Com 3 desafios: o jogador tem 3 oportunidades de explorar palavras com a IA, a dificuldade escala naturalmente dentro do dia, e o bônus de completude incentiva sessões mais longas.
+Without daily challenges, the app doesn't create habit. Wordle proved that scarcity + ritual = engagement. But 1 puzzle per day limits interaction with the AI Chat (Palabrita's differentiator). With 3 challenges: the player has 3 opportunities to explore words with the AI, difficulty scales naturally within the day, and the completion bonus encourages longer sessions.
 
-## Mecânica
+## Mechanics
 
-### 3 Desafios por Dia
+### 3 Challenges per Day
 
-| Desafio | Dificuldade | Desbloqueio |
+| Challenge | Difficulty | Unlock |
 |---------|-------------|-------------|
-| ① | tier atual - 1 (mín 1) | Sempre disponível |
-| ② | tier atual | Completar ① |
-| ③ | tier atual + 1 (máx 5) | Completar ② |
+| ① | current tier - 1 (min 1) | Always available |
+| ② | current tier | Complete ① |
+| ③ | current tier + 1 (max 5) | Complete ② |
 
-**Onde "tier atual" = `currentDifficulty` do `PlayerStats`** (dificuldade adaptativa existente, spec 05).
+**Where "current tier" = `currentDifficulty` from `PlayerStats`** (existing adaptive difficulty, spec 05).
 
-Exemplos:
-- Jogador nível 1: desafios ⭐/⭐/⭐⭐
-- Jogador nível 3: desafios ⭐⭐/⭐⭐⭐/⭐⭐⭐⭐
-- Jogador nível 5: desafios ⭐⭐⭐⭐/⭐⭐⭐⭐⭐/⭐⭐⭐⭐⭐
+Examples:
+- Player level 1: challenges ⭐/⭐/⭐⭐
+- Player level 3: challenges ⭐⭐/⭐⭐⭐/⭐⭐⭐⭐
+- Player level 5: challenges ⭐⭐⭐⭐/⭐⭐⭐⭐⭐/⭐⭐⭐⭐⭐
 
-### Seleção de Puzzles
+### Puzzle Selection
 
 ```kotlin
 suspend fun selectDailyPuzzles(
@@ -46,34 +46,34 @@ suspend fun selectDailyPuzzles(
 }
 ```
 
-- Puzzles são **únicos por jogador** (cada um recebe puzzles diferentes da IA ou do banco estático)
-- Se não há puzzles no banco para a dificuldade, gera inline (AI mode) ou busca dificuldade adjacente (Light mode)
-- Os 3 puzzles são selecionados ao acessar o primeiro daily do dia (lazy — não pré-seleciona à meia-noite)
+- Puzzles are **unique per player** (each one receives different puzzles from the AI or the static database)
+- If there are no puzzles in the database for the difficulty, generates inline (AI mode) or looks for adjacent difficulty (Light mode)
+- The 3 puzzles are selected when accessing the first daily of the day (lazy — not pre-selected at midnight)
 
-### Desbloqueio Sequencial
-
-```
-Desafio 1: AVAILABLE desde o início do dia
-Desafio 2: LOCKED → AVAILABLE quando desafio 1 completado (win ou loss)
-Desafio 3: LOCKED → AVAILABLE quando desafio 2 completado (win ou loss)
-```
-
-**Completar = finalizar o jogo** (win ou loss). Não é necessário vencer para desbloquear o próximo. O objetivo é engajar, não frustrar.
-
-### Fluxo (sem DifficultyPicker)
+### Sequential Unlock
 
 ```
-HomeScreen → tap "JOGAR #N" → PlayingScreen (puzzle pré-selecionado, dificuldade automática)
+Challenge 1: AVAILABLE from the start of the day
+Challenge 2: LOCKED → AVAILABLE when challenge 1 is completed (win or loss)
+Challenge 3: LOCKED → AVAILABLE when challenge 2 is completed (win or loss)
+```
+
+**Completing = finishing the game** (win or loss). Winning is not required to unlock the next one. The goal is to engage, not to frustrate.
+
+### Flow (without DifficultyPicker)
+
+```
+HomeScreen → tap "PLAY #N" → PlayingScreen (pre-selected puzzle, automatic difficulty)
                                     │
                                     ▼
-                              ResultScreen → Chat IA → Home
+                              ResultScreen → AI Chat → Home
 ```
 
-Não passa pelo DifficultyPicker. A dificuldade é automática (progressiva).
+Does not go through DifficultyPicker. Difficulty is automatic (progressive).
 
-## XP e Recompensas
+## XP and Rewards
 
-### XP por Daily Challenge
+### XP per Daily Challenge
 
 ```kotlin
 fun calculateDailyXp(
@@ -84,14 +84,14 @@ fun calculateDailyXp(
     currentStreak: Int,
 ): Int {
     val baseXp = calculateXpForGame(won, attempts, difficulty, currentStreak, hintsUsed)
-    return baseXp * 2  // Bônus 2x para dailies
+    return baseXp * 2  // 2x bonus for dailies
 }
 ```
 
-- Dailies dão **2x XP** comparado ao mesmo jogo no free play
-- O bônus de streak (spec 05) se aplica normalmente
+- Dailies give **2x XP** compared to the same game in free play
+- The streak bonus (spec 05) applies normally
 
-### Bônus de Completude (3/3)
+### Completion Bonus (3/3)
 
 ```kotlin
 fun calculateCompletionBonus(
@@ -101,56 +101,56 @@ fun calculateCompletionBonus(
     
     val winsCount = dailyResults.count { it.won }
     return when (winsCount) {
-        3 -> 5   // Varreu: +5 XP bônus
-        2 -> 3   // Quase: +3 XP bônus
-        1 -> 1   // Persistente: +1 XP bônus
-        0 -> 1   // Dedicado: +1 XP (participou dos 3)
+        3 -> 5   // Swept: +5 XP bonus
+        2 -> 3   // Almost: +3 XP bonus
+        1 -> 1   // Persistent: +1 XP bonus
+        0 -> 1   // Dedicated: +1 XP (participated in all 3)
         else -> 0
     }
 }
 ```
 
-- Completar os 3 (win ou loss) = bônus extra
-- Quanto mais vitórias nos 3, maior o bônus
-- Mesmo perdendo os 3, ganha +1 XP bônus por ter tentado todos
+- Completing all 3 (win or loss) = extra bonus
+- The more wins in the 3, the bigger the bonus
+- Even losing all 3, get +1 XP bonus for having tried all
 
-### Resumo de XP Diário Máximo
+### Daily Maximum XP Summary
 
-| Fonte | XP |
+| Source | XP |
 |-------|-----|
-| Daily 1 (fácil, vitória 1ª) | (1+3) × 2 = 8 |
-| Daily 2 (normal, vitória 1ª) | (2+3) × 2 = 10 |
-| Daily 3 (difícil, vitória 1ª) | (3+3) × 2 = 12 |
-| Bônus completude (3 wins) | 5 |
-| Chat IA bônus (3 sessões) | 3 |
-| **Máximo teórico/dia** | **38 XP** |
+| Daily 1 (easy, 1st-attempt win) | (1+3) × 2 = 8 |
+| Daily 2 (normal, 1st-attempt win) | (2+3) × 2 = 10 |
+| Daily 3 (hard, 1st-attempt win) | (3+3) × 2 = 12 |
+| Completion bonus (3 wins) | 5 |
+| AI Chat bonus (3 sessions) | 3 |
+| **Theoretical max/day** | **38 XP** |
 
-Na prática, ~15-20 XP/dia é mais realista (nem sempre 1ª tentativa).
+In practice, ~15-20 XP/day is more realistic (not always 1st attempt).
 
 ## Streak
 
-### Regras
+### Rules
 
-- **Streak incrementa** quando o jogador **finaliza** (win ou loss) pelo menos **1 daily** no dia
-- **Streak reseta** se o jogador não finalizar nenhum daily em um dia
-- **Free play NÃO conta** para streak
-- O jogador NÃO precisa vencer — basta participar
+- **Streak increments** when the player **finishes** (win or loss) at least **1 daily** in the day
+- **Streak resets** if the player does not finish any daily in a day
+- **Free play does NOT count** for streak
+- The player does NOT need to win — just participate
 
-### Cálculo
+### Calculation
 
 ```kotlin
 fun updateStreak(stats: PlayerStats, now: LocalDate): PlayerStats {
     val lastPlayed = stats.lastPlayedAt?.toLocalDate()
     
     return when {
-        lastPlayed == now -> stats // Já jogou hoje, sem mudança
+        lastPlayed == now -> stats // Already played today, no change
         lastPlayed == now.minusDays(1) -> stats.copy(
             currentStreak = stats.currentStreak + 1,
             maxStreak = maxOf(stats.maxStreak, stats.currentStreak + 1),
             lastPlayedAt = now.toEpochMillis(),
         )
         else -> stats.copy(
-            currentStreak = 1, // Reset, novo streak começa
+            currentStreak = 1, // Reset, new streak begins
             lastPlayedAt = now.toEpochMillis(),
         )
     }
@@ -159,106 +159,106 @@ fun updateStreak(stats: PlayerStats, now: LocalDate): PlayerStats {
 
 ### Streak Milestones
 
-| Dias | Marco | Bônus |
+| Days | Milestone | Bonus |
 |------|-------|-------|
-| 7 | 🔥 1 semana | +5 XP |
-| 30 | 🔥🔥 1 mês | +20 XP |
-| 100 | 🔥🔥🔥 100 dias | +50 XP (novo!) |
-| 365 | 🏆 1 ano | +100 XP + badge "Lendário" |
+| 7 | 🔥 1 week | +5 XP |
+| 30 | 🔥🔥 1 month | +20 XP |
+| 100 | 🔥🔥🔥 100 days | +50 XP (new!) |
+| 365 | 🏆 1 year | +100 XP + "Legendary" badge |
 
-## Compartilhamento
+## Sharing
 
-Formato (puzzles únicos por jogador, sem número compartilhado):
+Format (puzzles unique per player, no shared number):
 
 ```
-Palabrita 🔥12 · Astuto · 350 XP
+Palabrita 🔥12 · Savvy · 350 XP
 
-Desafio 1 ⭐ — 3/6
+Challenge 1 ⭐ — 3/6
 🟩🟩🟨⬜⬜
 🟩🟩🟩⬜🟩
 🟩🟩🟩🟩🟩
 
-Desafio 2 ⭐⭐ — 4/6
+Challenge 2 ⭐⭐ — 4/6
 🟩🟨🟨⬜⬜⬜
 🟩🟩🟨⬜🟩⬜
 🟩🟩🟩⬜🟩🟩
 🟩🟩🟩🟩🟩🟩
 
-💡 1 dica usada · +22 XP hoje
+💡 1 hint used · +22 XP today
 ```
 
-Destaques: streak, tier e XP (identidade do jogador, não do puzzle).
+Highlights: streak, tier and XP (player identity, not puzzle).
 
-## Data Model — Mudanças
+## Data Model — Changes
 
-### GameSessionEntity (campos novos)
+### GameSessionEntity (new fields)
 
 ```kotlin
 val dailyChallengeIndex: Int?    // 0, 1, 2 = daily; null = free play
 val dailyChallengeDate: String?  // "2026-04-21" (ISO date, null = free play)
 ```
 
-### PlayerStatsEntity (campo novo)
+### PlayerStatsEntity (new field)
 
 ```kotlin
-val lastDailyDate: String?       // "2026-04-21" — última data com daily finalizado
+val lastDailyDate: String?       // "2026-04-21" — last date with a completed daily
 ```
 
-Isso separa `lastPlayedAt` (qualquer jogo) de `lastDailyDate` (daily específico para streak).
+This separates `lastPlayedAt` (any game) from `lastDailyDate` (daily-specific for streak).
 
-## Reset Diário
+## Daily Reset
 
-- Os dailies resetam à **meia-noite local** (`LocalDate.now()`)
-- Ao acessar o HomeScreen, verifica se `today != lastDailyDate` → novos dailies
-- Puzzles dos dailies anteriores não completados são liberados de volta ao banco
-- Se o jogador está jogando um daily às 23:59 e termina às 00:01: o jogo conta para o dia em que **começou**
+- Dailies reset at **local midnight** (`LocalDate.now()`)
+- When accessing HomeScreen, checks if `today != lastDailyDate` → new dailies
+- Puzzles from previous incomplete dailies are released back to the database
+- If the player is playing a daily at 23:59 and finishes at 00:01: the game counts for the day it **started**
 
 ## Edge Cases
 
-| Cenário | Comportamento |
+| Scenario | Behavior |
 |---|---|
-| Jogador completa daily 1, fecha app, volta amanhã | Daily 2 e 3 de ontem não completados; novos dailies do novo dia |
-| Jogador no tier 1, daily 1 seria tier 0 | `coerceAtLeast(1)` — todos os 3 são tier 1 |
-| Jogador no tier 5, daily 3 seria tier 6 | `coerceAtMost(5)` — daily 3 é tier 5 |
-| Sem puzzles para a dificuldade | AI mode: gera inline. Light mode: busca dificuldade adjacente |
-| Jogador perde todos os 3 dailies | Streak mantido (participou). XP = 0 dos jogos + 1 bônus completude |
-| Free play não afeta streak | Correto — só dailies contam |
-| App kill durante daily | GameSession salva, restaura ao reabrir |
+| Player completes daily 1, closes app, returns tomorrow | Daily 2 and 3 from yesterday not completed; new dailies for the new day |
+| Player at tier 1, daily 1 would be tier 0 | `coerceAtLeast(1)` — all 3 are tier 1 |
+| Player at tier 5, daily 3 would be tier 6 | `coerceAtMost(5)` — daily 3 is tier 5 |
+| No puzzles for the difficulty | AI mode: generate inline. Light mode: look for adjacent difficulty |
+| Player loses all 3 dailies | Streak maintained (participated). XP = 0 from games + 1 completion bonus |
+| Free play does not affect streak | Correct — only dailies count |
+| App killed during daily | GameSession saved, restored on reopen |
 
-## Decisões
+## Decisions
 
-| Decisão | Escolha | Razão |
+| Decision | Choice | Reason |
 |---------|---------|-------|
-| Puzzles determinísticos | Não | Cada jogador tem experiência única (IA local) |
-| Desbloquear próximo requer vitória | Não | Completar (win/loss) basta. Engajamento > frustração |
-| Daily sem DifficultyPicker | Sim | Dificuldade automática simplifica fluxo |
-| Streak conta loss | Sim | Jogou = mantém streak. Recompensa participação |
-| 3 dailies (não 1) | Sim | 3x oportunidades de Chat IA + escalada de dificuldade |
+| Deterministic puzzles | No | Each player has a unique experience (local AI) |
+| Unlocking next requires win | No | Completing (win/loss) is enough. Engagement > frustration |
+| Daily without DifficultyPicker | Yes | Automatic difficulty simplifies flow |
+| Streak counts loss | Yes | Played = maintains streak. Rewards participation |
+| 3 dailies (not 1) | Yes | 3x AI Chat opportunities + difficulty escalation |
 
 ## Out of Scope
 
-- Dailies determinísticos / iguais para todos (decidido: não)
-- Leaderboard comparando dailies entre amigos (futuro)
-- Notificação push "Seu streak está em risco!" (futuro)
-- Replay de dailies de dias anteriores (futuro)
+- Deterministic / same dailies for all players (decided: no)
+- Leaderboard comparing dailies between friends (future)
+- Push notification "Your streak is at risk!" (future)
+- Replay of previous days' dailies (future)
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] 3 desafios diários aparecem no HomeScreen com estado correto
-- [ ] Dificuldade do daily 1 = `currentDifficulty - 1` (mín 1)
-- [ ] Dificuldade do daily 2 = `currentDifficulty`
-- [ ] Dificuldade do daily 3 = `currentDifficulty + 1` (máx 5)
-- [ ] Daily 2 desbloqueia ao completar daily 1 (win ou loss)
-- [ ] Daily 3 desbloqueia ao completar daily 2 (win ou loss)
-- [ ] Tap em daily navega direto para PlayingScreen (sem DifficultyPicker)
-- [ ] Daily dá 2x XP comparado ao free play
-- [ ] Completar 3/3 dailies dá bônus extra de XP
-- [ ] Streak incrementa ao finalizar 1º daily do dia
-- [ ] Streak NÃO incrementa com free play
-- [ ] Streak reseta se nenhum daily jogado no dia anterior
-- [ ] Dailies resetam à meia-noite local
-- [ ] `dailyChallengeIndex` e `dailyChallengeDate` salvos no GameSession
-- [ ] Compartilhamento mostra streak + tier + XP (não número de puzzle)
-- [ ] Bônus de streak aos 7, 30, 100 e 365 dias funciona
-- [ ] Puzzles do daily são únicos por jogador
-- [ ] Daily iniciado antes da meia-noite conta para o dia em que começou
+- [ ] 3 daily challenges appear on HomeScreen with correct state
+- [ ] Difficulty of daily 1 = `currentDifficulty - 1` (min 1)
+- [ ] Difficulty of daily 2 = `currentDifficulty`
+- [ ] Difficulty of daily 3 = `currentDifficulty + 1` (max 5)
+- [ ] Daily 2 unlocks when daily 1 is completed (win or loss)
+- [ ] Daily 3 unlocks when daily 2 is completed (win or loss)
+- [ ] Tap on daily navigates directly to PlayingScreen (no DifficultyPicker)
+- [ ] Daily gives 2x XP compared to free play
+- [ ] Completing 3/3 dailies gives extra XP bonus
+- [ ] Streak increments when finishing the 1st daily of the day
+- [ ] Streak does NOT increment with free play
+- [ ] Streak resets if no daily played the previous day
+- [ ] Dailies reset at local midnight
+- [ ] `dailyChallengeIndex` and `dailyChallengeDate` saved in GameSession
+- [ ] Sharing shows streak + tier + XP (not puzzle number)
+- [ ] Streak bonus at 7, 30, 100 and 365 days works
+- [ ] Daily puzzles are unique per player
+- [ ] Daily started before midnight counts for the day it started

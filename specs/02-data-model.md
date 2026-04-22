@@ -1,114 +1,114 @@
-# Spec 02 — Modelo de Dados
+# Spec 02 — Data Model
 
-## Resumo
+## Summary
 
-Toda persistência local usa Room (SQLite). As entities representam puzzles, sessões de jogo, estatísticas do jogador, mensagens de chat e configuração do modelo. Um dataset estático pré-bundled serve como fallback para o modo Light.
+All local persistence uses Room (SQLite). The entities represent puzzles, game sessions, player statistics, chat messages, and model configuration. A pre-bundled static dataset serves as fallback for Light mode.
 
 ## Entities
 
 ### PuzzleEntity
 
-| Campo | Tipo | Descrição |
+| Field | Type | Description |
 |---|---|---|
 | `id` | `Long` (auto-generate) | PK |
-| `word` | `String` | Palavra do puzzle (sem acentos, minúscula) |
-| `wordDisplay` | `String` | Palavra com acentos para exibição pós-jogo |
-| `language` | `String` | Código ISO 639-1 (ex: "pt", "en", "es") |
-| `difficulty` | `Int` | 1 a 5 |
-| `category` | `String` | Categoria da palavra (ex: "animal", "fruta") |
-| `hints` | `String` | JSON array de 5 strings (dicas progressivas) |
-| `source` | `String` | Enum: `"AI"` ou `"STATIC"` |
-| `generatedAt` | `Long` | Timestamp de geração (epoch ms) |
-| `playedAt` | `Long?` | Timestamp de quando foi jogada (null se não jogada) |
-| `isPlayed` | `Boolean` | Se já foi usada em um jogo, não pode ser usada de novo |
-| `isValid` | `Boolean` | Se passou na validação |
+| `word` | `String` | Puzzle word (no accents, lowercase) |
+| `wordDisplay` | `String` | Word with accents for post-game display |
+| `language` | `String` | ISO 639-1 code (e.g., "pt", "en", "es") |
+| `difficulty` | `Int` | 1 to 5 |
+| `category` | `String` | Word category (e.g., "animal", "fruit") |
+| `hints` | `String` | JSON array of 5 strings (progressive hints) |
+| `source` | `String` | Enum: `"AI"` or `"STATIC"` |
+| `generatedAt` | `Long` | Generation timestamp (epoch ms) |
+| `playedAt` | `Long?` | Timestamp when played (null if not played) |
+| `isPlayed` | `Boolean` | If already used in a game, cannot be used again |
+| `isValid` | `Boolean` | If it passed validation |
 
-**Índices**: `(isPlayed, language)`, `(word)` (unique constraint)
+**Indexes**: `(isPlayed, language)`, `(word)` (unique constraint)
 
 ### PlayerStatsEntity
 
-| Campo | Tipo | Descrição |
+| Field | Type | Description |
 |---|---|---|
-| `id` | `Int` | PK (sempre 1 — singleton) |
-| `totalPlayed` | `Int` | Total de jogos completados |
-| `totalWon` | `Int` | Total de vitórias |
-| `currentStreak` | `Int` | Dias consecutivos jogando (independente de vitória/derrota) |
-| `maxStreak` | `Int` | Maior sequência de dias consecutivos |
-| `avgAttempts` | `Float` | Média de tentativas por jogo |
-| `preferredLanguage` | `String` | Idioma preferido (ISO 639-1) |
-| `currentDifficulty` | `Int` | Nível de dificuldade recomendado pelo sistema (1-5) |
-| `maxUnlockedDifficulty` | `Int` | Maior nível desbloqueado (nunca decresce, jogador pode selecionar até este +1) |
-| `totalXp` | `Int` | XP acumulado (nunca decresce) |
-| `playerTier` | `String` | Tier atual: `"NOVATO"`, `"CURIOSO"`, `"ASTUTO"`, `"SABIO"`, `"EPICO"`, `"LENDARIO"` |
+| `id` | `Int` | PK (always 1 — singleton) |
+| `totalPlayed` | `Int` | Total games completed |
+| `totalWon` | `Int` | Total wins |
+| `currentStreak` | `Int` | Consecutive days played (regardless of win/loss) |
+| `maxStreak` | `Int` | Longest streak of consecutive days |
+| `avgAttempts` | `Float` | Average attempts per game |
+| `preferredLanguage` | `String` | Preferred language (ISO 639-1) |
+| `currentDifficulty` | `Int` | System-recommended difficulty level (1-5) |
+| `maxUnlockedDifficulty` | `Int` | Highest unlocked level (never decreases, player can select up to this +1) |
+| `totalXp` | `Int` | Accumulated XP (never decreases) |
+| `playerTier` | `String` | Current tier: `"NOVATO"`, `"CURIOSO"`, `"ASTUTO"`, `"SABIO"`, `"EPICO"`, `"LENDARIO"` |
 | `gamesWonByDifficulty` | `String` | JSON: `{"1": 45, "2": 30, "3": 12, "4": 5, "5": 0}` |
 | `winRateByDifficulty` | `String` | JSON: `{"1": 0.85, "2": 0.72, "3": 0.60, "4": 0.50, "5": 0.0}` |
-| `consecutiveLossesAtCurrent` | `Int` | Derrotas seguidas no nível atual (reset ao ganhar ou mudar nível) |
-| `wordSizePreference` | `String` | `"DEFAULT"`, `"SHORT"`, `"LONG"`, `"EPIC"` (desbloqueado no tier Astuto+) |
+| `consecutiveLossesAtCurrent` | `Int` | Consecutive losses at current level (reset on win or level change) |
+| `wordSizePreference` | `String` | `"DEFAULT"`, `"SHORT"`, `"LONG"`, `"EPIC"` (unlocked at Astuto+ tier) |
 | `guessDistribution` | `String` | JSON: `{"1": 5, "2": 10, "3": 8, "4": 3, "5": 1, "6": 0}` |
-| `lastPlayedAt` | `Long` | Timestamp do último jogo (para streak de dias) |
+| `lastPlayedAt` | `Long` | Timestamp of last game (for day streak) |
 
-**Tiers por XP:**
+**Tiers by XP:**
 
-| Tier | XP mínimo | Descrição |
+| Tier | Minimum XP | Description |
 |---|---|---|
-| Novato | 0 | Início |
-| Curioso | 50 | ~50 jogos fáceis |
-| Astuto | 150 | ~3 meses jogando |
-| Sábio | 400 | ~1 ano consistente |
-| Épico | 1000 | ~2-3 anos, domina nível 4-5 |
-| Lendário | 2500 | Veterano dedicado |
+| Novato | 0 | Start |
+| Curioso | 50 | ~50 easy games |
+| Astuto | 150 | ~3 months playing |
+| Sábio | 400 | ~1 consistent year |
+| Épico | 1000 | ~2-3 years, masters levels 4-5 |
+| Lendário | 2500 | Dedicated veteran |
 
-**XP por jogo:**
+**XP per game:**
 
-| Ação | XP |
+| Action | XP |
 |---|---|
-| Vitória nível 1 | 1 |
-| Vitória nível 2 | 2 |
-| Vitória nível 3 | 3 |
-| Vitória nível 4 | 5 |
-| Vitória nível 5 | 8 |
-| Acertou na 1ª tentativa | +3 bônus |
-| Acertou na 2ª tentativa | +1 bônus |
-| Streak 7 dias | +5 bônus |
-| Streak 30 dias | +20 bônus |
-| Cada dica usada | -1 (mínimo final: 1 XP) |
+| Level 1 win | 1 |
+| Level 2 win | 2 |
+| Level 3 win | 3 |
+| Level 4 win | 5 |
+| Level 5 win | 8 |
+| Correct on 1st attempt | +3 bonus |
+| Correct on 2nd attempt | +1 bonus |
+| 7-day streak | +5 bonus |
+| 30-day streak | +20 bonus |
+| Each hint used | -1 (minimum final: 1 XP) |
 
 ### GameSessionEntity
 
-| Campo | Tipo | Descrição |
+| Field | Type | Description |
 |---|---|---|
 | `id` | `Long` (auto-generate) | PK |
 | `puzzleId` | `Long` | FK → PuzzleEntity |
-| `attempts` | `String` | JSON array de strings (cada tentativa) |
-| `startedAt` | `Long` | Timestamp de início |
-| `completedAt` | `Long?` | Timestamp de fim (null se em andamento) |
-| `hintsUsed` | `Int` | Quantidade de dicas reveladas (0-5) |
-| `won` | `Boolean` | Se o jogador acertou |
+| `attempts` | `String` | JSON array of strings (each attempt) |
+| `startedAt` | `Long` | Start timestamp |
+| `completedAt` | `Long?` | End timestamp (null if in progress) |
+| `hintsUsed` | `Int` | Number of hints revealed (0-5) |
+| `won` | `Boolean` | Whether the player won |
 
-**Índice**: `(puzzleId)` unique
+**Index**: `(puzzleId)` unique
 
 ### ChatMessageEntity
 
-| Campo | Tipo | Descrição |
+| Field | Type | Description |
 |---|---|---|
 | `id` | `Long` (auto-generate) | PK |
-| `puzzleId` | `Long` | FK → PuzzleEntity (agrupa mensagens por puzzle) |
-| `role` | `String` | `"user"` ou `"model"` |
-| `content` | `String` | Texto da mensagem |
-| `timestamp` | `Long` | Timestamp de criação |
+| `puzzleId` | `Long` | FK → PuzzleEntity (groups messages by puzzle) |
+| `role` | `String` | `"user"` or `"model"` |
+| `content` | `String` | Message text |
+| `timestamp` | `Long` | Creation timestamp |
 
-**Índice**: `(puzzleId, timestamp)`
+**Index**: `(puzzleId, timestamp)`
 
 ### ModelConfigEntity
 
-| Campo | Tipo | Descrição |
+| Field | Type | Description |
 |---|---|---|
-| `id` | `Int` | PK (sempre 1 — singleton) |
+| `id` | `Int` | PK (always 1 — singleton) |
 | `modelId` | `String` | Enum: `"gemma4_e2b"`, `"gemma3_1b"`, `"none"` |
 | `downloadState` | `String` | Enum: `"NOT_DOWNLOADED"`, `"DOWNLOADING"`, `"DOWNLOADED"`, `"FAILED"` |
-| `modelPath` | `String?` | Caminho do modelo no filesystem |
-| `sizeBytes` | `Long` | Tamanho do modelo em bytes |
-| `selectedAt` | `Long` | Timestamp de seleção |
+| `modelPath` | `String?` | Model path on filesystem |
+| `sizeBytes` | `Long` | Model size in bytes |
+| `selectedAt` | `Long` | Selection timestamp |
 
 ## DAOs
 
@@ -177,7 +177,7 @@ suspend fun get(): ModelConfigEntity?
 suspend fun upsert(config: ModelConfigEntity)
 ```
 
-## Interfaces de Repositório (em `core/model`)
+## Repository Interfaces (in `core/model`)
 
 ```kotlin
 interface PuzzleRepository {
@@ -192,7 +192,7 @@ interface StatsRepository {
     suspend fun getStats(): PlayerStats
     suspend fun updateAfterGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int)
     suspend fun calculateXpForGame(won: Boolean, attempts: Int, difficulty: Int, currentStreak: Int, hintsUsed: Int): Int
-    suspend fun checkAndPromoteDifficulty(): Int  // retorna novo nível
+    suspend fun checkAndPromoteDifficulty(): Int  // returns new level
     fun observeStats(): Flow<PlayerStats>
 }
 
@@ -223,10 +223,10 @@ interface ModelRepository {
 {"1": 5, "2": 12, "3": 18, "4": 8, "5": 3, "6": 1}
 ```
 
-## Dataset Estático (Light Mode)
+## Static Dataset (Light Mode)
 
-- Formato: arquivo JSON em `assets/static_puzzles.json`
-- Estrutura:
+- Format: JSON file at `assets/static_puzzles.json`
+- Structure:
 
 ```json
 {
@@ -245,15 +245,15 @@ interface ModelRepository {
 }
 ```
 
-- Mínimo 200 puzzles divididos entre PT (~100), EN (~60), ES (~40)
-- Campo `curiosity` usado no fallback do chat (Light mode mostra card estático)
+- Minimum 200 puzzles split between PT (~100), EN (~60), ES (~40)
+- `curiosity` field used in chat fallback (Light mode shows a static card)
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Todas as entities criam tabelas corretamente via Room
-- [ ] Migrations funcionam (teste com versão anterior do schema)
-- [ ] DAOs retornam dados corretos em testes com in-memory DB
-- [ ] Unique constraint em `PuzzleEntity.word` previne duplicatas
-- [ ] Dataset estático carrega corretamente do assets
-- [ ] JSON de hints, attempts e guessDistribution serializa/deserializa sem erro
-- [ ] `ModelConfigEntity` persiste estado de download entre restarts do app
+- [ ] All entities correctly create tables via Room
+- [ ] Migrations work (tested with previous schema version)
+- [ ] DAOs return correct data in tests with in-memory DB
+- [ ] Unique constraint on `PuzzleEntity.word` prevents duplicates
+- [ ] Static dataset loads correctly from assets
+- [ ] JSON for hints, attempts, and guessDistribution serializes/deserializes without error
+- [ ] `ModelConfigEntity` persists download state between app restarts

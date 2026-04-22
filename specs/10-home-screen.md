@@ -1,128 +1,128 @@
 # Spec 10 — HomeScreen
 
-## Resumo
+## Summary
 
-A HomeScreen é o hub central do Palabrita. Substitui o fluxo atual (DifficultyPicker como tela inicial) por um hub que mostra streak, desafios diários, modo livre, stats rápidos e indicador de geração de puzzles. Toda navegação parte daqui e retorna aqui.
+The HomeScreen is the central hub of Palabrita. It replaces the current flow (DifficultyPicker as the initial screen) with a hub that shows streak, daily challenges, free play, quick stats, and a puzzle generation indicator. All navigation starts here and returns here.
 
 ## Context & Motivation
 
-Hoje o app abre direto no DifficultyPicker — sem contexto, sem sensação de progresso, sem ritual. Jogos de sucesso (Wordle, Words of Wonders, Wordscapes) usam uma tela de hub que mostra o estado do jogador antes de iniciar. A HomeScreen resolve isso e cria o ritual diário: abrir → ver streak → jogar → explorar palavras → compartilhar.
+Today the app opens directly on the DifficultyPicker — no context, no sense of progress, no ritual. Successful games (Wordle, Words of Wonders, Wordscapes) use a hub screen that shows the player's state before starting. The HomeScreen solves this and creates the daily ritual: open → see streak → play → explore words → share.
 
-## Navegação
+## Navigation
 
 ```
 App Launch
-  ├── 1ª vez → Onboarding → HomeScreen
-  └── Já completou → HomeScreen
+  ├── 1st time → Onboarding → HomeScreen
+  └── Already completed → HomeScreen
 
 HomeScreen
-  ├── Daily Challenges → PlayingScreen (sem DifficultyPicker)
-  ├── Modo Livre → DifficultyPicker → PlayingScreen
+  ├── Daily Challenges → PlayingScreen (no DifficultyPicker)
+  ├── Free Play → DifficultyPicker → PlayingScreen
   ├── Bottom Nav: Stats → StatsScreen
-  └── Bottom Nav: Mais → SettingsScreen
+  └── Bottom Nav: More → SettingsScreen
 ```
 
-A HomeScreen é a `startDestination` após o onboarding. O `GameRoute` atual se torna `HomeRoute`. O `DifficultyPicker` se torna acessível apenas via Modo Livre.
+The HomeScreen is the `startDestination` after onboarding. The current `GameRoute` becomes `HomeRoute`. The `DifficultyPicker` becomes accessible only via Free Play.
 
 ## Layout
 
 ```
 ┌──────────────────────────────────┐
-│    P A L A B R I T A             │  ← TopBar: logo centralizado
+│    P A L A B R I T A             │  ← TopBar: centered logo
 ├──────────────────────────────────┤
 │                                  │
 │  ┌────────────────────────────┐  │
-│  │  🔥 7 dias de streak!     │  │  ← Streak Card
-│  │  ████████░░  Próximo: 🏆  │  │     Barra visual, próximo marco
+│  │  🔥 7-day streak!          │  │  ← Streak Card
+│  │  ████████░░  Next: 🏆      │  │     Visual bar, next milestone
 │  └────────────────────────────┘  │
 │                                  │
 │  ┌────────────────────────────┐  │
-│  │  ⭐ DESAFIOS DO DIA (1/3)  │  │  ← Daily Challenges Card
+│  │  ⭐ DAILY CHALLENGES (1/3) │  │  ← Daily Challenges Card
 │  │                            │  │
-│  │  ① ✅ Animais   3/6       │  │
-│  │  ② 🔓 Comida    ⭐⭐       │  │
-│  │  ③ 🔒 ???       ⭐⭐⭐     │  │
+│  │  ① ✅ Animals  3/6         │  │
+│  │  ② 🔓 Food     ⭐⭐         │  │
+│  │  ③ 🔒 ???      ⭐⭐⭐       │  │
 │  │                            │  │
-│  │       [ JOGAR #2 ]         │  │
+│  │       [ PLAY #2 ]          │  │
 │  └────────────────────────────┘  │
 │                                  │
 │  ┌────────────────────────────┐  │
-│  │  🎲 MODO LIVRE             │  │  ← Free Play Card
-│  │  Escolha dificuldade e     │  │
-│  │  jogue quantas vezes       │  │
-│  │  quiser                    │  │
-│  │       [ JOGAR ]            │  │
+│  │  🎲 FREE PLAY              │  │  ← Free Play Card
+│  │  Choose difficulty and     │  │
+│  │  play as many times        │  │
+│  │  as you want               │  │
+│  │       [ PLAY ]             │  │
 │  └────────────────────────────┘  │
 │                                  │
 │  ┌──────────┬──────────┐        │
-│  │ 42 jogos │ 87% wins │        │  ← Quick Stats
-│  │ 🏆 Astuto│ 350 XP   │        │
+│  │ 42 games │ 87% wins │        │  ← Quick Stats
+│  │ 🏆 Savvy │ 350 XP   │        │
 │  └──────────┴──────────┘        │
 │                                  │
-│  ┌────────────────────────────┐  │  ← Generation Indicator (se ativo)
-│  │  ⟳ Gerando novos puzzles… │  │
+│  ┌────────────────────────────┐  │  ← Generation Indicator (if active)
+│  │  ⟳ Generating new puzzles… │  │
 │  └────────────────────────────┘  │
 │                                  │
 ├──────────────────────────────────┤
-│  🏠 Home   📊 Stats   ⚙️ Mais  │  ← Bottom Navigation
+│  🏠 Home   📊 Stats   ⚙️ More  │  ← Bottom Navigation
 └──────────────────────────────────┘
 ```
 
-## Componentes
+## Components
 
 ### StreakCard
 
-- Mostra `currentStreak` de dias
-- Barra de progresso visual até o próximo marco (7, 30, 100 dias)
-- Se streak = 0: "Comece seu streak hoje!"
-- Se streak > 0: "🔥 {N} dias de streak!"
+- Shows `currentStreak` in days
+- Visual progress bar to the next milestone (7, 30, 100 days)
+- If streak = 0: "Start your streak today!"
+- If streak > 0: "🔥 {N}-day streak!"
 
 ### DailyChallengesCard
 
-- Mostra 3 desafios com progresso individual
-- Cada desafio tem: número (①②③), estado (✅/🔓/🔒), categoria (teaser), dificuldade (estrelas)
-- Desafio 1: sempre desbloqueado
-- Desafio 2: desbloqueado ao completar o 1
-- Desafio 3: desbloqueado ao completar o 2
-- CTA: "JOGAR #N" aponta para o próximo desafio não completado
-- Ao completar os 3: "✓ 3/3 completos! +bônus XP"
-- Se o jogador usou chat IA após um desafio: "✅ Completado · 💬 Explorado"
-- Se NÃO usou chat: "✅ Completado · 💬 Explorar?" (link para o chat)
-- Reset diário: à meia-noite local, os 3 desafios resetam
+- Shows 3 challenges with individual progress
+- Each challenge has: number (①②③), state (✅/🔓/🔒), category (teaser), difficulty (stars)
+- Challenge 1: always unlocked
+- Challenge 2: unlocked when 1 is completed
+- Challenge 3: unlocked when 2 is completed
+- CTA: "PLAY #N" points to the next uncompleted challenge
+- When all 3 are completed: "✓ 3/3 complete! +bonus XP"
+- If the player used AI chat after a challenge: "✅ Completed · 💬 Explored"
+- If NOT used chat: "✅ Completed · 💬 Explore?" (link to chat)
+- Daily reset: at local midnight, the 3 challenges reset
 
 ### FreePlayCard
 
-- Card simples com "MODO LIVRE" + descrição + CTA "JOGAR"
-- Tap → navega para DifficultyPicker (o fluxo existente)
+- Simple card with "FREE PLAY" + description + CTA "PLAY"
+- Tap → navigates to DifficultyPicker (existing flow)
 
 ### QuickStatsRow
 
-- 2×2 grid compacto: total de jogos, win rate, tier, XP
-- Tap em qualquer stat → navega para StatsScreen
+- 2×2 compact grid: total games, win rate, tier, XP
+- Tap on any stat → navigates to StatsScreen
 
 ### GenerationIndicator
 
-- Visível **somente** quando WorkManager está gerando puzzles em background
-- Texto: "⟳ Gerando novos puzzles…"
-- Ao finalizar: transição para "✓ Novos puzzles prontos!" (auto-dismiss após 3s)
-- Em modo Light: nunca aparece
-- **Fonte de estado**: `WorkManager.getWorkInfoByIdLiveData()` ou Flow do `PuzzleGenerationScheduler`
+- Visible **only** when WorkManager is generating puzzles in the background
+- Text: "⟳ Generating new puzzles…"
+- When done: transitions to "✓ New puzzles ready!" (auto-dismiss after 3s)
+- In Light mode: never appears
+- **State source**: `WorkManager.getWorkInfoByIdLiveData()` or Flow from `PuzzleGenerationScheduler`
 
-### ChatNudge (condicional)
+### ChatNudge (conditional)
 
-- Aparece se o jogador completou um desafio mas NÃO usou o chat IA
-- Texto: "Quer saber mais sobre 'GATOS'? [Explorar agora]"
-- Tap → navega para ChatRoute(puzzleId)
-- Dismiss: "✕" no canto
-- Só aparece em modo AI
+- Appears if the player completed a challenge but did NOT use AI chat
+- Text: "Want to learn more about 'CATS'? [Explore now]"
+- Tap → navigates to ChatRoute(puzzleId)
+- Dismiss: "✕" in the corner
+- Only appears in AI mode
 
 ### BottomNavigation
 
-- 3 tabs: Home (🏠), Stats (📊), Mais (⚙️)
-- Home = HomeScreen (este)
-- Stats = StatsScreen (existente)
-- Mais = SettingsScreen (existente, inclui perfil e about)
-- Indicador visual no tab ativo
+- 3 tabs: Home (🏠), Stats (📊), More (⚙️)
+- Home = HomeScreen (this)
+- Stats = StatsScreen (existing)
+- More = SettingsScreen (existing, includes profile and about)
+- Visual indicator on the active tab
 
 ## ViewModel
 
@@ -141,16 +141,16 @@ data class HomeState(
     val totalXp: Int,
     val isGeneratingPuzzles: Boolean,
     val generationComplete: Boolean,
-    val chatNudge: ChatNudge?,             // null se não aplicável
+    val chatNudge: ChatNudge?,             // null if not applicable
 )
 
 data class DailyChallenge(
     val index: Int,                        // 0, 1, 2
     val state: DailyChallengeState,        // LOCKED, AVAILABLE, COMPLETED
     val difficulty: Int,                   // 1-5
-    val categoryHint: String?,             // "Animais" (teaser, null se locked)
-    val result: DailyChallengeResult?,     // tentativas, chat usado (null se não completado)
-    val puzzleId: Long?,                   // para navegar ao chat
+    val categoryHint: String?,             // "Animals" (teaser, null if locked)
+    val result: DailyChallengeResult?,     // attempts, chat used (null if not completed)
+    val puzzleId: Long?,                   // for navigating to chat
 )
 
 enum class DailyChallengeState { LOCKED, AVAILABLE, COMPLETED }
@@ -181,12 +181,12 @@ sealed class HomeAction {
 
 ## Data — Daily Challenges Tracking
 
-### Novo campo em GameSessionEntity
+### New field in GameSessionEntity
 
 ```kotlin
-// Adicionar ao GameSessionEntity existente:
-val dailyChallengeIndex: Int?   // 0, 1, 2 para dailies; null para free play
-val dailyChallengeDate: String? // "2026-04-21" (date ISO para saber de qual dia é)
+// Add to existing GameSessionEntity:
+val dailyChallengeIndex: Int?   // 0, 1, 2 for dailies; null for free play
+val dailyChallengeDate: String? // "2026-04-21" (ISO date to identify which day it belongs to)
 ```
 
 ### DailyChallengeDao (queries)
@@ -208,48 +208,48 @@ suspend fun countCompletedDailies(date: String): Int
 
 ## Edge Cases
 
-| Cenário | Comportamento |
+| Scenario | Behavior |
 |---|---|
-| Primeiro acesso (sem stats) | Streak = 0, "Comece seu streak!", dailies disponíveis |
-| Todos os dailies feitos | Card mostra "3/3 completos! +bônus", CTA desaparece |
-| Sem puzzles no banco (daily) | Gerar inline via PuzzleGenerator; se Light: fallback estático |
-| Meia-noite durante uso do app | Dailies resetam no próximo acesso ao Home (não mid-screen) |
-| App aberto às 23:59, fecha às 00:01 | Ao voltar para Home, dailies do novo dia |
-| Modo Light sem IA | Chat nudge nunca aparece; card de curiosidade estática no result |
-| Geração background falha | Indicador some; puzzles estáticos servem como fallback |
-| Jogador volta do PlayingScreen (back) | Home atualiza estado dos dailies |
+| First access (no stats) | Streak = 0, "Start your streak!", dailies available |
+| All dailies done | Card shows "3/3 complete! +bonus", CTA disappears |
+| No puzzles in database (daily) | Generate inline via PuzzleGenerator; if Light: static fallback |
+| Midnight while using the app | Dailies reset on next Home access (not mid-screen) |
+| App opened at 23:59, closes at 00:01 | On returning to Home, new day's dailies |
+| Light mode with no AI | Chat nudge never appears; static curiosity card in result |
+| Background generation fails | Indicator disappears; static puzzles serve as fallback |
+| Player returns from PlayingScreen (back) | Home updates dailies state |
 
-## Decisões
+## Decisions
 
-| Decisão | Escolha | Razão |
+| Decision | Choice | Reason |
 |---------|---------|-------|
-| DifficultyPicker no daily | Removido | Dificuldade é automática (progressiva) |
-| Bottom nav vs hamburger | Bottom nav (3 tabs) | Padrão Android, mais acessível |
-| Streak trigger | 1º jogo diário finalizado | Mínimo esforço para manter streak |
-| Geração feedback | Indicador no Home | Transparência sem interromper |
+| DifficultyPicker in daily | Removed | Difficulty is automatic (progressive) |
+| Bottom nav vs hamburger | Bottom nav (3 tabs) | Android standard, more accessible |
+| Streak trigger | 1st daily game completed | Minimum effort to maintain streak |
+| Generation feedback | Indicator on Home | Transparency without interrupting |
 
 ## Out of Scope
 
-- Leaderboard / amigos (futuro)
-- Perfil com avatar customizável (futuro)
-- Eventos temporários / sazonais (futuro)
-- Notificações push para streak em risco (futuro)
+- Leaderboard / friends (future)
+- Profile with customizable avatar (future)
+- Temporary / seasonal events (future)
+- Push notifications for streak at risk (future)
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] HomeScreen é a tela inicial após o onboarding
-- [ ] Streak card mostra `currentStreak` e barra de progresso
-- [ ] Daily Challenges card mostra 3 desafios com estado correto (locked/available/completed)
-- [ ] Desafio 2 só desbloqueia após completar desafio 1
-- [ ] Desafio 3 só desbloqueia após completar desafio 2
-- [ ] Tap em "JOGAR #N" navega para PlayingScreen com o puzzle do daily (sem DifficultyPicker)
-- [ ] Após completar os 3 dailies, card mostra bônus
-- [ ] Card do daily mostra "💬 Explorar?" se jogador não usou chat (modo AI)
-- [ ] Free Play card navega para DifficultyPicker
-- [ ] Quick stats mostra total de jogos, win rate, tier e XP
-- [ ] Indicador de geração aparece quando WorkManager está gerando e some ao finalizar
-- [ ] Chat nudge aparece se último daily completado sem chat (modo AI)
-- [ ] Bottom Navigation com 3 tabs funciona corretamente
-- [ ] Dailies resetam à meia-noite local
-- [ ] HomeScreen atualiza ao voltar de um jogo
-- [ ] Modo Light não mostra chat nudge nem indicador de geração
+- [ ] HomeScreen is the initial screen after onboarding
+- [ ] Streak card shows `currentStreak` and progress bar
+- [ ] Daily Challenges card shows 3 challenges with correct state (locked/available/completed)
+- [ ] Challenge 2 only unlocks after completing challenge 1
+- [ ] Challenge 3 only unlocks after completing challenge 2
+- [ ] Tap on "PLAY #N" navigates to PlayingScreen with the daily puzzle (no DifficultyPicker)
+- [ ] After completing all 3 dailies, card shows bonus
+- [ ] Daily card shows "💬 Explore?" if player did not use chat (AI mode)
+- [ ] Free Play card navigates to DifficultyPicker
+- [ ] Quick stats shows total games, win rate, tier and XP
+- [ ] Generation indicator appears when WorkManager is generating and disappears when done
+- [ ] Chat nudge appears if last daily completed without chat (AI mode)
+- [ ] Bottom Navigation with 3 tabs works correctly
+- [ ] Dailies reset at local midnight
+- [ ] HomeScreen updates when returning from a game
+- [ ] Light mode does not show chat nudge or generation indicator

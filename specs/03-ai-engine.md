@@ -1,21 +1,21 @@
 # Spec 03 — AI Engine
 
-## Resumo
+## Summary
 
-O módulo `core/ai` encapsula toda interação com o LLM local via LiteRT-LM. Ele é responsável por: gerenciar o lifecycle do Engine, gerar puzzles em batch, conduzir conversas pós-acerto, parsear respostas JSON e validar puzzles.
+The `core/ai` module encapsulates all interaction with the local LLM via LiteRT-LM. It is responsible for: managing the Engine lifecycle, generating puzzles in batch, conducting post-guess conversations, parsing JSON responses, and validating puzzles.
 
-## Componentes
+## Components
 
 ### LlmEngineManager
 
-Singleton (Hilt `@Singleton`) que gerencia o lifecycle do LiteRT-LM Engine.
+Singleton (Hilt `@Singleton`) that manages the LiteRT-LM Engine lifecycle.
 
-**Responsabilidades:**
-- Inicializar Engine com `EngineConfig` (modelPath, backend, cacheDir)
-- Selecionar backend: GPU preferido, fallback para CPU
-- Manter referência ao Engine ativo
-- Destruir Engine quando não mais necessário (ex: troca de modelo)
-- Expor estado via state machine formal
+**Responsibilities:**
+- Initialize Engine with `EngineConfig` (modelPath, backend, cacheDir)
+- Select backend: GPU preferred, fallback to CPU
+- Maintain reference to the active Engine
+- Destroy Engine when no longer needed (e.g., model switch)
+- Expose state via formal state machine
 
 **State Machine — Engine Lifecycle:**
 
@@ -45,7 +45,7 @@ Singleton (Hilt `@Singleton`) que gerencia o lifecycle do LiteRT-LM Engine.
 ```
 
 ```kotlin
-// Definição da state machine do Engine
+// Engine state machine definition
 val engineStateMachine = StateMachine<EngineState, EngineEvent>(
     initialState = EngineState.Uninitialized,
     transitions = mapOf(
@@ -87,16 +87,16 @@ interface LlmEngineManager {
 }
 ```
 
-**Regras:**
-- `initialize()` DEVE rodar em Dispatchers.IO (pode levar ~10s)
-- Transições inválidas (ex: `Initialize` quando já `Ready`) são ignoradas pela state machine
-- Se o modelo não existir no path, transição `Failure` com mensagem clara
-- Ao trocar de modelo: `Destroy` → `Initialize` com novo path
-- `AutoCloseable`: Engine e Conversation devem ser fechados adequadamente
+**Rules:**
+- `initialize()` MUST run on Dispatchers.IO (may take ~10s)
+- Invalid transitions (e.g., `Initialize` when already `Ready`) are ignored by the state machine
+- If the model does not exist at the path, `Failure` transition with a clear message
+- When switching models: `Destroy` → `Initialize` with new path
+- `AutoCloseable`: Engine and Conversation must be properly closed
 
 ### PuzzleGenerator
 
-Gera puzzles em batch usando o LLM.
+Generates puzzles in batch using the LLM.
 
 **Interface:**
 
@@ -112,33 +112,33 @@ interface PuzzleGenerator {
 }
 ```
 
-**Estratégia de exclusão de palavras:**
-- `recentWords`: últimas ~50 palavras jogadas, injetadas no prompt como hint de variedade para o LLM
-- `allExistingWords`: todas as palavras já geradas (pode chegar a milhares ao longo dos anos), usadas apenas pelo `PuzzleValidator` para checagem determinística
-- **Por que não mandar tudo no prompt?** Com ~3650 palavras (10 anos de uso), a exclusion list consumiria milhares de tokens do context window, degradando a qualidade e velocidade da inferência — especialmente no Gemma 3 1B. O LLM não é confiável para evitar listas grandes de qualquer forma.
+**Word exclusion strategy:**
+- `recentWords`: last ~50 played words, injected into the prompt as a variety hint for the LLM
+- `allExistingWords`: all previously generated words (can reach thousands over the years), used only by `PuzzleValidator` for deterministic checking
+- **Why not send everything in the prompt?** With ~3650 words (10 years of use), the exclusion list would consume thousands of context window tokens, degrading inference quality and speed — especially on Gemma 3 1B. The LLM is not reliable at avoiding large lists anyway.
 
-**Fluxo de geração (por puzzle):**
+**Generation flow (per puzzle):**
 
-1. Montar prompt baseado no modelo ativo (incluindo `recentWords` na exclusion list):
+1. Build prompt based on the active model (including `recentWords` in the exclusion list):
    - **Gemma 4 E2B**: system role + function calling + thinking mode
-   - **Gemma 3 1B**: prompt-only com instrução de JSON
-2. Criar Conversation (nova para cada puzzle para evitar contaminação)
-3. Enviar prompt via `conversation.sendMessage()`
-4. Parsear resposta via `LlmResponseParser`
-5. Validar via `PuzzleValidator` (checando contra `allExistingWords`)
-6. Se inválido: retry até 3x com prompts ligeiramente variados
-7. Se ainda inválido: pular (não adicionar ao batch)
-8. Palavras aceitas no batch são adicionadas a `allExistingWords` para evitar duplicatas intra-batch
-9. Fechar Conversation
+   - **Gemma 3 1B**: prompt-only with JSON instruction
+2. Create Conversation (new for each puzzle to avoid contamination)
+3. Send prompt via `conversation.sendMessage()`
+4. Parse response via `LlmResponseParser`
+5. Validate via `PuzzleValidator` (checking against `allExistingWords`)
+6. If invalid: retry up to 3x with slightly varied prompts
+7. If still invalid: skip (do not add to batch)
+8. Words accepted in the batch are added to `allExistingWords` to avoid intra-batch duplicates
+9. Close Conversation
 
 **Retry strategy:**
-- Tentativa 1: prompt padrão
-- Tentativa 2: adicionar instrução "A resposta anterior foi inválida. Tente novamente."
-- Tentativa 3: simplificar prompt (remover `recentWords`, relaxar constraints)
+- Attempt 1: standard prompt
+- Attempt 2: add instruction "The previous response was invalid. Try again."
+- Attempt 3: simplify prompt (remove `recentWords`, relax constraints)
 
 ### ChatEngine
 
-Gerencia conversas pós-acerto.
+Manages post-guess conversations.
 
 **Interface:**
 
@@ -154,21 +154,21 @@ interface ChatSession : AutoCloseable {
 }
 ```
 
-**Regras:**
-- System prompt contextualizado com a palavra e categoria
-- Gemma 4: usa `system` role nativo no `ConversationConfig.systemInstruction`
-- Gemma 3: prepend no primeiro user message
+**Rules:**
+- System prompt contextualized with the word and category
+- Gemma 4: uses native `system` role in `ConversationConfig.systemInstruction`
+- Gemma 3: prepend to the first user message
 - Streaming via `conversation.sendMessageAsync(message).collect {}`
-- Limite: 10 mensagens do usuário por sessão
-- Não disponível em Light mode (caller deve checar antes)
+- Limit: 10 user messages per session
+- Not available in Light mode (caller must check beforehand)
 
 ### PromptTemplates
 
-Constantes de prompt organizadas por modelo e use case.
+Prompt constants organized by model and use case.
 
-**Regra de idioma dos prompts:**
-- Instruções ao modelo: sempre em **inglês** (melhor instruction following em Gemma 3/4)
-- Conteúdo gerado (word, hints, category, chat): no idioma do usuário, controlado pelo parâmetro `language`
+**Prompt language rule:**
+- Instructions to the model: always in **English** (better instruction following in Gemma 3/4)
+- Generated content (word, hints, category, chat): in the user's language, controlled by the `language` parameter
 
 ```kotlin
 object PromptTemplates {
@@ -245,7 +245,7 @@ object PromptTemplates {
 
 ### LlmResponseParser
 
-Extrai JSON estruturado da resposta do LLM.
+Extracts structured JSON from the LLM response.
 
 **Interface:**
 
@@ -267,28 +267,28 @@ sealed class ParseResult<T> {
 }
 ```
 
-**Estratégia de parsing:**
-1. Tentar `kotlinx.serialization.json.Json.decodeFromString<PuzzleResponse>()`
-2. Se falhar: tentar extrair JSON via regex (`\{.*\}` com dotAll)
-3. Se extraiu: tentar decode novamente no substring
-4. Se tudo falhar: retornar `ParseResult.Error` com o motivo
+**Parsing strategy:**
+1. Try `kotlinx.serialization.json.Json.decodeFromString<PuzzleResponse>()`
+2. If it fails: try to extract JSON via regex (`\{.*\}` with dotAll)
+3. If extracted: try to decode again from the substring
+4. If everything fails: return `ParseResult.Error` with the reason
 
 ### PuzzleValidator
 
-Validação determinística (sem LLM).
+Deterministic validation (without LLM).
 
-**Regras de validação:**
+**Validation rules:**
 
-| Regra | Critério | Ação se falhar |
+| Rule | Criterion | Action if failed |
 |---|---|---|
-| Tamanho da palavra | Dentro do range para a dificuldade (ver `difficultyToWordLength`) | Rejeitar |
-| Caracteres válidos | Apenas `[a-z]` (sem acentos, sem espaços, sem hífens) | Rejeitar |
-| Minúscula | Toda a palavra em minúscula | Normalizar (toLowerCase) |
-| Não duplicada | Palavra não existe no banco | Rejeitar |
-| Hints count | Exatamente 5 hints | Rejeitar |
-| Hints não revelam | Nenhuma hint contém a palavra | Rejeitar |
-| Difficulty range | 1-5 | Clampar |
-| Category não vazia | category.isNotBlank() | Rejeitar |
+| Word length | Within the range for the difficulty (see `difficultyToWordLength`) | Reject |
+| Valid characters | Only `[a-z]` (no accents, no spaces, no hyphens) | Reject |
+| Lowercase | Entire word in lowercase | Normalize (toLowerCase) |
+| Not duplicated | Word does not exist in the database | Reject |
+| Hints count | Exactly 5 hints | Reject |
+| Hints do not reveal | No hint contains the word | Reject |
+| Difficulty range | 1-5 | Clamp |
+| Category not empty | category.isNotBlank() | Reject |
 
 **Interface:**
 
@@ -307,19 +307,19 @@ sealed class ValidationResult {
 }
 ```
 
-## SamplerConfig por Modelo
+## SamplerConfig by Model
 
-| Parâmetro | Gemma 4 E2B | Gemma 3 1B | Chat (ambos) |
+| Parameter | Gemma 4 E2B | Gemma 3 1B | Chat (both) |
 |---|---|---|---|
 | temperature | 1.0 | 0.7 | 0.9 |
 | topK | 64 | 40 | 40 |
 | topP | 0.95 | 0.95 | 0.95 |
 
-Gemma 4 usa temperature=1.0 conforme recomendação oficial do model card.
+Gemma 4 uses temperature=1.0 as per the official model card recommendation.
 
-## Function Calling (Gemma 4 apenas)
+## Function Calling (Gemma 4 only)
 
-Para Gemma 4, usar function calling nativo para forçar schema JSON:
+For Gemma 4, use native function calling to enforce the JSON schema:
 
 ```kotlin
 @Tool("Gera um puzzle de palavra para o jogo")
@@ -337,18 +337,18 @@ fun generatePuzzle(
 }
 ```
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] `LlmEngineManager` inicializa com Gemma 4 E2B em dispositivo com ≥8GB RAM
-- [ ] `LlmEngineManager` inicializa com Gemma 3 1B em dispositivo com 4-8GB RAM
-- [ ] `PuzzleGenerator` gera batch de 7 puzzles válidos em <60s (Gemma 4) ou <30s (Gemma 3)
-- [ ] `LlmResponseParser` parseia JSON válido corretamente
-- [ ] `LlmResponseParser` extrai JSON de respostas com texto extra via regex fallback
-- [ ] `PuzzleValidator` rejeita palavras fora do range 5-8 caracteres
-- [ ] `PuzzleValidator` rejeita palavras com acentos ou caracteres especiais
-- [ ] `PuzzleValidator` rejeita puzzles com hints que contêm a palavra
-- [ ] `PuzzleValidator` rejeita palavras duplicadas
-- [ ] `ChatEngine` faz streaming de tokens durante resposta
-- [ ] `ChatEngine` respeita limite de 10 mensagens por sessão
-- [ ] Retry gera puzzle válido após falha na primeira tentativa (testado com mock)
-- [ ] Engine é destruído e recriado corretamente ao trocar de modelo
+- [ ] `LlmEngineManager` initializes with Gemma 4 E2B on a device with ≥8GB RAM
+- [ ] `LlmEngineManager` initializes with Gemma 3 1B on a device with 4-8GB RAM
+- [ ] `PuzzleGenerator` generates a batch of 7 valid puzzles in <60s (Gemma 4) or <30s (Gemma 3)
+- [ ] `LlmResponseParser` parses valid JSON correctly
+- [ ] `LlmResponseParser` extracts JSON from responses with extra text via regex fallback
+- [ ] `PuzzleValidator` rejects words outside the 5-8 character range
+- [ ] `PuzzleValidator` rejects words with accents or special characters
+- [ ] `PuzzleValidator` rejects puzzles with hints that contain the word
+- [ ] `PuzzleValidator` rejects duplicate words
+- [ ] `ChatEngine` streams tokens during response
+- [ ] `ChatEngine` respects the 10-message limit per session
+- [ ] Retry generates a valid puzzle after failure on the first attempt (tested with mock)
+- [ ] Engine is destroyed and recreated correctly when switching models

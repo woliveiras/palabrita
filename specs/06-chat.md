@@ -1,80 +1,80 @@
-# Spec 06 — Chat Pós-Acerto
+# Spec 06 — Post-Guess Chat
 
-## Resumo
+## Summary
 
-Após o jogador descobrir (ou não) a palavra, ele pode explorar a palavra via chat com o LLM local. O chat é educacional: etimologia, curiosidades, uso em frases, sinônimos, traduções. Funciona apenas em modo AI. No modo Light, um card estático substitui o chat.
+After the player discovers (or fails to discover) the word, they can explore the word via chat with the local LLM. The chat is educational: etymology, fun facts, usage in sentences, synonyms, translations. It works only in AI mode. In Light mode, a static card replaces the chat.
 
-## Fluxo
+## Flow
 
 ```
-Tela de resultado (vitória ou derrota)
+Result screen (win or loss)
     │
-    ├── Modo AI ──→ Botão "Explorar a palavra" ──→ Chat screen
+    ├── AI Mode ──→ "Explore the word" button ──→ Chat screen
     │
-    └── Modo Light ──→ Card estático de curiosidade (inline na tela de resultado)
+    └── Light Mode ──→ Static curiosity card (inline on result screen)
 ```
 
-## Chat Screen (Modo AI)
+## Chat Screen (AI Mode)
 
 ### Layout
 
 ```
 ┌──────────────────────────────┐
-│ ← Voltar    Explorar: GATOS  │
+│ ← Back      Explore: GATOS  │
 ├──────────────────────────────┤
 │                              │
 │  🤖 "Gatos" é uma palavra    │
 │  fascinante! Vem do latim    │
 │  tardio "cattus"...          │
 │                              │
-│  👤 De onde vem essa palavra? │
+│  👤 Where does this word come from? │
 │                              │
-│  🤖 A palavra "gatos" tem    │
-│  origem no latim tardio...   │
+│  🤖 The word "gatos" has     │
+│  its origin in late Latin... │
 │  ████████▎ (typing)          │
 │                              │
-│  ─── 2 de 10 mensagens ───  │
+│  ─── 2 of 10 messages ───   │
 │                              │
 ├──────────────────────────────┤
-│  [    Digite sua pergunta  ] │
-│  [         Enviar ➤        ] │
+│  [    Type your question   ] │
+│  [         Send ➤          ] │
 └──────────────────────────────┘
 ```
 
-### Comportamento
+### Behavior
 
-**Mensagem inicial automática:**
-- Ao abrir o chat, o LLM envia automaticamente uma primeira mensagem sobre a palavra
-- Prompt interno (não visível ao usuário): "Conte uma curiosidade interessante sobre a palavra '{word}'"
-- Streaming: tokens aparecem um a um com typing indicator
+**Automatic initial message:**
+- When opening the chat, the LLM automatically sends a first message about the word
+- Internal prompt (not visible to the user): "Tell an interesting fact about the word '{word}'"
+- Streaming: tokens appear one by one with a typing indicator
 
-**Mensagens do usuário:**
-- Input de texto livre
-- Botão enviar (ou Enter no teclado)
-- Input desabilitado durante resposta do modelo (streaming)
-- Input desabilitado ao atingir limite
+**User messages:**
+- Free text input
+- Send button (or Enter on keyboard)
+- Input disabled while model responds (streaming)
+- Input disabled when limit is reached
 
-**Streaming de resposta:**
-- Tokens aparecem progressivamente (via `Flow<String>`)
-- Typing indicator (3 dots animados) antes do primeiro token
-- Scroll automático para baixo conforme tokens chegam
+**Response streaming:**
+- Tokens appear progressively (via `Flow<String>`)
+- Typing indicator (3 animated dots) before the first token
+- Automatic scroll to bottom as tokens arrive
 
-**Limite de mensagens:**
-- Máximo 10 mensagens do USUÁRIO por sessão (respostas do modelo não contam)
-- Indicador visual: "X de 10 mensagens"
-- Ao atingir limite:
-  - Input desabilitado
-  - Mensagem: "Você atingiu o limite de perguntas para esta palavra. Jogue novamente amanhã para explorar outra!"
-  - Botão "Voltar ao jogo"
+**Message limit:**
+- Maximum 10 USER messages per session (model responses do not count)
+- Visual indicator: "X of 10 messages"
+- When limit is reached:
+  - Input disabled
+  - Message: "You have reached the question limit for this word. Play again tomorrow to explore another!"
+  - Button "Back to game"
 
-**Persistência:**
-- Todas as mensagens salvas em `ChatMessageEntity`
-- Se o usuário voltar para a tela de resultado e reabrir o chat: conversa anterior restaurada
-- Histórico só existe para o puzzle atual (não carrega conversas de puzzles anteriores)
+**Persistence:**
+- All messages saved in `ChatMessageEntity`
+- If the user returns to the result screen and reopens the chat: previous conversation is restored
+- History only exists for the current puzzle (does not load conversations from previous puzzles)
 
 ### System Prompt
 
-**Gemma 4 (system role nativo):**
+**Gemma 4 (native system role):**
 
 ```
 System: You are an educational assistant for the word game Palabrita.
@@ -94,7 +94,7 @@ You must NOT:
 - Give overly long responses
 ```
 
-**Gemma 3 (prepend ao primeiro user message):**
+**Gemma 3 (prepend to first user message):**
 
 ```
 [Context: You are an educational assistant. The player discovered the word "{word}" (category: {category}). Answer about: origin, etymology, fun facts, usage in sentences, synonyms, translations. Keep responses short (3 paragraphs max). Always respond in {language}.]
@@ -102,27 +102,27 @@ You must NOT:
 {user_message}
 ```
 
-### Sugestões de Perguntas
+### Suggested Questions
 
-Abaixo do input, mostrar chips sugeridos (desaparecem após primeira mensagem manual):
+Below the input, show suggested chips (disappear after the first manual message):
 
-- "De onde vem essa palavra?"
-- "Me dá sinônimos"
-- "Como usar em uma frase?"
-- "Como se diz em inglês?"
-- "Alguma curiosidade?"
+- "Where does this word come from?"
+- "Give me synonyms"
+- "How to use it in a sentence?"
+- "How do you say it in English?"
+- "Any fun facts?"
 
-Ao clicar em um chip: preenche o input e envia automaticamente.
+Clicking a chip: fills the input and sends automatically.
 
-## Card Estático (Modo Light)
+## Static Card (Light Mode)
 
-Quando o usuário está em modo Light, o chat não está disponível. Em vez disso, a tela de resultado mostra um card inline:
+When the user is in Light mode, chat is not available. Instead, the result screen shows an inline card:
 
 ```
 ┌──────────────────────────────┐
-│ 💡 Curiosidade               │
+│ 💡 Fun Fact                  │
 │                              │
-│ Categoria: Animal            │
+│ Category: Animal             │
 │                              │
 │ A palavra "gatos" vem do     │
 │ latim tardio "cattus".       │
@@ -130,14 +130,14 @@ Quando o usuário está em modo Light, o chat não está disponível. Em vez dis
 │ brasileiros como animal de   │
 │ estimação.                   │
 │                              │
-│ [Ative a IA para explorar    │
-│  mais sobre as palavras →]   │
+│ [Activate AI to explore      │
+│  more about words →]         │
 └──────────────────────────────┘
 ```
 
-- Conteúdo vem do campo `curiosity` do dataset estático
-- Se `curiosity` estiver vazio: mostrar apenas categoria
-- Link "Ative a IA" → navega para Settings (troca de modelo)
+- Content comes from the `curiosity` field of the static dataset
+- If `curiosity` is empty: show only category
+- "Activate AI" link → navigates to Settings (model switching)
 
 ## ChatViewModel
 
@@ -161,7 +161,7 @@ data class ChatState(
 data class ChatMessage(
     val role: MessageRole,
     val content: String,
-    val isStreaming: Boolean = false  // true enquanto tokens estão chegando
+    val isStreaming: Boolean = false  // true while tokens are arriving
 )
 
 enum class MessageRole { USER, MODEL }
@@ -180,27 +180,27 @@ sealed class ChatAction {
 
 ## Edge Cases
 
-| Cenário | Comportamento |
+| Scenario | Behavior |
 |---|---|
-| LLM demora muito (>30s) para responder | Mostrar timeout message + botão retry |
-| LLM gera resposta ofensiva | V1: não filtramos (modelos Gemma já têm safety filters). V2: pós-filtro |
-| LLM gera resposta em idioma errado | V1: aceitar (prompt instrui idioma, mas não é garantido) |
-| App fechado durante streaming | Salvar tokens recebidos até o momento como mensagem parcial |
-| Usuário envia mensagem vazia | Ignorar (botão desabilitado se input vazio) |
-| Engine não inicializado | Mostrar loading + inicializar engine, depois continuar |
-| Conversa muito longa (muitos tokens) | Limite de 10 mensagens controla isso; contexto do Gemma 4 é 128K |
+| LLM takes too long (>30s) to respond | Show timeout message + retry button |
+| LLM generates offensive response | V1: we do not filter (Gemma models already have safety filters). V2: post-filter |
+| LLM generates response in wrong language | V1: accept (prompt instructs language, but it is not guaranteed) |
+| App closed during streaming | Save tokens received so far as partial message |
+| User sends empty message | Ignore (button disabled if input is empty) |
+| Engine not initialized | Show loading + initialize engine, then continue |
+| Very long conversation (many tokens) | 10-message limit controls this; Gemma 4 context is 128K |
 
-## Critérios de Aceite
+## Acceptance Criteria
 
-- [ ] Chat abre com mensagem inicial automática do modelo
-- [ ] Streaming de tokens funciona (tokens aparecem progressivamente)
-- [ ] Typing indicator aparece antes do primeiro token
-- [ ] Scroll automático segue a resposta
-- [ ] Limite de 10 mensagens é respeitado
-- [ ] Input desabilitado durante resposta do modelo
-- [ ] Input desabilitado ao atingir limite
-- [ ] Sugestões de perguntas aparecem e funcionam
-- [ ] Mensagens persistem se usuário sair e voltar ao chat
-- [ ] Modo Light mostra card estático em vez de chat
-- [ ] Link "Ative a IA" no card estático navega para Settings
-- [ ] System prompt inclui palavra e categoria corretas
+- [ ] Chat opens with automatic initial message from the model
+- [ ] Token streaming works (tokens appear progressively)
+- [ ] Typing indicator appears before the first token
+- [ ] Automatic scroll follows the response
+- [ ] 10-message limit is respected
+- [ ] Input disabled while model is responding
+- [ ] Input disabled when limit is reached
+- [ ] Suggested questions appear and work
+- [ ] Messages persist if user exits and returns to chat
+- [ ] Light mode shows static card instead of chat
+- [ ] "Activate AI" link in static card navigates to Settings
+- [ ] System prompt includes correct word and category

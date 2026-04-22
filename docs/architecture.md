@@ -2,82 +2,82 @@
 
 ## Overview
 
-Palabrita segue uma arquitetura multi-módulo Android com separação clara entre camadas de UI, domínio, dados e IA. Este documento explica as decisões técnicas, o grafo de dependências e os padrões utilizados.
+Palabrita follows a multi-module Android architecture with clear separation between UI, domain, data, and AI layers. This document explains the technical decisions, dependency graph, and patterns used.
 
-## Por que Multi-Módulo?
+## Why Multi-Module?
 
-| Benefício | Impacto |
+| Benefit | Impact |
 |---|---|
-| Build incremental | Alterar `feature/chat` não recompila `feature/game` |
-| Encapsulamento | Módulos expõem apenas interfaces públicas |
-| Testabilidade | Cada módulo pode ser testado isoladamente |
-| Escalabilidade | Novas features são módulos novos, sem afetar os existentes |
-| Portfólio | Demonstra maturidade arquitetural |
+| Incremental builds | Changing `feature/chat` does not recompile `feature/game` |
+| Encapsulation | Modules expose only public interfaces |
+| Testability | Each module can be tested in isolation |
+| Scalability | New features are new modules, without affecting existing ones |
+| Long-term maintainability | Clear boundaries make large-scale changes safer |
 
-## Diagrama de Módulos
+## Module Diagram
 
 ```
-                          ┌─────────┐
-                          │   app   │
-                          └────┬────┘
-                ┌──────────┬───┴───┬──────────┐
-                ▼          ▼       ▼          ▼
-        ┌───────────┐ ┌────────┐ ┌──────┐ ┌──────────┐
-        │ onboarding│ │  game  │ │ chat │ │ settings │
-        └─────┬─────┘ └───┬────┘ └──┬───┘ └────┬─────┘
-              │            │         │           │
-              └──────┬─────┴────┬────┴───────────┘
-                     ▼          ▼
-              ┌──────────┐ ┌─────────┐
-              │ core/ai  │ │core/data│
-              └────┬─────┘ └────┬────┘
-                   │            │
-                   └─────┬──────┘
-                         ▼
-                  ┌─────────────┐
-                  │ core/model  │
-                  └─────────────┘
-                         ▲
-                  ┌──────┴──────┐
-                  │ core/common │
-                  └─────────────┘
+                          +---------+
+                          |   app   |
+                          +----+----+
+                +---------+---+---+---------+
+                v          v       v          v
+        +----------+ +------+ +----+ +--------+
+        | onboarding| |  game  | | chat | | settings |
+        +-----+-----+ +---+----+ +--+---+ +----+-----+
+              |            |         |           |
+              +------+-----+----+----+-----------+
+                     v          v
+              +----------+ +---------+
+              | core/ai  | |core/data|
+              +----+-----+ +----+----+
+                   |            |
+                   +-----+------+
+                         v
+                  +-------------+
+                  | core/model  |
+                  +-------------+
+                         ^
+                  +------+------+
+                  | core/common |
+                  +-------------+
 ```
 
-## Padrões Arquiteturais
+## Architectural Patterns
 
-### Camada UI → ViewModel → Repository
+### UI Layer -> ViewModel -> Repository
 
 ```
 Compose Screen
-    │ observa StateFlow
-    ▼
+    | observes StateFlow
+    v
 ViewModel (Hilt @HiltViewModel)
-    │ chama suspend functions
-    ▼
-Repository Interface (em core/model)
-    │ implementado em core/data
-    ▼
+    | calls suspend functions
+    v
+Repository Interface (in core/model)
+    | implemented in core/data
+    v
 Room DAO / LiteRT-LM Engine
 ```
 
 ### Unidirectional Data Flow (UDF)
 
-Cada feature segue o padrão:
+Each feature follows the pattern:
 
 ```kotlin
-// State imutável
+// Immutable state
 data class GameState(
     val puzzle: Puzzle? = null,
-    val chosenDifficulty: Int = 1,    // auto-selecionado via PlayerStats.currentDifficulty
+    val chosenDifficulty: Int = 1,    // auto-selected via PlayerStats.currentDifficulty
     val attempts: List<Attempt> = emptyList(),
     val currentInput: String = "",
     val revealedHints: List<String> = emptyList(),
     val keyboardState: Map<Char, LetterState> = emptyMap(),
-    val gameStatus: GameStatus = GameStatus.LOADING,  // LOADING → PLAYING → WON/LOST
+    val gameStatus: GameStatus = GameStatus.LOADING,  // LOADING -> PLAYING -> WON/LOST
     // ...
 )
 
-// Actions discretas — sem SelectDifficulty/StartGame (removidos)
+// Discrete actions -- no SelectDifficulty/StartGame (removed)
 sealed class GameAction {
     data class TypeLetter(val letter: Char) : GameAction()
     data object DeleteLetter : GameAction()
@@ -87,20 +87,20 @@ sealed class GameAction {
     // ...
 }
 
-// ViewModel carrega jogo automaticamente na dificuldade do jogador
+// ViewModel automatically loads game at player's difficulty
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val puzzleRepository: PuzzleRepository,
     private val statsRepository: StatsRepository,
     // ...
 ) : ViewModel() {
-    init { loadNextGame() }  // auto-start sem picker
+    init { loadNextGame() }  // auto-start without picker
 
     private fun loadNextGame() {
         viewModelScope.launch {
             val stats = statsRepository.getStats()
-            val difficulty = stats.currentDifficulty  // 1-5, gerenciado automaticamente
-            // busca puzzle e inicia jogo
+            val difficulty = stats.currentDifficulty  // 1-5, automatically managed
+            // fetches puzzle and starts game
         }
     }
 }
@@ -108,14 +108,14 @@ class GameViewModel @Inject constructor(
 
 ### State Machines (core/common)
 
-Para fluxos complexos com muitos estados e transições condicionais, usamos uma mini state machine genérica (~30 linhas). Sem dependência externa.
+For complex flows with many states and conditional transitions, we use a generic mini state machine (~30 lines). No external dependency.
 
-**Implementação:**
+**Implementation:**
 
 ```kotlin
 /**
- * State machine genérica e tipada.
- * Transições inválidas são ignoradas (não lançam exceção).
+ * Generic, typed state machine.
+ * Invalid transitions are ignored (no exception thrown).
  * Thread-safe via StateFlow.
  */
 class StateMachine<S : Any, E : Any>(
@@ -135,7 +135,7 @@ class StateMachine<S : Any, E : Any>(
     }
 
     companion object {
-        /** Builder DSL para definir transições de forma declarativa */
+        /** Builder DSL for declaring transitions in a declarative style */
         fun <S : Any, E : Any> create(
             initialState: S,
             block: TransitionBuilder<S, E>.() -> Unit
@@ -159,10 +159,10 @@ class TransitionBuilder<S : Any, E : Any> {
 }
 ```
 
-**Uso:**
+**Usage:**
 
 ```kotlin
-// Exemplo: Engine lifecycle
+// Example: Engine lifecycle
 val engineSM = StateMachine.create<EngineState, EngineEvent>(
     initialState = EngineState.Uninitialized
 ) {
@@ -186,28 +186,28 @@ val engineSM = StateMachine.create<EngineState, EngineEvent>(
     }
 }
 
-// Uso no ViewModel/Manager
-engineSM.transition(EngineEvent.Initialize)   // Uninitialized → Initializing
-engineSM.transition(EngineEvent.Success)      // Initializing → Ready
-engineSM.transition(EngineEvent.Initialize)   // Ready + Initialize → ignorado (retorna false)
+// Usage in ViewModel/Manager
+engineSM.transition(EngineEvent.Initialize)   // Uninitialized -> Initializing
+engineSM.transition(EngineEvent.Success)      // Initializing -> Ready
+engineSM.transition(EngineEvent.Initialize)   // Ready + Initialize -> ignored (returns false)
 ```
 
-**Onde é usado no Palabrita:**
+**Where it is used in Palabrita:**
 
-| Fluxo | States | Events | Módulo |
+| Flow | States | Events | Module |
 |---|---|---|---|
 | Engine lifecycle | Uninitialized, Initializing, Ready, Error | Initialize, Success, Failure, Destroy, Retry | `core/ai` |
-| Download de modelo | Idle, Checking, WaitingForWifi, Downloading, Completed, Failed | StartDownload, SpaceOk, WifiRequired, Done, Fail, Retry, Cancel | `feature/onboarding` |
-| Fluxo de onboarding | Welcome, Language, ModelSelection, Download, Generation, Complete | Next, Back, DownloadComplete, GenerationComplete | `feature/onboarding` |
+| Model download | Idle, Checking, WaitingForWifi, Downloading, Completed, Failed | StartDownload, SpaceOk, WifiRequired, Done, Fail, Retry, Cancel | `feature/onboarding` |
+| Onboarding flow | Welcome, Language, ModelSelection, Download, Generation, Complete | Next, Back, DownloadComplete, GenerationComplete | `feature/onboarding` |
 
-**Onde NÃO usamos (sealed class + when é suficiente):**
+**Where we DON'T use it (sealed class + when is sufficient):**
 
-| Fluxo | Motivo |
+| Flow | Reason |
 |---|---|
-| Game status (Loading, Playing, Won, Lost) | Poucos estados, transições lineares. Auto-dificuldade baseada no nível do jogador (sem picker). |
-| Chat status (Idle, EngineLoading, Responding, AtLimit) | Linear, engine auto-inicializa se necessário |
+| Game status (Loading, Playing, Won, Lost) | Few states, linear transitions. Auto-difficulty based on player level (no picker). |
+| Chat status (Idle, EngineLoading, Responding, AtLimit) | Linear, engine auto-initializes if needed |
 
-### Injeção de Dependência (Hilt)
+### Dependency Injection (Hilt)
 
 ```
 @HiltAndroidApp
@@ -216,7 +216,7 @@ class PalabritaApp : Application()
 @AndroidEntryPoint
 class MainActivity : ComponentActivity()
 
-// Módulos Hilt por camada:
+// Hilt modules by layer:
 @Module @InstallIn(SingletonComponent::class)
 object DatabaseModule {
     @Provides @Singleton
@@ -236,9 +236,9 @@ abstract class RepositoryModule {
 }
 ```
 
-### Navegação
+### Navigation
 
-Navigation Compose com type-safe routes (Kotlin Serialization):
+Navigation Compose with type-safe routes (Kotlin Serialization):
 
 ```kotlin
 @Serializable data object OnboardingRoute
@@ -250,61 +250,61 @@ Navigation Compose com type-safe routes (Kotlin Serialization):
 @Serializable data object AiInfoRoute
 ```
 
-Fluxo de navegação:
+Navigation flow:
 
 ```
-Start ──→ Onboarding completado? ──→ Sim ──→ Home
-                                  └──→ Não ──→ Onboarding ──→ Generation ──→ Home
+Start ---> Onboarding completed? ---> Yes ---> Home
+                                  `---> No ---> Onboarding ---> Generation ---> Home
 
-Home ──→ Jogar ──→ Game (auto-dificuldade via PlayerStats.currentDifficulty)
-Home ──→ Gerar Mais ──→ Generation (re-gen)
-Game ──→ Win/Lose ──→ Result ──→ Chat (post-game, real LLM com streaming)
-Game ──→ No Puzzles Left ──→ Generation (re-gen)
+Home ---> Play ---> Game (auto-difficulty via PlayerStats.currentDifficulty)
+Home ---> Generate More ---> Generation (re-gen)
+Game ---> Win/Lose ---> Result ---> Chat (post-game, real LLM with streaming)
+Game ---> No Puzzles Left ---> Generation (re-gen)
 
-Após cada partida (win/lose), o sistema chama checkAndPromoteDifficulty():
-  - Promove: ≥5 wins + ≥70% winRate na dificuldade atual
-  - Demove: 3 derrotas consecutivas
+After each game (win/lose), the system calls checkAndPromoteDifficulty():
+  - Promote: >=5 wins + >=70% winRate at current difficulty
+  - Demote: 3 consecutive losses
 
-Bottom Nav: Home | IA (AiInfoScreen) | Mais (Settings)
+Bottom Nav: Home | AI (AiInfoScreen) | More (Settings)
 ```
 
-## Gestão de Estado de Longo Prazo
+## Long-Term State Management
 
-| Estado | Armazenamento | Escopo |
+| State | Storage | Scope |
 |---|---|---|
-| Puzzles gerados | Room (`PuzzleEntity`) | Permanente |
-| Sessão de jogo em andamento | Room (`GameSessionEntity`) | Até completar |
-| Estatísticas do jogador | Room (`PlayerStatsEntity`) | Permanente |
-| Histórico de chat | Room (`ChatMessageEntity`) | Permanente |
-| Configuração do modelo | Room (`ModelConfigEntity`) | Permanente |
-| Onboarding completado | DataStore Preferences | Permanente |
-| Estado da UI (input, etc.) | ViewModel StateFlow | Lifecycle do ViewModel |
+| Generated puzzles | Room (`PuzzleEntity`) | Permanent |
+| Active game session | Room (`GameSessionEntity`) | Until completed |
+| Player statistics | Room (`PlayerStatsEntity`) | Permanent |
+| Chat history | Room (`ChatMessageEntity`) | Permanent |
+| Model configuration | Room (`ModelConfigEntity`) | Permanent |
+| Onboarding completed | DataStore Preferences | Permanent |
+| UI state (input, etc.) | ViewModel StateFlow | ViewModel lifecycle |
 
-## Concorrência
+## Concurrency
 
 - **UI**: `Dispatchers.Main` (Compose, ViewModel)
-- **Room queries**: `Dispatchers.IO` (Room já faz por default em suspend functions)
+- **Room queries**: `Dispatchers.IO` (Room already does this by default in suspend functions)
 - **LLM inference**: `Dispatchers.IO` (via `withContext`)
-- **Engine init**: `Dispatchers.IO` (pode levar ~10s)
-- **WorkManager**: gerenciado pelo sistema (background thread)
-- **Download**: gerenciado pelo Play Asset Delivery / OkHttp
+- **Engine init**: `Dispatchers.IO` (may take ~10s)
+- **WorkManager**: managed by the system (background thread)
+- **Download**: managed by Play Asset Delivery / OkHttp
 
-## Tratamento de Erros
+## Error Handling
 
-Estratégia por camada:
+Strategy by layer:
 
-| Camada | Estratégia |
+| Layer | Strategy |
 |---|---|
-| Repository | Retorna `Result<T>` ou throws (caught pelo ViewModel) |
-| ViewModel | Catch, atualiza `state.error`, exibe na UI |
-| AI Engine | `ParseResult<T>` sealed class para parsing, retry para geração |
-| Download | Estados em `DownloadState` enum, retry explícito |
+| Repository | Returns `Result<T>` or throws (caught by ViewModel) |
+| ViewModel | Catch, updates `state.error`, displays in UI |
+| AI Engine | `ParseResult<T>` sealed class for parsing, retry for generation |
+| Download | States in `DownloadState` enum, explicit retry |
 
-## Testes
+## Testing
 
-| Tipo | Framework | Foco |
+| Type | Framework | Focus |
 |---|---|---|
-| Unit | JUnit 5 + MockK | Validador, parser, algoritmo de dificuldade |
-| Integration | Room in-memory + Turbine | DAOs, repositórios, flows |
-| UI | Compose Testing | Telas, navegação, interações |
-| E2E (manual) | Device físico | Fluxo completo com modelo real |
+| Unit | JUnit 5 + MockK | Validator, parser, difficulty algorithm |
+| Integration | Room in-memory + Turbine | DAOs, repositories, flows |
+| UI | Compose Testing | Screens, navigation, interactions |
+| E2E (manual) | Physical device | Full flow with real model |
