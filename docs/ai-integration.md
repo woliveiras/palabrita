@@ -121,33 +121,101 @@ suspend fun generateSinglePuzzle(params: PuzzleParams): PuzzleResponse? {
 }
 ```
 
-### Para Chat Pós-Acerto
+### Para Chat Pós-Jogo
 
-Manter uma Conversation aberta durante toda a sessão de chat (multi-turn):
+O `ChatViewModel` usa `LlmSession` para chat multi-turn com streaming. O engine é auto-inicializado se necessário.
 
 ```kotlin
-class ChatSessionImpl(
-    private val conversation: Conversation,
-    private val maxMessages: Int = 10
-) : ChatSession {
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val chatRepository: ChatRepository,
+    private val engineManager: LlmEngineManager,
+    private val modelRepository: ModelRepository,
+) : ViewModel() {
 
-    private var _messageCount = 0
-    override val messageCount: Int get() = _messageCount
-    override val isAtLimit: Boolean get() = _messageCount >= maxMessages
+    private var session: LlmSession? = null
 
-    override fun sendMessage(userMessage: String): Flow<String> = flow {
-        if (isAtLimit) throw ChatLimitReachedException()
+    // Garante engine pronto antes de criar sessão
+    private suspend fun ensureSession(): Boolean {
+        if (session != null) return true
 
-        _messageCount++
-        conversation.sendMessageAsync(userMessage).collect { chunk ->
-            emit(chunk)
+        val currentState = engineManager.engineState.value
+        if (currentState !is EngineState.Ready) {
+            _state.update { it.copy(isEngineLoading = true) }
+
+            // Auto-inicializa se Uninitialized
+            if (currentState is EngineState.Uninitialized) {
+                val modelPath = modelRepository.getConfig().modelPath ?: return false
+                engineManager.initialize(modelPath)
+            }
+
+            // Observa e aguarda Ready (timeout 120s)
+            val ready = withTimeoutOrNull(ENGINE_INIT_TIMEOUT_MS) {
+                engineManager.engineState.first { it is EngineState.Ready || it is EngineState.Error }
+            }
+            _state.update { it.copy(isEngineLoading = false) }
+            if (ready !is EngineState.Ready) return false
         }
-    }.flowOn(Dispatchers.IO)
 
-    override fun close() {
-        conversation.close()
+        val systemPrompt = PromptTemplates.chatSystemPrompt(word, category, language)
+        session = engineManager.createChatSession(systemPrompt)
+        return true
     }
 }
+```
+
+**Fluxo do chat:**
+
+```
+ChatScreen aberta
+    │
+    ├── Engine Ready? ──→ Sim ──→ Cria LlmSession com chatSystemPrompt
+    │                  └──→ Não ──→ Mostra loading, auto-inicializa engine
+    │
+    ▼
+Envia prompt inicial: "Conte uma curiosidade sobre a palavra '{word}'"
+    │
+    ▼
+LlmSession.sendMessageStreaming() → Flow<String>
+    │
+    ├── Tokens chegam → atualiza UiChatMessage.content progressivamente
+    ├── isStreaming = true enquanto tokens fluem
+    ├── Timeout 60s → remove mensagem, mostra erro
+    └── Completo → salva no Room, isStreaming = false
+```
+
+**Streaming de resposta:**
+
+```kotlin
+currentSession.sendMessageStreaming(userText).collect { token ->
+    accumulated.append(token)
+    _state.update {
+        val updated = it.messages.toMutableList()
+        updated[updated.lastIndex] = UiChatMessage(
+            role = MessageRole.MODEL,
+            content = accumulated.toString(),
+            isStreaming = true
+        )
+        it.copy(messages = updated)
+    }
+}
+```
+
+**Estado do chat:**
+
+```kotlin
+data class ChatState(
+    val isEngineLoading: Boolean = false,  // loading do engine
+    val isModelResponding: Boolean = false, // streaming de resposta
+    val messages: List<UiChatMessage>,
+    val userMessageCount: Int,             // limite: 10 mensagens do user
+    val suggestionsVisible: Boolean,       // chips desaparecem após 1ª mensagem
+    // ...
+)
+```
+
+**Restauração de histórico:** quando o chat reabre com histórico existente, as mensagens USER são re-enviadas ao `LlmSession` para reconstruir o contexto do modelo.
 ```
 
 ## Prompt Engineering

@@ -66,21 +66,41 @@ Cada feature segue o padrão:
 
 ```kotlin
 // State imutável
-data class GameState(...)
+data class GameState(
+    val puzzle: Puzzle? = null,
+    val chosenDifficulty: Int = 1,    // auto-selecionado via PlayerStats.currentDifficulty
+    val attempts: List<Attempt> = emptyList(),
+    val currentInput: String = "",
+    val revealedHints: List<String> = emptyList(),
+    val keyboardState: Map<Char, LetterState> = emptyMap(),
+    val gameStatus: GameStatus = GameStatus.LOADING,  // LOADING → PLAYING → WON/LOST
+    // ...
+)
 
-// Actions discretas
-sealed class GameAction { ... }
+// Actions discretas — sem SelectDifficulty/StartGame (removidos)
+sealed class GameAction {
+    data class TypeLetter(val letter: Char) : GameAction()
+    data object DeleteLetter : GameAction()
+    data object SubmitAttempt : GameAction()
+    data object RevealHint : GameAction()
+    data object LoadNextPuzzle : GameAction()
+    // ...
+}
 
-// ViewModel processa actions e emite state
+// ViewModel carrega jogo automaticamente na dificuldade do jogador
 @HiltViewModel
-class GameViewModel @Inject constructor(...) : ViewModel() {
-    private val _state = MutableStateFlow(GameState())
-    val state: StateFlow<GameState> = _state.asStateFlow()
+class GameViewModel @Inject constructor(
+    private val puzzleRepository: PuzzleRepository,
+    private val statsRepository: StatsRepository,
+    // ...
+) : ViewModel() {
+    init { loadNextGame() }  // auto-start sem picker
 
-    fun onAction(action: GameAction) {
-        when (action) {
-            is GameAction.TypeLetter -> handleTypeLetter(action.letter)
-            // ...
+    private fun loadNextGame() {
+        viewModelScope.launch {
+            val stats = statsRepository.getStats()
+            val difficulty = stats.currentDifficulty  // 1-5, gerenciado automaticamente
+            // busca puzzle e inicia jogo
         }
     }
 }
@@ -184,8 +204,8 @@ engineSM.transition(EngineEvent.Initialize)   // Ready + Initialize → ignorado
 
 | Fluxo | Motivo |
 |---|---|
-| Game status (Playing, Won, Lost) | Poucos estados, transições triviais |
-| Chat status (Idle, Responding, AtLimit) | Linear, sem bifurcações complexas |
+| Game status (Loading, Playing, Won, Lost) | Poucos estados, transições lineares. Auto-dificuldade baseada no nível do jogador (sem picker). |
+| Chat status (Idle, EngineLoading, Responding, AtLimit) | Linear, engine auto-inicializa se necessário |
 
 ### Injeção de Dependência (Hilt)
 
@@ -236,10 +256,14 @@ Fluxo de navegação:
 Start ──→ Onboarding completado? ──→ Sim ──→ Home
                                   └──→ Não ──→ Onboarding ──→ Generation ──→ Home
 
-Home ──→ Jogar ──→ Game
+Home ──→ Jogar ──→ Game (auto-dificuldade via PlayerStats.currentDifficulty)
 Home ──→ Gerar Mais ──→ Generation (re-gen)
-Game ──→ Win/Lose ──→ Chat (post-game)
+Game ──→ Win/Lose ──→ Result ──→ Chat (post-game, real LLM com streaming)
 Game ──→ No Puzzles Left ──→ Generation (re-gen)
+
+Após cada partida (win/lose), o sistema chama checkAndPromoteDifficulty():
+  - Promove: ≥5 wins + ≥70% winRate na dificuldade atual
+  - Demove: 3 derrotas consecutivas
 
 Bottom Nav: Home | IA (AiInfoScreen) | Mais (Settings)
 ```
