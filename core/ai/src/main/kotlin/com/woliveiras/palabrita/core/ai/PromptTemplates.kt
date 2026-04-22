@@ -25,6 +25,8 @@ object PromptTemplates {
       Required JSON format (keys MUST be in English):
       {"word": "string", "category": "string", "difficulty": number, "hints": ["h1","h2","h3","h4","h5"]}
 
+      CRITICAL: The word MUST have exactly $minLength to $maxLength letters. Count the letters carefully. Words with fewer or more letters will be rejected.
+
       Rules:
       - Output language for values: $language
       - The word MUST be a common noun in $language, $minLength-$maxLength lowercase letters, no accents

@@ -45,27 +45,28 @@ constructor(
 
     Log.i(TAG, "generateBatch: difficulty=$targetDifficulty count=$count length=$wordLength")
 
-    val batchWords = mutableListOf<String>()
-
-    for (i in 0 until count) {
-      val puzzle =
-        generateSinglePuzzle(
-          language = language,
-          difficulty = targetDifficulty,
-          wordLength = wordLength,
-          recentWords = recentWords + batchWords,
-          usedWords = usedWords,
-          modelId = modelId,
-        )
-      if (puzzle != null) {
-        generated.add(puzzle)
-        usedWords.add(puzzle.word)
-        batchWords.add(puzzle.word)
-        Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
-      } else {
-        Log.w(TAG, "  puzzle ${i + 1}/$count FAILED after $MAX_RETRIES retries")
+    val systemPrompt = buildSystemPrompt(modelId, language)
+    engineManager.createChatSession(systemPrompt).use { session ->
+      for (i in 0 until count) {
+        val puzzle =
+          generateSinglePuzzle(
+            session = session,
+            language = language,
+            difficulty = targetDifficulty,
+            wordLength = wordLength,
+            recentWords = recentWords,
+            usedWords = usedWords,
+            modelId = modelId,
+          )
+        if (puzzle != null) {
+          generated.add(puzzle)
+          usedWords.add(puzzle.word)
+          Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
+        } else {
+          Log.w(TAG, "  puzzle ${i + 1}/$count FAILED after $MAX_RETRIES retries")
+        }
+        onPuzzleAttempted(generated.size)
       }
-      onPuzzleAttempted(generated.size)
     }
 
     Log.i(TAG, "generateBatch: done, ${generated.size}/$count succeeded")
@@ -73,6 +74,7 @@ constructor(
   }
 
   private suspend fun generateSinglePuzzle(
+    session: LlmSession,
     language: String,
     difficulty: Int,
     wordLength: IntRange,
@@ -80,8 +82,14 @@ constructor(
     usedWords: Set<String>,
     modelId: ModelId,
   ): Puzzle? {
+    var lastFailureReason: String? = null
     repeat(MAX_RETRIES) { attempt ->
-      val rawResponse = callLlm(language, difficulty, wordLength, recentWords, modelId, attempt)
+      val userPrompt =
+        buildUserPrompt(
+          modelId, language, difficulty, wordLength, recentWords, usedWords,
+          attempt, lastFailureReason,
+        )
+      val rawResponse = session.sendMessage(userPrompt)
       Log.d(
         TAG,
         "  attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(300)}",
@@ -97,11 +105,13 @@ constructor(
               return puzzleFromResponse(parseResult.data, language, difficulty)
             }
             is ValidationResult.Invalid -> {
+              lastFailureReason = validation.reasons.joinToString("; ")
               Log.w(TAG, "  attempt $attempt validation failed: ${validation.reasons}")
             }
           }
         }
         is ParseResult.Error -> {
+          lastFailureReason = "JSON parse error: ${parseResult.reason}"
           Log.w(TAG, "  attempt $attempt parse failed: ${parseResult.reason}")
         }
       }
@@ -109,74 +119,51 @@ constructor(
     return null
   }
 
-  private suspend fun callLlm(
+  private fun buildSystemPrompt(modelId: ModelId, language: String): String =
+    when (modelId) {
+      ModelId.GEMMA4_E2B -> PromptTemplates.puzzleSystemPromptGemma4()
+      ModelId.QWEN3_0_6B,
+      ModelId.NONE -> PromptTemplates.puzzlePromptGemma3(language, 1, 4, 5, emptyList())
+    }
+
+  private fun buildUserPrompt(
+    modelId: ModelId,
     language: String,
     difficulty: Int,
     wordLength: IntRange,
     recentWords: List<String>,
-    modelId: ModelId,
+    usedWords: Set<String>,
     attempt: Int,
+    failureReason: String? = null,
   ): String {
-    val systemPrompt: String?
-    val userPrompt: String
-
-    when (modelId) {
-      ModelId.GEMMA4_E2B -> {
-        systemPrompt = PromptTemplates.puzzleSystemPromptGemma4()
-        val basePrompt =
+    val avoidWords = (recentWords + usedWords).distinct().takeLast(30)
+    val base =
+      when (modelId) {
+        ModelId.GEMMA4_E2B ->
           PromptTemplates.puzzleUserPromptGemma4(
             language,
             difficulty,
             wordLength.first,
             wordLength.last,
-            if (attempt < 2) recentWords else emptyList(),
+            avoidWords,
           )
-        userPrompt =
-          when (attempt) {
-            0 -> basePrompt
-            1 ->
-              "$basePrompt\n\nThe previous response was invalid. " +
-                "Please try again with a different word."
-            else ->
-              PromptTemplates.puzzleUserPromptGemma4(
-                language,
-                difficulty,
-                wordLength.first,
-                wordLength.last,
-                emptyList(),
-              )
-          }
-      }
-      ModelId.QWEN3_0_6B -> {
-        systemPrompt = null
-        val basePrompt =
+        ModelId.QWEN3_0_6B ->
           PromptTemplates.puzzlePromptGemma3(
             language,
             difficulty,
             wordLength.first,
             wordLength.last,
-            if (attempt < 2) recentWords else emptyList(),
+            avoidWords,
           )
-        userPrompt =
-          when (attempt) {
-            0 -> basePrompt
-            1 ->
-              "$basePrompt\n\nThe previous response was invalid. " +
-                "Please try again with a different word."
-            else ->
-              PromptTemplates.puzzlePromptGemma3(
-                language,
-                difficulty,
-                wordLength.first,
-                wordLength.last,
-                emptyList(),
-              )
-          }
+        ModelId.NONE -> throw IllegalArgumentException("No model selected")
       }
-      ModelId.NONE -> throw IllegalArgumentException("No model selected")
+    return if (attempt > 0 && failureReason != null) {
+      "$base\n\nYour previous response was rejected: $failureReason. The word MUST have ${wordLength.first}-${wordLength.last} letters. Try again with a DIFFERENT word."
+    } else if (attempt > 0) {
+      "$base\n\nThe previous response was invalid. Generate a DIFFERENT word with ${wordLength.first}-${wordLength.last} letters."
+    } else {
+      base
     }
-
-    return engineManager.generateSingleTurn(systemPrompt, userPrompt)
   }
 
   private fun puzzleFromResponse(
@@ -197,7 +184,7 @@ constructor(
 
   companion object {
     private const val TAG = "PuzzleGenerator"
-    private const val MAX_RETRIES = 3
+    private const val MAX_RETRIES = 5
 
     fun difficultyToWordLength(difficulty: Int): IntRange =
       when (difficulty) {
