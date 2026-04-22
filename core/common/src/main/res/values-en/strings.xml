@@ -56,6 +56,10 @@
     <string name="generation_failed">Failed to generate puzzles</string>
     <string name="generation_progress_detail">%1$d of %2$d puzzles — difficulty %3$d of 5</string>
     <string name="generation_retry">TRY AGAIN</string>
+    <string name="generation_step_verify">Verifying model integrity</string>
+    <string name="generation_step_load">Loading model into memory</string>
+    <string name="generation_step_init">Initializing model</string>
+    <string name="generation_step_generate">Generating puzzles</string>
 
     <!-- Onboarding: Tier Warning -->
     <string name="tier_warning_message">The selected model may require more memory than your device has. Performance may be poor or the app may crash.</string>
