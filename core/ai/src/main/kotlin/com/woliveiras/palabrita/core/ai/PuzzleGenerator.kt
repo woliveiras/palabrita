@@ -46,27 +46,36 @@ constructor(
     Log.i(TAG, "generateBatch: difficulty=$targetDifficulty count=$count length=$wordLength")
 
     val systemPrompt = buildSystemPrompt(modelId, language)
-    engineManager.createChatSession(systemPrompt).use { session ->
-      for (i in 0 until count) {
-        val puzzle =
-          generateSinglePuzzle(
-            session = session,
-            language = language,
-            difficulty = targetDifficulty,
-            wordLength = wordLength,
-            recentWords = recentWords,
-            usedWords = usedWords,
-            modelId = modelId,
-          )
-        if (puzzle != null) {
-          generated.add(puzzle)
-          usedWords.add(puzzle.word)
-          Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
-        } else {
-          Log.w(TAG, "  puzzle ${i + 1}/$count FAILED after $MAX_RETRIES retries")
+    var puzzleIndex = 0
+
+    while (puzzleIndex < count) {
+      val remaining = count - puzzleIndex
+      val chunkSize = remaining.coerceAtMost(SESSION_ROTATION)
+
+      engineManager.createChatSession(systemPrompt).use { session ->
+        repeat(chunkSize) {
+          val i = puzzleIndex++
+          val puzzle =
+            generateSinglePuzzle(
+              session = session,
+              language = language,
+              difficulty = targetDifficulty,
+              wordLength = wordLength,
+              recentWords = recentWords,
+              usedWords = usedWords,
+              modelId = modelId,
+            )
+          if (puzzle != null) {
+            generated.add(puzzle)
+            usedWords.add(puzzle.word)
+            Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
+          } else {
+            Log.w(TAG, "  puzzle ${i + 1}/$count FAILED after $MAX_RETRIES retries")
+          }
+          onPuzzleAttempted(generated.size)
         }
-        onPuzzleAttempted(generated.size)
       }
+      Log.d(TAG, "  session rotated after $chunkSize puzzles (${generated.size} total OK)")
     }
 
     Log.i(TAG, "generateBatch: done, ${generated.size}/$count succeeded")
@@ -185,6 +194,7 @@ constructor(
   companion object {
     private const val TAG = "PuzzleGenerator"
     private const val MAX_RETRIES = 5
+    private const val SESSION_ROTATION = 3
 
     fun difficultyToWordLength(difficulty: Int): IntRange =
       when (difficulty) {
