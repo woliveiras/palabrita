@@ -148,6 +148,8 @@
     <string name="notification_channel_description">Notifications about new AI-generated challenges</string>
     <string name="notification_generation_title">New challenges ready!</string>
     <string name="notification_generation_body">The AI created %d new challenges. Next time you play, it will be even more fun!</string>
+    <string name="notification_generation_progress_title">Generating challenges…</string>
+    <string name="notification_generation_progress_body">The AI is creating new challenges. This may take a few seconds.</string>
 
     <!-- AI/Download errors -->
     <string name="error_engine_init">Failed to initialize AI</string>

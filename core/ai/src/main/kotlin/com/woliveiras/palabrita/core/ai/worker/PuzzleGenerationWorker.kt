@@ -5,11 +5,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.PuzzleGenerator
@@ -32,6 +34,8 @@ constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
   override suspend fun doWork(): Result {
+    setForeground(createForegroundInfo())
+
     val stats = statsRepository.getStats()
     val language = stats.preferredLanguage
 
@@ -93,6 +97,28 @@ constructor(
       else -> 6
     }
 
+  private fun createForegroundInfo(): ForegroundInfo {
+    createNotificationChannel()
+    val notification =
+      NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+        .setSmallIcon(CommonR.drawable.ic_notification)
+        .setContentTitle(
+          applicationContext.getString(CommonR.string.notification_generation_progress_title)
+        )
+        .setContentText(
+          applicationContext.getString(CommonR.string.notification_generation_progress_body)
+        )
+        .setOngoing(true)
+        .setProgress(0, 0, true)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .build()
+    return ForegroundInfo(
+      PROGRESS_NOTIFICATION_ID,
+      notification,
+      ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+    )
+  }
+
   private fun showCompletionNotification(count: Int) {
     createNotificationChannel()
 
@@ -140,5 +166,6 @@ constructor(
     const val REPLENISHMENT_THRESHOLD = 10
     private const val CHANNEL_ID = "puzzle_generation"
     private const val NOTIFICATION_ID = 1001
+    private const val PROGRESS_NOTIFICATION_ID = 1002
   }
 }

@@ -2,6 +2,7 @@ package com.woliveiras.palabrita.core.ai.worker
 
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
@@ -21,6 +22,7 @@ class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager:
     val workRequest =
       OneTimeWorkRequestBuilder<PuzzleGenerationWorker>()
         .setInputData(workDataOf(PuzzleGenerationWorker.KEY_MODEL_ID to modelId.name))
+        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
         .build()
 
     workManager.enqueueUniqueWork(

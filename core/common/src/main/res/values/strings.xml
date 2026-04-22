@@ -147,6 +147,8 @@
     <string name="notification_channel_description">Notificações sobre novos desafios gerados pela IA</string>
     <string name="notification_generation_title">Novos desafios prontos!</string>
     <string name="notification_generation_body">A IA criou %d novos desafios. Na próxima vez que jogar, será ainda mais divertido!</string>
+    <string name="notification_generation_progress_title">Gerando desafios…</string>
+    <string name="notification_generation_progress_body">A IA está criando novos desafios. Isso pode levar alguns segundos.</string>
 
     <!-- AI/Download errors -->
     <string name="error_engine_init">Falha ao inicializar IA</string>
