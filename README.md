@@ -1,6 +1,6 @@
 # Palabrita
 
-Um jogo de palavras com inteligência artificial, direto no seu celular.
+A word-guessing game powered by artificial intelligence, right on your phone.
 
 Android word-guessing game (Wordle-style) powered by on-device LLM (Gemma 4 E2B / Gemma 3 1B via LiteRT-LM). 100% offline after initial model download.
 
