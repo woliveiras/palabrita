@@ -1,10 +1,6 @@
 package com.woliveiras.palabrita.feature.game
 
 sealed class GameAction {
-  data class SelectDifficulty(val level: Int) : GameAction()
-
-  data object StartGame : GameAction()
-
   data class TypeLetter(val letter: Char) : GameAction()
 
   data object DeleteLetter : GameAction()

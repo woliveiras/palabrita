@@ -37,13 +37,11 @@ constructor(
   val events = _events.asSharedFlow()
 
   init {
-    loadDifficultyOptions()
+    loadNextGame()
   }
 
   fun onAction(action: GameAction) {
     when (action) {
-      is GameAction.SelectDifficulty -> selectDifficulty(action.level)
-      is GameAction.StartGame -> startGame()
       is GameAction.TypeLetter -> typeLetter(action.letter)
       is GameAction.DeleteLetter -> deleteLetter()
       is GameAction.SubmitAttempt -> submitAttempt()
@@ -57,43 +55,20 @@ constructor(
       is GameAction.NavigateToStats -> {
         /* handled by UI */
       }
-      is GameAction.LoadNextPuzzle -> loadDifficultyOptions()
+      is GameAction.LoadNextPuzzle -> loadNextGame()
       is GameAction.BackPressed -> handleBackPressed()
       is GameAction.ConfirmAbandon -> confirmAbandon()
       is GameAction.DismissAbandonDialog -> _state.update { it.copy(showAbandonDialog = false) }
     }
   }
 
-  fun loadDifficultyOptions() {
-    viewModelScope.launch {
-      val stats = statsRepository.getStats()
-      val options =
-        GameLogic.buildDifficultyOptions(
-          currentDifficulty = stats.currentDifficulty,
-          maxUnlockedDifficulty = stats.maxUnlockedDifficulty,
-        )
-      _state.update {
-        it.copy(
-          availableDifficulties = options,
-          chosenDifficulty = stats.currentDifficulty,
-          gameStatus = GameStatus.CHOOSING_DIFFICULTY,
-        )
-      }
-    }
-  }
-
-  private fun selectDifficulty(level: Int) {
-    val option = _state.value.availableDifficulties.find { it.level == level } ?: return
-    if (!option.isSelectable) return
-    _state.update { it.copy(chosenDifficulty = level) }
-  }
-
-  private fun startGame() {
+  fun loadNextGame() {
     viewModelScope.launch {
       _state.update { it.copy(gameStatus = GameStatus.LOADING) }
       val stats = statsRepository.getStats()
-      val puzzle =
-        puzzleRepository.getNextUnplayed(stats.preferredLanguage, _state.value.chosenDifficulty)
+      val difficulty = stats.currentDifficulty
+      _state.update { it.copy(chosenDifficulty = difficulty) }
+      val puzzle = puzzleRepository.getNextUnplayed(stats.preferredLanguage, difficulty)
       if (puzzle != null) {
         _state.update {
           it.copy(
@@ -114,7 +89,7 @@ constructor(
           )
         )
       } else {
-        _state.update { it.copy(gameStatus = GameStatus.CHOOSING_DIFFICULTY, isLoading = false) }
+        _state.update { it.copy(isLoading = false) }
         _events.emit(GameEvent.NoPuzzlesLeft)
       }
     }
@@ -172,6 +147,7 @@ constructor(
           difficulty = current.chosenDifficulty,
           hintsUsed = current.revealedHints.size,
         )
+        statsRepository.checkAndPromoteDifficulty()
         puzzleRepository.markAsPlayed(puzzle.id)
         gameSessionRepository.completeSession(
           puzzleId = puzzle.id,

@@ -39,72 +39,43 @@ class GameViewModelTest {
   // --- Initial state ---
 
   @Test
-  fun `initial status is CHOOSING_DIFFICULTY`() = runTest {
-    val vm = createViewModel()
-    assertThat(vm.state.value.gameStatus).isEqualTo(GameStatus.CHOOSING_DIFFICULTY)
-  }
-
-  @Test
-  fun `initial attempts list is empty`() = runTest {
-    val vm = createViewModel()
-    assertThat(vm.state.value.attempts).isEmpty()
-  }
-
-  @Test
-  fun `initial current input is empty`() = runTest {
-    val vm = createViewModel()
-    assertThat(vm.state.value.currentInput).isEmpty()
-  }
-
-  // --- Difficulty selection ---
-
-  @Test
-  fun `load difficulty options populates available difficulties`() = runTest {
-    val vm = createViewModel(stats = PlayerStats(currentDifficulty = 1, maxUnlockedDifficulty = 2))
-    vm.loadDifficultyOptions()
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.availableDifficulties).hasSize(5)
-  }
-
-  @Test
-  fun `selecting unlocked difficulty updates chosen difficulty`() = runTest {
-    val vm = createViewModel(stats = PlayerStats(currentDifficulty = 1, maxUnlockedDifficulty = 3))
-    vm.loadDifficultyOptions()
-    testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(GameAction.SelectDifficulty(2))
-    assertThat(vm.state.value.chosenDifficulty).isEqualTo(2)
-  }
-
-  @Test
-  fun `selecting locked difficulty does not change chosen difficulty`() = runTest {
-    val vm = createViewModel(stats = PlayerStats(currentDifficulty = 1, maxUnlockedDifficulty = 1))
-    vm.loadDifficultyOptions()
-    testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(GameAction.SelectDifficulty(4))
-    assertThat(vm.state.value.chosenDifficulty).isEqualTo(1)
-  }
-
-  // --- Game start ---
-
-  @Test
-  fun `starting game transitions to PLAYING with puzzle`() = runTest {
+  fun `init auto-starts game and transitions to PLAYING`() = runTest {
     val puzzle = createTestPuzzle()
     val vm = createViewModel(puzzle = puzzle)
-    vm.loadDifficultyOptions()
-    testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(GameAction.StartGame)
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.gameStatus).isEqualTo(GameStatus.PLAYING)
     assertThat(vm.state.value.puzzle).isEqualTo(puzzle)
   }
 
   @Test
-  fun `starting game with no puzzle available emits NoPuzzlesLeft`() = runTest {
-    val vm = createViewModel(puzzle = null)
-    vm.loadDifficultyOptions()
+  fun `initial attempts list is empty`() = runTest {
+    val vm = createViewModel()
     testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.attempts).isEmpty()
+  }
+
+  @Test
+  fun `initial current input is empty`() = runTest {
+    val vm = createViewModel()
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.currentInput).isEmpty()
+  }
+
+  // --- Difficulty from player level ---
+
+  @Test
+  fun `chosen difficulty matches player current difficulty`() = runTest {
+    val vm = createViewModel(stats = PlayerStats(currentDifficulty = 3, maxUnlockedDifficulty = 3))
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.chosenDifficulty).isEqualTo(3)
+  }
+
+  // --- Game start ---
+
+  @Test
+  fun `no puzzle available emits NoPuzzlesLeft`() = runTest {
+    val vm = createViewModel(puzzle = null)
     vm.events.test {
-      vm.onAction(GameAction.StartGame)
       testDispatcher.scheduler.advanceUntilIdle()
       assertThat(awaitItem()).isEqualTo(GameEvent.NoPuzzlesLeft)
     }
@@ -332,9 +303,6 @@ class GameViewModelTest {
         statsRepository = FakeStatsRepository(),
         gameSessionRepository = FakeGameSessionRepository(),
       )
-    vm.loadDifficultyOptions()
-    testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(GameAction.StartGame)
     testDispatcher.scheduler.advanceUntilIdle()
     return vm
   }

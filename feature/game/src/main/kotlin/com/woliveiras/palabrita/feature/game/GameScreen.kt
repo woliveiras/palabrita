@@ -27,10 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Backspace
 import androidx.compose.material.icons.rounded.Lightbulb
-import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -41,7 +39,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -97,14 +94,6 @@ fun GameScreen(
     label = "game-status",
   ) { status ->
     when (status) {
-      GameStatus.CHOOSING_DIFFICULTY ->
-        DifficultyPickerScreen(
-          options = state.availableDifficulties,
-          chosen = state.chosenDifficulty,
-          onSelect = { viewModel.onAction(GameAction.SelectDifficulty(it)) },
-          onStart = { viewModel.onAction(GameAction.StartGame) },
-          onSettings = onNavigateToSettings,
-        )
       GameStatus.LOADING -> LoadingScreen()
       GameStatus.PLAYING ->
         PlayingScreen(
@@ -137,110 +126,6 @@ fun GameScreen(
           onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
           onHome = onNavigateToHome,
         )
-    }
-  }
-}
-
-// --- Difficulty Picker ---
-
-@Composable
-private fun DifficultyPickerScreen(
-  options: List<DifficultyOption>,
-  chosen: Int,
-  onSelect: (Int) -> Unit,
-  onStart: () -> Unit,
-  onSettings: () -> Unit,
-) {
-  Column(
-    modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).padding(32.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-  ) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-      IconButton(onClick = onSettings) {
-        Icon(Icons.Rounded.Settings, contentDescription = stringResource(CommonR.string.settings))
-      }
-    }
-    Spacer(Modifier.height(16.dp))
-    Text(
-      text = stringResource(CommonR.string.difficulty_title),
-      style = MaterialTheme.typography.headlineSmall,
-    )
-    Spacer(Modifier.height(24.dp))
-
-    options.forEach { option ->
-      DifficultyCard(
-        option = option,
-        isChosen = option.level == chosen,
-        onClick = { onSelect(option.level) },
-      )
-      Spacer(Modifier.height(8.dp))
-    }
-
-    Spacer(Modifier.weight(1f))
-    Button(onClick = onStart, modifier = Modifier.fillMaxWidth()) {
-      Text(stringResource(CommonR.string.play))
-    }
-  }
-}
-
-@Composable
-private fun DifficultyCard(option: DifficultyOption, isChosen: Boolean, onClick: () -> Unit) {
-  val border = if (isChosen) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
-  val colors =
-    if (isChosen)
-      CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-    else CardDefaults.outlinedCardColors()
-
-  OutlinedCard(
-    onClick = onClick,
-    modifier = Modifier.fillMaxWidth(),
-    border = border ?: CardDefaults.outlinedCardBorder(),
-    colors = colors,
-    enabled = option.isSelectable,
-  ) {
-    Row(
-      modifier = Modifier.padding(16.dp).fillMaxWidth(),
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      if (!option.isSelectable) {
-        Icon(
-          Icons.Rounded.Lock,
-          contentDescription = null,
-          modifier = Modifier.size(20.dp),
-          tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.width(8.dp))
-      }
-      Row(modifier = Modifier.weight(1f)) {
-        repeat(option.level) {
-          Icon(
-            Icons.Rounded.Star,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint =
-              if (option.isSelectable) MaterialTheme.colorScheme.primary
-              else MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-        }
-        Spacer(Modifier.width(8.dp))
-        Text(text = stringResource(option.labelRes), style = MaterialTheme.typography.titleSmall)
-      }
-      Text(
-        text = "${option.baseXp} XP",
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-      if (option.isRecommended) {
-        Spacer(Modifier.width(8.dp))
-        Surface(shape = RoundedCornerShape(4.dp), color = MaterialTheme.colorScheme.tertiary) {
-          Text(
-            text = stringResource(CommonR.string.recommended),
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onTertiary,
-          )
-        }
-      }
     }
   }
 }

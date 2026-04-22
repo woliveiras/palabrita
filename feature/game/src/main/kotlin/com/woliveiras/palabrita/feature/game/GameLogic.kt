@@ -85,32 +85,6 @@ object GameLogic {
     return "Palabrita $stars — $score\n\n$emojiGrid\n\n$footer"
   }
 
-  fun buildDifficultyOptions(
-    currentDifficulty: Int,
-    maxUnlockedDifficulty: Int,
-  ): List<DifficultyOption> {
-    val labelRes =
-      listOf(
-        com.woliveiras.palabrita.core.common.R.string.difficulty_easy,
-        com.woliveiras.palabrita.core.common.R.string.difficulty_normal,
-        com.woliveiras.palabrita.core.common.R.string.difficulty_hard,
-        com.woliveiras.palabrita.core.common.R.string.difficulty_challenging,
-        com.woliveiras.palabrita.core.common.R.string.difficulty_expert,
-      )
-    val baseXps = listOf(1, 2, 3, 5, 8)
-
-    return (1..5).map { level ->
-      DifficultyOption(
-        level = level,
-        labelRes = labelRes[level - 1],
-        baseXp = baseXps[level - 1],
-        isUnlocked = level <= maxUnlockedDifficulty,
-        isSelectable = level <= maxUnlockedDifficulty + 1,
-        isRecommended = level == currentDifficulty,
-      )
-    }
-  }
-
   fun difficultyToWordLength(difficulty: Int, wordSizePreference: String): IntRange {
     return when (wordSizePreference) {
       "SHORT" -> 5..6
