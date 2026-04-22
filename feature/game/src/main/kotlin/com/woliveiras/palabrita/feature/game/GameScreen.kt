@@ -163,7 +163,7 @@ private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int)
     }
 
     Text(
-      text = stringResource(CommonR.string.game_header_free),
+      text = stringResource(CommonR.string.app_name_display),
       style = MaterialTheme.typography.titleMedium,
       fontWeight = FontWeight.Bold,
     )
