@@ -45,19 +45,22 @@ constructor(
 
     Log.i(TAG, "generateBatch: difficulty=$targetDifficulty count=$count length=$wordLength")
 
+    val batchWords = mutableListOf<String>()
+
     for (i in 0 until count) {
       val puzzle =
         generateSinglePuzzle(
           language = language,
           difficulty = targetDifficulty,
           wordLength = wordLength,
-          recentWords = recentWords,
+          recentWords = recentWords + batchWords,
           usedWords = usedWords,
           modelId = modelId,
         )
       if (puzzle != null) {
         generated.add(puzzle)
         usedWords.add(puzzle.word)
+        batchWords.add(puzzle.word)
         Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
       } else {
         Log.w(TAG, "  puzzle ${i + 1}/$count FAILED after $MAX_RETRIES retries")
