@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,7 +38,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.ChevronLeft
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Memory
@@ -46,6 +47,7 @@ import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Spellcheck
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -191,11 +193,12 @@ private fun WelcomeScreen(onNext: () -> Unit) {
     modifier =
       Modifier.fillMaxSize()
         .background(PalabritaColors.BackgroundLight)
+        .statusBarsPadding()
         .navigationBarsPadding()
         .padding(horizontal = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Spacer(Modifier.height(64.dp))
+    Spacer(Modifier.height(32.dp))
 
     AnimatedVisibility(
       visible = logoVisible,
@@ -328,6 +331,7 @@ private fun LanguageScreen(
     modifier =
       Modifier.fillMaxSize()
         .background(PalabritaColors.BackgroundLight)
+        .statusBarsPadding()
         .navigationBarsPadding(),
   ) {
     BackButton(onBack)
@@ -431,6 +435,7 @@ private fun ModelSelectionScreen(
     modifier =
       Modifier.fillMaxSize()
         .background(PalabritaColors.BackgroundLight)
+        .statusBarsPadding()
         .navigationBarsPadding(),
   ) {
     BackButton(onBack)
@@ -606,6 +611,7 @@ private fun DownloadScreen(
     modifier =
       Modifier.fillMaxSize()
         .background(PalabritaColors.BackgroundLight)
+        .statusBarsPadding()
         .navigationBarsPadding()
         .padding(horizontal = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -787,23 +793,14 @@ private fun GradientButton(
 
 @Composable
 private fun BackButton(onBack: () -> Unit) {
-  Row(
-    modifier =
-      Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-        .clickable { onBack() }
-        .padding(horizontal = 8.dp, vertical = 8.dp),
-    verticalAlignment = Alignment.CenterVertically,
+  IconButton(
+    onClick = onBack,
+    modifier = Modifier.padding(4.dp),
   ) {
     Icon(
-      imageVector = Icons.Rounded.ChevronLeft,
-      contentDescription = null,
+      imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+      contentDescription = stringResource(CommonR.string.back),
       tint = PalabritaColors.ContentPrimary,
-      modifier = Modifier.size(20.dp),
-    )
-    Text(
-      text = stringResource(CommonR.string.back),
-      style = MaterialTheme.typography.bodyMedium,
-      color = PalabritaColors.ContentPrimary,
     )
   }
 }
