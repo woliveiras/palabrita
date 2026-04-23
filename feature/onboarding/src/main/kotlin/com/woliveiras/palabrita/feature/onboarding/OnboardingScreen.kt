@@ -91,14 +91,17 @@ fun OnboardingScreen(
     }
   }
 
-  if (
-    state.currentStep == OnboardingStep.GENERATION || state.currentStep == OnboardingStep.COMPLETE
-  ) {
-    return
-  }
+  // Map transient navigation steps to DOWNLOAD so the screen keeps rendering
+  // meaningful content while the NavHost exit animation plays, preventing a blank frame.
+  val displayStep =
+    when (state.currentStep) {
+      OnboardingStep.GENERATION,
+      OnboardingStep.COMPLETE -> OnboardingStep.DOWNLOAD
+      else -> state.currentStep
+    }
 
   AnimatedContent(
-    targetState = state.currentStep,
+    targetState = displayStep,
     transitionSpec = {
       (slideInHorizontally { it } + fadeIn()) togetherWith
         (slideOutHorizontally { -it } + fadeOut())
@@ -137,12 +140,8 @@ fun OnboardingScreen(
           onRetry = { viewModel.onAction(OnboardingAction.RetryDownload) },
           onCancel = { viewModel.onAction(OnboardingAction.CancelDownload) },
         )
-      OnboardingStep.COMPLETE -> {
-        /* handled above */
-      }
-      OnboardingStep.GENERATION -> {
-        /* handled above */
-      }
+      OnboardingStep.GENERATION,
+      OnboardingStep.COMPLETE -> Unit
     }
   }
 
