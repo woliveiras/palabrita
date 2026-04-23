@@ -15,6 +15,7 @@ data class OnboardingState(
   val downloadFailed: Boolean = false,
   val downloadErrorMessage: String? = null,
   val error: OnboardingError? = null,
+  val downloadComplete: Boolean = false,
 )
 
 enum class OnboardingStep {
@@ -51,4 +52,6 @@ sealed class OnboardingAction {
   data object RetryDownload : OnboardingAction()
 
   data object DismissTierWarning : OnboardingAction()
+
+  data object ProceedToGeneration : OnboardingAction()
 }

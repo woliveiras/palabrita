@@ -58,6 +58,8 @@ constructor(
       is OnboardingAction.StartDownload -> startDownload()
       is OnboardingAction.CancelDownload -> cancelDownload()
       is OnboardingAction.RetryDownload -> retryDownload()
+      is OnboardingAction.ProceedToGeneration ->
+        _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
     }
   }
 
@@ -196,12 +198,12 @@ constructor(
             is EngineState.Ready -> {
               enqueueBackgroundGeneration()
               statsRepository.updateLanguage(_state.value.selectedLanguage)
-              _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
+              _state.update { it.copy(downloadComplete = true) }
               return@collect
             }
             is EngineState.Error -> {
               statsRepository.updateLanguage(_state.value.selectedLanguage)
-              _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
+              _state.update { it.copy(downloadComplete = true) }
               return@collect
             }
             else -> {
@@ -211,7 +213,7 @@ constructor(
         }
       } catch (e: Exception) {
         statsRepository.updateLanguage(_state.value.selectedLanguage)
-        _state.update { it.copy(currentStep = OnboardingStep.GENERATION) }
+        _state.update { it.copy(downloadComplete = true) }
       }
     }
   }

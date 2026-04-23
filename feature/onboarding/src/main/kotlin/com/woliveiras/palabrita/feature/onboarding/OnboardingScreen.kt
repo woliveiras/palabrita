@@ -137,8 +137,10 @@ fun OnboardingScreen(
           totalBytes = state.totalBytes,
           downloadFailed = state.downloadFailed,
           errorMessage = state.downloadErrorMessage,
+          downloadComplete = state.downloadComplete,
           onRetry = { viewModel.onAction(OnboardingAction.RetryDownload) },
           onCancel = { viewModel.onAction(OnboardingAction.CancelDownload) },
+          onContinue = { viewModel.onAction(OnboardingAction.ProceedToGeneration) },
         )
       OnboardingStep.GENERATION,
       OnboardingStep.COMPLETE -> Unit
@@ -674,8 +676,10 @@ private fun DownloadScreen(
   totalBytes: Long,
   downloadFailed: Boolean,
   errorMessage: String?,
+  downloadComplete: Boolean,
   onRetry: () -> Unit,
   onCancel: () -> Unit,
+  onContinue: () -> Unit,
 ) {
   // Derive visual status from progress + failed flag
   val isComplete = downloadProgress >= 1f && !downloadFailed
@@ -810,7 +814,14 @@ private fun DownloadScreen(
       TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(CommonR.string.download_choose_other))
       }
-    } else if (!isComplete) {
+    } else if (isComplete) {
+      Spacer(Modifier.height(24.dp))
+      GradientButton(
+        text = stringResource(CommonR.string.continue_button),
+        onClick = onContinue,
+        enabled = downloadComplete,
+      )
+    } else {
       Spacer(Modifier.height(16.dp))
       TextButton(onClick = onCancel) { Text(stringResource(CommonR.string.cancel)) }
     }
