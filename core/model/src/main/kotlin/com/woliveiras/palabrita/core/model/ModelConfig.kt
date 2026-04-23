@@ -10,7 +10,11 @@ data class ModelConfig(
 )
 
 enum class ModelId {
+  GEMMA4_E4B,
   GEMMA4_E2B,
+  PHI4_MINI,
+  DEEPSEEK_R1_1_5B,
+  QWEN2_5_1_5B,
   QWEN3_0_6B,
   NONE,
 }

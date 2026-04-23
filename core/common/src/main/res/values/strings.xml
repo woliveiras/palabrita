@@ -41,6 +41,18 @@
     <string name="model_compact_subtitle">Otimizado para velocidade e bateria</string>
     <string name="model_compact_info">Todos os dispositivos · 614 MB</string>
     <string name="model_auto_select">Escolha por mim</string>
+    <string name="model_qwen25_1_5b_title">Qwen2.5 1.5B</string>
+    <string name="model_qwen25_1_5b_subtitle">Excelente suporte multilíngue e ao português</string>
+    <string name="model_qwen25_1_5b_info">6 GB RAM · 1,6 GB</string>
+    <string name="model_deepseek_r1_title">DeepSeek R1 1.5B</string>
+    <string name="model_deepseek_r1_subtitle">Raciocínio passo a passo (Chain-of-Thought)</string>
+    <string name="model_deepseek_r1_info">6 GB RAM · 1,83 GB</string>
+    <string name="model_phi4_mini_title">Phi-4 Mini</string>
+    <string name="model_phi4_mini_subtitle">Raciocínio lógico superior da Microsoft</string>
+    <string name="model_phi4_mini_info">Dispositivos high-end · 3,9 GB</string>
+    <string name="model_gemma4_e4b_title">Gemma 4 4B</string>
+    <string name="model_gemma4_e4b_subtitle">O mais poderoso da família Gemma</string>
+    <string name="model_gemma4_e4b_info">Dispositivos premium · 3,65 GB</string>
 
     <!-- Onboarding: Download -->
     <string name="download_title">Baixando modelo de IA</string>
@@ -53,8 +65,12 @@
     <string name="download_tip">💡 <b>Sabia que?</b> Seu modelo de IA fica no dispositivo e funciona completamente offline.</string>
     <string name="download_description">O modelo de inteligência artificial será baixado para o seu celular. Depois disso, tudo funcionará offline!</string>
     <string name="download_model_label">Modelo: %s</string>
-    <string name="download_model_gemma4">Gemma 4 E2B (~2,6 GB)</string>
+    <string name="download_model_gemma4">Gemma 4 2B (~2,6 GB)</string>
     <string name="download_model_qwen3">Qwen3 0.6B (~614 MB)</string>
+    <string name="download_model_qwen25_1_5b">Qwen2.5 1.5B (~1,6 GB)</string>
+    <string name="download_model_deepseek_r1">DeepSeek R1 1.5B (~1,8 GB)</string>
+    <string name="download_model_phi4_mini">Phi-4 Mini (~3,9 GB)</string>
+    <string name="download_model_gemma4_e4b">Gemma 4 4B (~3,65 GB)</string>
     <string name="download_model_unknown">—</string>
     <string name="download_failed">Falha no download</string>
     <string name="download_retry">Tentar novamente</string>
@@ -136,7 +152,11 @@
     <string name="settings_word_size_locked">Desbloqueado no Astuto</string>
     <string name="settings_section_ai">Inteligência Artificial</string>
     <string name="settings_current_model">Modelo atual</string>
-    <string name="settings_model_gemma4">Gemma 4 E2B</string>
+    <string name="settings_model_gemma4">Gemma 4 2B</string>
+    <string name="settings_model_gemma4_e4b">Gemma 4 4B</string>
+    <string name="settings_model_phi4_mini">Phi-4 Mini</string>
+    <string name="settings_model_deepseek_r1">DeepSeek R1 1.5B</string>
+    <string name="settings_model_qwen25_1_5b">Qwen2.5 1.5B</string>
     <string name="settings_model_qwen3">Qwen3 0.6B</string>
     <string name="settings_model_none">Nenhum</string>
     <string name="settings_storage">Espaço usado</string>

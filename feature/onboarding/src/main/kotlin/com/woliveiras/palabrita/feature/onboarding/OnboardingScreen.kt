@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -28,17 +27,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Memory
@@ -47,13 +47,10 @@ import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Spellcheck
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -173,19 +170,37 @@ private fun WelcomeScreen(onNext: () -> Unit) {
 
   LaunchedEffect(Unit) {
     logoVisible = true
-    delay(100); titleVisible = true
-    delay(100); descVisible = true
-    delay(100); card0Visible = true
-    delay(100); card1Visible = true
-    delay(100); card2Visible = true
-    delay(100); buttonVisible = true
+    delay(100)
+    titleVisible = true
+    delay(100)
+    descVisible = true
+    delay(100)
+    card0Visible = true
+    delay(100)
+    card1Visible = true
+    delay(100)
+    card2Visible = true
+    delay(100)
+    buttonVisible = true
   }
 
   val features =
     listOf(
-      Triple(Icons.Rounded.Psychology, CommonR.string.feature_ai_title, CommonR.string.feature_ai_desc),
-      Triple(Icons.Rounded.Bolt, CommonR.string.feature_offline_title, CommonR.string.feature_offline_desc),
-      Triple(Icons.Rounded.Shield, CommonR.string.feature_private_title, CommonR.string.feature_private_desc),
+      Triple(
+        Icons.Rounded.Psychology,
+        CommonR.string.feature_ai_title,
+        CommonR.string.feature_ai_desc,
+      ),
+      Triple(
+        Icons.Rounded.Bolt,
+        CommonR.string.feature_offline_title,
+        CommonR.string.feature_offline_desc,
+      ),
+      Triple(
+        Icons.Rounded.Shield,
+        CommonR.string.feature_private_title,
+        CommonR.string.feature_private_desc,
+      ),
     )
   val cardVisibilities = listOf(card0Visible, card1Visible, card2Visible)
 
@@ -202,14 +217,18 @@ private fun WelcomeScreen(onNext: () -> Unit) {
 
     AnimatedVisibility(
       visible = logoVisible,
-      enter = scaleIn(initialScale = 0.9f, animationSpec = tween(500, easing = FastOutSlowInEasing)) + fadeIn(tween(500)),
+      enter =
+        scaleIn(initialScale = 0.9f, animationSpec = tween(500, easing = FastOutSlowInEasing)) +
+          fadeIn(tween(500)),
     ) {
       Box(
         contentAlignment = Alignment.Center,
         modifier =
           Modifier.size(80.dp)
             .background(
-              Brush.linearGradient(listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)),
+              Brush.linearGradient(
+                listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
+              ),
               RoundedCornerShape(24.dp),
             ),
       ) {
@@ -226,7 +245,8 @@ private fun WelcomeScreen(onNext: () -> Unit) {
 
     AnimatedVisibility(
       visible = titleVisible,
-      enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
+      enter =
+        slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
     ) {
       Text(
         text = stringResource(CommonR.string.welcome_title_new),
@@ -240,7 +260,8 @@ private fun WelcomeScreen(onNext: () -> Unit) {
 
     AnimatedVisibility(
       visible = descVisible,
-      enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
+      enter =
+        slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
     ) {
       Text(
         text = stringResource(CommonR.string.welcome_description),
@@ -255,7 +276,9 @@ private fun WelcomeScreen(onNext: () -> Unit) {
     features.forEachIndexed { index, (icon, titleRes, descRes) ->
       AnimatedVisibility(
         visible = cardVisibilities[index],
-        enter = slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } + fadeIn(tween(500)),
+        enter =
+          slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } +
+            fadeIn(tween(500)),
       ) {
         FeatureCard(icon = icon, titleRes = titleRes, descRes = descRes)
       }
@@ -269,10 +292,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
       enter = fadeIn(tween(500)),
       modifier = Modifier.padding(bottom = 24.dp),
     ) {
-      GradientButton(
-        text = stringResource(CommonR.string.welcome_start),
-        onClick = onNext,
-      )
+      GradientButton(text = stringResource(CommonR.string.welcome_start), onClick = onNext)
     }
   }
 }
@@ -332,7 +352,7 @@ private fun LanguageScreen(
       Modifier.fillMaxSize()
         .background(PalabritaColors.BackgroundLight)
         .statusBarsPadding()
-        .navigationBarsPadding(),
+        .navigationBarsPadding()
   ) {
     BackButton(onBack)
     Column(
@@ -378,7 +398,9 @@ private fun LanguageCard(
 ) {
   val isSelected = code == selected
   val borderColor = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.OutlineDefault
-  val bgColor = if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f) else PalabritaColors.SurfaceLight
+  val bgColor =
+    if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f)
+    else PalabritaColors.SurfaceLight
 
   Row(
     modifier =
@@ -404,7 +426,11 @@ private fun LanguageCard(
         )
       }
     }
-    Text(text = label, style = MaterialTheme.typography.titleMedium, color = PalabritaColors.ContentPrimary)
+    Text(
+      text = label,
+      style = MaterialTheme.typography.titleMedium,
+      color = PalabritaColors.ContentPrimary,
+    )
   }
 }
 
@@ -420,30 +446,93 @@ private fun ModelSelectionScreen(
   onBack: () -> Unit,
 ) {
   var headerVisible by remember { mutableStateOf(false) }
-  var card0Visible by remember { mutableStateOf(false) }
-  var card1Visible by remember { mutableStateOf(false) }
+  val cardVisibilities = remember { List(6) { mutableStateOf(false) } }
   var buttonVisible by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     headerVisible = true
-    delay(100); card0Visible = true
-    delay(100); card1Visible = true
-    delay(100); buttonVisible = true
+    cardVisibilities.forEach { state ->
+      delay(100)
+      state.value = true
+    }
+    delay(100)
+    buttonVisible = true
   }
+
+  val modelOptions =
+    listOf(
+      Triple(
+        ModelId.GEMMA4_E4B,
+        stringResource(CommonR.string.model_gemma4_e4b_title),
+        Pair(
+          stringResource(CommonR.string.model_gemma4_e4b_subtitle),
+          stringResource(CommonR.string.model_gemma4_e4b_info),
+        ),
+      ) to Pair(Icons.Rounded.AutoAwesome, listOf(Color(0xFFD946EF), Color(0xFF7C3AED))),
+      Triple(
+        ModelId.GEMMA4_E2B,
+        stringResource(CommonR.string.model_powerful_title),
+        Pair(
+          stringResource(CommonR.string.model_powerful_subtitle),
+          stringResource(CommonR.string.model_powerful_info),
+        ),
+      ) to
+        Pair(
+          Icons.Rounded.Memory,
+          listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet),
+        ),
+      Triple(
+        ModelId.PHI4_MINI,
+        stringResource(CommonR.string.model_phi4_mini_title),
+        Pair(
+          stringResource(CommonR.string.model_phi4_mini_subtitle),
+          stringResource(CommonR.string.model_phi4_mini_info),
+        ),
+      ) to Pair(Icons.Rounded.Psychology, listOf(Color(0xFF0EA5E9), Color(0xFF6366F1))),
+      Triple(
+        ModelId.DEEPSEEK_R1_1_5B,
+        stringResource(CommonR.string.model_deepseek_r1_title),
+        Pair(
+          stringResource(CommonR.string.model_deepseek_r1_subtitle),
+          stringResource(CommonR.string.model_deepseek_r1_info),
+        ),
+      ) to Pair(Icons.Rounded.Spellcheck, listOf(Color(0xFF10B981), Color(0xFF0891B2))),
+      Triple(
+        ModelId.QWEN2_5_1_5B,
+        stringResource(CommonR.string.model_qwen25_1_5b_title),
+        Pair(
+          stringResource(CommonR.string.model_qwen25_1_5b_subtitle),
+          stringResource(CommonR.string.model_qwen25_1_5b_info),
+        ),
+      ) to Pair(Icons.Rounded.Bolt, listOf(Color(0xFFF59E0B), Color(0xFFEF4444))),
+      Triple(
+        ModelId.QWEN3_0_6B,
+        stringResource(CommonR.string.model_compact_title),
+        Pair(
+          stringResource(CommonR.string.model_compact_subtitle),
+          stringResource(CommonR.string.model_compact_info),
+        ),
+      ) to Pair(Icons.Rounded.PhoneAndroid, listOf(Color(0xFF06B6D4), Color(0xFF2563EB))),
+    )
 
   Column(
     modifier =
       Modifier.fillMaxSize()
         .background(PalabritaColors.BackgroundLight)
         .statusBarsPadding()
-        .navigationBarsPadding(),
+        .navigationBarsPadding()
   ) {
     BackButton(onBack)
 
-    Column(modifier = Modifier.weight(1f).padding(horizontal = 24.dp)) {
+    Column(
+      modifier =
+        Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)
+    ) {
       AnimatedVisibility(
         visible = headerVisible,
-        enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
+        enter =
+          slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } +
+            fadeIn(tween(500)),
       ) {
         Column {
           Text(
@@ -461,36 +550,27 @@ private fun ModelSelectionScreen(
         }
       }
 
-      AnimatedVisibility(
-        visible = card0Visible,
-        enter = slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } + fadeIn(tween(500)),
-      ) {
-        ModelCard(
-          title = stringResource(CommonR.string.model_powerful_title),
-          subtitle = stringResource(CommonR.string.model_powerful_subtitle),
-          info = stringResource(CommonR.string.model_powerful_info),
-          icon = Icons.Rounded.Memory,
-          iconGradient = listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet),
-          isSelected = selectedModel == ModelId.GEMMA4_E2B,
-          onClick = { onSelectModel(ModelId.GEMMA4_E2B) },
-        )
-      }
-
-      Spacer(Modifier.height(12.dp))
-
-      AnimatedVisibility(
-        visible = card1Visible,
-        enter = slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } + fadeIn(tween(500)),
-      ) {
-        ModelCard(
-          title = stringResource(CommonR.string.model_compact_title),
-          subtitle = stringResource(CommonR.string.model_compact_subtitle),
-          info = stringResource(CommonR.string.model_compact_info),
-          icon = Icons.Rounded.PhoneAndroid,
-          iconGradient = listOf(Color(0xFF06B6D4), Color(0xFF2563EB)),
-          isSelected = selectedModel == ModelId.QWEN3_0_6B,
-          onClick = { onSelectModel(ModelId.QWEN3_0_6B) },
-        )
+      modelOptions.forEachIndexed { index, (modelTriple, iconPair) ->
+        val (modelId, title, subtitleInfo) = modelTriple
+        val (subtitle, info) = subtitleInfo
+        val (icon, gradient) = iconPair
+        AnimatedVisibility(
+          visible = cardVisibilities[index].value,
+          enter =
+            slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } +
+              fadeIn(tween(500)),
+        ) {
+          ModelCard(
+            title = title,
+            subtitle = subtitle,
+            info = info,
+            icon = icon,
+            iconGradient = gradient,
+            isSelected = selectedModel == modelId,
+            onClick = { onSelectModel(modelId) },
+          )
+        }
+        if (index < modelOptions.lastIndex) Spacer(Modifier.height(12.dp))
       }
 
       Spacer(Modifier.height(16.dp))
@@ -498,11 +578,14 @@ private fun ModelSelectionScreen(
       TextButton(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(CommonR.string.model_auto_select), color = PalabritaColors.BrandPurple)
       }
+
+      Spacer(Modifier.height(16.dp))
     }
 
     AnimatedVisibility(
       visible = buttonVisible,
-      enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
+      enter =
+        slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
       modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp),
     ) {
       GradientButton(
@@ -525,7 +608,9 @@ private fun ModelCard(
   onClick: () -> Unit,
 ) {
   val borderColor = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.OutlineDefault
-  val bgColor = if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f) else PalabritaColors.SurfaceLight
+  val bgColor =
+    if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f)
+    else PalabritaColors.SurfaceLight
 
   Row(
     modifier =
@@ -542,17 +627,26 @@ private fun ModelCard(
       contentAlignment = Alignment.Center,
       modifier =
         Modifier.size(56.dp)
-          .background(
-            Brush.linearGradient(iconGradient),
-            RoundedCornerShape(16.dp),
-          ),
+          .background(Brush.linearGradient(iconGradient), RoundedCornerShape(16.dp)),
     ) {
-      Icon(imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
+      Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = Color.White,
+        modifier = Modifier.size(28.dp),
+      )
     }
 
     Column(modifier = Modifier.weight(1f)) {
-      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(text = title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold), color = PalabritaColors.ContentPrimary)
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+      ) {
+        Text(
+          text = title,
+          style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+          color = PalabritaColors.ContentPrimary,
+        )
         if (isSelected) {
           Icon(
             imageVector = Icons.Rounded.Check,
@@ -569,9 +663,7 @@ private fun ModelCard(
         color = PalabritaColors.ContentSecondary,
       )
       Spacer(Modifier.height(10.dp))
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Chip(text = info)
-      }
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { Chip(text = info) }
     }
   }
 }
@@ -602,7 +694,11 @@ private fun DownloadScreen(
 
   val modelName =
     when (modelId) {
+      ModelId.GEMMA4_E4B -> stringResource(CommonR.string.download_model_gemma4_e4b)
       ModelId.GEMMA4_E2B -> stringResource(CommonR.string.download_model_gemma4)
+      ModelId.PHI4_MINI -> stringResource(CommonR.string.download_model_phi4_mini)
+      ModelId.DEEPSEEK_R1_1_5B -> stringResource(CommonR.string.download_model_deepseek_r1)
+      ModelId.QWEN2_5_1_5B -> stringResource(CommonR.string.download_model_qwen25_1_5b)
       ModelId.QWEN3_0_6B -> stringResource(CommonR.string.download_model_qwen3)
       else -> stringResource(CommonR.string.download_model_unknown)
     }
@@ -633,7 +729,9 @@ private fun DownloadScreen(
         modifier =
           Modifier.size(96.dp)
             .background(
-              Brush.linearGradient(listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)),
+              Brush.linearGradient(
+                listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
+              ),
               RoundedCornerShape(24.dp),
             ),
       ) {
@@ -643,7 +741,12 @@ private fun DownloadScreen(
             isComplete -> Icons.Rounded.Check
             else -> Icons.Rounded.Download
           }
-        Icon(imageVector = statusIcon, contentDescription = null, tint = Color.White, modifier = Modifier.size(48.dp))
+        Icon(
+          imageVector = statusIcon,
+          contentDescription = null,
+          tint = Color.White,
+          modifier = Modifier.size(48.dp),
+        )
       }
     }
 
@@ -681,10 +784,7 @@ private fun DownloadScreen(
 
     if (!downloadFailed) {
       // Progress row
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-      ) {
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(
           text = stringResource(CommonR.string.download_progress_label),
           style = MaterialTheme.typography.bodySmall,
@@ -704,7 +804,7 @@ private fun DownloadScreen(
           Modifier.fillMaxWidth()
             .height(10.dp)
             .clip(RoundedCornerShape(50.dp))
-            .background(PalabritaColors.OutlineDefault),
+            .background(PalabritaColors.OutlineDefault)
       ) {
         Box(
           modifier =
@@ -715,7 +815,7 @@ private fun DownloadScreen(
                 Brush.horizontalGradient(
                   listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
                 )
-              ),
+              )
         )
       }
     }
@@ -728,8 +828,12 @@ private fun DownloadScreen(
         modifier =
           Modifier.fillMaxWidth()
             .background(PalabritaColors.ContainerBlue, RoundedCornerShape(16.dp))
-            .border(1.dp, PalabritaColors.OnContainerBlue.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
-            .padding(16.dp),
+            .border(
+              1.dp,
+              PalabritaColors.OnContainerBlue.copy(alpha = 0.2f),
+              RoundedCornerShape(16.dp),
+            )
+            .padding(16.dp)
       ) {
         Text(
           text = stringResource(CommonR.string.download_tip),
@@ -793,10 +897,7 @@ private fun GradientButton(
 
 @Composable
 private fun BackButton(onBack: () -> Unit) {
-  IconButton(
-    onClick = onBack,
-    modifier = Modifier.padding(4.dp),
-  ) {
+  IconButton(onClick = onBack, modifier = Modifier.padding(4.dp)) {
     Icon(
       imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
       contentDescription = stringResource(CommonR.string.back),
@@ -810,7 +911,7 @@ private fun Chip(text: String) {
   Box(
     modifier =
       Modifier.background(PalabritaColors.SurfaceVariantLight, RoundedCornerShape(50.dp))
-        .padding(horizontal = 12.dp, vertical = 4.dp),
+        .padding(horizontal = 12.dp, vertical = 4.dp)
   ) {
     Text(
       text = text,

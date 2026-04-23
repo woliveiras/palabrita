@@ -136,7 +136,11 @@ constructor(
 
   private fun buildSystemPrompt(modelId: ModelId, language: String): String =
     when (modelId) {
+      ModelId.GEMMA4_E4B,
       ModelId.GEMMA4_E2B -> PromptTemplates.puzzleSystemPromptGemma4()
+      ModelId.PHI4_MINI,
+      ModelId.DEEPSEEK_R1_1_5B,
+      ModelId.QWEN2_5_1_5B,
       ModelId.QWEN3_0_6B,
       ModelId.NONE -> PromptTemplates.puzzlePromptGemma3(language, 1, 4, 5, emptyList())
     }
@@ -154,6 +158,7 @@ constructor(
     val avoidWords = (recentWords + usedWords).distinct().takeLast(30)
     val base =
       when (modelId) {
+        ModelId.GEMMA4_E4B,
         ModelId.GEMMA4_E2B ->
           PromptTemplates.puzzleUserPromptGemma4(
             language,
@@ -162,6 +167,9 @@ constructor(
             wordLength.last,
             avoidWords,
           )
+        ModelId.PHI4_MINI,
+        ModelId.DEEPSEEK_R1_1_5B,
+        ModelId.QWEN2_5_1_5B,
         ModelId.QWEN3_0_6B ->
           PromptTemplates.puzzlePromptGemma3(
             language,

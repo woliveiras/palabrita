@@ -139,7 +139,11 @@ fun SettingsScreen(
 
       val modelName =
         when (state.currentModel.modelId) {
+          ModelId.GEMMA4_E4B -> stringResource(CommonR.string.settings_model_gemma4_e4b)
           ModelId.GEMMA4_E2B -> stringResource(CommonR.string.settings_model_gemma4)
+          ModelId.PHI4_MINI -> stringResource(CommonR.string.settings_model_phi4_mini)
+          ModelId.DEEPSEEK_R1_1_5B -> stringResource(CommonR.string.settings_model_deepseek_r1)
+          ModelId.QWEN2_5_1_5B -> stringResource(CommonR.string.settings_model_qwen25_1_5b)
           ModelId.QWEN3_0_6B -> stringResource(CommonR.string.settings_model_qwen3)
           ModelId.NONE -> stringResource(CommonR.string.settings_model_none)
         }

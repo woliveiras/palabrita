@@ -143,7 +143,9 @@ constructor(
     val tier = _state.value.deviceTier
     val requiresTierWarning =
       when {
-        modelId == ModelId.GEMMA4_E2B && tier != DeviceTier.HIGH -> true
+        modelId == ModelId.GEMMA4_E4B -> true
+        (modelId == ModelId.GEMMA4_E2B || modelId == ModelId.PHI4_MINI) &&
+          tier != DeviceTier.HIGH -> true
         else -> false
       }
     _state.update { it.copy(selectedModel = modelId, showTierWarning = requiresTierWarning) }

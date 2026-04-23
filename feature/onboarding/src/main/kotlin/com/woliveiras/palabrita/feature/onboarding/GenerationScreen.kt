@@ -82,14 +82,16 @@ fun GenerationScreen(
     infiniteTransition.animateFloat(
       initialValue = 0f,
       targetValue = -18f,
-      animationSpec = infiniteRepeatable(tween(2_200, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+      animationSpec =
+        infiniteRepeatable(tween(2_200, easing = FastOutSlowInEasing), RepeatMode.Reverse),
       label = "p0y",
     )
   val particle1Y by
     infiniteTransition.animateFloat(
       initialValue = 0f,
       targetValue = -12f,
-      animationSpec = infiniteRepeatable(tween(1_800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+      animationSpec =
+        infiniteRepeatable(tween(1_800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
       label = "p1y",
     )
   val particle0Alpha by
@@ -117,20 +119,14 @@ fun GenerationScreen(
     verticalArrangement = Arrangement.Center,
   ) {
     // Icon with floating particles
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier = Modifier.size(160.dp),
-    ) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(160.dp)) {
       // Soft radial glow behind icon
       Box(
         modifier =
           Modifier.size(160.dp)
             .background(
               Brush.radialGradient(
-                listOf(
-                  PalabritaColors.BrandPurple.copy(alpha = 0.15f),
-                  Color.Transparent,
-                )
+                listOf(PalabritaColors.BrandPurple.copy(alpha = 0.15f), Color.Transparent)
               )
             )
       )
@@ -165,7 +161,9 @@ fun GenerationScreen(
         modifier =
           Modifier.size(96.dp)
             .background(
-              Brush.linearGradient(listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)),
+              Brush.linearGradient(
+                listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
+              ),
               RoundedCornerShape(24.dp),
             ),
       ) {
@@ -194,8 +192,7 @@ fun GenerationScreen(
     Text(
       text =
         if (isComplete) stringResource(CommonR.string.generation_complete_subtitle)
-        else if (isFailed) ""
-        else stringResource(CommonR.string.generation_subtitle),
+        else if (isFailed) "" else stringResource(CommonR.string.generation_subtitle),
       style = MaterialTheme.typography.bodyMedium,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       textAlign = TextAlign.Center,
@@ -209,12 +206,10 @@ fun GenerationScreen(
         Modifier.fillMaxWidth()
           .clip(RoundedCornerShape(24.dp))
           .background(
-            Brush.linearGradient(
-              listOf(PalabritaColors.ContainerPurple, Color(0xFFF5F3FF))
-            )
+            Brush.linearGradient(listOf(PalabritaColors.ContainerPurple, Color(0xFFF5F3FF)))
           )
           .border(1.dp, PalabritaColors.BrandPurple.copy(alpha = 0.2f), RoundedCornerShape(24.dp))
-          .padding(24.dp),
+          .padding(24.dp)
     ) {
       Row(
         modifier = Modifier.fillMaxWidth(),
@@ -230,10 +225,11 @@ fun GenerationScreen(
         key(puzzlesGenerated) {
           Text(
             text = puzzlesGenerated.toString(),
-            style = MaterialTheme.typography.headlineSmall.copy(
-              fontWeight = FontWeight.Bold,
-              color = PalabritaColors.BrandIndigo,
-            ),
+            style =
+              MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold,
+                color = PalabritaColors.BrandIndigo,
+              ),
           )
         }
       }
@@ -245,7 +241,7 @@ fun GenerationScreen(
           Modifier.fillMaxWidth()
             .height(6.dp)
             .clip(RoundedCornerShape(50.dp))
-            .background(Color.White.copy(alpha = 0.5f)),
+            .background(Color.White.copy(alpha = 0.5f))
       ) {
         Box(
           modifier =
@@ -256,7 +252,7 @@ fun GenerationScreen(
                 Brush.horizontalGradient(
                   listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
                 )
-              ),
+              )
         )
       }
     }
@@ -265,7 +261,8 @@ fun GenerationScreen(
 
     AnimatedVisibility(
       visible = isComplete,
-      enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
+      enter =
+        slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
     ) {
       GradientButton(
         text = stringResource(CommonR.string.generation_continue),
@@ -302,4 +299,3 @@ private fun GradientButton(text: String, onClick: () -> Unit) {
     )
   }
 }
-

@@ -164,10 +164,7 @@ fun SplashScreen(onNavigationReady: () -> Unit) {
       modifier =
         Modifier.fillMaxSize()
           .background(
-            Brush.radialGradient(
-              0f to Color.White.copy(alpha = 0.10f),
-              0.5f to Color.Transparent,
-            )
+            Brush.radialGradient(0f to Color.White.copy(alpha = 0.10f), 0.5f to Color.Transparent)
           )
     )
 
@@ -232,9 +229,9 @@ fun SplashScreen(onNavigationReady: () -> Unit) {
     Row(
       horizontalArrangement = Arrangement.spacedBy(8.dp),
       modifier =
-        Modifier.align(Alignment.BottomCenter)
-          .padding(bottom = 48.dp)
-          .graphicsLayer { alpha = dotsAlpha.value },
+        Modifier.align(Alignment.BottomCenter).padding(bottom = 48.dp).graphicsLayer {
+          alpha = dotsAlpha.value
+        },
     ) {
       listOf(dot0Alpha, dot1Alpha, dot2Alpha).forEach { dotAlpha ->
         Box(

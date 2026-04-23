@@ -27,13 +27,13 @@ import androidx.navigation.toRoute
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.data.preferences.AppPreferences
 import com.woliveiras.palabrita.feature.chat.ChatScreen
-import com.woliveiras.palabrita.ui.SplashScreen
 import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen
 import com.woliveiras.palabrita.feature.onboarding.GenerationScreen
 import com.woliveiras.palabrita.feature.onboarding.OnboardingScreen
 import com.woliveiras.palabrita.feature.settings.AiInfoScreen
 import com.woliveiras.palabrita.feature.settings.SettingsScreen
+import com.woliveiras.palabrita.ui.SplashScreen
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 
@@ -109,9 +109,7 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
         SplashScreen(
           onNavigationReady = {
             val destination = if (isOnboardingComplete == true) HomeRoute else OnboardingRoute
-            navController.navigate(destination) {
-              popUpTo(SplashRoute) { inclusive = true }
-            }
+            navController.navigate(destination) { popUpTo(SplashRoute) { inclusive = true } }
           }
         )
       }
