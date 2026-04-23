@@ -63,6 +63,12 @@
     <string name="download_complete_subtitle">Tu IA está lista para generar puzzles</string>
     <string name="download_progress_label">Progreso</string>
     <string name="download_tip">💡 <b>¿Sabías que?</b> Tu modelo de IA se queda en el dispositivo y funciona completamente sin conexión.</string>
+    <string name="download_curiosity_1">🧠 IA local significa que el modelo corre directamente en tu celular — sin enviar nada a la nube.</string>
+    <string name="download_curiosity_2">🔒 IA sin conexión protege tu privacidad: tus conversas y palabras nunca salen del dispositivo.</string>
+    <string name="download_curiosity_3">🌐 IA open source como Gemma y Qwen es desarrollada por comunidades abiertas al mundo.</string>
+    <string name="download_curiosity_4">⚡ Modelos cuantizados como Qwen3 0.6B pueden correr en celulares comunes usando solo ~614 MB.</string>
+    <string name="download_curiosity_5">🤖 Los LLMs aprenden patrones del lenguaje entrenando con miles de millones de textos — todo en tu bolsillo.</string>
+    <string name="download_curiosity_6">📱 ¡Ejecutar IA en el dispositivo es más rápido que en la nube — sin latencia de red!</string>
     <string name="download_description">El modelo de inteligencia artificial se descargará en tu celular. ¡Después de eso, todo funciona sin conexión!</string>
     <string name="download_model_label">Modelo: %s</string>
     <string name="download_model_gemma4">Gemma 4 2B (~2,6 GB)</string>

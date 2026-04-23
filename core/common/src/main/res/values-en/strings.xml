@@ -63,6 +63,12 @@
     <string name="download_complete_subtitle">Your AI is ready to generate puzzles</string>
     <string name="download_progress_label">Progress</string>
     <string name="download_tip">💡 <b>Did you know?</b> Your AI model stays on your device and works completely offline.</string>
+    <string name="download_curiosity_1">🧠 Local AI means the model runs directly on your phone — without sending anything to the cloud.</string>
+    <string name="download_curiosity_2">🔒 Offline AI protects your privacy: your conversations and words never leave your device.</string>
+    <string name="download_curiosity_3">🌐 Open source AI like Gemma and Qwen is developed by communities open to the world.</string>
+    <string name="download_curiosity_4">⚡ Quantized models like Qwen3 0.6B can run on everyday phones using only ~614 MB.</string>
+    <string name="download_curiosity_5">🤖 LLMs learn language patterns by training on billions of texts — all right in your pocket.</string>
+    <string name="download_curiosity_6">📱 Running AI on-device is faster than in the cloud — no network latency!</string>
     <string name="download_description">The AI model will be downloaded to your phone. After that, everything works offline!</string>
     <string name="download_model_label">Model: %s</string>
     <string name="download_model_gemma4">Gemma 4 2B (~2.6 GB)</string>
