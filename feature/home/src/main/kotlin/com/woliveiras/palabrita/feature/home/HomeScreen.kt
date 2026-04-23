@@ -16,12 +16,14 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.woliveiras.palabrita.core.common.LocalGameColors
 import com.woliveiras.palabrita.core.common.R as CommonR
 
 @Composable
@@ -100,12 +101,27 @@ fun HomeScreen(
       }
     }
 
-    // Generation Indicator
-    if (state.isGeneratingPuzzles || state.generationComplete) {
+    // Generation in-progress indicator
+    if (state.isGeneratingPuzzles) {
       Spacer(Modifier.height(16.dp))
-      GenerationIndicator(
-        isGenerating = state.isGeneratingPuzzles,
-        isComplete = state.generationComplete,
+      GenerationIndicator()
+    }
+
+    // Generation complete dialog
+    if (state.generationComplete) {
+      AlertDialog(
+        onDismissRequest = { viewModel.onAction(HomeAction.DismissGenerationBanner) },
+        text = {
+          Text(
+            text = stringResource(CommonR.string.home_generation_complete),
+            style = MaterialTheme.typography.bodyMedium,
+          )
+        },
+        confirmButton = {
+          TextButton(onClick = { viewModel.onAction(HomeAction.DismissGenerationBanner) }) {
+            Text(text = stringResource(CommonR.string.close))
+          }
+        },
       )
     }
 
@@ -159,27 +175,19 @@ private fun StatItem(value: String, label: String) {
 // --- Generation Indicator ---
 
 @Composable
-private fun GenerationIndicator(isGenerating: Boolean, isComplete: Boolean) {
+private fun GenerationIndicator() {
   OutlinedCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
     Row(
       modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      if (isGenerating) {
-        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-        Spacer(Modifier.width(8.dp))
-        Text(
-          text = stringResource(CommonR.string.home_generating),
-          style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-      } else if (isComplete) {
-        Text(
-          text = stringResource(CommonR.string.home_generation_complete),
-          style = MaterialTheme.typography.bodyMedium,
-          color = LocalGameColors.current.correct,
-        )
-      }
+      CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+      Spacer(Modifier.width(8.dp))
+      Text(
+        text = stringResource(CommonR.string.home_generating),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
     }
   }
 }
