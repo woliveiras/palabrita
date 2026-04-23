@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.woliveiras.palabrita.core.common.GameColors
 import com.woliveiras.palabrita.core.common.LocalGameColors
+import com.woliveiras.palabrita.core.common.PalabritaColors
 
 private val LightColorScheme =
   lightColorScheme(
@@ -15,6 +16,8 @@ private val LightColorScheme =
     onPrimary = LightOnPrimary,
     primaryContainer = LightPrimaryContainer,
     onPrimaryContainer = LightOnPrimaryContainer,
+    background = PalabritaColors.BackgroundLight,
+    onBackground = LightOnSurface,
     surface = LightSurface,
     onSurface = LightOnSurface,
     surfaceVariant = LightSurfaceVariant,
@@ -30,6 +33,8 @@ private val DarkColorScheme =
     onPrimary = DarkOnPrimary,
     primaryContainer = DarkPrimaryContainer,
     onPrimaryContainer = DarkOnPrimaryContainer,
+    background = PalabritaColors.BackgroundDark,
+    onBackground = DarkOnSurface,
     surface = DarkSurface,
     onSurface = DarkOnSurface,
     surfaceVariant = DarkSurfaceVariant,
@@ -42,8 +47,14 @@ private val DarkColorScheme =
 @Composable
 fun PalabritaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
   val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+  val gameColors =
+    if (darkTheme) {
+      GameColors(unused = PalabritaColors.TileUnusedDark)
+    } else {
+      GameColors()
+    }
 
-  CompositionLocalProvider(LocalGameColors provides GameColors()) {
+  CompositionLocalProvider(LocalGameColors provides gameColors) {
     MaterialTheme(
       colorScheme = colorScheme,
       typography = PalabritaTypography,
