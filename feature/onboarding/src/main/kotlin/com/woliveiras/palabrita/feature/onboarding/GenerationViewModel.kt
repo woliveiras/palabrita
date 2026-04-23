@@ -148,4 +148,8 @@ constructor(
   fun markOnboardingComplete() {
     viewModelScope.launch { appPreferences.setOnboardingComplete() }
   }
+
+  fun cancelGeneration() {
+    generationScheduler.cancelGeneration()
+  }
 }

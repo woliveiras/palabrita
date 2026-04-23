@@ -32,6 +32,10 @@ class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager:
     )
   }
 
+  override fun cancelGeneration() {
+    workManager.cancelUniqueWork(PuzzleGenerationWorker.WORK_NAME)
+  }
+
   override fun observeGenerationState(): Flow<GenerationWorkState> =
     workManager.getWorkInfosForUniqueWorkFlow(PuzzleGenerationWorker.WORK_NAME).map { infos ->
       val info = infos.firstOrNull()

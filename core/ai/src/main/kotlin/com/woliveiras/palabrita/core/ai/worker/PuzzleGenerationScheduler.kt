@@ -24,6 +24,8 @@ data class GenerationInfo(
 interface PuzzleGenerationScheduler {
   fun scheduleGeneration(modelId: ModelId)
 
+  fun cancelGeneration()
+
   fun observeGenerationState(): Flow<GenerationWorkState>
 
   fun observeGenerationInfo(): Flow<GenerationInfo>

@@ -141,6 +141,11 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
               popUpTo(GenerationRoute::class) { inclusive = true }
             }
           },
+          onCancel = {
+            navController.navigate(OnboardingRoute) {
+              popUpTo(GenerationRoute::class) { inclusive = true }
+            }
+          },
         )
       }
       composable<HomeRoute> {

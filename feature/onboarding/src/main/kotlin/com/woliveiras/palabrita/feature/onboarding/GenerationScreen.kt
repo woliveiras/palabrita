@@ -32,6 +32,7 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,6 +58,7 @@ fun GenerationScreen(
   modelId: ModelId?,
   isRegeneration: Boolean,
   onComplete: () -> Unit,
+  onCancel: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: GenerationViewModel = hiltViewModel(),
 ) {
@@ -276,6 +278,22 @@ fun GenerationScreen(
         text = stringResource(CommonR.string.generation_retry),
         onClick = { modelId?.let { viewModel.triggerGeneration(it) } },
       )
+    }
+
+    if (!isComplete) {
+      Spacer(Modifier.height(12.dp))
+      TextButton(
+        onClick = {
+          viewModel.cancelGeneration()
+          onCancel()
+        }
+      ) {
+        Text(
+          text = stringResource(CommonR.string.generation_cancel),
+          style = MaterialTheme.typography.bodyMedium,
+          color = PalabritaColors.ContentSecondary,
+        )
+      }
     }
   }
 }
