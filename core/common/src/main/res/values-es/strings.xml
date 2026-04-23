@@ -34,13 +34,13 @@
     <!-- Onboarding: Model Selection -->
     <string name="model_selection_title">Elige tu modelo de IA</string>
     <string name="model_selection_hint">Selecciona la IA ideal para tu dispositivo. Puedes cambiar después.</string>
-    <string name="model_powerful_title">Modelo Performance</string>
+    <string name="model_powerful_title">Gemma 4 2B</string>
     <string name="model_powerful_subtitle">Mejor calidad de puzzles y respuestas de IA</string>
-    <string name="model_powerful_info">485 MB · Dispositivos high-end</string>
-    <string name="model_compact_title">Modelo Eficiente</string>
+    <string name="model_powerful_info">Dispositivos high-end · 2,6 GB</string>
+    <string name="model_compact_title">Qwen3 0.6B</string>
     <string name="model_compact_subtitle">Optimizado para velocidad y batería</string>
-    <string name="model_compact_info">180 MB · Todos los dispositivos</string>
-    <string name="model_auto_select">No, elige por mí</string>
+    <string name="model_compact_info">Todos los dispositivos · 614 MB</string>
+    <string name="model_auto_select">Elegir por mí</string>
 
     <!-- Onboarding: Download -->
     <string name="download_title">Descargando modelo de IA</string>
