@@ -6,8 +6,12 @@ import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.PuzzleSource
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface PuzzleGenerator {
+  val activity: StateFlow<GenerationActivity?>
+
   suspend fun generateBatch(
     count: Int,
     language: String,
@@ -27,6 +31,9 @@ constructor(
   private val parser: LlmResponseParser,
   private val validator: PuzzleValidator,
 ) : PuzzleGenerator {
+
+  private val _activity = MutableStateFlow<GenerationActivity?>(null)
+  override val activity: StateFlow<GenerationActivity?> = _activity
 
   override suspend fun generateBatch(
     count: Int,
@@ -79,6 +86,7 @@ constructor(
     }
 
     Log.i(TAG, "generateBatch: done, ${generated.size}/$count succeeded")
+    _activity.value = null
     return generated
   }
 
@@ -93,6 +101,7 @@ constructor(
   ): Puzzle? {
     var lastFailureReason: String? = null
     repeat(MAX_RETRIES) { attempt ->
+      _activity.value = GenerationActivity.CREATING
       val userPrompt =
         buildUserPrompt(
           modelId,
@@ -109,6 +118,7 @@ constructor(
         TAG,
         "  attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(300)}",
       )
+      _activity.value = GenerationActivity.VALIDATING
       val parseResult = parser.parsePuzzle(rawResponse)
 
       when (parseResult) {
@@ -117,20 +127,24 @@ constructor(
           when (validation) {
             is ValidationResult.Valid -> {
               Log.d(TAG, "  attempt $attempt VALID: '${parseResult.data.word}'")
+              _activity.value = GenerationActivity.ACCEPTED
               return puzzleFromResponse(parseResult.data, language, difficulty)
             }
             is ValidationResult.Invalid -> {
               lastFailureReason = validation.reasons.joinToString("; ")
               Log.w(TAG, "  attempt $attempt validation failed: ${validation.reasons}")
+              _activity.value = GenerationActivity.VALIDATION_FAILED
             }
           }
         }
         is ParseResult.Error -> {
           lastFailureReason = "JSON parse error: ${parseResult.reason}"
           Log.w(TAG, "  attempt $attempt parse failed: ${parseResult.reason}")
+          _activity.value = GenerationActivity.VALIDATION_FAILED
         }
       }
     }
+    _activity.value = GenerationActivity.FAILED_RETRYING
     return null
   }
 

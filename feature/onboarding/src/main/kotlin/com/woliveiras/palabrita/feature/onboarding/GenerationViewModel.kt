@@ -4,7 +4,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.ai.EngineState
+import com.woliveiras.palabrita.core.ai.GenerationActivity
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
+import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.ai.worker.GenerationInfo
 import com.woliveiras.palabrita.core.ai.worker.GenerationProgress
 import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
@@ -40,6 +42,7 @@ data class GenerationState(
   val failed: Boolean = false,
   val progress: GenerationProgress = GenerationProgress(),
   val steps: List<GenerationStep> = emptyList(),
+  val currentActivityResId: Int? = null,
 )
 
 @HiltViewModel
@@ -50,6 +53,7 @@ constructor(
   private val appPreferences: AppPreferences,
   private val modelRepository: ModelRepository,
   private val engineManager: LlmEngineManager,
+  private val puzzleGenerator: PuzzleGenerator,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(GenerationState())
@@ -57,6 +61,7 @@ constructor(
 
   init {
     observeGeneration()
+    observeActivity()
   }
 
   fun triggerGeneration(modelId: ModelId?) {
@@ -85,11 +90,23 @@ constructor(
                 it.copy(status = StepStatus.COMPLETED, detail = null)
               }
               _state.update {
-                it.copy(isGenerating = false, isComplete = true, steps = completedSteps)
+                it.copy(
+                  isGenerating = false,
+                  isComplete = true,
+                  steps = completedSteps,
+                  currentActivityResId = null,
+                )
               }
             }
             GenerationWorkState.FAILED -> {
-              _state.update { it.copy(isGenerating = false, failed = true, steps = steps) }
+              _state.update {
+                it.copy(
+                  isGenerating = false,
+                  failed = true,
+                  steps = steps,
+                  currentActivityResId = null,
+                )
+              }
             }
             GenerationWorkState.RUNNING -> {
               _state.update {
@@ -152,4 +169,24 @@ constructor(
   fun cancelGeneration() {
     generationScheduler.cancelGeneration()
   }
+
+  private fun observeActivity() {
+    viewModelScope.launch {
+      puzzleGenerator.activity.collect { activity ->
+        val current = _state.value
+        val resId = if (current.isComplete || current.failed) null else activityToResId(activity)
+        _state.update { it.copy(currentActivityResId = resId) }
+      }
+    }
+  }
+
+  private fun activityToResId(activity: GenerationActivity?): Int? =
+    when (activity) {
+      GenerationActivity.CREATING -> CommonR.string.generation_activity_creating
+      GenerationActivity.VALIDATING -> CommonR.string.generation_activity_validating
+      GenerationActivity.VALIDATION_FAILED -> CommonR.string.generation_activity_validation_failed
+      GenerationActivity.FAILED_RETRYING -> CommonR.string.generation_activity_retrying
+      GenerationActivity.ACCEPTED -> CommonR.string.generation_activity_accepted
+      null -> null
+    }
 }

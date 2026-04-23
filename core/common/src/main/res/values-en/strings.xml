@@ -98,6 +98,11 @@
     <string name="generation_step_load">Loading model into memory</string>
     <string name="generation_step_init">Initializing model</string>
     <string name="generation_step_generate">Generating puzzles</string>
+    <string name="generation_activity_creating">✍️ Model creating puzzle…</string>
+    <string name="generation_activity_validating">🔍 Validating puzzle…</string>
+    <string name="generation_activity_validation_failed">⚠️ Puzzle rejected, retrying…</string>
+    <string name="generation_activity_retrying">🔄 Slot failed after all attempts, moving on…</string>
+    <string name="generation_activity_accepted">✅ Puzzle accepted!</string>
 
     <!-- Onboarding: Tier Warning -->
     <string name="tier_warning_message">The selected model may require more memory than your device has. Performance may be poor or the app may crash.</string>

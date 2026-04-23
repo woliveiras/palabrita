@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.feature.onboarding
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -9,7 +10,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,6 +47,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -77,6 +83,7 @@ fun GenerationScreen(
   val progressFraction = (puzzlesGenerated.toFloat() / totalPuzzles).coerceIn(0f, 1f)
   val isComplete = state.isComplete
   val isFailed = state.failed
+  val currentActivityResId = state.currentActivityResId
 
   // Floating particle animation
   val infiniteTransition = rememberInfiniteTransition(label = "gen_particles")
@@ -261,6 +268,28 @@ fun GenerationScreen(
     }
 
     Spacer(Modifier.height(24.dp))
+
+    // Live activity feed
+    AnimatedContent(
+      targetState = currentActivityResId,
+      transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(300)) },
+      label = "generation-activity",
+      modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
+    ) { resId ->
+      if (resId != null) {
+        Text(
+          text = stringResource(resId),
+          style = MaterialTheme.typography.bodySmall,
+          color = PalabritaColors.ContentSecondary,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth(),
+        )
+      } else {
+        Spacer(Modifier.height(20.dp))
+      }
+    }
+
+    Spacer(Modifier.height(8.dp))
 
     AnimatedVisibility(
       visible = isComplete,
