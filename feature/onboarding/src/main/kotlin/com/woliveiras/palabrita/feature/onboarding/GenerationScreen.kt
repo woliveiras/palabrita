@@ -72,10 +72,7 @@ fun GenerationScreen(
         textAlign = TextAlign.Center,
       )
       Spacer(Modifier.height(32.dp))
-      GenerationChecklist(
-        steps = state.steps,
-        modifier = Modifier.fillMaxWidth(),
-      )
+      GenerationChecklist(steps = state.steps, modifier = Modifier.fillMaxWidth())
     } else if (state.isComplete) {
       Text(
         text = stringResource(CommonR.string.generation_complete_title),
@@ -113,14 +110,8 @@ fun GenerationScreen(
 }
 
 @Composable
-private fun GenerationChecklist(
-  steps: List<GenerationStep>,
-  modifier: Modifier = Modifier,
-) {
-  Column(
-    modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(16.dp),
-  ) {
+private fun GenerationChecklist(steps: List<GenerationStep>, modifier: Modifier = Modifier) {
+  Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
     steps.forEach { step -> GenerationStepRow(step) }
   }
 }
@@ -166,10 +157,7 @@ private fun StepIcon(status: StepStatus) {
         modifier = Modifier.size(24.dp),
       )
     StepStatus.IN_PROGRESS ->
-      CircularProgressIndicator(
-        modifier = Modifier.size(24.dp),
-        strokeWidth = 2.dp,
-      )
+      CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
     StepStatus.PENDING ->
       Box(
         modifier =
@@ -179,7 +167,7 @@ private fun StepIcon(status: StepStatus) {
               width = 2.dp,
               color = MaterialTheme.colorScheme.outlineVariant,
               shape = CircleShape,
-            ),
+            )
       )
   }
 }

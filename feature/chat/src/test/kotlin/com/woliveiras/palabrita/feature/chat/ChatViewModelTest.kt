@@ -384,9 +384,8 @@ private class FakeChatRepository(
   override suspend fun deleteAll() {}
 }
 
-private class FakeModelRepository(
-  private val modelPath: String? = "/fake/model/path",
-) : ModelRepository {
+private class FakeModelRepository(private val modelPath: String? = "/fake/model/path") :
+  ModelRepository {
   private var config =
     ModelConfig(
       modelId = ModelId.GEMMA4_E2B,

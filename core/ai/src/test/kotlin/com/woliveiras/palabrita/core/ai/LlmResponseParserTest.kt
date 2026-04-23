@@ -14,7 +14,7 @@ class LlmResponseParserTest {
     val json =
       """
       {"word":"gatos","category":"animal","difficulty":2,"hints":["Dica 1","Dica 2","Dica 3","Dica 4","Dica 5"]}
-    """
+      """
         .trimIndent()
 
     val result = parser.parsePuzzle(json)
@@ -43,7 +43,7 @@ class LlmResponseParserTest {
           "Zona rural"
         ]
       }
-    """
+      """
         .trimIndent()
 
     val result = parser.parsePuzzle(json)
@@ -61,7 +61,7 @@ class LlmResponseParserTest {
       Here is the word for the game:
       {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"]}
       I hope this helps!
-    """
+      """
         .trimIndent()
 
     val result = parser.parsePuzzle(raw)
@@ -77,7 +77,7 @@ class LlmResponseParserTest {
       ```json
       {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"]}
       ```
-    """
+      """
         .trimIndent()
 
     val result = parser.parsePuzzle(raw)
@@ -128,7 +128,7 @@ class LlmResponseParserTest {
     val json =
       """
       {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"],"extra":"ignored"}
-    """
+      """
         .trimIndent()
 
     val result = parser.parsePuzzle(json)

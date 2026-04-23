@@ -69,10 +69,9 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
 
   val navBackStackEntry by navController.currentBackStackEntryAsState()
   val currentDestination = navBackStackEntry?.destination
-  val showBottomBar =
-    bottomNavItems.any { item ->
-      currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
-    }
+  val showBottomBar = bottomNavItems.any { item ->
+    currentDestination?.hierarchy?.any { it.hasRoute(item.route::class) } == true
+  }
 
   Scaffold(
     bottomBar = {

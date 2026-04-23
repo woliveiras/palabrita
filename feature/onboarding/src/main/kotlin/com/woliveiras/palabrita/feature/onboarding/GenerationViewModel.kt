@@ -72,30 +72,33 @@ constructor(
 
   private fun observeGeneration() {
     viewModelScope.launch {
-      combine(
-        engineManager.engineState,
-        generationScheduler.observeGenerationInfo(),
-      ) { engineState, info ->
-        Pair(engineState, info)
-      }.collect { (engineState, info) ->
-        val steps = deriveSteps(engineState, info)
-        when (info.state) {
-          GenerationWorkState.SUCCEEDED -> {
-            val completedSteps =
-              steps.map { it.copy(status = StepStatus.COMPLETED, detail = null) }
-            _state.update {
-              it.copy(isGenerating = false, isComplete = true, steps = completedSteps)
-            }
-          }
-          GenerationWorkState.FAILED -> {
-            _state.update { it.copy(isGenerating = false, failed = true, steps = steps) }
-          }
-          GenerationWorkState.RUNNING -> {
-            _state.update { it.copy(isGenerating = true, progress = info.progress, steps = steps) }
-          }
-          GenerationWorkState.IDLE -> {}
+      combine(engineManager.engineState, generationScheduler.observeGenerationInfo()) {
+          engineState,
+          info ->
+          Pair(engineState, info)
         }
-      }
+        .collect { (engineState, info) ->
+          val steps = deriveSteps(engineState, info)
+          when (info.state) {
+            GenerationWorkState.SUCCEEDED -> {
+              val completedSteps = steps.map {
+                it.copy(status = StepStatus.COMPLETED, detail = null)
+              }
+              _state.update {
+                it.copy(isGenerating = false, isComplete = true, steps = completedSteps)
+              }
+            }
+            GenerationWorkState.FAILED -> {
+              _state.update { it.copy(isGenerating = false, failed = true, steps = steps) }
+            }
+            GenerationWorkState.RUNNING -> {
+              _state.update {
+                it.copy(isGenerating = true, progress = info.progress, steps = steps)
+              }
+            }
+            GenerationWorkState.IDLE -> {}
+          }
+        }
     }
   }
 

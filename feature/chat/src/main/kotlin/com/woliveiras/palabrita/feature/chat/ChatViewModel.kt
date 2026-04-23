@@ -110,9 +110,7 @@ constructor(
         val config = modelRepository.getConfig()
         val modelPath = config.modelPath
         if (modelPath == null) {
-          _state.update {
-            it.copy(isEngineLoading = false, error = "No AI model configured.")
-          }
+          _state.update { it.copy(isEngineLoading = false, error = "No AI model configured.") }
           return false
         }
         engineManager.initialize(modelPath)
@@ -127,8 +125,7 @@ constructor(
 
       if (ready == null || ready is EngineState.Error) {
         val errorMsg =
-          if (ready is EngineState.Error) ready.message
-          else "AI engine initialization timed out."
+          if (ready is EngineState.Error) ready.message else "AI engine initialization timed out."
         _state.update { it.copy(error = errorMsg) }
         return false
       }
@@ -144,84 +141,83 @@ constructor(
   private fun ensureSessionAndSend(userText: String, isInitial: Boolean = false) {
     _state.update { it.copy(isModelResponding = true, error = null) }
 
-    streamingJob =
-      viewModelScope.launch {
-        if (!ensureSession()) {
-          _state.update { it.copy(isModelResponding = false) }
-          return@launch
+    streamingJob = viewModelScope.launch {
+      if (!ensureSession()) {
+        _state.update { it.copy(isModelResponding = false) }
+        return@launch
+      }
+
+      val currentSession = session ?: return@launch
+
+      try {
+        val accumulated = StringBuilder()
+
+        _state.update {
+          it.copy(
+            messages =
+              it.messages +
+                UiChatMessage(role = MessageRole.MODEL, content = "", isStreaming = true)
+          )
         }
 
-        val currentSession = session ?: return@launch
-
-        try {
-          val accumulated = StringBuilder()
-
-          _state.update {
-            it.copy(
-              messages =
-                it.messages +
-                  UiChatMessage(role = MessageRole.MODEL, content = "", isStreaming = true)
-            )
-          }
-
-          val completed =
-            withTimeoutOrNull(RESPONSE_TIMEOUT_MS) {
-              currentSession.sendMessageStreaming(userText).collect { token ->
-                accumulated.append(token)
-                val text = accumulated.toString()
-                _state.update {
-                  val updated = it.messages.toMutableList()
-                  updated[updated.lastIndex] =
-                    UiChatMessage(role = MessageRole.MODEL, content = text, isStreaming = true)
-                  it.copy(messages = updated)
-                }
+        val completed =
+          withTimeoutOrNull(RESPONSE_TIMEOUT_MS) {
+            currentSession.sendMessageStreaming(userText).collect { token ->
+              accumulated.append(token)
+              val text = accumulated.toString()
+              _state.update {
+                val updated = it.messages.toMutableList()
+                updated[updated.lastIndex] =
+                  UiChatMessage(role = MessageRole.MODEL, content = text, isStreaming = true)
+                it.copy(messages = updated)
               }
             }
-
-          val finalText = accumulated.toString()
-
-          if (completed == null && finalText.isBlank()) {
-            _state.update {
-              val updated = it.messages.toMutableList()
-              updated.removeAt(updated.lastIndex)
-              it.copy(
-                messages = updated,
-                isModelResponding = false,
-                error = "Response timed out. Try again.",
-              )
-            }
-            return@launch
           }
 
-          _state.update {
-            val updated = it.messages.toMutableList()
-            updated[updated.lastIndex] =
-              UiChatMessage(role = MessageRole.MODEL, content = finalText, isStreaming = false)
-            it.copy(messages = updated, isModelResponding = false)
-          }
+        val finalText = accumulated.toString()
 
-          chatRepository.saveMessage(
-            ChatMessage(
-              puzzleId = puzzleId,
-              role = MessageRole.MODEL,
-              content = finalText,
-              timestamp = System.currentTimeMillis(),
-            )
-          )
-        } catch (e: Exception) {
+        if (completed == null && finalText.isBlank()) {
           _state.update {
             val updated = it.messages.toMutableList()
-            if (updated.isNotEmpty() && updated.last().isStreaming) {
-              updated.removeAt(updated.lastIndex)
-            }
+            updated.removeAt(updated.lastIndex)
             it.copy(
               messages = updated,
               isModelResponding = false,
-              error = "Failed to get response: ${e.message}",
+              error = "Response timed out. Try again.",
             )
           }
+          return@launch
+        }
+
+        _state.update {
+          val updated = it.messages.toMutableList()
+          updated[updated.lastIndex] =
+            UiChatMessage(role = MessageRole.MODEL, content = finalText, isStreaming = false)
+          it.copy(messages = updated, isModelResponding = false)
+        }
+
+        chatRepository.saveMessage(
+          ChatMessage(
+            puzzleId = puzzleId,
+            role = MessageRole.MODEL,
+            content = finalText,
+            timestamp = System.currentTimeMillis(),
+          )
+        )
+      } catch (e: Exception) {
+        _state.update {
+          val updated = it.messages.toMutableList()
+          if (updated.isNotEmpty() && updated.last().isStreaming) {
+            updated.removeAt(updated.lastIndex)
+          }
+          it.copy(
+            messages = updated,
+            isModelResponding = false,
+            error = "Failed to get response: ${e.message}",
+          )
         }
       }
+    }
   }
 
   private fun updateInput(text: String) {

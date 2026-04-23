@@ -95,8 +95,14 @@ constructor(
     repeat(MAX_RETRIES) { attempt ->
       val userPrompt =
         buildUserPrompt(
-          modelId, language, difficulty, wordLength, recentWords, usedWords,
-          attempt, lastFailureReason,
+          modelId,
+          language,
+          difficulty,
+          wordLength,
+          recentWords,
+          usedWords,
+          attempt,
+          lastFailureReason,
         )
       val rawResponse = session.sendMessage(userPrompt)
       Log.d(

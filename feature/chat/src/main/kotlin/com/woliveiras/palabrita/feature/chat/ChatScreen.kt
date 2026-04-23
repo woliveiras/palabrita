@@ -64,7 +64,8 @@ fun ChatScreen(
   val state by viewModel.state.collectAsStateWithLifecycle()
   val listState = rememberLazyListState()
 
-  val streamingContent = state.messages.lastOrNull()?.let { if (it.isStreaming) it.content else null }
+  val streamingContent =
+    state.messages.lastOrNull()?.let { if (it.isStreaming) it.content else null }
 
   LaunchedEffect(state.messages.size, streamingContent) {
     if (state.messages.isNotEmpty()) {
@@ -96,10 +97,7 @@ fun ChatScreen(
   ) { padding ->
     Column(modifier = modifier.fillMaxSize().padding(padding)) {
       if (state.isEngineLoading) {
-        Box(
-          modifier = Modifier.weight(1f).fillMaxWidth(),
-          contentAlignment = Alignment.Center,
-        ) {
+        Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
           Column(horizontalAlignment = Alignment.CenterHorizontally) {
             androidx.compose.material3.CircularProgressIndicator()
             Spacer(Modifier.height(16.dp))
@@ -111,102 +109,103 @@ fun ChatScreen(
           }
         }
       } else {
-      // Messages
-      LazyColumn(
-        state = listState,
-        modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-      ) {
-        items(state.messages) { message -> MessageBubble(message) }
-
-        val hasStreamingMessage = state.messages.any { it.isStreaming }
-        if (state.isModelResponding && !hasStreamingMessage) {
-          item { TypingIndicator() }
-        }
-      }
-
-      // Message counter
-      if (state.userMessageCount > 0) {
-        Text(
-          text =
-            stringResource(
-              CommonR.string.chat_message_count,
-              state.userMessageCount,
-              state.maxMessages,
-            ),
-          style = MaterialTheme.typography.labelSmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        )
-      }
-
-      // Suggestions
-      if (state.suggestionsVisible) {
-        FlowRow(
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-          horizontalArrangement = Arrangement.spacedBy(8.dp),
+        // Messages
+        LazyColumn(
+          state = listState,
+          modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
+          verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-          SUGGESTIONS.forEach { suggestionProvider ->
-            val suggestion = suggestionProvider()
-            AssistChip(
-              onClick = { viewModel.onAction(ChatAction.SelectSuggestion(suggestion)) },
-              label = { Text(suggestion, style = MaterialTheme.typography.labelSmall) },
+          items(state.messages) { message -> MessageBubble(message) }
+
+          val hasStreamingMessage = state.messages.any { it.isStreaming }
+          if (state.isModelResponding && !hasStreamingMessage) {
+            item { TypingIndicator() }
+          }
+        }
+
+        // Message counter
+        if (state.userMessageCount > 0) {
+          Text(
+            text =
+              stringResource(
+                CommonR.string.chat_message_count,
+                state.userMessageCount,
+                state.maxMessages,
+              ),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+          )
+        }
+
+        // Suggestions
+        if (state.suggestionsVisible) {
+          FlowRow(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            SUGGESTIONS.forEach { suggestionProvider ->
+              val suggestion = suggestionProvider()
+              AssistChip(
+                onClick = { viewModel.onAction(ChatAction.SelectSuggestion(suggestion)) },
+                label = { Text(suggestion, style = MaterialTheme.typography.labelSmall) },
+              )
+            }
+          }
+          Spacer(Modifier.height(8.dp))
+        }
+
+        // Limit reached
+        if (state.isAtLimit) {
+          Text(
+            text = stringResource(CommonR.string.chat_limit_reached),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+          )
+        }
+
+        // Error
+        val errorMessage = state.error
+        if (errorMessage != null) {
+          Text(
+            text = errorMessage,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+          )
+        }
+
+        // Input
+        Row(
+          modifier = Modifier.fillMaxWidth().padding(8.dp),
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          OutlinedTextField(
+            value = state.currentInput,
+            onValueChange = { viewModel.onAction(ChatAction.UpdateInput(it)) },
+            modifier = Modifier.weight(1f),
+            placeholder = { Text(stringResource(CommonR.string.chat_input_placeholder)) },
+            enabled = !state.isModelResponding && !state.isAtLimit,
+            singleLine = true,
+            shape = RoundedCornerShape(24.dp),
+          )
+          Spacer(Modifier.width(8.dp))
+          IconButton(
+            onClick = { viewModel.onAction(ChatAction.SendMessage) },
+            enabled =
+              state.currentInput.isNotBlank() && !state.isModelResponding && !state.isAtLimit,
+          ) {
+            Icon(
+              Icons.AutoMirrored.Rounded.Send,
+              contentDescription = stringResource(CommonR.string.send),
+              tint =
+                if (state.currentInput.isNotBlank() && !state.isModelResponding)
+                  MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurfaceVariant,
             )
           }
         }
-        Spacer(Modifier.height(8.dp))
-      }
-
-      // Limit reached
-      if (state.isAtLimit) {
-        Text(
-          text = stringResource(CommonR.string.chat_limit_reached),
-          style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.error,
-          modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        )
-      }
-
-      // Error
-      val errorMessage = state.error
-      if (errorMessage != null) {
-        Text(
-          text = errorMessage,
-          style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.error,
-          modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-        )
-      }
-
-      // Input
-      Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        OutlinedTextField(
-          value = state.currentInput,
-          onValueChange = { viewModel.onAction(ChatAction.UpdateInput(it)) },
-          modifier = Modifier.weight(1f),
-          placeholder = { Text(stringResource(CommonR.string.chat_input_placeholder)) },
-          enabled = !state.isModelResponding && !state.isAtLimit,
-          singleLine = true,
-          shape = RoundedCornerShape(24.dp),
-        )
-        Spacer(Modifier.width(8.dp))
-        IconButton(
-          onClick = { viewModel.onAction(ChatAction.SendMessage) },
-          enabled = state.currentInput.isNotBlank() && !state.isModelResponding && !state.isAtLimit,
-        ) {
-          Icon(
-            Icons.AutoMirrored.Rounded.Send,
-            contentDescription = stringResource(CommonR.string.send),
-            tint =
-              if (state.currentInput.isNotBlank() && !state.isModelResponding)
-                MaterialTheme.colorScheme.primary
-              else MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-        }
-      }
       } // else (not loading)
     }
   }

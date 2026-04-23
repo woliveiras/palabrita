@@ -403,8 +403,9 @@ private class FakeGameSessionRepository : GameSessionRepository {
     sessions.add(session)
   }
 
-  override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
-    sessions.find { it.puzzleId == puzzleId }
+  override suspend fun getByPuzzleId(puzzleId: Long): GameSession? = sessions.find {
+    it.puzzleId == puzzleId
+  }
 
   override suspend fun hasActiveGame(): Boolean = sessions.any { it.completedAt == null }
 
@@ -428,17 +429,17 @@ private class FakeGameSessionRepository : GameSessionRepository {
 private class FakeChatRepository : ChatRepository {
   val savedMessages = mutableListOf<ChatMessage>()
 
-  override suspend fun getMessages(puzzleId: Long): List<ChatMessage> =
-    savedMessages.filter { it.puzzleId == puzzleId }
+  override suspend fun getMessages(puzzleId: Long): List<ChatMessage> = savedMessages.filter {
+    it.puzzleId == puzzleId
+  }
 
   override suspend fun saveMessage(message: ChatMessage) {
     savedMessages.add(message)
   }
 
-  override suspend fun countUserMessages(puzzleId: Long): Int =
-    savedMessages.count {
-      it.puzzleId == puzzleId && it.role == com.woliveiras.palabrita.core.model.MessageRole.USER
-    }
+  override suspend fun countUserMessages(puzzleId: Long): Int = savedMessages.count {
+    it.puzzleId == puzzleId && it.role == com.woliveiras.palabrita.core.model.MessageRole.USER
+  }
 
   override suspend fun getPuzzle(puzzleId: Long): Puzzle? = null
 
