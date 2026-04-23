@@ -1,8 +1,5 @@
 # ADR 001 — Multi-Module Gradle Project Structure
 
-**Status**: Accepted  
-**Date**: 2026-04-21
-
 ## Context
 
 Palabrita is an Android app that will grow to include multiple features (onboarding, game, chat, settings) plus core infrastructure (AI engine, data persistence, device capabilities). We need a project structure that enforces separation of concerns, enables incremental builds, and supports long-term maintainability.
