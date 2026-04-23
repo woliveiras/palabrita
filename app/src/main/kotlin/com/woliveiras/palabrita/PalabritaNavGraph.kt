@@ -32,6 +32,7 @@ import com.woliveiras.palabrita.feature.onboarding.GenerationScreen
 import com.woliveiras.palabrita.feature.onboarding.OnboardingScreen
 import com.woliveiras.palabrita.feature.settings.AiInfoScreen
 import com.woliveiras.palabrita.feature.settings.SettingsScreen
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 
 @Serializable data object OnboardingRoute
@@ -53,9 +54,11 @@ private data class BottomNavItem(val route: Any, val icon: ImageVector, val labe
 
 @Composable
 fun PalabritaNavGraph(appPreferences: AppPreferences) {
-  val isOnboardingComplete by appPreferences.isOnboardingComplete.collectAsState(initial = false)
+  val isOnboardingComplete: Boolean? by
+    appPreferences.isOnboardingComplete.map { it as Boolean? }.collectAsState(initial = null)
+  if (isOnboardingComplete == null) return
   val navController = rememberNavController()
-  val startDestination: Any = if (isOnboardingComplete) HomeRoute else OnboardingRoute
+  val startDestination: Any = if (isOnboardingComplete!!) HomeRoute else OnboardingRoute
 
   val bottomNavItems =
     listOf(
