@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -189,82 +190,81 @@ private fun WelcomeScreen(onNext: () -> Unit) {
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(
-          Brush.verticalGradient(listOf(Color.White, PalabritaColors.BackgroundLight))
-        ),
+        .background(PalabritaColors.BackgroundLight)
+        .navigationBarsPadding()
+        .padding(horizontal = 24.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Column(
-      modifier = Modifier.weight(1f).padding(horizontal = 24.dp).padding(top = 64.dp, bottom = 24.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
+    Spacer(Modifier.height(64.dp))
+
+    AnimatedVisibility(
+      visible = logoVisible,
+      enter = scaleIn(initialScale = 0.9f, animationSpec = tween(500, easing = FastOutSlowInEasing)) + fadeIn(tween(500)),
     ) {
-      AnimatedVisibility(
-        visible = logoVisible,
-        enter = scaleIn(initialScale = 0.9f, animationSpec = tween(500, easing = FastOutSlowInEasing)) + fadeIn(tween(500)),
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier =
+          Modifier.size(80.dp)
+            .background(
+              Brush.linearGradient(listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)),
+              RoundedCornerShape(24.dp),
+            ),
       ) {
-        Box(
-          contentAlignment = Alignment.Center,
-          modifier =
-            Modifier.size(80.dp)
-              .background(
-                Brush.linearGradient(
-                  listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
-                ),
-                RoundedCornerShape(24.dp),
-              ),
-        ) {
-          Icon(
-            imageVector = Icons.Rounded.Psychology,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(40.dp),
-          )
-        }
-      }
-
-      Spacer(Modifier.height(32.dp))
-
-      AnimatedVisibility(
-        visible = titleVisible,
-        enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
-      ) {
-        Text(
-          text = stringResource(CommonR.string.welcome_title_new),
-          style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-          textAlign = TextAlign.Center,
+        Icon(
+          imageVector = Icons.Rounded.Psychology,
+          contentDescription = null,
+          tint = Color.White,
+          modifier = Modifier.size(40.dp),
         )
-      }
-
-      Spacer(Modifier.height(16.dp))
-
-      AnimatedVisibility(
-        visible = descVisible,
-        enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
-      ) {
-        Text(
-          text = stringResource(CommonR.string.welcome_description),
-          style = MaterialTheme.typography.bodyLarge,
-          textAlign = TextAlign.Center,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-      }
-
-      Spacer(Modifier.height(40.dp))
-
-      features.forEachIndexed { index, (icon, titleRes, descRes) ->
-        AnimatedVisibility(
-          visible = cardVisibilities[index],
-          enter = slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } + fadeIn(tween(500)),
-        ) {
-          FeatureCard(icon = icon, titleRes = titleRes, descRes = descRes)
-        }
-        if (index < features.lastIndex) Spacer(Modifier.height(12.dp))
       }
     }
 
+    Spacer(Modifier.height(32.dp))
+
+    AnimatedVisibility(
+      visible = titleVisible,
+      enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
+    ) {
+      Text(
+        text = stringResource(CommonR.string.welcome_title_new),
+        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+        textAlign = TextAlign.Center,
+        color = PalabritaColors.ContentPrimary,
+      )
+    }
+
+    Spacer(Modifier.height(16.dp))
+
+    AnimatedVisibility(
+      visible = descVisible,
+      enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
+    ) {
+      Text(
+        text = stringResource(CommonR.string.welcome_description),
+        style = MaterialTheme.typography.bodyLarge,
+        textAlign = TextAlign.Center,
+        color = PalabritaColors.ContentSecondary,
+      )
+    }
+
+    Spacer(Modifier.height(32.dp))
+
+    features.forEachIndexed { index, (icon, titleRes, descRes) ->
+      AnimatedVisibility(
+        visible = cardVisibilities[index],
+        enter = slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } + fadeIn(tween(500)),
+      ) {
+        FeatureCard(icon = icon, titleRes = titleRes, descRes = descRes)
+      }
+      if (index < features.lastIndex) Spacer(Modifier.height(12.dp))
+    }
+
+    Spacer(Modifier.height(32.dp))
+
     AnimatedVisibility(
       visible = buttonVisible,
-      enter = slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
-      modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp),
+      enter = fadeIn(tween(500)),
+      modifier = Modifier.padding(bottom = 24.dp),
     ) {
       GradientButton(
         text = stringResource(CommonR.string.welcome_start),
@@ -279,7 +279,7 @@ private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int) {
   Row(
     modifier =
       Modifier.fillMaxWidth()
-        .background(Color.White, RoundedCornerShape(16.dp))
+        .background(PalabritaColors.SurfaceLight, RoundedCornerShape(16.dp))
         .border(1.dp, PalabritaColors.OutlineDefault, RoundedCornerShape(16.dp))
         .padding(16.dp),
     verticalAlignment = Alignment.CenterVertically,
@@ -290,14 +290,14 @@ private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int) {
       modifier =
         Modifier.size(48.dp)
           .background(
-            Brush.linearGradient(listOf(PalabritaColors.ContainerPurple, Color(0xFFF5F3FF))),
+            Brush.linearGradient(listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)),
             RoundedCornerShape(12.dp),
           ),
     ) {
       Icon(
         imageVector = icon,
         contentDescription = null,
-        tint = PalabritaColors.BrandIndigo,
+        tint = Color.White,
         modifier = Modifier.size(24.dp),
       )
     }
@@ -305,12 +305,13 @@ private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int) {
       Text(
         text = stringResource(titleRes),
         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+        color = PalabritaColors.ContentPrimary,
       )
       Spacer(Modifier.height(2.dp))
       Text(
         text = stringResource(descRes),
         style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = PalabritaColors.ContentSecondary,
       )
     }
   }
@@ -326,9 +327,8 @@ private fun LanguageScreen(
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(
-          Brush.verticalGradient(listOf(Color.White, PalabritaColors.BackgroundLight))
-        ),
+        .background(PalabritaColors.BackgroundLight)
+        .navigationBarsPadding(),
   ) {
     BackButton(onBack)
     Column(
@@ -339,12 +339,13 @@ private fun LanguageScreen(
       Text(
         text = stringResource(CommonR.string.language_title),
         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+        color = PalabritaColors.ContentPrimary,
       )
       Spacer(Modifier.height(8.dp))
       Text(
         text = stringResource(CommonR.string.language_hint),
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = PalabritaColors.ContentSecondary,
       )
       Spacer(Modifier.height(32.dp))
 
@@ -358,7 +359,7 @@ private fun LanguageScreen(
     GradientButton(
       text = stringResource(CommonR.string.continue_button),
       onClick = onNext,
-      modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp),
+      modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 24.dp),
     )
   }
 }
@@ -373,7 +374,7 @@ private fun LanguageCard(
 ) {
   val isSelected = code == selected
   val borderColor = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.OutlineDefault
-  val bgColor = if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f) else Color.White
+  val bgColor = if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f) else PalabritaColors.SurfaceLight
 
   Row(
     modifier =
@@ -388,20 +389,18 @@ private fun LanguageCard(
   ) {
     Surface(
       shape = CircleShape,
-      color =
-        if (isSelected) PalabritaColors.BrandPurple
-        else MaterialTheme.colorScheme.surfaceVariant,
+      color = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.SurfaceVariantLight,
       modifier = Modifier.size(40.dp),
     ) {
       Box(contentAlignment = Alignment.Center) {
         Text(
           text = flag,
           style = MaterialTheme.typography.labelMedium,
-          color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+          color = if (isSelected) Color.White else PalabritaColors.ContentSecondary,
         )
       }
     }
-    Text(text = label, style = MaterialTheme.typography.titleMedium)
+    Text(text = label, style = MaterialTheme.typography.titleMedium, color = PalabritaColors.ContentPrimary)
   }
 }
 
@@ -431,9 +430,8 @@ private fun ModelSelectionScreen(
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(
-          Brush.verticalGradient(listOf(Color.White, PalabritaColors.BackgroundLight))
-        ),
+        .background(PalabritaColors.BackgroundLight)
+        .navigationBarsPadding(),
   ) {
     BackButton(onBack)
 
@@ -446,12 +444,13 @@ private fun ModelSelectionScreen(
           Text(
             text = stringResource(CommonR.string.model_selection_title),
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+            color = PalabritaColors.ContentPrimary,
           )
           Spacer(Modifier.height(8.dp))
           Text(
             text = stringResource(CommonR.string.model_selection_hint),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = PalabritaColors.ContentSecondary,
           )
           Spacer(Modifier.height(24.dp))
         }
@@ -492,7 +491,7 @@ private fun ModelSelectionScreen(
       Spacer(Modifier.height(16.dp))
 
       TextButton(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(CommonR.string.model_auto_select))
+        Text(stringResource(CommonR.string.model_auto_select), color = PalabritaColors.BrandPurple)
       }
     }
 
@@ -521,7 +520,7 @@ private fun ModelCard(
   onClick: () -> Unit,
 ) {
   val borderColor = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.OutlineDefault
-  val bgColor = if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f) else Color.White
+  val bgColor = if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f) else PalabritaColors.SurfaceLight
 
   Row(
     modifier =
@@ -548,7 +547,7 @@ private fun ModelCard(
 
     Column(modifier = Modifier.weight(1f)) {
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(text = title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+        Text(text = title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold), color = PalabritaColors.ContentPrimary)
         if (isSelected) {
           Icon(
             imageVector = Icons.Rounded.Check,
@@ -562,7 +561,7 @@ private fun ModelCard(
       Text(
         text = subtitle,
         style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = PalabritaColors.ContentSecondary,
       )
       Spacer(Modifier.height(10.dp))
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -606,9 +605,8 @@ private fun DownloadScreen(
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(
-          Brush.verticalGradient(listOf(Color.White, PalabritaColors.BackgroundLight))
-        )
+        .background(PalabritaColors.BackgroundLight)
+        .navigationBarsPadding()
         .padding(horizontal = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
@@ -655,6 +653,7 @@ private fun DownloadScreen(
         },
       style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
       textAlign = TextAlign.Center,
+      color = PalabritaColors.ContentPrimary,
     )
 
     Spacer(Modifier.height(8.dp))
@@ -668,7 +667,7 @@ private fun DownloadScreen(
           else -> stringResource(CommonR.string.download_subtitle, modelName)
         },
       style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      color = PalabritaColors.ContentSecondary,
       textAlign = TextAlign.Center,
     )
 
@@ -683,11 +682,12 @@ private fun DownloadScreen(
         Text(
           text = stringResource(CommonR.string.download_progress_label),
           style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          color = PalabritaColors.ContentSecondary,
         )
         Text(
           text = "${(downloadProgress * 100).toInt()}%",
           style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+          color = PalabritaColors.ContentPrimary,
         )
       }
       Spacer(Modifier.height(8.dp))
@@ -797,13 +797,13 @@ private fun BackButton(onBack: () -> Unit) {
     Icon(
       imageVector = Icons.Rounded.ChevronLeft,
       contentDescription = null,
-      tint = MaterialTheme.colorScheme.onSurfaceVariant,
+      tint = PalabritaColors.ContentPrimary,
       modifier = Modifier.size(20.dp),
     )
     Text(
       text = stringResource(CommonR.string.back),
       style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      color = PalabritaColors.ContentPrimary,
     )
   }
 }
@@ -812,13 +812,13 @@ private fun BackButton(onBack: () -> Unit) {
 private fun Chip(text: String) {
   Box(
     modifier =
-      Modifier.background(PalabritaColors.BackgroundLight, RoundedCornerShape(50.dp))
+      Modifier.background(PalabritaColors.SurfaceVariantLight, RoundedCornerShape(50.dp))
         .padding(horizontal = 12.dp, vertical = 4.dp),
   ) {
     Text(
       text = text,
       style = MaterialTheme.typography.labelSmall,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      color = PalabritaColors.ContentSecondary,
     )
   }
 }
