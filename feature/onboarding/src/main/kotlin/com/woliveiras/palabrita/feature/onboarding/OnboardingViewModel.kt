@@ -166,6 +166,7 @@ constructor(
   private fun startDownloadForModel(modelId: ModelId) {
     val existingPath = downloadManager.getModelPath(modelId)
     if (existingPath != null) {
+      _state.update { it.copy(downloadProgress = 1f) }
       initializeEngineAndGenerate(existingPath)
       return
     }
