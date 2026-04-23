@@ -6,13 +6,9 @@ import kotlinx.coroutines.flow.Flow
 interface StatsRepository {
   suspend fun getStats(): PlayerStats
 
-  suspend fun updateAfterGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int)
-
-  suspend fun checkAndPromoteDifficulty(): Int
+  suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int)
 
   suspend fun updateLanguage(language: String)
-
-  suspend fun updateWordSizePreference(preference: String)
 
   suspend fun resetProgress()
 

@@ -71,7 +71,6 @@ constructor(
         _state.update {
           it.copy(
             puzzle = puzzle,
-            chosenDifficulty = stats.currentDifficulty,
             gameStatus = GameStatus.PLAYING,
             attempts = emptyList(),
             currentInput = "",
@@ -143,10 +142,8 @@ constructor(
         statsRepository.updateAfterGame(
           won = won,
           attempts = newAttempts.size,
-          difficulty = puzzle.difficulty,
           hintsUsed = current.revealedHints.size,
         )
-        statsRepository.checkAndPromoteDifficulty()
         puzzleRepository.markAsPlayed(puzzle.id)
         gameSessionRepository.completeSession(
           puzzleId = puzzle.id,

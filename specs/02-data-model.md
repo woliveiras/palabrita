@@ -14,9 +14,9 @@ All local persistence uses Room (SQLite). The entities represent puzzles, game s
 | `word` | `String` | Puzzle word (no accents, lowercase) |
 | `wordDisplay` | `String` | Word with accents for post-game display |
 | `language` | `String` | ISO 639-1 code (e.g., "pt", "en", "es") |
-| `difficulty` | `Int` | 1 to 5 |
-| `category` | `String` | Word category (e.g., "animal", "fruit") |
-| `hints` | `String` | JSON array of 5 strings (progressive hints) |
+| `difficulty` | `Int` | Word length (4–8) |
+| `category` | `String` | Always empty string `""`. Column kept for backward compatibility (no Room migration). |
+| `hints` | `String` | JSON array of 3 strings (progressive hints). Legacy rows may have 5. |
 | `source` | `String` | Enum: `"AI"` or `"STATIC"` |
 | `generatedAt` | `Long` | Generation timestamp (epoch ms) |
 | `playedAt` | `Long?` | Timestamp when played (null if not played) |
@@ -36,42 +36,10 @@ All local persistence uses Room (SQLite). The entities represent puzzles, game s
 | `maxStreak` | `Int` | Longest streak of consecutive days |
 | `avgAttempts` | `Float` | Average attempts per game |
 | `preferredLanguage` | `String` | Preferred language (ISO 639-1) |
-| `currentDifficulty` | `Int` | System-recommended difficulty level (1-5) |
-| `maxUnlockedDifficulty` | `Int` | Highest unlocked level (never decreases, player can select up to this +1) |
-| `totalXp` | `Int` | Accumulated XP (never decreases) |
-| `playerTier` | `String` | Current tier: `"NOVATO"`, `"CURIOSO"`, `"ASTUTO"`, `"SABIO"`, `"EPICO"`, `"LENDARIO"` |
-| `gamesWonByDifficulty` | `String` | JSON: `{"1": 45, "2": 30, "3": 12, "4": 5, "5": 0}` |
-| `winRateByDifficulty` | `String` | JSON: `{"1": 0.85, "2": 0.72, "3": 0.60, "4": 0.50, "5": 0.0}` |
-| `consecutiveLossesAtCurrent` | `Int` | Consecutive losses at current level (reset on win or level change) |
-| `wordSizePreference` | `String` | `"DEFAULT"`, `"SHORT"`, `"LONG"`, `"EPIC"` (unlocked at Astuto+ tier) |
 | `guessDistribution` | `String` | JSON: `{"1": 5, "2": 10, "3": 8, "4": 3, "5": 1, "6": 0}` |
 | `lastPlayedAt` | `Long` | Timestamp of last game (for day streak) |
 
-**Tiers by XP:**
-
-| Tier | Minimum XP | Description |
-|---|---|---|
-| Novato | 0 | Start |
-| Curioso | 50 | ~50 easy games |
-| Astuto | 150 | ~3 months playing |
-| Sábio | 400 | ~1 consistent year |
-| Épico | 1000 | ~2-3 years, masters levels 4-5 |
-| Lendário | 2500 | Dedicated veteran |
-
-**XP per game:**
-
-| Action | XP |
-|---|---|
-| Level 1 win | 1 |
-| Level 2 win | 2 |
-| Level 3 win | 3 |
-| Level 4 win | 5 |
-| Level 5 win | 8 |
-| Correct on 1st attempt | +3 bonus |
-| Correct on 2nd attempt | +1 bonus |
-| 7-day streak | +5 bonus |
-| 30-day streak | +20 bonus |
-| Each hint used | -1 (minimum final: 1 XP) |
+> **Note:** Legacy columns (`totalXp`, `playerTier`, `currentDifficulty`, `maxUnlockedDifficulty`, `gamesWonByDifficulty`, `winRateByDifficulty`, `consecutiveLossesAtCurrent`, `wordSizePreference`) are kept in the DB schema for backward compatibility (no Room migration) but are no longer used by the application.
 
 ### GameSessionEntity
 
@@ -82,7 +50,7 @@ All local persistence uses Room (SQLite). The entities represent puzzles, game s
 | `attempts` | `String` | JSON array of strings (each attempt) |
 | `startedAt` | `Long` | Start timestamp |
 | `completedAt` | `Long?` | End timestamp (null if in progress) |
-| `hintsUsed` | `Int` | Number of hints revealed (0-5) |
+| `hintsUsed` | `Int` | Number of hints revealed |
 | `won` | `Boolean` | Whether the player won |
 
 **Index**: `(puzzleId)` unique
@@ -190,9 +158,7 @@ interface PuzzleRepository {
 
 interface StatsRepository {
     suspend fun getStats(): PlayerStats
-    suspend fun updateAfterGame(won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int)
-    suspend fun calculateXpForGame(won: Boolean, attempts: Int, difficulty: Int, currentStreak: Int, hintsUsed: Int): Int
-    suspend fun checkAndPromoteDifficulty(): Int  // returns new level
+    suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int)
     fun observeStats(): Flow<PlayerStats>
 }
 
@@ -208,7 +174,7 @@ interface ModelRepository {
 ### Puzzle hints (stored in PuzzleEntity.hints)
 
 ```json
-["Dica mais vaga", "Dica menos vaga", "Dica média", "Dica mais específica", "Dica quase direta"]
+["Dica mais vaga", "Dica intermediária", "Dica mais específica"]
 ```
 
 ### Game attempts (stored in GameSessionEntity.attempts)
@@ -236,14 +202,16 @@ interface ModelRepository {
       "word": "gatos",
       "wordDisplay": "gatos",
       "language": "pt",
-      "difficulty": 2,
-      "category": "animal",
-      "hints": ["Tem quatro patas", "É um animal doméstico", "Ronrona", "Persegue ratos", "Mia"],
+      "difficulty": 5,
+      "category": "",
+      "hints": ["Tem quatro patas", "É um animal doméstico", "Ronrona"],
       "curiosity": "A palavra 'gato' vem do latim tardio 'cattus'."
     }
   ]
 }
 ```
+
+> **Note:** `difficulty` now stores the word length (4–8). `category` is always empty string. Hints are 3 per puzzle.
 
 - Minimum 200 puzzles split between PT (~100), EN (~60), ES (~40)
 - `curiosity` field used in chat fallback (Light mode shows a static card)

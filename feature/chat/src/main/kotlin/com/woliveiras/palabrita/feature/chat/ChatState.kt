@@ -5,7 +5,6 @@ import com.woliveiras.palabrita.core.model.MessageRole
 data class ChatState(
   val puzzleId: Long = 0,
   val word: String = "",
-  val category: String = "",
   val language: String = "",
   val messages: List<UiChatMessage> = emptyList(),
   val currentInput: String = "",

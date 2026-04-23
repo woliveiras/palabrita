@@ -16,9 +16,9 @@ class PuzzleMapperTest {
         word = "gatos",
         wordDisplay = "gatos",
         language = "pt",
-        difficulty = 2,
-        category = "animal",
-        hints = """["Dica 1","Dica 2","Dica 3","Dica 4","Dica 5"]""",
+        difficulty = 5,
+        category = "",
+        hints = """["Dica 1","Dica 2","Dica 3"]""",
         source = "AI",
         generatedAt = 1000L,
         playedAt = 2000L,
@@ -30,7 +30,7 @@ class PuzzleMapperTest {
 
     assertThat(domain.id).isEqualTo(1)
     assertThat(domain.word).isEqualTo("gatos")
-    assertThat(domain.hints).containsExactly("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5")
+    assertThat(domain.hints).containsExactly("Dica 1", "Dica 2", "Dica 3")
     assertThat(domain.source).isEqualTo(PuzzleSource.AI)
     assertThat(domain.playedAt).isEqualTo(2000L)
     assertThat(domain.isPlayed).isTrue()
@@ -44,9 +44,9 @@ class PuzzleMapperTest {
         word = "gatos",
         wordDisplay = "gatos",
         language = "pt",
-        difficulty = 2,
-        category = "animal",
-        hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
+        difficulty = 5,
+        category = "",
+        hints = listOf("Dica 1", "Dica 2", "Dica 3"),
         source = PuzzleSource.AI,
         generatedAt = 1000L,
       )
@@ -56,19 +56,19 @@ class PuzzleMapperTest {
     assertThat(entity.word).isEqualTo("gatos")
     assertThat(entity.source).isEqualTo("AI")
     assertThat(entity.hints).contains("Dica 1")
-    assertThat(entity.hints).contains("Dica 5")
+    assertThat(entity.hints).contains("Dica 3")
   }
 
   @Test
   fun `hints roundtrip preserves data`() {
-    val hints = listOf("Tem quatro patas", "É doméstico", "Ronrona", "Persegue ratos", "Mia")
+    val hints = listOf("Tem quatro patas", "É doméstico", "Ronrona")
     val domain =
       Puzzle(
         word = "gatos",
         wordDisplay = "gatos",
         language = "pt",
-        difficulty = 2,
-        category = "animal",
+        difficulty = 5,
+        category = "",
         hints = hints,
         source = PuzzleSource.AI,
         generatedAt = 1000L,
@@ -86,8 +86,8 @@ class PuzzleMapperTest {
         word = "gatos",
         wordDisplay = "gatos",
         language = "pt",
-        difficulty = 2,
-        category = "animal",
+        difficulty = 5,
+        category = "",
         hints = "[]",
         source = "AI",
         generatedAt = 0,

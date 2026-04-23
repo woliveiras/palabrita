@@ -2,11 +2,11 @@
 
 ## Summary
 
-The HomeScreen is the central hub of Palabrita. It replaces the current flow (DifficultyPicker as the initial screen) with a hub that shows streak, daily challenges, free play, quick stats, and a puzzle generation indicator. All navigation starts here and returns here.
+The HomeScreen is the central hub of Palabrita. It shows streak, daily challenges, free play, quick stats, and a puzzle generation indicator. All navigation starts here and returns here.
 
 ## Context & Motivation
 
-Today the app opens directly on the DifficultyPicker — no context, no sense of progress, no ritual. Successful games (Wordle, Words of Wonders, Wordscapes) use a hub screen that shows the player's state before starting. The HomeScreen solves this and creates the daily ritual: open → see streak → play → explore words → share.
+The HomeScreen creates the daily ritual: open → see streak → play → explore words → share.
 
 ## Navigation
 
@@ -16,13 +16,13 @@ App Launch
   └── Already completed → HomeScreen
 
 HomeScreen
-  ├── Daily Challenges → PlayingScreen (no DifficultyPicker)
-  ├── Free Play → DifficultyPicker → PlayingScreen
+  ├── Daily Challenges → PlayingScreen (no difficulty picker)
+  ├── Free Play → PlayingScreen (next puzzle)
   ├── Bottom Nav: Stats → StatsScreen
   └── Bottom Nav: More → SettingsScreen
 ```
 
-The HomeScreen is the `startDestination` after onboarding. The current `GameRoute` becomes `HomeRoute`. The `DifficultyPicker` becomes accessible only via Free Play.
+The HomeScreen is the `startDestination` after onboarding. The current `GameRoute` becomes `HomeRoute`.
 
 ## Layout
 
@@ -56,7 +56,6 @@ The HomeScreen is the `startDestination` after onboarding. The current `GameRout
 │                                  │
 │  ┌──────────┬──────────┐        │
 │  │ 42 games │ 87% wins │        │  ← Quick Stats
-│  │ 🏆 Savvy │ 350 XP   │        │
 │  └──────────┴──────────┘        │
 │                                  │
 │  ┌────────────────────────────┐  │  ← Generation Indicator (if active)
@@ -85,7 +84,7 @@ The HomeScreen is the `startDestination` after onboarding. The current `GameRout
 - Challenge 2: unlocked when 1 is completed
 - Challenge 3: unlocked when 2 is completed
 - CTA: "PLAY #N" points to the next uncompleted challenge
-- When all 3 are completed: "✓ 3/3 complete! +bonus XP"
+- When all 3 are completed: "✓ 3/3 complete!"
 - If the player used AI chat after a challenge: "✅ Completed · 💬 Explored"
 - If NOT used chat: "✅ Completed · 💬 Explore?" (link to chat)
 - Daily reset: at local midnight, the 3 challenges reset
@@ -93,11 +92,11 @@ The HomeScreen is the `startDestination` after onboarding. The current `GameRout
 ### FreePlayCard
 
 - Simple card with "FREE PLAY" + description + CTA "PLAY"
-- Tap → navigates to DifficultyPicker (existing flow)
+- Tap → starts the next puzzle directly (no difficulty picker)
 
 ### QuickStatsRow
 
-- 2×2 compact grid: total games, win rate, tier, XP
+- 1×2 compact grid: total games, win rate
 - Tap on any stat → navigates to StatsScreen
 
 ### GenerationIndicator
@@ -137,8 +136,6 @@ data class HomeState(
     val allDailiesComplete: Boolean,
     val totalPlayed: Int,
     val winRate: Float,
-    val playerTier: String,
-    val totalXp: Int,
     val isGeneratingPuzzles: Boolean,
     val generationComplete: Boolean,
     val chatNudge: ChatNudge?,             // null if not applicable
@@ -223,7 +220,7 @@ suspend fun countCompletedDailies(date: String): Int
 
 | Decision | Choice | Reason |
 |---------|---------|-------|
-| DifficultyPicker in daily | Removed | Difficulty is automatic (progressive) |
+| DifficultyPicker in daily | Removed | Difficulty is implicit via word length (progressive cycles) |
 | Bottom nav vs hamburger | Bottom nav (3 tabs) | Android standard, more accessible |
 | Streak trigger | 1st daily game completed | Minimum effort to maintain streak |
 | Generation feedback | Indicator on Home | Transparency without interrupting |
@@ -243,10 +240,10 @@ suspend fun countCompletedDailies(date: String): Int
 - [ ] Challenge 2 only unlocks after completing challenge 1
 - [ ] Challenge 3 only unlocks after completing challenge 2
 - [ ] Tap on "PLAY #N" navigates to PlayingScreen with the daily puzzle (no DifficultyPicker)
-- [ ] After completing all 3 dailies, card shows bonus
+- [ ] After completing all 3 dailies, card shows completion
 - [ ] Daily card shows "💬 Explore?" if player did not use chat (AI mode)
-- [ ] Free Play card navigates to DifficultyPicker
-- [ ] Quick stats shows total games, win rate, tier and XP
+- [ ] Free Play card starts the next puzzle directly
+- [ ] Quick stats shows total games and win rate
 - [ ] Generation indicator appears when WorkManager is generating and disappears when done
 - [ ] Chat nudge appears if last daily completed without chat (AI mode)
 - [ ] Bottom Navigation with 3 tabs works correctly

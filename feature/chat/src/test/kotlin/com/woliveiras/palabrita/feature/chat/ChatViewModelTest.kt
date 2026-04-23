@@ -61,11 +61,10 @@ class ChatViewModelTest {
   // --- Loading chat ---
 
   @Test
-  fun `loads puzzle word and category on init`() = runTest {
+  fun `loads puzzle word on init`() = runTest {
     val vm = createViewModel()
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.word).isEqualTo("gatos")
-    assertThat(vm.state.value.category).isEqualTo("Animal")
   }
 
   @Test
@@ -298,8 +297,8 @@ class ChatViewModelTest {
       wordDisplay = "GATOS",
       language = "pt",
       difficulty = 1,
-      category = "Animal",
-      hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
+      category = "",
+      hints = listOf("Dica 1", "Dica 2", "Dica 3"),
       source = PuzzleSource.AI,
       generatedAt = 1000,
     )
@@ -362,8 +361,8 @@ private class FakeChatRepository(
       wordDisplay = "GATOS",
       language = "pt",
       difficulty = 1,
-      category = "Animal",
-      hints = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
+      category = "",
+      hints = listOf("Dica 1", "Dica 2", "Dica 3"),
       source = PuzzleSource.AI,
       generatedAt = 1000,
     ),

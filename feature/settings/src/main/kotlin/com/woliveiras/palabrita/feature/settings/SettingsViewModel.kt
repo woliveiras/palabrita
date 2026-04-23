@@ -44,7 +44,6 @@ constructor(
   fun onAction(action: SettingsAction) {
     when (action) {
       is SettingsAction.ChangeLanguage -> changeLanguage(action.language)
-      is SettingsAction.ChangeWordSize -> changeWordSize(action.preference)
       is SettingsAction.SwitchModel -> switchModel(action.newModelId)
       is SettingsAction.DeleteModel -> deleteModel()
       is SettingsAction.ResetProgress -> resetProgress()
@@ -72,14 +71,6 @@ constructor(
     viewModelScope.launch {
       statsRepository.updateLanguage(language)
       _state.update { it.copy(stats = it.stats.copy(preferredLanguage = language)) }
-    }
-  }
-
-  private fun changeWordSize(preference: String) {
-    if (!_state.value.isWordSizeUnlocked) return
-    viewModelScope.launch {
-      statsRepository.updateWordSizePreference(preference)
-      _state.update { it.copy(stats = it.stats.copy(wordSizePreference = preference)) }
     }
   }
 
@@ -130,8 +121,6 @@ constructor(
 
   private fun resetProgress() {
     viewModelScope.launch {
-      val currentLang = _state.value.stats.preferredLanguage
-      val currentWordSize = _state.value.stats.wordSizePreference
       statsRepository.resetProgress()
       gameSessionRepository.deleteAll()
       chatRepository.deleteAll()

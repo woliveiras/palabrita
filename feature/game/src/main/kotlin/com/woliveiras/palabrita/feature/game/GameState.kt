@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 
 data class GameState(
   val puzzle: com.woliveiras.palabrita.core.model.Puzzle? = null,
-  val chosenDifficulty: Int = 1,
   val attempts: List<Attempt> = emptyList(),
   val currentInput: String = "",
   val revealedHints: List<String> = emptyList(),
@@ -13,7 +12,6 @@ data class GameState(
   val isLoading: Boolean = false,
   @StringRes val errorRes: Int? = null,
   val showAbandonDialog: Boolean = false,
-  val xpGained: Int = 0,
 )
 
 data class Attempt(val word: String, val feedback: List<LetterFeedback>)

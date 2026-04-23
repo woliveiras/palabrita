@@ -68,7 +68,6 @@ constructor(
       _state.update {
         it.copy(
           word = puzzle.word,
-          category = puzzle.category,
           language = puzzle.language,
           messages = existing.map { msg -> UiChatMessage(role = msg.role, content = msg.content) },
           userMessageCount = userCount,

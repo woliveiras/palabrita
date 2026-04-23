@@ -13,7 +13,7 @@ fun createTestPuzzleEntity(
   language: String = "pt",
   difficulty: Int = 2,
   category: String = "animal",
-  hints: String = """["Dica 1","Dica 2","Dica 3","Dica 4","Dica 5"]""",
+  hints: String = """["Dica 1","Dica 2","Dica 3"]""",
   source: String = "AI",
   generatedAt: Long = System.currentTimeMillis(),
   playedAt: Long? = null,

@@ -13,7 +13,6 @@ class GameLogicShareTextTest {
         difficulty = 3,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 3,
         won = true,
       )
     assertThat(text).contains("⭐⭐⭐")
@@ -27,7 +26,6 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 1,
         won = true,
       )
     assertThat(text).contains("4/6")
@@ -41,7 +39,6 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 0,
         won = false,
       )
     assertThat(text).contains("X/6")
@@ -55,7 +52,6 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 1,
         won = true,
       )
     assertThat(text).contains("GATOS")
@@ -70,10 +66,8 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 1,
         won = true,
       )
-    // Each attempt generates one line of emojis; count lines with colored squares
     val emojiLines =
       text.lines().filter { line ->
         line.contains("🟦") || line.contains("🟧") || line.contains("🟥")
@@ -90,7 +84,6 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 1,
         won = true,
       )
     assertThat(text).contains("🟦🟦🟦🟦🟦")
@@ -105,7 +98,6 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 1,
         won = true,
       )
     assertThat(text).contains("🟧🟧🟧🟧🟧")
@@ -120,7 +112,6 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 0,
         won = false,
       )
     assertThat(text).contains("🟥🟥🟥🟥🟥")
@@ -134,38 +125,22 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 2,
-        xpGained = 1,
         won = true,
       )
     assertThat(text).contains("2 dicas usadas")
   }
 
   @Test
-  fun `share text shows XP on win`() {
+  fun `share text does not show hints when zero`() {
     val text =
       GameLogic.generateShareText(
         attempts = createWinAttempts("gatos", 2),
-        difficulty = 3,
-        word = "GATOS",
-        hintsUsed = 0,
-        xpGained = 4,
-        won = true,
-      )
-    assertThat(text).contains("+4 XP")
-  }
-
-  @Test
-  fun `share text does not show XP on loss`() {
-    val text =
-      GameLogic.generateShareText(
-        attempts = createLossAttempts("gatos", 6),
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 0,
-        won = false,
+        won = true,
       )
-    assertThat(text).doesNotContain("+0 XP")
+    assertThat(text).doesNotContain("dicas usadas")
   }
 
   @Test
@@ -176,7 +151,6 @@ class GameLogicShareTextTest {
         difficulty = 1,
         word = "GATOS",
         hintsUsed = 0,
-        xpGained = 4,
         won = true,
       )
     assertThat(text).startsWith("Palabrita")

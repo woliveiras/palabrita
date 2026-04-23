@@ -60,72 +60,22 @@ Challenge 3: LOCKED → AVAILABLE when challenge 2 is completed (win or loss)
 
 **Completing = finishing the game** (win or loss). Winning is not required to unlock the next one. The goal is to engage, not to frustrate.
 
-### Flow (without DifficultyPicker)
+### Flow (no difficulty picker)
 
 ```
-HomeScreen → tap "PLAY #N" → PlayingScreen (pre-selected puzzle, automatic difficulty)
+HomeScreen → tap "PLAY #N" → PlayingScreen (pre-selected puzzle, word length determines difficulty)
                                     │
                                     ▼
                               ResultScreen → AI Chat → Home
 ```
 
-Does not go through DifficultyPicker. Difficulty is automatic (progressive).
+No difficulty picker. Difficulty is implicit via word length, controlled by generation cycles (Spec 14).
 
-## XP and Rewards
-
-### XP per Daily Challenge
-
-```kotlin
-fun calculateDailyXp(
-    won: Boolean,
-    attempts: Int,
-    difficulty: Int,
-    hintsUsed: Int,
-    currentStreak: Int,
-): Int {
-    val baseXp = calculateXpForGame(won, attempts, difficulty, currentStreak, hintsUsed)
-    return baseXp * 2  // 2x bonus for dailies
-}
-```
-
-- Dailies give **2x XP** compared to the same game in free play
-- The streak bonus (spec 05) applies normally
+## Rewards
 
 ### Completion Bonus (3/3)
 
-```kotlin
-fun calculateCompletionBonus(
-    dailyResults: List<DailyChallengeResult>,
-): Int {
-    if (dailyResults.size < 3 || !dailyResults.all { it.completed }) return 0
-    
-    val winsCount = dailyResults.count { it.won }
-    return when (winsCount) {
-        3 -> 5   // Swept: +5 XP bonus
-        2 -> 3   // Almost: +3 XP bonus
-        1 -> 1   // Persistent: +1 XP bonus
-        0 -> 1   // Dedicated: +1 XP (participated in all 3)
-        else -> 0
-    }
-}
-```
-
-- Completing all 3 (win or loss) = extra bonus
-- The more wins in the 3, the bigger the bonus
-- Even losing all 3, get +1 XP bonus for having tried all
-
-### Daily Maximum XP Summary
-
-| Source | XP |
-|-------|-----|
-| Daily 1 (easy, 1st-attempt win) | (1+3) × 2 = 8 |
-| Daily 2 (normal, 1st-attempt win) | (2+3) × 2 = 10 |
-| Daily 3 (hard, 1st-attempt win) | (3+3) × 2 = 12 |
-| Completion bonus (3 wins) | 5 |
-| AI Chat bonus (3 sessions) | 3 |
-| **Theoretical max/day** | **38 XP** |
-
-In practice, ~15-20 XP/day is more realistic (not always 1st attempt).
+Completing all 3 dailies in a day is its own reward — no XP system needed. The streak and completion tracking provide the engagement loop.
 
 ## Streak
 
@@ -221,7 +171,7 @@ This separates `lastPlayedAt` (any game) from `lastDailyDate` (daily-specific fo
 | Player at tier 1, daily 1 would be tier 0 | `coerceAtLeast(1)` — all 3 are tier 1 |
 | Player at tier 5, daily 3 would be tier 6 | `coerceAtMost(5)` — daily 3 is tier 5 |
 | No puzzles for the difficulty | AI mode: generate inline. Light mode: look for adjacent difficulty |
-| Player loses all 3 dailies | Streak maintained (participated). XP = 0 from games + 1 completion bonus |
+| Player loses all 3 dailies | Streak maintained (participated) |
 | Free play does not affect streak | Correct — only dailies count |
 | App killed during daily | GameSession saved, restored on reopen |
 
@@ -231,7 +181,7 @@ This separates `lastPlayedAt` (any game) from `lastDailyDate` (daily-specific fo
 |---------|---------|-------|
 | Deterministic puzzles | No | Each player has a unique experience (local AI) |
 | Unlocking next requires win | No | Completing (win/loss) is enough. Engagement > frustration |
-| Daily without DifficultyPicker | Yes | Automatic difficulty simplifies flow |
+| Daily without difficulty picker | Yes | Difficulty is implicit via word length |
 | Streak counts loss | Yes | Played = maintains streak. Rewards participation |
 | 3 dailies (not 1) | Yes | 3x AI Chat opportunities + difficulty escalation |
 
@@ -250,9 +200,8 @@ This separates `lastPlayedAt` (any game) from `lastDailyDate` (daily-specific fo
 - [ ] Difficulty of daily 3 = `currentDifficulty + 1` (max 5)
 - [ ] Daily 2 unlocks when daily 1 is completed (win or loss)
 - [ ] Daily 3 unlocks when daily 2 is completed (win or loss)
-- [ ] Tap on daily navigates directly to PlayingScreen (no DifficultyPicker)
-- [ ] Daily gives 2x XP compared to free play
-- [ ] Completing 3/3 dailies gives extra XP bonus
+- [ ] Tap on daily navigates directly to PlayingScreen (no difficulty picker)
+- [ ] Completing 3/3 dailies shows completion indicator
 - [ ] Streak increments when finishing the 1st daily of the day
 - [ ] Streak does NOT increment with free play
 - [ ] Streak resets if no daily played the previous day

@@ -54,7 +54,6 @@ object GameLogic {
     difficulty: Int,
     word: String,
     hintsUsed: Int,
-    xpGained: Int,
     won: Boolean,
   ): String {
     val stars = "⭐".repeat(difficulty)
@@ -73,32 +72,11 @@ object GameLogic {
 
     val footer = buildString {
       append("A palavra era: $word")
-      if (hintsUsed > 0 || (won && xpGained > 0)) {
-        append("\n")
-        val parts = mutableListOf<String>()
-        if (hintsUsed > 0) parts.add("$hintsUsed dicas usadas")
-        if (won && xpGained > 0) parts.add("+$xpGained XP")
-        append(parts.joinToString(" · "))
+      if (hintsUsed > 0) {
+        append("\n$hintsUsed dicas usadas")
       }
     }
 
     return "Palabrita $stars — $score\n\n$emojiGrid\n\n$footer"
-  }
-
-  fun difficultyToWordLength(difficulty: Int, wordSizePreference: String): IntRange {
-    return when (wordSizePreference) {
-      "SHORT" -> 5..6
-      "LONG" -> 7..9
-      "EPIC" -> 8..10
-      else ->
-        when (difficulty) {
-          1 -> 5..5
-          2 -> 5..6
-          3 -> 6..7
-          4 -> 7..8
-          5 -> 7..8
-          else -> 5..6
-        }
-    }
   }
 }

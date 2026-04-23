@@ -14,9 +14,6 @@ The settings screen allows the player to: change the game language, switch the A
 │ 🎮 JOGO                      │
 │ ├── Idioma das palavras      │
 │ │   Português (BR) ▸        │
-│ ├── Tamanho das palavras 🔒  │
-│ │   5-8 letras (padrão)     │
-│ │   Desbloqueado no Astuto  │
 │ └── Estatísticas ▸          │
 │                              │
 │ 🤖 INTELIGÊNCIA ARTIFICIAL   │
@@ -52,28 +49,6 @@ The settings screen allows the player to: change the game language, switch the A
 - Already-generated puzzles (cache) in the old language are NOT deleted (can be used if the user switches back)
 - Does not affect the UI language (follows device locale, changeable in Android settings)
 
-### Word Size
-
-**Locked** until the **Astuto** tier (150 XP). When locked:
-- Shows lock icon (🔒)
-- Text: "Unlocked at Astuto"
-- Tap shows toast: "Keep playing to unlock!"
-
-**Unlocked** (tier ≥ Astuto):
-- Opens a selector with the following options:
-
-| Option | Range | Description |
-|---|---|---|
-| Default | Dynamic by difficulty (5-8) | Normal behavior |
-| Short words | 5-6 letters (fixed) | For players who prefer speed |
-| Long words | 7-9 letters (fixed) | For players who want more challenge |
-| Epic words | 8-10 letters (fixed) | Maximum challenge, Epic+ tier |
-
-- "Epic words" only appears for tier ≥ Epic (1000 XP)
-- Saved in `PlayerStatsEntity.wordSizePreference`
-- When the player chooses a fixed range, difficulty still affects the word's **rarity** and **hint style**, but not the size
-- Value `"DEFAULT"` = dynamic behavior by difficulty
-
 ### Statistics
 
 Dedicated screen with:
@@ -103,7 +78,7 @@ Dedicated screen with:
 └──────────────────────────────┘
 ```
 
-- Data from `PlayerStatsEntity`
+- Data from `PlayerStatsEntity` (totalPlayed, totalWon, currentStreak, maxStreak, avgAttempts, guessDistribution)
 - Attempt distribution histogram
 - "Share stats" button generates text to clipboard:
 

@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.PlayerStats
-import com.woliveiras.palabrita.core.model.PlayerTier
 
 data class SettingsState(
   val stats: PlayerStats = PlayerStats(),
@@ -18,15 +17,6 @@ data class SettingsState(
 ) {
   val currentLanguage: String
     get() = stats.preferredLanguage
-
-  val wordSizePreference: String
-    get() = stats.wordSizePreference
-
-  val isWordSizeUnlocked: Boolean
-    get() = stats.playerTier >= PlayerTier.ASTUTO
-
-  val isEpicWordSizeAvailable: Boolean
-    get() = stats.playerTier >= PlayerTier.EPICO
 
   val winRate: Int
     get() =
@@ -43,33 +33,3 @@ data class StorageInfo(
   val totalSizeBytes: Long = 0,
   val availableSpaceBytes: Long = 0,
 )
-
-data class WordSizeOption(
-  val key: String,
-  @androidx.annotation.StringRes val labelRes: Int,
-  @androidx.annotation.StringRes val descriptionRes: Int,
-)
-
-val WORD_SIZE_OPTIONS =
-  listOf(
-    WordSizeOption(
-      "DEFAULT",
-      com.woliveiras.palabrita.core.common.R.string.word_size_default_label,
-      com.woliveiras.palabrita.core.common.R.string.word_size_default_desc,
-    ),
-    WordSizeOption(
-      "SHORT",
-      com.woliveiras.palabrita.core.common.R.string.word_size_short_label,
-      com.woliveiras.palabrita.core.common.R.string.word_size_short_desc,
-    ),
-    WordSizeOption(
-      "LONG",
-      com.woliveiras.palabrita.core.common.R.string.word_size_long_label,
-      com.woliveiras.palabrita.core.common.R.string.word_size_long_desc,
-    ),
-    WordSizeOption(
-      "EPIC",
-      com.woliveiras.palabrita.core.common.R.string.word_size_epic_label,
-      com.woliveiras.palabrita.core.common.R.string.word_size_epic_desc,
-    ),
-  )

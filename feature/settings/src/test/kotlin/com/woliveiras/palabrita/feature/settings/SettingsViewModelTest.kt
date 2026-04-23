@@ -8,7 +8,6 @@ import com.woliveiras.palabrita.core.model.GameSession
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
-import com.woliveiras.palabrita.core.model.PlayerTier
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
@@ -103,52 +102,6 @@ class SettingsViewModelTest {
     assertThat(statsRepo.getStats().preferredLanguage).isEqualTo("es")
   }
 
-  // --- Word size preference ---
-
-  @Test
-  fun `word size unlocked when tier is Astuto`() = runTest {
-    val stats = PlayerStats(totalXp = 150, playerTier = PlayerTier.ASTUTO)
-    val vm = createViewModel(stats = stats)
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.isWordSizeUnlocked).isTrue()
-  }
-
-  @Test
-  fun `word size locked when tier below Astuto`() = runTest {
-    val stats = PlayerStats(totalXp = 49, playerTier = PlayerTier.NOVATO)
-    val vm = createViewModel(stats = stats)
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.isWordSizeUnlocked).isFalse()
-  }
-
-  @Test
-  fun `epic word size available when tier is Epico`() = runTest {
-    val stats = PlayerStats(totalXp = 1000, playerTier = PlayerTier.EPICO)
-    val vm = createViewModel(stats = stats)
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.isEpicWordSizeAvailable).isTrue()
-  }
-
-  @Test
-  fun `changing word size persists to repository`() = runTest {
-    val statsRepo = FakeStatsRepository(PlayerStats(playerTier = PlayerTier.ASTUTO))
-    val vm = createViewModel(statsRepo = statsRepo)
-    testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(SettingsAction.ChangeWordSize("SHORT"))
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(statsRepo.getStats().wordSizePreference).isEqualTo("SHORT")
-  }
-
-  @Test
-  fun `changing word size ignored when tier below Astuto`() = runTest {
-    val statsRepo = FakeStatsRepository(PlayerStats(playerTier = PlayerTier.NOVATO))
-    val vm = createViewModel(statsRepo = statsRepo)
-    testDispatcher.scheduler.advanceUntilIdle()
-    vm.onAction(SettingsAction.ChangeWordSize("SHORT"))
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(statsRepo.getStats().wordSizePreference).isEqualTo("DEFAULT")
-  }
-
   // --- Stats display ---
 
   @Test
@@ -179,16 +132,13 @@ class SettingsViewModelTest {
   @Test
   fun `reset progress clears stats`() = runTest {
     val statsRepo =
-      FakeStatsRepository(
-        PlayerStats(totalPlayed = 42, totalWon = 36, totalXp = 500, preferredLanguage = "es")
-      )
+      FakeStatsRepository(PlayerStats(totalPlayed = 42, totalWon = 36, preferredLanguage = "es"))
     val vm = createViewModel(statsRepo = statsRepo)
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.ResetProgress)
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.stats.totalPlayed).isEqualTo(0)
     assertThat(vm.state.value.stats.totalWon).isEqualTo(0)
-    assertThat(vm.state.value.stats.totalXp).isEqualTo(0)
   }
 
   @Test
@@ -345,31 +295,15 @@ private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()
 
   override suspend fun getStats(): PlayerStats = stats
 
-  override suspend fun updateAfterGame(
-    won: Boolean,
-    attempts: Int,
-    difficulty: Int,
-    hintsUsed: Int,
-  ) {}
-
-  override suspend fun checkAndPromoteDifficulty(): Int = stats.currentDifficulty
+  override suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int) {}
 
   override suspend fun updateLanguage(language: String) {
     stats = stats.copy(preferredLanguage = language)
     _flow.value = stats
   }
 
-  override suspend fun updateWordSizePreference(preference: String) {
-    stats = stats.copy(wordSizePreference = preference)
-    _flow.value = stats
-  }
-
   override suspend fun resetProgress() {
-    stats =
-      PlayerStats(
-        preferredLanguage = stats.preferredLanguage,
-        wordSizePreference = stats.wordSizePreference,
-      )
+    stats = PlayerStats(preferredLanguage = stats.preferredLanguage)
     _flow.value = stats
   }
 

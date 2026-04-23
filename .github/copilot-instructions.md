@@ -36,7 +36,7 @@ core/model/           # Domain models, repositories interfaces
 core/data/            # Room entities, DAOs, repository implementations
 core/ai/              # LlmEngineManager, PuzzleGenerator, parsers
 feature/onboarding/   # Onboarding flow
-feature/game/         # Game screen, difficulty picker, keyboard
+feature/game/         # Game screen, keyboard
 feature/chat/         # Post-game chat with LLM
 feature/settings/     # Settings, stats, model management
 specs/                # Feature specifications (source of truth)

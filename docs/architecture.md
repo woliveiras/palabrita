@@ -68,13 +68,14 @@ Each feature follows the pattern:
 // Immutable state
 data class GameState(
     val puzzle: Puzzle? = null,
-    val chosenDifficulty: Int = 1,    // auto-selected via PlayerStats.currentDifficulty
     val attempts: List<Attempt> = emptyList(),
     val currentInput: String = "",
     val revealedHints: List<String> = emptyList(),
     val keyboardState: Map<Char, LetterState> = emptyMap(),
     val gameStatus: GameStatus = GameStatus.LOADING,  // LOADING -> PLAYING -> WON/LOST
-    // ...
+    val isLoading: Boolean = false,
+    val errorRes: Int? = null,
+    val showAbandonDialog: Boolean = false,
 )
 
 // Discrete actions -- no SelectDifficulty/StartGame (removed)
@@ -87,20 +88,17 @@ sealed class GameAction {
     // ...
 }
 
-// ViewModel automatically loads game at player's difficulty
+// ViewModel automatically loads the next puzzle by word length
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val puzzleRepository: PuzzleRepository,
-    private val statsRepository: StatsRepository,
     // ...
 ) : ViewModel() {
-    init { loadNextGame() }  // auto-start without picker
+    init { loadNextGame() }  // auto-start, no picker
 
     private fun loadNextGame() {
         viewModelScope.launch {
-            val stats = statsRepository.getStats()
-            val difficulty = stats.currentDifficulty  // 1-5, automatically managed
-            // fetches puzzle and starts game
+            // fetches next unplayed puzzle (ordered by word length within batch)
         }
     }
 }
@@ -204,7 +202,7 @@ engineSM.transition(EngineEvent.Initialize)   // Ready + Initialize -> ignored (
 
 | Flow | Reason |
 |---|---|
-| Game status (Loading, Playing, Won, Lost) | Few states, linear transitions. Auto-difficulty based on player level (no picker). |
+| Game status (Loading, Playing, Won, Lost) | Few states, linear transitions. No picker — puzzle loaded automatically. |
 | Chat status (Idle, EngineLoading, Responding, AtLimit) | Linear, engine auto-initializes if needed |
 
 ### Dependency Injection (Hilt)
@@ -256,14 +254,13 @@ Navigation flow:
 Start ---> Onboarding completed? ---> Yes ---> Home
                                   `---> No ---> Onboarding ---> Generation ---> Home
 
-Home ---> Play ---> Game (auto-difficulty via PlayerStats.currentDifficulty)
+Home ---> Play ---> Game (next puzzle by word length from current cycle)
 Home ---> Generate More ---> Generation (re-gen)
 Game ---> Win/Lose ---> Result ---> Chat (post-game, real LLM with streaming)
 Game ---> No Puzzles Left ---> Generation (re-gen)
 
-After each game (win/lose), the system calls checkAndPromoteDifficulty():
-  - Promote: >=5 wins + >=70% winRate at current difficulty
-  - Demote: 3 consecutive losses
+Difficulty is implicit via word length (4-8 letters). Progressive cycles
+increase the minimum word length over time (see Spec 14).
 
 Bottom Nav: Home | AI (AiInfoScreen) | More (Settings)
 ```

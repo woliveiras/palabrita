@@ -540,12 +540,6 @@ private fun ResultScreen(
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
       )
-      Spacer(Modifier.height(4.dp))
-      Text(
-        text = stringResource(CommonR.string.result_category, it.category),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
     }
 
     if (hintsUsed > 0) {
@@ -606,12 +600,6 @@ private fun ChatCardCta(word: String, onExplore: () -> Unit) {
           style = MaterialTheme.typography.labelMedium,
         )
       }
-      Spacer(Modifier.height(8.dp))
-      Text(
-        text = stringResource(CommonR.string.chat_card_bonus),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.primary,
-      )
       Spacer(Modifier.height(12.dp))
       Button(onClick = onExplore, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(CommonR.string.chat_card_cta))

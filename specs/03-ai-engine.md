@@ -105,12 +105,14 @@ interface PuzzleGenerator {
     suspend fun generateBatch(
         count: Int,
         language: String,
-        targetDifficulty: Int,
+        wordLengths: List<Int>,
         recentWords: List<String>,
         allExistingWords: Set<String>
     ): List<Puzzle>
 }
 ```
+
+> **Note:** `targetDifficulty` was removed. Instead, `wordLengths` specifies which word lengths to generate (e.g., `[4, 5, 6, 7, 8]`). Word length distribution is determined by the generation cycle (see Spec 14).
 
 **Word exclusion strategy:**
 - `recentWords`: last ~50 played words, injected into the prompt as a variety hint for the LLM
@@ -144,7 +146,7 @@ Manages post-guess conversations.
 
 ```kotlin
 interface ChatEngine {
-    suspend fun startConversation(word: String, category: String, language: String): ChatSession
+    suspend fun startConversation(word: String, language: String): ChatSession
 }
 
 interface ChatSession : AutoCloseable {
@@ -155,7 +157,7 @@ interface ChatSession : AutoCloseable {
 ```
 
 **Rules:**
-- System prompt contextualized with the word and category
+- System prompt contextualized with the word
 - Gemma 4: uses native `system` role in `ConversationConfig.systemInstruction`
 - Gemma 3: prepend to the first user message
 - Streaming via `conversation.sendMessageAsync(message).collect {}`
@@ -182,61 +184,42 @@ object PromptTemplates {
 
     fun puzzleUserPromptGemma4(
         language: String,
-        difficulty: Int,
-        minLength: Int,
-        maxLength: Int,
+        wordLength: Int,
         recentWords: List<String>
     ): String {
-        val rarity = difficultyToRarity(difficulty)
         return """
             Generate a word for the game.
             Output language: $language
-            Difficulty: $difficulty (1=easy, 5=hard)
-            Length: $minLength-$maxLength letters
-            Word rarity: $rarity
-            The word, category, and hints MUST be in $language.
+            Length: exactly $wordLength letters
+            The word and hints MUST be in $language.
             Avoid these recent words: ${recentWords.joinToString(", ")}
         """.trimIndent()
     }
 
     fun puzzlePromptGemma3(
         language: String,
-        difficulty: Int,
-        minLength: Int,
-        maxLength: Int,
+        wordLength: Int,
         recentWords: List<String>
     ): String {
-        val rarity = difficultyToRarity(difficulty)
         return """
             You are a word generator for a game. Return ONLY valid JSON, no extra text.
 
             Schema:
-            {"word": "string", "category": "string", "difficulty": number, "hints": ["string","string","string","string","string"]}
+            {"word": "string", "hints": ["string","string","string"]}
 
             Rules:
-            - The word MUST be a common noun in $language, $minLength-$maxLength letters
-            - Word rarity: $rarity
+            - The word MUST be a common noun in $language, exactly $wordLength letters
             - No proper nouns, no accents, lowercase only
-            - difficulty: $difficulty (1=easy, 5=hard)
-            - 5 progressive hints: from vaguest to most specific, written in $language
+            - 3 progressive hints: from vaguest to most specific, written in $language
             - Hints MUST NOT contain the word
             - Avoid these recent words: ${recentWords.joinToString(", ")}
         """.trimIndent()
     }
 
-    private fun difficultyToRarity(difficulty: Int): String = when (difficulty) {
-        1 -> "very common, everyday word"
-        2 -> "common word"
-        3 -> "less frequent word"
-        4 -> "uncommon word"
-        5 -> "rare or technical word"
-        else -> "common word"
-    }
-
     // --- Chat ---
 
-    fun chatSystemPrompt(word: String, category: String, language: String): String = """
-        You are an educational assistant. The player just guessed the word "$word" (category: $category).
+    fun chatSystemPrompt(word: String, language: String): String = """
+        You are an educational assistant. The player just guessed the word "$word".
         Answer questions about: word origin, etymology, fun facts, usage in sentences, synonyms, translations to other languages.
         Keep responses short (max 3 paragraphs). Always respond in $language.
     """.trimIndent()
@@ -256,8 +239,6 @@ interface LlmResponseParser {
 
 data class PuzzleResponse(
     val word: String,
-    val category: String,
-    val difficulty: Int,
     val hints: List<String>
 )
 
@@ -281,14 +262,12 @@ Deterministic validation (without LLM).
 
 | Rule | Criterion | Action if failed |
 |---|---|---|
-| Word length | Within the range for the difficulty (see `difficultyToWordLength`) | Reject |
+| Word length | Within 4-8 letters, matching the requested length | Reject |
 | Valid characters | Only `[a-z]` (no accents, no spaces, no hyphens) | Reject |
 | Lowercase | Entire word in lowercase | Normalize (toLowerCase) |
 | Not duplicated | Word does not exist in the database | Reject |
-| Hints count | Exactly 5 hints | Reject |
+| Hints count | At least 3 hints (if more, take first 3) | Reject if < 3 |
 | Hints do not reveal | No hint contains the word | Reject |
-| Difficulty range | 1-5 | Clamp |
-| Category not empty | category.isNotBlank() | Reject |
 
 **Interface:**
 
@@ -326,11 +305,7 @@ For Gemma 4, use native function calling to enforce the JSON schema:
 fun generatePuzzle(
     @ToolParam("A palavra gerada, substantivo comum, sem acentos, minúscula")
     word: String,
-    @ToolParam("Categoria da palavra")
-    category: String,
-    @ToolParam("Nível de dificuldade de 1 a 5")
-    difficulty: Int,
-    @ToolParam("Lista de 5 dicas progressivas, da mais vaga à mais específica")
+    @ToolParam("Lista de 3 dicas progressivas, da mais vaga à mais específica")
     hints: List<String>
 ): String {
     // Parse structured output
@@ -341,13 +316,14 @@ fun generatePuzzle(
 
 - [ ] `LlmEngineManager` initializes with Gemma 4 E2B on a device with ≥8GB RAM
 - [ ] `LlmEngineManager` initializes with Gemma 3 1B on a device with 4-8GB RAM
-- [ ] `PuzzleGenerator` generates a batch of 7 valid puzzles in <60s (Gemma 4) or <30s (Gemma 3)
+- [ ] `PuzzleGenerator` generates a batch of 20 valid puzzles in <60s (Gemma 4) or <30s (Gemma 3)
 - [ ] `LlmResponseParser` parses valid JSON correctly
 - [ ] `LlmResponseParser` extracts JSON from responses with extra text via regex fallback
-- [ ] `PuzzleValidator` rejects words outside the 5-8 character range
+- [ ] `PuzzleValidator` rejects words outside the 4-8 character range
 - [ ] `PuzzleValidator` rejects words with accents or special characters
 - [ ] `PuzzleValidator` rejects puzzles with hints that contain the word
 - [ ] `PuzzleValidator` rejects duplicate words
+- [ ] `PuzzleValidator` accepts 3 hints; takes first 3 if more are returned
 - [ ] `ChatEngine` streams tokens during response
 - [ ] `ChatEngine` respects the 10-message limit per session
 - [ ] Retry generates a valid puzzle after failure on the first attempt (tested with mock)

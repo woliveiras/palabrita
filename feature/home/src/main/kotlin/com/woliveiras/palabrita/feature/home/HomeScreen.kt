@@ -69,12 +69,7 @@ fun HomeScreen(
     Spacer(Modifier.height(16.dp))
 
     // Quick Stats
-    QuickStatsRow(
-      totalPlayed = state.totalPlayed,
-      winRate = state.winRate,
-      playerTier = state.playerTier,
-      totalXp = state.totalXp,
-    )
+    QuickStatsRow(totalPlayed = state.totalPlayed, winRate = state.winRate)
 
     Spacer(Modifier.height(24.dp))
 
@@ -143,7 +138,7 @@ private fun LoadingHome() {
 // --- Quick Stats ---
 
 @Composable
-private fun QuickStatsRow(totalPlayed: Int, winRate: Float, playerTier: String, totalXp: Int) {
+private fun QuickStatsRow(totalPlayed: Int, winRate: Float) {
   Surface(shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
     Row(
       modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -154,8 +149,6 @@ private fun QuickStatsRow(totalPlayed: Int, winRate: Float, playerTier: String, 
         value = "${(winRate * 100).toInt()}%",
         label = stringResource(CommonR.string.home_stats_wins),
       )
-      StatItem(value = playerTier, label = stringResource(CommonR.string.home_stats_tier))
-      StatItem(value = "$totalXp", label = stringResource(CommonR.string.home_stats_xp))
     }
   }
 }

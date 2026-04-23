@@ -15,10 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.RestartAlt
-import androidx.compose.material.icons.rounded.SortByAlpha
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,7 +60,6 @@ fun SettingsScreen(
   val errorMessage = state.errorRes?.let { stringResource(it) }
 
   var showLanguageDialog by remember { mutableStateOf(false) }
-  var showWordSizeDialog by remember { mutableStateOf(false) }
   var showDeleteModelDialog by remember { mutableStateOf(false) }
   var showResetDialog by remember { mutableStateOf(false) }
 
@@ -104,32 +101,6 @@ fun SettingsScreen(
         },
         leadingContent = { Icon(Icons.Rounded.Language, contentDescription = null) },
         modifier = Modifier.clickable { showLanguageDialog = true },
-      )
-
-      ListItem(
-        headlineContent = { Text(stringResource(CommonR.string.settings_word_size)) },
-        supportingContent = {
-          if (state.isWordSizeUnlocked) {
-            val opt = WORD_SIZE_OPTIONS.find { it.key == state.wordSizePreference }
-            Text(
-              opt?.let { stringResource(it.labelRes) }
-                ?: stringResource(CommonR.string.settings_word_size_default)
-            )
-          } else {
-            Text(stringResource(CommonR.string.settings_word_size_locked))
-          }
-        },
-        leadingContent = {
-          if (state.isWordSizeUnlocked) {
-            Icon(Icons.Rounded.SortByAlpha, contentDescription = null)
-          } else {
-            Icon(
-              Icons.Rounded.Lock,
-              contentDescription = stringResource(CommonR.string.settings_word_size_locked),
-            )
-          }
-        },
-        modifier = Modifier.clickable { if (state.isWordSizeUnlocked) showWordSizeDialog = true },
       )
 
       HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -222,18 +193,6 @@ fun SettingsScreen(
     )
   }
 
-  if (showWordSizeDialog) {
-    WordSizeDialog(
-      current = state.wordSizePreference,
-      isEpicAvailable = state.isEpicWordSizeAvailable,
-      onSelect = {
-        viewModel.onAction(SettingsAction.ChangeWordSize(it))
-        showWordSizeDialog = false
-      },
-      onDismiss = { showWordSizeDialog = false },
-    )
-  }
-
   if (showDeleteModelDialog) {
     AlertDialog(
       onDismissRequest = { showDeleteModelDialog = false },
@@ -314,50 +273,6 @@ private fun LanguageDialog(current: String, onSelect: (String) -> Unit, onDismis
           ) {
             Text(name)
             if (code == current) {
-              Text("✓", color = MaterialTheme.colorScheme.primary)
-            }
-          }
-        }
-      }
-    },
-    confirmButton = {
-      TextButton(onClick = onDismiss) { Text(stringResource(CommonR.string.close)) }
-    },
-  )
-}
-
-@Composable
-private fun WordSizeDialog(
-  current: String,
-  isEpicAvailable: Boolean,
-  onSelect: (String) -> Unit,
-  onDismiss: () -> Unit,
-) {
-  val options =
-    if (isEpicAvailable) WORD_SIZE_OPTIONS else WORD_SIZE_OPTIONS.filter { it.key != "EPIC" }
-
-  AlertDialog(
-    onDismissRequest = onDismiss,
-    title = { Text(stringResource(CommonR.string.settings_word_size)) },
-    text = {
-      Column {
-        options.forEach { option ->
-          Row(
-            modifier =
-              Modifier.fillMaxWidth()
-                .clickable { onSelect(option.key) }
-                .padding(vertical = 12.dp, horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-          ) {
-            Column(modifier = Modifier.weight(1f)) {
-              Text(stringResource(option.labelRes))
-              Text(
-                stringResource(option.descriptionRes),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-              )
-            }
-            if (option.key == current) {
               Text("✓", color = MaterialTheme.colorScheme.primary)
             }
           }

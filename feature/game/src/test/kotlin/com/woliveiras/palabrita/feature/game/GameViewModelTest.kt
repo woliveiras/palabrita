@@ -61,15 +61,6 @@ class GameViewModelTest {
     assertThat(vm.state.value.currentInput).isEmpty()
   }
 
-  // --- Difficulty from player level ---
-
-  @Test
-  fun `chosen difficulty matches player current difficulty`() = runTest {
-    val vm = createViewModel(stats = PlayerStats(currentDifficulty = 3, maxUnlockedDifficulty = 3))
-    testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.chosenDifficulty).isEqualTo(3)
-  }
-
   // --- Game start ---
 
   @Test
@@ -214,10 +205,10 @@ class GameViewModelTest {
   }
 
   @Test
-  fun `cannot reveal more than 5 hints`() = runTest {
+  fun `cannot reveal more hints than available`() = runTest {
     val vm = createPlayingViewModel()
-    repeat(6) { vm.onAction(GameAction.RevealHint) }
-    assertThat(vm.state.value.revealedHints).hasSize(5)
+    repeat(5) { vm.onAction(GameAction.RevealHint) }
+    assertThat(vm.state.value.revealedHints).hasSize(3)
   }
 
   @Test
@@ -268,7 +259,7 @@ class GameViewModelTest {
 
   private fun createTestPuzzle(
     word: String = "gatos",
-    hints: List<String> = listOf("Dica 1", "Dica 2", "Dica 3", "Dica 4", "Dica 5"),
+    hints: List<String> = listOf("Dica 1", "Dica 2", "Dica 3"),
   ) =
     Puzzle(
       id = 1,
@@ -276,7 +267,7 @@ class GameViewModelTest {
       wordDisplay = word.uppercase(),
       language = "pt",
       difficulty = 1,
-      category = "Animal",
+      category = "",
       hints = hints,
       source = PuzzleSource.AI,
       generatedAt = System.currentTimeMillis(),
@@ -336,18 +327,9 @@ private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()
   StatsRepository {
   override suspend fun getStats(): PlayerStats = stats
 
-  override suspend fun updateAfterGame(
-    won: Boolean,
-    attempts: Int,
-    difficulty: Int,
-    hintsUsed: Int,
-  ) {}
-
-  override suspend fun checkAndPromoteDifficulty(): Int = stats.currentDifficulty
+  override suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int) {}
 
   override suspend fun updateLanguage(language: String) {}
-
-  override suspend fun updateWordSizePreference(preference: String) {}
 
   override suspend fun resetProgress() {}
 

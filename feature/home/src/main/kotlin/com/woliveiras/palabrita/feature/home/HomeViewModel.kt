@@ -5,7 +5,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.woliveiras.palabrita.core.model.PlayerTier
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,8 +41,6 @@ constructor(
           it.copy(
             totalPlayed = stats.totalPlayed,
             winRate = winRate,
-            playerTier = PlayerTier.fromXp(stats.totalXp).displayName,
-            totalXp = stats.totalXp,
             unplayedCount = unplayed,
             isLoading = false,
           )

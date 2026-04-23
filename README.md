@@ -64,7 +64,7 @@ core/
   ai/                 → LiteRT-LM wrapper, PuzzleGenerator, parsers
 feature/
   onboarding/         → Onboarding flow, model selection, download
-  game/               → Game screen, difficulty picker, keyboard
+  game/               → Game screen, keyboard
   chat/               → Post-game chat with LLM
   settings/           → Settings, stats, model management
 specs/                → Feature specifications (source of truth)

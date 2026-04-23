@@ -10,6 +10,7 @@ data class PlayerStatsEntity(
   val totalWon: Int = 0,
   val avgAttempts: Float = 0f,
   val preferredLanguage: String = "pt",
+  // Legacy columns kept for Room compatibility — no longer used by app logic
   val currentDifficulty: Int = 1,
   val maxUnlockedDifficulty: Int = 1,
   val totalXp: Int = 0,

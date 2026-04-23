@@ -110,12 +110,6 @@
     <string name="tier_warning_choose_other">Escolher outro</string>
 
     <!-- Game: Difficulty Picker -->
-    <string name="difficulty_title">Escolha a dificuldade</string>
-    <string name="difficulty_easy">Fácil</string>
-    <string name="difficulty_normal">Normal</string>
-    <string name="difficulty_hard">Difícil</string>
-    <string name="difficulty_challenging">Desafiante</string>
-    <string name="difficulty_expert">Expert</string>
     <string name="play">Jogar</string>
 
     <!-- Game: Top Bar -->
@@ -137,7 +131,6 @@
     <string name="result_lost">Não foi dessa vez</string>
     <string name="result_attempts">Você descobriu em %1$d/6</string>
     <string name="result_word">Palavra: %s</string>
-    <string name="result_category">Categoria: %s</string>
     <string name="result_hints_used">%d dicas usadas</string>
     <string name="result_explore">Explorar a palavra</string>
 
@@ -159,9 +152,6 @@
     <!-- Settings -->
     <string name="settings_section_game">Jogo</string>
     <string name="settings_language">Idioma das palavras</string>
-    <string name="settings_word_size">Tamanho das palavras</string>
-    <string name="settings_word_size_default">Padrão</string>
-    <string name="settings_word_size_locked">Desbloqueado no Astuto</string>
     <string name="settings_section_ai">Inteligência Artificial</string>
     <string name="settings_current_model">Modelo atual</string>
     <string name="settings_model_gemma4">Gemma 4 2B</string>
@@ -186,14 +176,6 @@
     <string name="settings_error_download_soon">Download de modelos disponível em breve</string>
 
     <!-- Word Size Options -->
-    <string name="word_size_default_label">Padrão</string>
-    <string name="word_size_default_desc">Dinâmico por dificuldade (5–8)</string>
-    <string name="word_size_short_label">Palavras curtas</string>
-    <string name="word_size_short_desc">5–6 letras</string>
-    <string name="word_size_long_label">Palavras longas</string>
-    <string name="word_size_long_desc">7–9 letras</string>
-    <string name="word_size_epic_label">Palavras épicas</string>
-    <string name="word_size_epic_desc">8–10 letras</string>
 
     <!-- Notifications -->
     <string name="notification_channel_name">Desafios</string>
@@ -225,7 +207,6 @@
     <string name="chat_suggestion_etymology">Etimologia</string>
     <string name="chat_suggestion_curiosity">Curiosidade</string>
     <string name="chat_suggestion_examples">Exemplos</string>
-    <string name="chat_card_bonus">+1 XP bônus ✨</string>
     <string name="chat_card_cta">EXPLORAR AGORA</string>
 
     <!-- Home -->
@@ -238,8 +219,6 @@
     <string name="home_generate_more">GERAR MAIS PUZZLES</string>
     <string name="home_stats_games">jogos</string>
     <string name="home_stats_wins">wins</string>
-    <string name="home_stats_tier">tier</string>
-    <string name="home_stats_xp">XP</string>
     <string name="home_generating">Gerando novos puzzles…</string>
     <string name="home_generation_complete">✓ Novos puzzles prontos!</string>
 

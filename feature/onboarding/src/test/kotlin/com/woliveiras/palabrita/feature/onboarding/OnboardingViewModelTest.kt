@@ -183,20 +183,11 @@ private class FakeStatsRepository : StatsRepository {
 
   override suspend fun getStats(): PlayerStats = stats
 
-  override suspend fun updateAfterGame(
-    won: Boolean,
-    attempts: Int,
-    difficulty: Int,
-    hintsUsed: Int,
-  ) {
+  override suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int) {
     // no-op for onboarding tests
   }
 
-  override suspend fun checkAndPromoteDifficulty(): Int = stats.currentDifficulty
-
   override suspend fun updateLanguage(language: String) {}
-
-  override suspend fun updateWordSizePreference(preference: String) {}
 
   override suspend fun resetProgress() {}
 
