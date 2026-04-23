@@ -58,17 +58,17 @@ fun SettingsScreen(
   viewModel: SettingsViewModel = hiltViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
-  val context = androidx.compose.ui.platform.LocalContext.current
   val snackbarHostState = remember { SnackbarHostState() }
+  val errorMessage = state.errorRes?.let { stringResource(it) }
 
   var showLanguageDialog by remember { mutableStateOf(false) }
   var showWordSizeDialog by remember { mutableStateOf(false) }
   var showDeleteModelDialog by remember { mutableStateOf(false) }
   var showResetDialog by remember { mutableStateOf(false) }
 
-  LaunchedEffect(state.errorRes) {
-    state.errorRes?.let {
-      snackbarHostState.showSnackbar(context.getString(it))
+  LaunchedEffect(errorMessage) {
+    errorMessage?.let {
+      snackbarHostState.showSnackbar(it)
       viewModel.onAction(SettingsAction.DismissError)
     }
   }

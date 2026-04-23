@@ -1,6 +1,7 @@
 package com.woliveiras.palabrita.core.ai.worker
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -160,6 +161,8 @@ constructor(
         .setAutoCancel(true)
         .build()
 
+    // Permission is checked above via ContextCompat.checkSelfPermission before reaching this line
+    @SuppressLint("MissingPermission")
     NotificationManagerCompat.from(applicationContext).notify(NOTIFICATION_ID, notification)
   }
 

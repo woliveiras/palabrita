@@ -4,7 +4,7 @@ object PromptTemplates {
 
   fun puzzleSystemPromptGemma4(): String =
     """
-    You are a word generator for a guessing game.
+    You are a word generator for a guessing game. Your function is to return exactly one JSON object per request.
     Always respond with ONLY a JSON object. No markdown, no code fences, no explanation.
     The JSON keys MUST be in English: "word", "category", "difficulty", "hints".
     The values for word, category, and hints must be in the requested language.

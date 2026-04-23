@@ -7,6 +7,7 @@ import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.LlmSession
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
+import com.woliveiras.palabrita.core.ai.worker.GenerationInfo
 import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
 import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
@@ -274,4 +275,6 @@ private class FakeGenerationScheduler : PuzzleGenerationScheduler {
 
   override fun observeGenerationState(): Flow<GenerationWorkState> =
     flowOf(GenerationWorkState.IDLE)
+
+  override fun observeGenerationInfo(): Flow<GenerationInfo> = flowOf(GenerationInfo())
 }

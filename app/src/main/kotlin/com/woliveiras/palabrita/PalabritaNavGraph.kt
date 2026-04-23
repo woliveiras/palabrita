@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -55,7 +56,8 @@ private data class BottomNavItem(val route: Any, val icon: ImageVector, val labe
 @Composable
 fun PalabritaNavGraph(appPreferences: AppPreferences) {
   val isOnboardingComplete: Boolean? by
-    appPreferences.isOnboardingComplete.map { it as Boolean? }.collectAsState(initial = null)
+    remember(appPreferences) { appPreferences.isOnboardingComplete.map { it as Boolean? } }
+      .collectAsState(initial = null)
   if (isOnboardingComplete == null) return
   val navController = rememberNavController()
   val startDestination: Any = if (isOnboardingComplete!!) HomeRoute else OnboardingRoute
