@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Palabrita</string>
+    <string name="splash_subtitle">AI-powered word puzzles, offline</string>
 </resources>

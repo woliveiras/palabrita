@@ -14,6 +14,15 @@ import androidx.compose.ui.graphics.Color
 object PalabritaColors {
 
     // -------------------------------------------------------------------------
+    // Splash screen gradient
+    // from-[#6366f1] via-[#8b5cf6] to-[#a855f7], direction: top → bottom
+    // -------------------------------------------------------------------------
+
+    val SplashGradientStart = Color(0xFF6366F1) // indigo top
+    val SplashGradientMid = Color(0xFF8B5CF6)   // violet center
+    val SplashGradientEnd = Color(0xFFA855F7)   // purple bottom
+
+    // -------------------------------------------------------------------------
     // Brand — purple/indigo gradient identity
     // -------------------------------------------------------------------------
 
