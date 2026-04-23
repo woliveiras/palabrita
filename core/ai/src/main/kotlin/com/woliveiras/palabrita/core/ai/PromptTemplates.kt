@@ -47,19 +47,26 @@ object PromptTemplates {
     recentWords: List<String>,
   ): String {
     val rarity = difficultyToRarity(difficulty)
+    val lengthExample =
+      if (minLength == maxLength) "(exactly $minLength letters)"
+      else "(between $minLength and $maxLength letters)"
     return """
       You are a word generator for a game. Return ONLY a JSON object, no markdown, no code fences.
 
       Required JSON format (keys MUST be in English exactly as shown):
       {"word": "string", "category": "string", "difficulty": number, "hints": ["h1","h2","h3","h4","h5"]}
 
-      Rules:
-      - The word MUST be a common noun in $language, $minLength-$maxLength lowercase letters, no accents
+      CRITICAL RULE 1 — Word length: the word MUST have $minLength to $maxLength letters $lengthExample.
+      Count every letter before answering. A word like "estufa" has 6 letters and would be REJECTED.
+      CRITICAL RULE 2 — Hints: NEVER include the word itself inside any hint.
+      If the word is "gato", hints cannot contain "gato", "gatos", "gatito" or any form of it.
+
+      Other rules:
+      - The word must be a common noun in $language, lowercase, no accents
       - Word rarity: $rarity
       - No proper nouns
       - difficulty: $difficulty (1=easy, 5=hard)
       - Exactly 5 progressive hints in $language: from vaguest to most specific
-      - Hints MUST NOT contain the word itself
       - Avoid these recent words: ${recentWords.joinToString(", ")}
     """
       .trimIndent()

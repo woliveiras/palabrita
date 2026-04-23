@@ -45,7 +45,7 @@ constructor(
 
     Log.i(TAG, "generateBatch: difficulty=$targetDifficulty count=$count length=$wordLength")
 
-    val systemPrompt = buildSystemPrompt(modelId, language)
+    val systemPrompt = buildSystemPrompt(modelId)
     var puzzleIndex = 0
 
     while (puzzleIndex < count) {
@@ -134,7 +134,7 @@ constructor(
     return null
   }
 
-  private fun buildSystemPrompt(modelId: ModelId, language: String): String =
+  private fun buildSystemPrompt(modelId: ModelId): String =
     when (modelId) {
       ModelId.GEMMA4_E4B,
       ModelId.GEMMA4_E2B -> PromptTemplates.puzzleSystemPromptGemma4()
@@ -142,7 +142,7 @@ constructor(
       ModelId.DEEPSEEK_R1_1_5B,
       ModelId.QWEN2_5_1_5B,
       ModelId.QWEN3_0_6B,
-      ModelId.NONE -> PromptTemplates.puzzlePromptGemma3(language, 1, 4, 5, emptyList())
+      ModelId.NONE -> PromptTemplates.puzzleSystemPromptGemma4()
     }
 
   private fun buildUserPrompt(
