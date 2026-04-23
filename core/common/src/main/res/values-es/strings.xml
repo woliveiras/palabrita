@@ -15,25 +15,42 @@
 
     <!-- Onboarding: Welcome -->
     <string name="welcome_title">Descubre la palabra del día</string>
+    <string name="welcome_title_new">Bienvenido a Palabrita</string>
     <string name="welcome_description">Un juego de palabras con inteligencia artificial, directo en tu celular</string>
     <string name="welcome_start">Comenzar</string>
+
+    <!-- Onboarding: Welcome feature cards -->
+    <string name="feature_ai_title">Puzzles con IA</string>
+    <string name="feature_ai_desc">Desafíos frescos creados por IA en el dispositivo</string>
+    <string name="feature_offline_title">Instantáneo y Sin Conexión</string>
+    <string name="feature_offline_desc">Juega en cualquier lugar, sin internet</string>
+    <string name="feature_private_title">Privado y Seguro</string>
+    <string name="feature_private_desc">Tus datos nunca salen de tu dispositivo</string>
 
     <!-- Onboarding: Language -->
     <string name="language_title">¿En qué idioma quieres jugar?</string>
     <string name="language_hint">Puedes cambiarlo después en la configuración</string>
 
     <!-- Onboarding: Model Selection -->
-    <string name="model_selection_title">¿Quieres elegir tu IA?</string>
-    <string name="model_powerful_title">Tengo un dispositivo potente</string>
-    <string name="model_powerful_subtitle">Gemma 4 E2B · ~2,6 GB de descarga</string>
-    <string name="model_powerful_info">Requiere 8 GB de RAM</string>
-    <string name="model_compact_title">Necesito ahorrar espacio</string>
-    <string name="model_compact_subtitle">Qwen3 0.6B · ~614 MB de descarga</string>
-    <string name="model_compact_info">Requiere 2 GB de RAM</string>
+    <string name="model_selection_title">Elige tu modelo de IA</string>
+    <string name="model_selection_hint">Selecciona la IA ideal para tu dispositivo. Puedes cambiar después.</string>
+    <string name="model_powerful_title">Modelo Performance</string>
+    <string name="model_powerful_subtitle">Mejor calidad de puzzles y respuestas de IA</string>
+    <string name="model_powerful_info">485 MB · Dispositivos high-end</string>
+    <string name="model_compact_title">Modelo Eficiente</string>
+    <string name="model_compact_subtitle">Optimizado para velocidad y batería</string>
+    <string name="model_compact_info">180 MB · Todos los dispositivos</string>
     <string name="model_auto_select">No, elige por mí</string>
 
     <!-- Onboarding: Download -->
-    <string name="download_title">Preparando tu IA</string>
+    <string name="download_title">Descargando modelo de IA</string>
+    <string name="download_subtitle">Descargando %s a tu dispositivo</string>
+    <string name="download_verifying_title">Verificando modelo…</string>
+    <string name="download_verifying_subtitle">Comprobando integridad del archivo</string>
+    <string name="download_complete_title">¡Descarga completa!</string>
+    <string name="download_complete_subtitle">Tu IA está lista para generar puzzles</string>
+    <string name="download_progress_label">Progreso</string>
+    <string name="download_tip">💡 <b>¿Sabías que?</b> Tu modelo de IA se queda en el dispositivo y funciona completamente sin conexión.</string>
     <string name="download_description">El modelo de inteligencia artificial se descargará en tu celular. ¡Después de eso, todo funciona sin conexión!</string>
     <string name="download_model_label">Modelo: %s</string>
     <string name="download_model_gemma4">Gemma 4 E2B (~2,6 GB)</string>
@@ -45,11 +62,12 @@
     <string name="download_checking">Verificando…</string>
 
     <!-- Onboarding: Generation -->
-    <string name="generation_title">Generando puzzles…</string>
-    <string name="generation_subtitle">La IA está creando tus desafíos. Esto puede tardar unos minutos.</string>
-    <string name="generation_complete_title">¡Puzzles listos!</string>
-    <string name="generation_complete_subtitle">Tus desafíos se generaron con éxito.</string>
-    <string name="generation_continue">EMPEZAR A JUGAR</string>
+    <string name="generation_title">Generando Puzzles</string>
+    <string name="generation_subtitle">Tu IA está creando desafíos únicos de palabras</string>
+    <string name="generation_puzzles_label">Puzzles creados</string>
+    <string name="generation_complete_title">¡Todo listo!</string>
+    <string name="generation_complete_subtitle">Tu primer lote de puzzles está listo para jugar</string>
+    <string name="generation_continue">Empezar a jugar</string>
     <string name="generation_failed">Error al generar puzzles</string>
     <string name="generation_progress_detail">%1$d de %2$d puzzles — dificultad %3$d de 5</string>
     <string name="generation_retry">INTENTAR DE NUEVO</string>
