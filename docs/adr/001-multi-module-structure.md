@@ -33,8 +33,8 @@ feature/settings/     → Settings screen (Compose + Hilt)
 
 | Concern | Choice | Rationale |
 |---|---|---|
-| Build system | Gradle 8.13 + Version Catalog | Pinned deps, reproducible builds |
-| Kotlin | 2.1.x + KSP | Latest stable, KSP for annotation processing |
+| Build system | Gradle + Version Catalog | Pinned deps, reproducible builds |
+| Kotlin | Kotlin + KSP | Latest stable, KSP for annotation processing |
 | DI | Hilt | Standard for Android, integrates with ViewModel/WorkManager |
 | UI | Jetpack Compose + Material 3 | Modern declarative UI |
 | Navigation | Navigation Compose (type-safe routes) | Kotlin serialization for route args |

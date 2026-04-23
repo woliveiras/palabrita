@@ -1,28 +1,29 @@
 [versions]
-agp = "8.8.2"
+agp = "9.2.0"
 kotlin = "2.3.20"
-ksp = "2.3.6"
-compose-bom = "2026.03.01"
-hilt = "2.58"
-room = "2.7.1"
-navigation = "2.9.0"
-workmanager = "2.10.1"
-lifecycle = "2.9.0"
+ksp = "2.3.7"
+compose-bom = "2026.04.01"
+hilt = "2.59.2"
+hilt-androidx = "1.3.0"
+room = "2.8.4"
+navigation = "2.9.8"
+workmanager = "2.11.2"
+lifecycle = "2.10.0"
 coroutines = "1.10.2"
-serialization = "1.8.1"
-spotless = "7.0.3"
-ktfmt = "0.54"
+serialization = "1.11.0"
+spotless = "8.4.0"
+ktfmt = "0.62"
 detekt = "1.23.8"
 dependency-guard = "0.5.0"
-truth = "1.4.4"
-turbine = "1.2.0"
+truth = "1.4.5"
+turbine = "1.2.1"
 junit = "4.13.2"
-androidx-test = "1.6.1"
-androidx-test-runner = "1.6.2"
-core-ktx = "1.16.0"
-core-splashscreen = "1.0.1"
-activity-compose = "1.10.1"
-datastore = "1.1.7"
+androidx-test = "1.7.0"
+androidx-test-runner = "1.7.0"
+core-ktx = "1.18.0"
+core-splashscreen = "1.2.0"
+activity-compose = "1.13.0"
+datastore = "1.2.1"
 litertlm = "0.10.2"
 
 [libraries]
@@ -50,9 +51,9 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
-hilt-work = { group = "androidx.hilt", name = "hilt-work", version = "1.2.0" }
-hilt-work-compiler = { group = "androidx.hilt", name = "hilt-compiler", version = "1.2.0" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-androidx" }
+hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hilt-androidx" }
+hilt-work-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hilt-androidx" }
 
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -75,7 +76,7 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test-runner" }
-androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version = "1.2.1" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version = "1.3.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

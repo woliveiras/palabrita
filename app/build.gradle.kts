@@ -10,12 +10,12 @@ plugins {
 
 android {
   namespace = "com.woliveiras.palabrita"
-  compileSdk = 35
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "com.woliveiras.palabrita"
     minSdk = 31
-    targetSdk = 35
+    targetSdk = 36
     versionCode = 1
     versionName = "0.1.0"
 

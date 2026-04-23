@@ -12,9 +12,9 @@ A Wordle-style word-guessing game powered by an on-device LLM (Gemma 4 E2B / Qwe
 |---|---|---|
 | JDK | 21+ | Any distribution (OpenJDK, Temurin, etc.) |
 | Android SDK | API 31+ (Android 12) | `sdkmanager` or Android Studio |
-| Android SDK Build-Tools | 35.0.0+ | |
-| Android SDK Platform | 35 | compileSdk |
-| Kotlin | 2.1.x | Managed by Gradle wrapper |
+| Android SDK Build-Tools | Latest | |
+| Android SDK Platform | 36 | compileSdk |
+| Kotlin | Latest stable | Managed by Gradle wrapper |
 
 > You do **not** need Android Studio. VS Code + terminal works fine.
 
