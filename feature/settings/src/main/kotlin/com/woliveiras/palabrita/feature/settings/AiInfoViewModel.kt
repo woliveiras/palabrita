@@ -53,9 +53,9 @@ constructor(
             modelInfo = info,
             modelId = config.modelId,
             modelPath = config.modelPath,
-            puzzleSystemPrompt = PromptTemplates.puzzleSystemPromptGemma4(),
+            puzzleSystemPrompt = PromptTemplates.puzzleSystemPrompt(),
             puzzleSamplePrompt =
-              PromptTemplates.puzzleUserPromptGemma4(
+              PromptTemplates.puzzleUserPromptLarge(
                 language = "pt",
                 difficulty = 3,
                 minLength = 4,

@@ -2,7 +2,7 @@ package com.woliveiras.palabrita.core.ai
 
 object PromptTemplates {
 
-  fun puzzleSystemPromptGemma4(): String =
+  fun puzzleSystemPrompt(): String =
     """
     You are a word generator for a guessing game. Your function is to return exactly one JSON object per request.
     Always respond with ONLY a JSON object. No markdown, no code fences, no explanation.
@@ -11,7 +11,7 @@ object PromptTemplates {
     """
       .trimIndent()
 
-  fun puzzleUserPromptGemma4(
+  fun puzzleUserPromptLarge(
     language: String,
     difficulty: Int,
     minLength: Int,
@@ -39,7 +39,7 @@ object PromptTemplates {
       .trimIndent()
   }
 
-  fun puzzlePromptGemma3(
+  fun puzzlePromptCompact(
     language: String,
     difficulty: Int,
     minLength: Int,

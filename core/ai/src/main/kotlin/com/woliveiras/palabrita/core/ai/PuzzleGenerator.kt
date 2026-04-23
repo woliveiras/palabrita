@@ -137,12 +137,12 @@ constructor(
   private fun buildSystemPrompt(modelId: ModelId): String =
     when (modelId) {
       ModelId.GEMMA4_E4B,
-      ModelId.GEMMA4_E2B -> PromptTemplates.puzzleSystemPromptGemma4()
+      ModelId.GEMMA4_E2B -> PromptTemplates.puzzleSystemPrompt()
       ModelId.PHI4_MINI,
       ModelId.DEEPSEEK_R1_1_5B,
       ModelId.QWEN2_5_1_5B,
       ModelId.QWEN3_0_6B,
-      ModelId.NONE -> PromptTemplates.puzzleSystemPromptGemma4()
+      ModelId.NONE -> PromptTemplates.puzzleSystemPrompt()
     }
 
   private fun buildUserPrompt(
@@ -160,7 +160,7 @@ constructor(
       when (modelId) {
         ModelId.GEMMA4_E4B,
         ModelId.GEMMA4_E2B ->
-          PromptTemplates.puzzleUserPromptGemma4(
+          PromptTemplates.puzzleUserPromptLarge(
             language,
             difficulty,
             wordLength.first,
@@ -171,7 +171,7 @@ constructor(
         ModelId.DEEPSEEK_R1_1_5B,
         ModelId.QWEN2_5_1_5B,
         ModelId.QWEN3_0_6B ->
-          PromptTemplates.puzzlePromptGemma3(
+          PromptTemplates.puzzlePromptCompact(
             language,
             difficulty,
             wordLength.first,

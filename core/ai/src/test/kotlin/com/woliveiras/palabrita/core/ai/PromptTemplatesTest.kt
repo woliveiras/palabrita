@@ -6,16 +6,16 @@ import org.junit.Test
 class PromptTemplatesTest {
 
   @Test
-  fun `puzzle system prompt gemma4 is in english`() {
-    val prompt = PromptTemplates.puzzleSystemPromptGemma4()
+  fun `puzzle system prompt is in english`() {
+    val prompt = PromptTemplates.puzzleSystemPrompt()
     assertThat(prompt).contains("word generator")
     assertThat(prompt).contains("function")
   }
 
   @Test
-  fun `puzzle user prompt gemma4 includes language parameter`() {
+  fun `puzzle user prompt large includes language parameter`() {
     val prompt =
-      PromptTemplates.puzzleUserPromptGemma4(
+      PromptTemplates.puzzleUserPromptLarge(
         language = "pt",
         difficulty = 3,
         minLength = 6,
@@ -27,9 +27,9 @@ class PromptTemplatesTest {
   }
 
   @Test
-  fun `puzzle user prompt gemma4 includes recent words`() {
+  fun `puzzle user prompt large includes recent words`() {
     val prompt =
-      PromptTemplates.puzzleUserPromptGemma4(
+      PromptTemplates.puzzleUserPromptLarge(
         language = "pt",
         difficulty = 2,
         minLength = 5,
@@ -41,9 +41,9 @@ class PromptTemplatesTest {
   }
 
   @Test
-  fun `puzzle prompt gemma3 includes JSON schema`() {
+  fun `puzzle prompt compact includes JSON schema`() {
     val prompt =
-      PromptTemplates.puzzlePromptGemma3(
+      PromptTemplates.puzzlePromptCompact(
         language = "en",
         difficulty = 1,
         minLength = 5,
@@ -56,9 +56,9 @@ class PromptTemplatesTest {
   }
 
   @Test
-  fun `puzzle prompt gemma3 includes language output instruction`() {
+  fun `puzzle prompt compact includes language output instruction`() {
     val prompt =
-      PromptTemplates.puzzlePromptGemma3(
+      PromptTemplates.puzzlePromptCompact(
         language = "es",
         difficulty = 2,
         minLength = 5,
@@ -71,7 +71,7 @@ class PromptTemplatesTest {
   @Test
   fun `difficulty 1 maps to everyday rarity`() {
     val prompt =
-      PromptTemplates.puzzleUserPromptGemma4(
+      PromptTemplates.puzzleUserPromptLarge(
         language = "pt",
         difficulty = 1,
         minLength = 5,
@@ -84,7 +84,7 @@ class PromptTemplatesTest {
   @Test
   fun `difficulty 5 maps to rare rarity`() {
     val prompt =
-      PromptTemplates.puzzleUserPromptGemma4(
+      PromptTemplates.puzzleUserPromptLarge(
         language = "pt",
         difficulty = 5,
         minLength = 7,
