@@ -1,5 +1,8 @@
 package com.woliveiras.palabrita
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
@@ -104,6 +107,10 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
       navController = navController,
       startDestination = SplashRoute,
       modifier = Modifier.padding(innerPadding),
+      enterTransition = { fadeIn(animationSpec = tween(300)) },
+      exitTransition = { fadeOut(animationSpec = tween(300)) },
+      popEnterTransition = { fadeIn(animationSpec = tween(300)) },
+      popExitTransition = { fadeOut(animationSpec = tween(300)) },
     ) {
       composable<SplashRoute> {
         SplashScreen(
