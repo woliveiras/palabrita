@@ -17,7 +17,7 @@ Specs and tests are the source of truth. Code adapts to them, never the other wa
 - **Stack**: Kotlin, Jetpack Compose, Hilt, Room, Navigation Compose, WorkManager, LiteRT-LM SDK, Play Asset Delivery
 - **Architecture**: Multi-module MVVM with UDF (Unidirectional Data Flow). StateMachine<S, E> for complex flows, sealed class + when for simple flows.
 - **Min SDK**: Android 12 (API 31)
-- **3 Operating Modes**: AI Premium (RAM ≥8GB, Gemma 4), AI Compact (4-8GB RAM, Gemma 3), Light (RAM <4GB, static dataset)
+- **2 Operating Modes**: AI Premium (RAM ≥8GB, Gemma 4), AI Compact (<8GB RAM, Qwen3 0.6B)
 
 ## Conventions
 

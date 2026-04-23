@@ -9,8 +9,7 @@ object DeviceCapabilities {
     val totalRamMb = getTotalRamMb(context)
     return when {
       totalRamMb >= 8192 -> DeviceTier.HIGH
-      totalRamMb >= 4096 -> DeviceTier.MEDIUM
-      else -> DeviceTier.LOW
+      else -> DeviceTier.MEDIUM
     }
   }
 

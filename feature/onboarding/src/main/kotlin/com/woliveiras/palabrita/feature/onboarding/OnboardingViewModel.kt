@@ -154,7 +154,6 @@ constructor(
       when (_state.value.deviceTier) {
         DeviceTier.HIGH -> ModelId.GEMMA4_E2B
         DeviceTier.MEDIUM -> ModelId.QWEN3_0_6B
-        DeviceTier.LOW -> ModelId.QWEN3_0_6B
       }
     _state.update { it.copy(selectedModel = model, showTierWarning = false) }
     navigateNext()

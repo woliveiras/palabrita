@@ -77,7 +77,7 @@ docs/                 → Architecture docs, ADRs, integration guides
 - **StateMachine<S, E>** for complex flows (engine lifecycle, download, onboarding)
 - **Sealed class + when** for simple state (game status, chat status)
 - **Hilt** for DI, **Room** for persistence, **WorkManager** for background puzzle generation
-- **3 Operating Modes**: AI Premium (Gemma 4, RAM ≥8GB), AI Compact (Gemma 3, 4-8GB), Light (static dataset, <4GB)
+- **2 Operating Modes**: AI Premium (Gemma 4, RAM ≥8GB), AI Compact (Qwen3 0.6B, <8GB)
 
 See [docs/](docs/) for detailed architecture documentation.
 See [specs/](specs/) for feature specifications.

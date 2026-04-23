@@ -262,61 +262,41 @@ private fun ModelSelectionScreen(
   ) {
     Spacer(Modifier.height(48.dp))
 
-    if (deviceTier == DeviceTier.LOW) {
-      // Low tier — auto Light mode
-      Text(
-        text = stringResource(CommonR.string.model_device_title),
-        style = MaterialTheme.typography.headlineSmall,
-      )
-      Spacer(Modifier.height(16.dp))
-      Text(
-        text = stringResource(CommonR.string.model_low_tier_message),
-        style = MaterialTheme.typography.bodyLarge,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-      Spacer(Modifier.weight(1f))
-      Button(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(CommonR.string.model_low_tier_button))
-      }
-    } else {
-      // Medium or High tier — model selection
-      Text(
-        text = stringResource(CommonR.string.model_selection_title),
-        style = MaterialTheme.typography.headlineSmall,
-        textAlign = TextAlign.Center,
-      )
-      Spacer(Modifier.height(24.dp))
+    Text(
+      text = stringResource(CommonR.string.model_selection_title),
+      style = MaterialTheme.typography.headlineSmall,
+      textAlign = TextAlign.Center,
+    )
+    Spacer(Modifier.height(24.dp))
 
-      ModelCard(
-        title = stringResource(CommonR.string.model_powerful_title),
-        subtitle = stringResource(CommonR.string.model_powerful_subtitle),
-        info = stringResource(CommonR.string.model_powerful_info),
-        isRecommended = deviceTier == DeviceTier.HIGH,
-        isSelected = selectedModel == ModelId.GEMMA4_E2B,
-        onClick = { onSelectModel(ModelId.GEMMA4_E2B) },
-      )
-      Spacer(Modifier.height(12.dp))
-      ModelCard(
-        title = stringResource(CommonR.string.model_compact_title),
-        subtitle = stringResource(CommonR.string.model_compact_subtitle),
-        info = stringResource(CommonR.string.model_compact_info),
-        isRecommended = deviceTier == DeviceTier.MEDIUM,
-        isSelected = selectedModel == ModelId.QWEN3_0_6B,
-        onClick = { onSelectModel(ModelId.QWEN3_0_6B) },
-      )
+    ModelCard(
+      title = stringResource(CommonR.string.model_powerful_title),
+      subtitle = stringResource(CommonR.string.model_powerful_subtitle),
+      info = stringResource(CommonR.string.model_powerful_info),
+      isRecommended = deviceTier == DeviceTier.HIGH,
+      isSelected = selectedModel == ModelId.GEMMA4_E2B,
+      onClick = { onSelectModel(ModelId.GEMMA4_E2B) },
+    )
+    Spacer(Modifier.height(12.dp))
+    ModelCard(
+      title = stringResource(CommonR.string.model_compact_title),
+      subtitle = stringResource(CommonR.string.model_compact_subtitle),
+      info = stringResource(CommonR.string.model_compact_info),
+      isRecommended = deviceTier == DeviceTier.MEDIUM,
+      isSelected = selectedModel == ModelId.QWEN3_0_6B,
+      onClick = { onSelectModel(ModelId.QWEN3_0_6B) },
+    )
 
-      Spacer(Modifier.height(24.dp))
-      OutlinedButton(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(CommonR.string.model_auto_select))
-      }
+    Spacer(Modifier.height(24.dp))
+    OutlinedButton(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
+      Text(stringResource(CommonR.string.model_auto_select))
+    }
 
-      Spacer(Modifier.weight(1f))
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        TextButton(onClick = onBack) { Text(stringResource(CommonR.string.back)) }
-        Button(onClick = onNext, enabled = selectedModel != null) {
-          Text(stringResource(CommonR.string.continue_button))
-        }
+    Spacer(Modifier.weight(1f))
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+      TextButton(onClick = onBack) { Text(stringResource(CommonR.string.back)) }
+      Button(onClick = onNext, enabled = selectedModel != null) {
+        Text(stringResource(CommonR.string.continue_button))
       }
     }
   }

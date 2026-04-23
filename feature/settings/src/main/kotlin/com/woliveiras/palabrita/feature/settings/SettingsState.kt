@@ -9,7 +9,7 @@ import com.woliveiras.palabrita.core.model.PlayerTier
 data class SettingsState(
   val stats: PlayerStats = PlayerStats(),
   val currentModel: ModelConfig = ModelConfig(),
-  val deviceTier: DeviceTier = DeviceTier.LOW,
+  val deviceTier: DeviceTier = DeviceTier.MEDIUM,
   val storageInfo: StorageInfo = StorageInfo(),
   val isModelSwitching: Boolean = false,
   val downloadProgress: Float? = null,
