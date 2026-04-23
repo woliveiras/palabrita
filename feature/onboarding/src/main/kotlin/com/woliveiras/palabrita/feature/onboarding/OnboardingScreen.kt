@@ -3,10 +3,6 @@ package com.woliveiras.palabrita.feature.onboarding
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -683,15 +679,6 @@ private fun DownloadScreen(
   val isComplete = downloadProgress >= 1f && !downloadFailed
   val isVerifying = downloadProgress >= 1f && !isComplete && !downloadFailed
 
-  val infiniteTransition = rememberInfiniteTransition(label = "download_spin")
-  val spinRotation by
-    infiniteTransition.animateFloat(
-      initialValue = 0f,
-      targetValue = 360f,
-      animationSpec = infiniteRepeatable(tween(2_000, easing = LinearEasing)),
-      label = "spin",
-    )
-
   val modelName =
     when (modelId) {
       ModelId.GEMMA4_E4B -> stringResource(CommonR.string.download_model_gemma4_e4b)
@@ -717,11 +704,12 @@ private fun DownloadScreen(
     Box(contentAlignment = Alignment.Center, modifier = Modifier.size(108.dp)) {
       if (!isComplete && !downloadFailed) {
         CircularProgressIndicator(
+          progress = { downloadProgress.coerceIn(0f, 1f) },
           modifier = Modifier.size(108.dp),
-          color = PalabritaColors.BrandIndigo.copy(alpha = 0.4f),
+          color = PalabritaColors.BrandIndigo,
           strokeWidth = 3.dp,
           strokeCap = StrokeCap.Round,
-          trackColor = Color.Transparent,
+          trackColor = PalabritaColors.BrandIndigo.copy(alpha = 0.15f),
         )
       }
       Box(
