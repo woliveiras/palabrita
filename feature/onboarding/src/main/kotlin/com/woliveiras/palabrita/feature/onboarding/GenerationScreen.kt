@@ -184,6 +184,7 @@ fun GenerationScreen(
         else if (isFailed) stringResource(CommonR.string.generation_failed)
         else stringResource(CommonR.string.generation_title),
       style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+      color = PalabritaColors.ContentPrimary,
       textAlign = TextAlign.Center,
     )
 
@@ -194,7 +195,7 @@ fun GenerationScreen(
         if (isComplete) stringResource(CommonR.string.generation_complete_subtitle)
         else if (isFailed) "" else stringResource(CommonR.string.generation_subtitle),
       style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      color = PalabritaColors.ContentSecondary,
       textAlign = TextAlign.Center,
     )
 
@@ -219,7 +220,7 @@ fun GenerationScreen(
         Text(
           text = stringResource(CommonR.string.generation_puzzles_label),
           style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          color = PalabritaColors.ContentSecondary,
         )
         // key forces recompose + subtle scale animation on each change
         key(puzzlesGenerated) {
