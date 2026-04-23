@@ -311,10 +311,7 @@ class GameViewModelTest {
 private class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepository {
   val markedPlayed = mutableListOf<Long>()
 
-  override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? = puzzle
-
-  override suspend fun countUnplayed(language: String, difficulty: Int): Int =
-    if (puzzle != null) 1 else 0
+  override suspend fun getNextUnplayed(language: String): Puzzle? = puzzle
 
   override suspend fun countAllUnplayed(language: String): Int = if (puzzle != null) 1 else 0
 

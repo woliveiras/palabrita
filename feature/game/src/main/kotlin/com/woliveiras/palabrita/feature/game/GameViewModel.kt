@@ -66,13 +66,12 @@ constructor(
     viewModelScope.launch {
       _state.update { it.copy(gameStatus = GameStatus.LOADING) }
       val stats = statsRepository.getStats()
-      val difficulty = stats.currentDifficulty
-      _state.update { it.copy(chosenDifficulty = difficulty) }
-      val puzzle = puzzleRepository.getNextUnplayed(stats.preferredLanguage, difficulty)
+      val puzzle = puzzleRepository.getNextUnplayed(stats.preferredLanguage)
       if (puzzle != null) {
         _state.update {
           it.copy(
             puzzle = puzzle,
+            chosenDifficulty = stats.currentDifficulty,
             gameStatus = GameStatus.PLAYING,
             attempts = emptyList(),
             currentInput = "",
@@ -144,7 +143,7 @@ constructor(
         statsRepository.updateAfterGame(
           won = won,
           attempts = newAttempts.size,
-          difficulty = current.chosenDifficulty,
+          difficulty = puzzle.difficulty,
           hintsUsed = current.revealedHints.size,
         )
         statsRepository.checkAndPromoteDifficulty()

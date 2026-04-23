@@ -10,11 +10,7 @@ enum class GenerationWorkState {
   IDLE,
 }
 
-data class GenerationProgress(
-  val currentDifficulty: Int = 0,
-  val generatedCount: Int = 0,
-  val totalExpected: Int = 0,
-)
+data class GenerationProgress(val generatedCount: Int = 0, val totalExpected: Int = 0)
 
 data class GenerationInfo(
   val state: GenerationWorkState = GenerationWorkState.IDLE,

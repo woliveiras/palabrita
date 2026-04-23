@@ -12,11 +12,8 @@ import javax.inject.Singleton
 class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao) :
   PuzzleRepository {
 
-  override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? =
-    puzzleDao.getNextUnplayed(language, difficulty)?.toDomain()
-
-  override suspend fun countUnplayed(language: String, difficulty: Int): Int =
-    puzzleDao.countUnplayed(language, difficulty)
+  override suspend fun getNextUnplayed(language: String): Puzzle? =
+    puzzleDao.getNextUnplayed(language)?.toDomain()
 
   override suspend fun countAllUnplayed(language: String): Int =
     puzzleDao.countAllUnplayed(language)

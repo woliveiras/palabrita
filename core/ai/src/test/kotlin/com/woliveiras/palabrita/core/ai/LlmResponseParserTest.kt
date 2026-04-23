@@ -13,7 +13,7 @@ class LlmResponseParserTest {
   fun `parses valid JSON response`() {
     val json =
       """
-      {"word":"gatos","category":"animal","difficulty":2,"hints":["Dica 1","Dica 2","Dica 3","Dica 4","Dica 5"]}
+      {"word":"gatos","hints":["Dica 1","Dica 2","Dica 3"]}
       """
         .trimIndent()
 
@@ -22,9 +22,7 @@ class LlmResponseParserTest {
     assertThat(result).isInstanceOf(ParseResult.Success::class.java)
     val puzzle = (result as ParseResult.Success).data
     assertThat(puzzle.word).isEqualTo("gatos")
-    assertThat(puzzle.category).isEqualTo("animal")
-    assertThat(puzzle.difficulty).isEqualTo(2)
-    assertThat(puzzle.hints).hasSize(5)
+    assertThat(puzzle.hints).hasSize(3)
   }
 
   @Test
@@ -33,13 +31,9 @@ class LlmResponseParserTest {
       """
       {
         "word": "campo",
-        "category": "lugar",
-        "difficulty": 1,
         "hints": [
           "É aberto",
           "Tem grama",
-          "Animais pastam",
-          "Fica fora da cidade",
           "Zona rural"
         ]
       }
@@ -59,7 +53,7 @@ class LlmResponseParserTest {
     val raw =
       """
       Here is the word for the game:
-      {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"]}
+      {"word":"gatos","hints":["A","B","C"]}
       I hope this helps!
       """
         .trimIndent()
@@ -75,7 +69,7 @@ class LlmResponseParserTest {
     val raw =
       """
       ```json
-      {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"]}
+      {"word":"gatos","hints":["A","B","C"]}
       ```
       """
         .trimIndent()
@@ -107,7 +101,7 @@ class LlmResponseParserTest {
 
   @Test
   fun `returns error for incomplete JSON`() {
-    val raw = """{"word":"gatos","category":"""
+    val raw = """{"word":"gatos","hints":"""
 
     val result = parser.parsePuzzle(raw)
 
@@ -115,7 +109,7 @@ class LlmResponseParserTest {
   }
 
   @Test
-  fun `returns error for JSON missing required fields`() {
+  fun `returns error for JSON missing hints`() {
     val raw = """{"word":"gatos"}"""
 
     val result = parser.parsePuzzle(raw)
@@ -127,7 +121,7 @@ class LlmResponseParserTest {
   fun `handles JSON with extra fields gracefully`() {
     val json =
       """
-      {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C","D","E"],"extra":"ignored"}
+      {"word":"gatos","category":"animal","difficulty":2,"hints":["A","B","C"],"extra":"ignored"}
       """
         .trimIndent()
 

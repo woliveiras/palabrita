@@ -18,10 +18,12 @@ import androidx.work.workDataOf
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.common.R as CommonR
+import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 
 @HiltWorker
 class PuzzleGenerationWorker
@@ -33,6 +35,7 @@ constructor(
   private val puzzleGenerator: PuzzleGenerator,
   private val statsRepository: StatsRepository,
   private val engineManager: LlmEngineManager,
+  private val appPreferences: AppPreferences,
 ) : CoroutineWorker(appContext, workerParams) {
 
   override suspend fun doWork(): Result {
@@ -62,59 +65,46 @@ constructor(
     val existingWords = puzzleRepository.getAllGeneratedWords()
     val recentWords = puzzleRepository.getRecentWords(50)
     var totalGenerated = 0
-    val totalExpected = (1..5).sumOf { puzzlesPerDifficulty(it) }
 
-    for (difficulty in 1..5) {
-      val count = puzzlesPerDifficulty(difficulty)
-      setProgress(
-        workDataOf(
-          KEY_CURRENT_DIFFICULTY to difficulty,
-          KEY_GENERATED_COUNT to totalGenerated,
-          KEY_TOTAL_EXPECTED to totalExpected,
-        )
-      )
+    val cycle = appPreferences.generationCycle.first()
+    val minLength = (4 + cycle).coerceAtMost(MAX_WORD_LENGTH)
+    val lengths = (minLength..MAX_WORD_LENGTH).toList()
+    val basePerLength = BATCH_SIZE / lengths.size
+    val remainder = BATCH_SIZE % lengths.size
+
+    setProgress(workDataOf(KEY_GENERATED_COUNT to 0, KEY_TOTAL_EXPECTED to BATCH_SIZE))
+
+    for ((index, wordLength) in lengths.withIndex()) {
+      val count = basePerLength + if (index < remainder) 1 else 0
       try {
         val puzzles =
           puzzleGenerator.generateBatch(
             count = count,
             language = language,
-            targetDifficulty = difficulty,
+            wordLength = wordLength,
             recentWords = recentWords,
             allExistingWords = existingWords,
             modelId = modelId,
           ) { batchSuccess ->
             val currentTotal = totalGenerated + batchSuccess
             setProgress(
-              workDataOf(
-                KEY_CURRENT_DIFFICULTY to difficulty,
-                KEY_GENERATED_COUNT to currentTotal,
-                KEY_TOTAL_EXPECTED to totalExpected,
-              )
+              workDataOf(KEY_GENERATED_COUNT to currentTotal, KEY_TOTAL_EXPECTED to BATCH_SIZE)
             )
           }
         puzzleRepository.savePuzzles(puzzles)
         totalGenerated += puzzles.size
       } catch (_: Exception) {
-        // Continue with next difficulty even if one fails
+        // Continue with next word length even if one fails
       }
     }
 
     if (totalGenerated > 0) {
+      appPreferences.incrementGenerationCycle()
       showCompletionNotification(totalGenerated)
     }
 
     return Result.success()
   }
-
-  private fun puzzlesPerDifficulty(difficulty: Int): Int =
-    when (difficulty) {
-      1 -> 8
-      2 -> 7
-      3 -> 6
-      4 -> 5
-      5 -> 4
-      else -> 6
-    }
 
   private fun createForegroundInfo(): ForegroundInfo {
     createNotificationChannel()
@@ -184,10 +174,11 @@ constructor(
   companion object {
     const val WORK_NAME = "puzzle_generation"
     const val KEY_MODEL_ID = "model_id"
-    const val KEY_CURRENT_DIFFICULTY = "current_difficulty"
     const val KEY_GENERATED_COUNT = "generated_count"
     const val KEY_TOTAL_EXPECTED = "total_expected"
     const val REPLENISHMENT_THRESHOLD = 10
+    const val BATCH_SIZE = 20
+    const val MAX_WORD_LENGTH = 8
     private const val CHANNEL_ID = "puzzle_generation"
     private const val NOTIFICATION_ID = 1001
     private const val PROGRESS_NOTIFICATION_ID = 1002

@@ -15,7 +15,7 @@ interface PuzzleGenerator {
   suspend fun generateBatch(
     count: Int,
     language: String,
-    targetDifficulty: Int,
+    wordLength: Int,
     recentWords: List<String>,
     allExistingWords: Set<String>,
     modelId: ModelId,
@@ -38,7 +38,7 @@ constructor(
   override suspend fun generateBatch(
     count: Int,
     language: String,
-    targetDifficulty: Int,
+    wordLength: Int,
     recentWords: List<String>,
     allExistingWords: Set<String>,
     modelId: ModelId,
@@ -46,13 +46,13 @@ constructor(
   ): List<Puzzle> {
     require(engineManager.isReady()) { "Engine not ready" }
 
-    val wordLength = difficultyToWordLength(targetDifficulty)
+    val lengthRange = wordLength..wordLength
     val generated = mutableListOf<Puzzle>()
     val usedWords = allExistingWords.toMutableSet()
 
-    Log.i(TAG, "generateBatch: difficulty=$targetDifficulty count=$count length=$wordLength")
+    Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count")
 
-    val systemPrompt = buildSystemPrompt(modelId)
+    val systemPrompt = PromptTemplates.puzzleSystemPrompt()
     var puzzleIndex = 0
 
     while (puzzleIndex < count) {
@@ -66,8 +66,8 @@ constructor(
             generateSinglePuzzle(
               session = session,
               language = language,
-              difficulty = targetDifficulty,
               wordLength = wordLength,
+              lengthRange = lengthRange,
               recentWords = recentWords,
               usedWords = usedWords,
               modelId = modelId,
@@ -93,8 +93,8 @@ constructor(
   private suspend fun generateSinglePuzzle(
     session: LlmSession,
     language: String,
-    difficulty: Int,
-    wordLength: IntRange,
+    wordLength: Int,
+    lengthRange: IntRange,
     recentWords: List<String>,
     usedWords: Set<String>,
     modelId: ModelId,
@@ -106,7 +106,6 @@ constructor(
         buildUserPrompt(
           modelId,
           language,
-          difficulty,
           wordLength,
           recentWords,
           usedWords,
@@ -123,12 +122,12 @@ constructor(
 
       when (parseResult) {
         is ParseResult.Success -> {
-          val validation = validator.validate(parseResult.data, usedWords, wordLength)
+          val validation = validator.validate(parseResult.data, usedWords, lengthRange)
           when (validation) {
             is ValidationResult.Valid -> {
               Log.d(TAG, "  attempt $attempt VALID: '${parseResult.data.word}'")
               _activity.value = GenerationActivity.ACCEPTED
-              return puzzleFromResponse(parseResult.data, language, difficulty)
+              return puzzleFromResponse(parseResult.data, language, wordLength)
             }
             is ValidationResult.Invalid -> {
               lastFailureReason = validation.reasons.joinToString("; ")
@@ -148,22 +147,10 @@ constructor(
     return null
   }
 
-  private fun buildSystemPrompt(modelId: ModelId): String =
-    when (modelId) {
-      ModelId.GEMMA4_E4B,
-      ModelId.GEMMA4_E2B -> PromptTemplates.puzzleSystemPrompt()
-      ModelId.PHI4_MINI,
-      ModelId.DEEPSEEK_R1_1_5B,
-      ModelId.QWEN2_5_1_5B,
-      ModelId.QWEN3_0_6B,
-      ModelId.NONE -> PromptTemplates.puzzleSystemPrompt()
-    }
-
   private fun buildUserPrompt(
     modelId: ModelId,
     language: String,
-    difficulty: Int,
-    wordLength: IntRange,
+    wordLength: Int,
     recentWords: List<String>,
     usedWords: Set<String>,
     attempt: Int,
@@ -174,30 +161,17 @@ constructor(
       when (modelId) {
         ModelId.GEMMA4_E4B,
         ModelId.GEMMA4_E2B ->
-          PromptTemplates.puzzleUserPromptLarge(
-            language,
-            difficulty,
-            wordLength.first,
-            wordLength.last,
-            avoidWords,
-          )
+          PromptTemplates.puzzleUserPromptLarge(language, wordLength, avoidWords)
         ModelId.PHI4_MINI,
         ModelId.DEEPSEEK_R1_1_5B,
         ModelId.QWEN2_5_1_5B,
-        ModelId.QWEN3_0_6B ->
-          PromptTemplates.puzzlePromptCompact(
-            language,
-            difficulty,
-            wordLength.first,
-            wordLength.last,
-            avoidWords,
-          )
+        ModelId.QWEN3_0_6B -> PromptTemplates.puzzlePromptCompact(language, wordLength, avoidWords)
         ModelId.NONE -> throw IllegalArgumentException("No model selected")
       }
     return if (attempt > 0 && failureReason != null) {
-      "$base\n\nYour previous response was rejected: $failureReason. The word MUST have ${wordLength.first}-${wordLength.last} letters. Try again with a DIFFERENT word."
+      "$base\n\nYour previous response was rejected: $failureReason. The word MUST have exactly $wordLength letters. Try again with a DIFFERENT word."
     } else if (attempt > 0) {
-      "$base\n\nThe previous response was invalid. Generate a DIFFERENT word with ${wordLength.first}-${wordLength.last} letters."
+      "$base\n\nThe previous response was invalid. Generate a DIFFERENT word with exactly $wordLength letters."
     } else {
       base
     }
@@ -206,15 +180,15 @@ constructor(
   private fun puzzleFromResponse(
     response: PuzzleResponse,
     language: String,
-    difficulty: Int,
+    wordLength: Int,
   ): Puzzle =
     Puzzle(
       word = response.word.lowercase(),
       wordDisplay = response.word.uppercase(),
       language = language,
-      difficulty = difficulty,
-      category = response.category,
-      hints = response.hints,
+      difficulty = wordLength,
+      category = "",
+      hints = response.hints.take(3),
       source = PuzzleSource.AI,
       generatedAt = System.currentTimeMillis(),
     )
@@ -223,15 +197,5 @@ constructor(
     private const val TAG = "PuzzleGenerator"
     private const val MAX_RETRIES = 5
     private const val SESSION_ROTATION = 3
-
-    fun difficultyToWordLength(difficulty: Int): IntRange =
-      when (difficulty) {
-        1 -> 4..5
-        2 -> 5..6
-        3 -> 5..7
-        4 -> 6..8
-        5 -> 7..9
-        else -> 5..6
-      }
   }
 }

@@ -132,8 +132,7 @@ constructor(
     }
 
     val current = _state.value
-    val systemPrompt =
-      PromptTemplates.chatSystemPrompt(current.word, current.category, current.language)
+    val systemPrompt = PromptTemplates.chatSystemPrompt(current.word, current.language)
     session = engineManager.createChatSession(systemPrompt)
     return true
   }

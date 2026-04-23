@@ -3,9 +3,7 @@ package com.woliveiras.palabrita.core.model.repository
 import com.woliveiras.palabrita.core.model.Puzzle
 
 interface PuzzleRepository {
-  suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle?
-
-  suspend fun countUnplayed(language: String, difficulty: Int): Int
+  suspend fun getNextUnplayed(language: String): Puzzle?
 
   suspend fun countAllUnplayed(language: String): Int
 

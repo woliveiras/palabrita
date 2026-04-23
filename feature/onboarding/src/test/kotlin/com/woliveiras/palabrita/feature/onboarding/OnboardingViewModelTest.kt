@@ -11,10 +11,10 @@ import com.woliveiras.palabrita.core.ai.worker.GenerationInfo
 import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
 import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
-import com.woliveiras.palabrita.core.data.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
+import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import kotlinx.coroutines.Dispatchers
@@ -219,8 +219,15 @@ private class FakeAppPreferences : AppPreferences {
   private val _isOnboardingComplete = MutableStateFlow(false)
   override val isOnboardingComplete: Flow<Boolean> = _isOnboardingComplete
 
+  private val _generationCycle = MutableStateFlow(0)
+  override val generationCycle: Flow<Int> = _generationCycle
+
   override suspend fun setOnboardingComplete() {
     _isOnboardingComplete.value = true
+  }
+
+  override suspend fun incrementGenerationCycle() {
+    _generationCycle.value += 1
   }
 }
 
@@ -272,6 +279,8 @@ private class FakeGenerationScheduler : PuzzleGenerationScheduler {
   override fun scheduleGeneration(modelId: ModelId) {
     scheduledModelId = modelId
   }
+
+  override fun cancelGeneration() {}
 
   override fun observeGenerationState(): Flow<GenerationWorkState> =
     flowOf(GenerationWorkState.IDLE)

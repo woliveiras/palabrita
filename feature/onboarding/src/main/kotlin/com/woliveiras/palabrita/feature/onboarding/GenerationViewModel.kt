@@ -12,8 +12,8 @@ import com.woliveiras.palabrita.core.ai.worker.GenerationProgress
 import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
 import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.R as CommonR
-import com.woliveiras.palabrita.core.data.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.ModelId
+import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

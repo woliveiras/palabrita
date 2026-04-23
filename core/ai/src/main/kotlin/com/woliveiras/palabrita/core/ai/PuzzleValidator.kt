@@ -29,9 +29,9 @@ class PuzzleValidatorImpl @Inject constructor() : PuzzleValidator {
       reasons.add("duplicate word '$word'")
     }
 
-    // Hints count — exactly 5 required
-    if (puzzle.hints.size != 5) {
-      reasons.add("expected 5 hints, got ${puzzle.hints.size}")
+    // Hints count — at least 3 required
+    if (puzzle.hints.size < 3) {
+      reasons.add("expected at least 3 hints, got ${puzzle.hints.size}")
     }
 
     // Hints must not contain the word
@@ -39,11 +39,6 @@ class PuzzleValidatorImpl @Inject constructor() : PuzzleValidator {
       if (hint.lowercase().contains(word)) {
         reasons.add("hint $index contains the word '$word'")
       }
-    }
-
-    // Category must not be blank
-    if (puzzle.category.isBlank()) {
-      reasons.add("category is blank")
     }
 
     return if (reasons.isEmpty()) ValidationResult.Valid else ValidationResult.Invalid(reasons)

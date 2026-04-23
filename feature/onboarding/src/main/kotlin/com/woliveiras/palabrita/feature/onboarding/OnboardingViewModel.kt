@@ -8,8 +8,8 @@ import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
 import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
-import com.woliveiras.palabrita.core.data.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.ModelId
+import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

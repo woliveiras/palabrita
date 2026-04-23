@@ -13,17 +13,22 @@ class PromptTemplatesTest {
   }
 
   @Test
+  fun `puzzle system prompt does not mention category or difficulty`() {
+    val prompt = PromptTemplates.puzzleSystemPrompt()
+    assertThat(prompt).doesNotContain("category")
+    assertThat(prompt).doesNotContain("difficulty")
+  }
+
+  @Test
   fun `puzzle user prompt large includes language parameter`() {
     val prompt =
       PromptTemplates.puzzleUserPromptLarge(
         language = "pt",
-        difficulty = 3,
-        minLength = 6,
-        maxLength = 7,
+        wordLength = 6,
         recentWords = emptyList(),
       )
     assertThat(prompt).contains("pt")
-    assertThat(prompt).contains("6-7")
+    assertThat(prompt).contains("6 letters")
   }
 
   @Test
@@ -31,9 +36,7 @@ class PromptTemplatesTest {
     val prompt =
       PromptTemplates.puzzleUserPromptLarge(
         language = "pt",
-        difficulty = 2,
-        minLength = 5,
-        maxLength = 6,
+        wordLength = 5,
         recentWords = listOf("gatos", "campo"),
       )
     assertThat(prompt).contains("gatos")
@@ -41,13 +44,23 @@ class PromptTemplatesTest {
   }
 
   @Test
+  fun `puzzle user prompt large does not mention category or difficulty`() {
+    val prompt =
+      PromptTemplates.puzzleUserPromptLarge(
+        language = "pt",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(prompt).doesNotContain("category")
+    assertThat(prompt).doesNotContain("difficulty")
+  }
+
+  @Test
   fun `puzzle prompt compact includes JSON schema`() {
     val prompt =
       PromptTemplates.puzzlePromptCompact(
         language = "en",
-        difficulty = 1,
-        minLength = 5,
-        maxLength = 5,
+        wordLength = 5,
         recentWords = emptyList(),
       )
     assertThat(prompt).contains("\"word\"")
@@ -60,59 +73,38 @@ class PromptTemplatesTest {
     val prompt =
       PromptTemplates.puzzlePromptCompact(
         language = "es",
-        difficulty = 2,
-        minLength = 5,
-        maxLength = 6,
+        wordLength = 5,
         recentWords = emptyList(),
       )
     assertThat(prompt).contains("es")
   }
 
   @Test
-  fun `difficulty 1 maps to everyday rarity`() {
+  fun `puzzle prompt compact asks for 3 hints`() {
     val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
+      PromptTemplates.puzzlePromptCompact(
         language = "pt",
-        difficulty = 1,
-        minLength = 5,
-        maxLength = 5,
+        wordLength = 5,
         recentWords = emptyList(),
       )
-    assertThat(prompt).containsMatch("(?i)everyday|very common")
+    assertThat(prompt).contains("3 progressive hints")
   }
 
   @Test
-  fun `difficulty 5 maps to rare rarity`() {
-    val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "pt",
-        difficulty = 5,
-        minLength = 7,
-        maxLength = 8,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).containsMatch("(?i)rare|technical")
-  }
-
-  @Test
-  fun `chat system prompt includes word and category`() {
-    val prompt =
-      PromptTemplates.chatSystemPrompt(word = "gatos", category = "animal", language = "pt")
+  fun `chat system prompt includes word`() {
+    val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
     assertThat(prompt).contains("gatos")
-    assertThat(prompt).contains("animal")
   }
 
   @Test
   fun `chat system prompt includes language`() {
-    val prompt =
-      PromptTemplates.chatSystemPrompt(word = "cats", category = "animal", language = "en")
+    val prompt = PromptTemplates.chatSystemPrompt(word = "cats", language = "en")
     assertThat(prompt).contains("en")
   }
 
   @Test
   fun `chat system prompt is in english`() {
-    val prompt =
-      PromptTemplates.chatSystemPrompt(word = "gatos", category = "animal", language = "pt")
+    val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
     assertThat(prompt).contains("educational assistant")
   }
 }

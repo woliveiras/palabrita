@@ -6,7 +6,6 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 
@@ -65,8 +64,6 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
       val obj = json.decodeFromString<JsonObject>(text.trim())
 
       var word: String? = null
-      var category: String? = null
-      var difficulty: Int? = null
       var hints: List<String>? = null
 
       for ((_, value) in obj) {
@@ -77,26 +74,17 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
             }
           }
           is JsonPrimitive -> {
-            val intVal = value.intOrNull
             val strVal = value.contentOrNull
-            when {
-              intVal != null && difficulty == null -> difficulty = intVal
-              strVal != null && word == null && strVal.length in 2..9 && !strVal.contains(' ') ->
-                word = strVal
-              strVal != null && category == null -> category = strVal
+            if (strVal != null && word == null && strVal.length in 2..8 && !strVal.contains(' ')) {
+              word = strVal
             }
           }
           else -> {}
         }
       }
 
-      if (word != null && category != null && hints != null && hints.isNotEmpty()) {
-        PuzzleResponse(
-          word = word,
-          category = category,
-          difficulty = difficulty ?: 1,
-          hints = hints,
-        )
+      if (word != null && hints != null && hints.size >= 3) {
+        PuzzleResponse(word = word, hints = hints)
       } else {
         null
       }

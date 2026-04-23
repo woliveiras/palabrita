@@ -452,9 +452,7 @@ private class FakePuzzleRepository : PuzzleRepository {
   var unplayedAiPuzzlesCleared = false
   var allUnplayed = false
 
-  override suspend fun getNextUnplayed(language: String, difficulty: Int): Puzzle? = null
-
-  override suspend fun countUnplayed(language: String, difficulty: Int): Int = 0
+  override suspend fun getNextUnplayed(language: String): Puzzle? = null
 
   override suspend fun countAllUnplayed(language: String): Int = 0
 

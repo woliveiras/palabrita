@@ -12,12 +12,22 @@ interface PuzzleDao {
   @Query(
     """
         SELECT * FROM puzzles
+        WHERE isPlayed = 0 AND language = :lang
+        ORDER BY difficulty ASC, RANDOM()
+        LIMIT 1
+        """
+  )
+  suspend fun getNextUnplayed(lang: String): PuzzleEntity?
+
+  @Query(
+    """
+        SELECT * FROM puzzles
         WHERE isPlayed = 0 AND language = :lang AND difficulty = :difficulty
         ORDER BY RANDOM()
         LIMIT 1
         """
   )
-  suspend fun getNextUnplayed(lang: String, difficulty: Int): PuzzleEntity?
+  suspend fun getNextUnplayedByDifficulty(lang: String, difficulty: Int): PuzzleEntity?
 
   @Query(
     """

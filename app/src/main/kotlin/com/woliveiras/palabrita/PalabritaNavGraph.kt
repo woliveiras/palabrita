@@ -28,7 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.woliveiras.palabrita.core.common.R as CommonR
-import com.woliveiras.palabrita.core.data.preferences.AppPreferences
+import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.feature.chat.ChatScreen
 import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen

@@ -2,13 +2,7 @@ package com.woliveiras.palabrita.core.ai
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class PuzzleResponse(
-  val word: String,
-  val category: String,
-  val difficulty: Int,
-  val hints: List<String>,
-)
+@Serializable data class PuzzleResponse(val word: String, val hints: List<String>)
 
 sealed class ParseResult<out T> {
   data class Success<T>(val data: T) : ParseResult<T>()

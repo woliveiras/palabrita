@@ -57,17 +57,10 @@ constructor(
             puzzleSamplePrompt =
               PromptTemplates.puzzleUserPromptLarge(
                 language = "pt",
-                difficulty = 3,
-                minLength = 4,
-                maxLength = 7,
+                wordLength = 5,
                 recentWords = listOf("gatos", "mesa"),
               ),
-            chatSamplePrompt =
-              PromptTemplates.chatSystemPrompt(
-                word = "gatos",
-                category = "animal",
-                language = "pt",
-              ),
+            chatSamplePrompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt"),
             isLoading = false,
           )
         }
