@@ -64,43 +64,33 @@ constructor(
 
     val existingWords = puzzleRepository.getAllGeneratedWords()
     val recentWords = puzzleRepository.getRecentWords(50)
-    var totalGenerated = 0
 
     val cycle = appPreferences.generationCycle.first()
-    val minLength = (4 + cycle).coerceAtMost(MAX_WORD_LENGTH)
-    val lengths = (minLength..MAX_WORD_LENGTH).toList()
-    val basePerLength = BATCH_SIZE / lengths.size
-    val remainder = BATCH_SIZE % lengths.size
+    val (wordLength, batchSize) = levelForCycle(cycle)
 
-    setProgress(workDataOf(KEY_GENERATED_COUNT to 0, KEY_TOTAL_EXPECTED to BATCH_SIZE))
+    setProgress(workDataOf(KEY_GENERATED_COUNT to 0, KEY_TOTAL_EXPECTED to batchSize))
 
-    for ((index, wordLength) in lengths.withIndex()) {
-      val count = basePerLength + if (index < remainder) 1 else 0
-      try {
-        val puzzles =
-          puzzleGenerator.generateBatch(
-            count = count,
-            language = language,
-            wordLength = wordLength,
-            recentWords = recentWords,
-            allExistingWords = existingWords,
-            modelId = modelId,
-          ) { batchSuccess ->
-            val currentTotal = totalGenerated + batchSuccess
-            setProgress(
-              workDataOf(KEY_GENERATED_COUNT to currentTotal, KEY_TOTAL_EXPECTED to BATCH_SIZE)
-            )
-          }
-        puzzleRepository.savePuzzles(puzzles)
-        totalGenerated += puzzles.size
-      } catch (_: Exception) {
-        // Continue with next word length even if one fails
+    try {
+      val puzzles =
+        puzzleGenerator.generateBatch(
+          count = batchSize,
+          language = language,
+          wordLength = wordLength,
+          recentWords = recentWords,
+          allExistingWords = existingWords,
+          modelId = modelId,
+        ) { successCount ->
+          setProgress(
+            workDataOf(KEY_GENERATED_COUNT to successCount, KEY_TOTAL_EXPECTED to batchSize)
+          )
+        }
+      puzzleRepository.savePuzzles(puzzles)
+      if (puzzles.isNotEmpty()) {
+        appPreferences.incrementGenerationCycle()
+        showCompletionNotification(puzzles.size)
       }
-    }
-
-    if (totalGenerated > 0) {
-      appPreferences.incrementGenerationCycle()
-      showCompletionNotification(totalGenerated)
+    } catch (_: Exception) {
+      // Generation failed entirely
     }
 
     return Result.success()
@@ -176,11 +166,15 @@ constructor(
     const val KEY_MODEL_ID = "model_id"
     const val KEY_GENERATED_COUNT = "generated_count"
     const val KEY_TOTAL_EXPECTED = "total_expected"
-    const val REPLENISHMENT_THRESHOLD = 10
-    const val BATCH_SIZE = 20
-    const val MAX_WORD_LENGTH = 8
+    const val REPLENISHMENT_THRESHOLD = 5
+    const val MAX_WORD_LENGTH = 6
     private const val CHANNEL_ID = "puzzle_generation"
     private const val NOTIFICATION_ID = 1001
     private const val PROGRESS_NOTIFICATION_ID = 1002
+
+    // Each level is (wordLength, batchSize). Last entry repeats forever.
+    val LEVELS = listOf(4 to 5, 5 to 10, 6 to 10)
+
+    fun levelForCycle(cycle: Int): Pair<Int, Int> = LEVELS[cycle.coerceIn(0, LEVELS.lastIndex)]
   }
 }

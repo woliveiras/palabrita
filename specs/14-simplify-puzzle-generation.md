@@ -1,5 +1,7 @@
 # Spec: Simplify Puzzle Generation
 
+> **⚠️ Superseded by [spec 15 — Simplified Level-Based Generation](15-simplified-level-generation.md)**
+
 ## Context & Motivation
 
 Puzzle generation is too slow. The LLM prompt currently asks for `word`, `category`,
