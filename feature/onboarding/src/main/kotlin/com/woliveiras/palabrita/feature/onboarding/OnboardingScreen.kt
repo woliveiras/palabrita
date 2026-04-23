@@ -83,13 +83,17 @@ fun OnboardingScreen(
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
 
-  if (state.currentStep == OnboardingStep.GENERATION) {
-    state.selectedModel?.let { onNavigateToGeneration(it) }
-    return
+  LaunchedEffect(state.currentStep) {
+    when (state.currentStep) {
+      OnboardingStep.GENERATION -> state.selectedModel?.let { onNavigateToGeneration(it) }
+      OnboardingStep.COMPLETE -> onComplete()
+      else -> Unit
+    }
   }
 
-  if (state.currentStep == OnboardingStep.COMPLETE) {
-    onComplete()
+  if (
+    state.currentStep == OnboardingStep.GENERATION || state.currentStep == OnboardingStep.COMPLETE
+  ) {
     return
   }
 
