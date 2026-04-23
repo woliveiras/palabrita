@@ -1,8 +1,10 @@
 # Palabrita
 
-A word-guessing game powered by artificial intelligence, right on your phone.
+[![CI](https://github.com/woliveiras/palabrita/actions/workflows/ci.yml/badge.svg)](https://github.com/woliveiras/palabrita/actions/workflows/ci.yml)
+[![Min SDK](https://img.shields.io/badge/Android-12%2B-green.svg)](https://developer.android.com/about/versions/12)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.x-7F52FF.svg)](https://kotlinlang.org)
 
-Android word-guessing game (Wordle-style) powered by on-device LLM (Gemma 4 E2B / Gemma 3 1B via LiteRT-LM). 100% offline after initial model download.
+A Wordle-style word-guessing game powered by an on-device LLM (Gemma 4 E2B / Qwen / Open Source Models). Generates puzzles and explanations entirely on-device — 100% offline after initial model download.
 
 ## Requirements
 
@@ -79,6 +81,10 @@ docs/                 → Architecture docs, ADRs, integration guides
 
 See [docs/](docs/) for detailed architecture documentation.
 See [specs/](specs/) for feature specifications.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow, code standards, and how to submit a pull request.
 
 ## License
 
