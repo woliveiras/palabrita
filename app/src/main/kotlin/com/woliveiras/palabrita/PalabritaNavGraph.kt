@@ -19,6 +19,8 @@ import com.woliveiras.palabrita.feature.home.HowToPlayScreen
 import com.woliveiras.palabrita.feature.onboarding.GenerationScreen
 import com.woliveiras.palabrita.feature.onboarding.OnboardingScreen
 import com.woliveiras.palabrita.feature.settings.AiInfoScreen
+import com.woliveiras.palabrita.feature.settings.LanguageSelectionScreen
+import com.woliveiras.palabrita.feature.settings.ModelDownloadScreen
 import com.woliveiras.palabrita.feature.settings.SettingsScreen
 import com.woliveiras.palabrita.ui.SplashScreen
 import kotlinx.coroutines.flow.map
@@ -42,6 +44,10 @@ data class GenerationRoute(val modelId: String = "", val isRegeneration: Boolean
 @Serializable data object AiInfoRoute
 
 @Serializable data object HowToPlayRoute
+
+@Serializable data object LanguageSelectionRoute
+
+@Serializable data class ModelDownloadRoute(val modelId: String)
 
 @Composable
 fun PalabritaNavGraph(appPreferences: AppPreferences) {
@@ -125,7 +131,17 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
       val route = backStackEntry.toRoute<ChatRoute>()
       ChatScreen(puzzleId = route.puzzleId, onBack = { navController.popBackStack() })
     }
-    composable<SettingsRoute> { SettingsScreen(onBack = { navController.popBackStack() }) }
+    composable<SettingsRoute> {
+      SettingsScreen(
+        onBack = { navController.popBackStack() },
+        onNavigateToModelDownload = { modelId ->
+          navController.navigate(ModelDownloadRoute(modelId = modelId.name))
+        },
+        onNavigateToGeneration = { navController.navigate(GenerationRoute(isRegeneration = true)) },
+        onNavigateToLanguageSelection = { navController.navigate(LanguageSelectionRoute) },
+        onNavigateToAiInfo = { navController.navigate(AiInfoRoute) },
+      )
+    }
     composable<AiInfoRoute> {
       AiInfoScreen(
         onBack = { navController.popBackStack() },
@@ -136,6 +152,27 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
       HowToPlayScreen(
         onBack = { navController.popBackStack() },
         onStartPlaying = { navController.navigate(GameRoute) },
+      )
+    }
+    composable<LanguageSelectionRoute> {
+      LanguageSelectionScreen(
+        onBack = { navController.popBackStack() },
+        onNavigateToGeneration = {
+          navController.navigate(GenerationRoute(isRegeneration = true)) {
+            popUpTo(LanguageSelectionRoute) { inclusive = true }
+          }
+        },
+      )
+    }
+    composable<ModelDownloadRoute> { backStackEntry ->
+      val route = backStackEntry.toRoute<ModelDownloadRoute>()
+      ModelDownloadScreen(
+        onBack = { navController.popBackStack() },
+        onNavigateToGeneration = { modelId ->
+          navController.navigate(GenerationRoute(modelId = modelId.name, isRegeneration = true)) {
+            popUpTo(ModelDownloadRoute::class) { inclusive = true }
+          }
+        },
       )
     }
   }

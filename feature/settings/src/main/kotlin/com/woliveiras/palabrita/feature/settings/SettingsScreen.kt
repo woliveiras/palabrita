@@ -1,10 +1,6 @@
 package com.woliveiras.palabrita.feature.settings
 
-import android.content.Intent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,90 +8,83 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Memory
-import androidx.compose.material.icons.rounded.RestartAlt
-import androidx.compose.material.icons.rounded.Storage
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.woliveiras.palabrita.core.ai.AiModelInfo
+import com.woliveiras.palabrita.core.ai.AiModelRegistry
+import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.DownloadState
-import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.ModelId
-
-private val LANGUAGES = listOf("pt" to "Português (BR)", "en" to "English", "es" to "Español")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
   onBack: () -> Unit,
+  onNavigateToModelDownload: (ModelId) -> Unit,
+  onNavigateToGeneration: () -> Unit,
+  onNavigateToLanguageSelection: () -> Unit,
+  onNavigateToAiInfo: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: SettingsViewModel = hiltViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
-  val snackbarHostState = remember { SnackbarHostState() }
-  val errorMessage = state.errorRes?.let { stringResource(it) }
-
-  var showLanguageDialog by remember { mutableStateOf(false) }
-  var showDeleteModelDialog by remember { mutableStateOf(false) }
-  var showResetDialog by remember { mutableStateOf(false) }
-
   val context = LocalContext.current
-
-  LaunchedEffect(errorMessage) {
-    errorMessage?.let {
-      snackbarHostState.showSnackbar(it)
-      viewModel.onAction(SettingsAction.DismissError)
-    }
-  }
+  val currentOnNavigateToModelDownload by rememberUpdatedState(onNavigateToModelDownload)
+  val currentOnNavigateToGeneration by rememberUpdatedState(onNavigateToGeneration)
+  val currentOnNavigateToLanguageSelection by rememberUpdatedState(onNavigateToLanguageSelection)
+  val currentOnNavigateToAiInfo by rememberUpdatedState(onNavigateToAiInfo)
 
   LaunchedEffect(Unit) {
     viewModel.events.collect { event ->
       when (event) {
-        is SettingsEvent.ShareText -> {
-          val sendIntent =
-            Intent(Intent.ACTION_SEND).apply {
-              putExtra(Intent.EXTRA_TEXT, event.text)
-              type = "text/plain"
-            }
-          context.startActivity(Intent.createChooser(sendIntent, null))
-        }
+        is SettingsEvent.NavigateToModelDownload -> currentOnNavigateToModelDownload(event.modelId)
+        is SettingsEvent.NavigateToGeneration -> currentOnNavigateToGeneration()
+        is SettingsEvent.NavigateToLanguageSelection -> currentOnNavigateToLanguageSelection()
+        is SettingsEvent.NavigateToAiInfo -> currentOnNavigateToAiInfo()
       }
     }
   }
+
+  val appVersion =
+    runCatching {
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0.0"
+      }
+      .getOrDefault("1.0.0")
 
   Scaffold(
     topBar = {
@@ -110,307 +99,270 @@ fun SettingsScreen(
           }
         },
       )
-    },
-    snackbarHost = { SnackbarHost(snackbarHostState) },
+    }
   ) { padding ->
     Column(
       modifier = modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
     ) {
-      // --- JOGO ---
-      SectionHeader(stringResource(CommonR.string.settings_section_game))
-
-      ListItem(
-        headlineContent = { Text(stringResource(CommonR.string.settings_language)) },
-        supportingContent = {
-          Text(
-            LANGUAGES.find { it.first == state.currentLanguage }?.second ?: state.currentLanguage
-          )
-        },
-        leadingContent = { Icon(Icons.Rounded.Language, contentDescription = null) },
-        modifier = Modifier.clickable { showLanguageDialog = true },
-      )
-
-      HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-      // --- ESTATÍSTICAS ---
-      SectionHeader(stringResource(CommonR.string.settings_section_stats))
-      StatsSection(state = state, onShareStats = { viewModel.onAction(SettingsAction.ShareStats) })
-
-      HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-      // --- INTELIGÊNCIA ARTIFICIAL ---
-      SectionHeader(stringResource(CommonR.string.settings_section_ai))
+      SettingsSectionHeader(stringResource(CommonR.string.settings_section_ai_config))
 
       val modelName =
-        when (state.currentModel.modelId) {
-          ModelId.GEMMA4_E4B -> stringResource(CommonR.string.settings_model_gemma4_e4b)
-          ModelId.GEMMA4_E2B -> stringResource(CommonR.string.settings_model_gemma4)
-          ModelId.PHI4_MINI -> stringResource(CommonR.string.settings_model_phi4_mini)
-          ModelId.DEEPSEEK_R1_1_5B -> stringResource(CommonR.string.settings_model_deepseek_r1)
-          ModelId.QWEN2_5_1_5B -> stringResource(CommonR.string.settings_model_qwen25_1_5b)
-          ModelId.QWEN3_0_6B -> stringResource(CommonR.string.settings_model_qwen3)
-          ModelId.NONE -> stringResource(CommonR.string.settings_model_none)
-        }
-      ListItem(
-        headlineContent = { Text(stringResource(CommonR.string.settings_current_model)) },
-        supportingContent = { Text(modelName) },
-        leadingContent = { Icon(Icons.Rounded.Memory, contentDescription = null) },
+        AiModelRegistry.getInfo(state.currentModel.modelId)?.displayName
+          ?: stringResource(CommonR.string.settings_model_none)
+
+      SettingsRow(
+        icon = { Icon(Icons.Rounded.Memory, contentDescription = null) },
+        title = stringResource(CommonR.string.settings_ai_model),
+        subtitle = modelName,
+        onClick = { viewModel.onAction(SettingsAction.ShowModelPicker) },
       )
 
-      if (
-        state.currentModel.modelId != ModelId.NONE &&
-          state.currentModel.downloadState == DownloadState.DOWNLOADED
-      ) {
-        ListItem(
-          headlineContent = { Text(stringResource(CommonR.string.settings_storage)) },
-          supportingContent = {
-            val sizeMb = state.currentModel.sizeBytes / (1024 * 1024)
-            Text(stringResource(CommonR.string.settings_storage_size, sizeMb))
-          },
-          leadingContent = { Icon(Icons.Rounded.Storage, contentDescription = null) },
-        )
-      }
+      HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
-      HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+      SettingsRow(
+        icon = { Icon(Icons.Rounded.Refresh, contentDescription = null) },
+        title = stringResource(CommonR.string.settings_regenerate_puzzles),
+        subtitle = stringResource(CommonR.string.settings_regenerate_puzzles_hint),
+        onClick = { viewModel.onAction(SettingsAction.RegenPuzzles) },
+      )
 
-      // --- DADOS ---
-      SectionHeader(stringResource(CommonR.string.settings_section_data))
+      Spacer(Modifier.height(8.dp))
 
-      if (state.currentModel.modelId != ModelId.NONE) {
-        ListItem(
-          headlineContent = { Text(stringResource(CommonR.string.settings_delete_model)) },
-          supportingContent = { Text(stringResource(CommonR.string.settings_delete_model_hint)) },
-          leadingContent = {
-            Icon(
-              Icons.Rounded.Delete,
-              contentDescription = null,
-              tint = MaterialTheme.colorScheme.error,
-            )
-          },
-          modifier = Modifier.clickable { showDeleteModelDialog = true },
-        )
-      }
+      SettingsSectionHeader(stringResource(CommonR.string.settings_section_language))
+
+      val languageLabel =
+        when (state.currentLanguage) {
+          "pt" -> stringResource(CommonR.string.language_pt)
+          "en" -> stringResource(CommonR.string.language_en)
+          "es" -> stringResource(CommonR.string.language_es)
+          else -> state.currentLanguage
+        }
+
+      SettingsRow(
+        icon = { Icon(Icons.Rounded.Language, contentDescription = null) },
+        title = stringResource(CommonR.string.settings_language_row),
+        subtitle = languageLabel,
+        onClick = { viewModel.onAction(SettingsAction.NavigateToLanguageSelection) },
+      )
+
+      Spacer(Modifier.height(8.dp))
+
+      SettingsSectionHeader(stringResource(CommonR.string.settings_section_about))
+
+      SettingsRow(
+        icon = { Icon(Icons.Rounded.AutoAwesome, contentDescription = null) },
+        title = stringResource(CommonR.string.settings_about_ai),
+        subtitle = stringResource(CommonR.string.settings_about_ai_hint),
+        onClick = { viewModel.onAction(SettingsAction.NavigateToAiInfo) },
+      )
+
+      HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
 
       ListItem(
-        headlineContent = {
+        headlineContent = { Text(stringResource(CommonR.string.settings_app_version)) },
+        trailingContent = {
           Text(
-            stringResource(CommonR.string.settings_reset_progress),
-            color = MaterialTheme.colorScheme.error,
+            text = appVersion,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
         },
-        supportingContent = { Text(stringResource(CommonR.string.settings_reset_hint)) },
-        leadingContent = {
-          Icon(
-            Icons.Rounded.RestartAlt,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.error,
-          )
-        },
-        modifier = Modifier.clickable { showResetDialog = true },
       )
 
       Spacer(Modifier.height(32.dp))
     }
   }
 
-  // --- Dialogs ---
-
-  if (showLanguageDialog) {
-    LanguageDialog(
-      current = state.currentLanguage,
-      onSelect = {
-        viewModel.onAction(SettingsAction.ChangeLanguage(it))
-        showLanguageDialog = false
-      },
-      onDismiss = { showLanguageDialog = false },
-    )
-  }
-
-  if (showDeleteModelDialog) {
-    AlertDialog(
-      onDismissRequest = { showDeleteModelDialog = false },
-      title = { Text(stringResource(CommonR.string.settings_delete_model)) },
-      text = { Text(stringResource(CommonR.string.settings_delete_model_message)) },
-      confirmButton = {
-        TextButton(
-          onClick = {
-            viewModel.onAction(SettingsAction.DeleteModel)
-            showDeleteModelDialog = false
-          }
-        ) {
-          Text(
-            stringResource(CommonR.string.settings_delete_confirm),
-            color = MaterialTheme.colorScheme.error,
-          )
-        }
-      },
-      dismissButton = {
-        TextButton(onClick = { showDeleteModelDialog = false }) {
-          Text(stringResource(CommonR.string.cancel))
-        }
-      },
-    )
-  }
-
-  if (showResetDialog) {
-    AlertDialog(
-      onDismissRequest = { showResetDialog = false },
-      title = { Text(stringResource(CommonR.string.settings_reset_progress)) },
-      text = { Text(stringResource(CommonR.string.settings_reset_message)) },
-      confirmButton = {
-        TextButton(
-          onClick = {
-            viewModel.onAction(SettingsAction.ResetProgress)
-            showResetDialog = false
-          }
-        ) {
-          Text(
-            stringResource(CommonR.string.settings_reset_confirm),
-            color = MaterialTheme.colorScheme.error,
-          )
-        }
-      },
-      dismissButton = {
-        TextButton(onClick = { showResetDialog = false }) {
-          Text(stringResource(CommonR.string.cancel))
-        }
-      },
+  if (state.isModelPickerVisible) {
+    ModelPickerBottomSheet(
+      currentModelId = state.currentModel.modelId,
+      currentDownloadState = state.currentModel.downloadState,
+      availableModels = state.availableModels,
+      deviceTier = state.deviceTier,
+      onSelect = { viewModel.onAction(SettingsAction.SelectModel(it)) },
+      onDismiss = { viewModel.onAction(SettingsAction.DismissModelPicker) },
     )
   }
 }
 
 @Composable
-private fun SectionHeader(title: String) {
+private fun SettingsSectionHeader(title: String, modifier: Modifier = Modifier) {
   Text(
     text = title.uppercase(),
-    style = MaterialTheme.typography.labelMedium,
+    style = MaterialTheme.typography.labelSmall,
     color = MaterialTheme.colorScheme.primary,
-    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    fontWeight = FontWeight.SemiBold,
+    modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
   )
 }
 
 @Composable
-private fun LanguageDialog(current: String, onSelect: (String) -> Unit, onDismiss: () -> Unit) {
-  AlertDialog(
-    onDismissRequest = onDismiss,
-    title = { Text(stringResource(CommonR.string.settings_language)) },
-    text = {
-      Column {
-        LANGUAGES.forEach { (code, name) ->
-          Row(
-            modifier =
-              Modifier.fillMaxWidth()
-                .clickable { onSelect(code) }
-                .padding(vertical = 12.dp, horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-          ) {
-            Text(name)
-            if (code == current) {
-              Text("✓", color = MaterialTheme.colorScheme.primary)
-            }
-          }
-        }
-      }
-    },
-    confirmButton = {
-      TextButton(onClick = onDismiss) { Text(stringResource(CommonR.string.close)) }
-    },
+private fun SettingsRow(
+  icon: @Composable () -> Unit,
+  title: String,
+  subtitle: String,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  ListItem(
+    headlineContent = { Text(title) },
+    supportingContent = { Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant) },
+    leadingContent = icon,
+    modifier = modifier.clickable(onClick = onClick),
   )
 }
 
-// --- Stats Section ---
-
-private const val STAT_PERCENT_MULTIPLIER = 100
-private const val HISTOGRAM_BAR_MIN_WIDTH = 24
-private const val HISTOGRAM_BAR_HEIGHT = 20
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun StatsSection(state: SettingsState, onShareStats: () -> Unit) {
-  Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-      StatItem(
-        value = state.stats.totalPlayed.toString(),
-        label = stringResource(CommonR.string.stats_played),
-      )
-      StatItem(
-        value = state.stats.totalWon.toString(),
-        label = stringResource(CommonR.string.stats_won),
-      )
-      StatItem(value = "${state.winRate}%", label = stringResource(CommonR.string.stats_win_rate))
-      StatItem(
-        value =
-          if (state.stats.totalPlayed > 0) String.format("%.1f", state.stats.avgAttempts) else "-",
-        label = stringResource(CommonR.string.stats_avg_attempts),
-      )
-    }
+private fun ModelPickerBottomSheet(
+  currentModelId: ModelId,
+  currentDownloadState: DownloadState,
+  availableModels: List<AiModelInfo>,
+  deviceTier: DeviceTier,
+  onSelect: (ModelId) -> Unit,
+  onDismiss: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    if (state.stats.guessDistribution.isNotEmpty()) {
-      Spacer(Modifier.height(16.dp))
+  ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, modifier = modifier) {
+    Column(modifier = Modifier.padding(bottom = 32.dp)) {
       Text(
-        text = stringResource(CommonR.string.stats_guess_distribution),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        text = stringResource(CommonR.string.model_picker_title),
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(horizontal = 24.dp),
       )
-      Spacer(Modifier.height(8.dp))
-      GuessDistributionHistogram(distribution = state.stats.guessDistribution)
-    }
+      Spacer(Modifier.height(4.dp))
+      Text(
+        text = stringResource(CommonR.string.model_picker_subtitle),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 24.dp),
+      )
+      Spacer(Modifier.height(16.dp))
 
-    if (state.stats.totalPlayed > 0) {
-      Spacer(Modifier.height(12.dp))
-      TextButton(onClick = onShareStats, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-        Text(stringResource(CommonR.string.share))
-      }
-    }
-  }
-}
-
-@Composable
-private fun StatItem(value: String, label: String) {
-  Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    Text(text = value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-    Text(
-      text = label,
-      style = MaterialTheme.typography.labelSmall,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-  }
-}
-
-@Composable
-private fun GuessDistributionHistogram(distribution: Map<Int, Int>) {
-  val maxCount = distribution.values.maxOrNull() ?: 1
-  Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-    for (attempt in 1..GameRules.MAX_ATTEMPTS) {
-      val count = distribution[attempt] ?: 0
-      val fraction = if (maxCount > 0) count.toFloat() / maxCount else 0f
-      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-          text = attempt.toString(),
-          style = MaterialTheme.typography.bodySmall,
-          fontWeight = FontWeight.Bold,
-          modifier = Modifier.width(16.dp),
-          textAlign = TextAlign.Center,
+      availableModels.forEach { model ->
+        val isSelected =
+          model.modelId == currentModelId && currentDownloadState == DownloadState.DOWNLOADED
+        val isAboveTier =
+          when (deviceTier) {
+            DeviceTier.HIGH -> false
+            DeviceTier.MEDIUM -> model.requiredRamMb > 8192L
+          }
+        ModelOptionCard(
+          model = model,
+          isSelected = isSelected,
+          isAboveTier = isAboveTier,
+          onClick = { onSelect(model.modelId) },
         )
-        Spacer(Modifier.width(8.dp))
-        Box(
-          modifier =
-            Modifier.weight(1f)
-              .height(HISTOGRAM_BAR_HEIGHT.dp)
-              .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(4.dp))
-        ) {
-          Box(
-            modifier =
-              Modifier.fillMaxWidth(fraction.coerceAtLeast(if (count > 0) 0.05f else 0f))
-                .height(HISTOGRAM_BAR_HEIGHT.dp)
-                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+      }
+
+      LightModeOptionCard(
+        isSelected = currentModelId == ModelId.NONE,
+        onClick = { onSelect(ModelId.NONE) },
+      )
+    }
+  }
+}
+
+@Composable
+private fun ModelOptionCard(
+  model: AiModelInfo,
+  isSelected: Boolean,
+  isAboveTier: Boolean,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val sizeMb = model.sizeBytes / (1024 * 1024)
+  val sizeLabel = if (sizeMb >= 1024) "%.1f GB".format(sizeMb / 1024f) else "$sizeMb MB"
+  val ramGb = model.requiredRamMb / 1024
+
+  Card(
+    onClick = onClick,
+    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+    colors =
+      CardDefaults.cardColors(
+        containerColor =
+          if (isSelected) MaterialTheme.colorScheme.primaryContainer
+          else MaterialTheme.colorScheme.surfaceVariant
+      ),
+    shape = RoundedCornerShape(12.dp),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Column(modifier = Modifier.weight(1f)) {
+        Text(
+          text = model.displayName,
+          style = MaterialTheme.typography.bodyLarge,
+          fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+          text = "$sizeLabel · RAM: ${ramGb}GB",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (isAboveTier) {
+          Text(
+            text = stringResource(CommonR.string.warning),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.error,
           )
         }
-        Spacer(Modifier.width(8.dp))
+      }
+      if (isSelected) {
+        Icon(
+          imageVector = Icons.Rounded.CheckCircle,
+          contentDescription = stringResource(CommonR.string.model_picker_selected),
+          tint = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.size(24.dp),
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun LightModeOptionCard(
+  isSelected: Boolean,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Card(
+    onClick = onClick,
+    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+    colors =
+      CardDefaults.cardColors(
+        containerColor =
+          if (isSelected) MaterialTheme.colorScheme.primaryContainer
+          else MaterialTheme.colorScheme.surfaceVariant
+      ),
+    shape = RoundedCornerShape(12.dp),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Column(modifier = Modifier.weight(1f)) {
         Text(
-          text = count.toString(),
+          text = stringResource(CommonR.string.model_picker_none_title),
+          style = MaterialTheme.typography.bodyLarge,
+          fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+          text = stringResource(CommonR.string.model_picker_none_hint),
           style = MaterialTheme.typography.bodySmall,
-          modifier = Modifier.width(HISTOGRAM_BAR_MIN_WIDTH.dp),
-          textAlign = TextAlign.End,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+      }
+      if (isSelected) {
+        Icon(
+          imageVector = Icons.Rounded.CheckCircle,
+          contentDescription = stringResource(CommonR.string.model_picker_selected),
+          tint = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.size(24.dp),
         )
       }
     }

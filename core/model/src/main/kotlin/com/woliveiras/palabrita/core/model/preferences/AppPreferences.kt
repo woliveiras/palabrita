@@ -7,9 +7,13 @@ interface AppPreferences {
 
   val generationCycle: Flow<Int>
 
+  val appLanguage: Flow<String>
+
   suspend fun setOnboardingComplete()
 
   suspend fun incrementGenerationCycle()
 
   suspend fun resetGenerationCycle()
+
+  suspend fun setAppLanguage(language: String)
 }

@@ -19,6 +19,8 @@ interface PuzzleRepository {
 
   suspend fun deleteUnplayedAiPuzzles()
 
+  suspend fun deleteUnplayedByLanguage(language: String)
+
   suspend fun markAllUnplayed()
 
   suspend fun deleteAll()

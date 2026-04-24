@@ -9,8 +9,9 @@ Palabrita runs LLM on-device, which requires capable hardware. This document det
 | Tier | RAM | Model | Mode | Features |
 |---|---|---|---|---|
 | **HIGH** | >= 8 GB | Gemma 4 E2B (~2.6GB) | AI Premium | Generation, chat, system prompt, function calling, thinking |
-| **MEDIUM** | 4-7 GB | Qwen3 0.6B (~614MB) | AI Compact | Generation, chat (prompt-only) |
-| **LOW** | < 4 GB | Qwen3 0.6B (~614MB) | AI Compact | Generation, chat (prompt-only) |
+| **MEDIUM** | < 8 GB | Qwen3 0.6B (~614MB) | AI Compact | Generation, chat (prompt-only) |
+
+> `DeviceTier` has two values: `HIGH` and `MEDIUM`. The user can always override the model in Settings.
 
 ## RAM Detection
 
@@ -33,8 +34,7 @@ class DeviceCapabilities @Inject constructor(
         val ramGb = getTotalRamGb()
         return when {
             ramGb >= 8.0f -> DeviceTier.HIGH
-            ramGb >= 4.0f -> DeviceTier.MEDIUM
-            else -> DeviceTier.LOW
+            else -> DeviceTier.MEDIUM
         }
     }
 
@@ -42,7 +42,6 @@ class DeviceCapabilities @Inject constructor(
         return when (getDeviceTier()) {
             DeviceTier.HIGH -> ModelId.GEMMA4_E2B
             DeviceTier.MEDIUM -> ModelId.QWEN3_0_6B
-            DeviceTier.LOW -> ModelId.QWEN3_0_6B
         }
     }
 
@@ -56,10 +55,15 @@ class DeviceCapabilities @Inject constructor(
     }
 }
 
-enum class DeviceTier { LOW, MEDIUM, HIGH }
+enum class DeviceTier { MEDIUM, HIGH }
 
+// Available models (AiModelRegistry)
 enum class ModelId {
+    GEMMA4_E4B,
     GEMMA4_E2B,
+    PHI4_MINI,
+    DEEPSEEK_R1_1_5B,
+    QWEN2_5_1_5B,
     QWEN3_0_6B,
     NONE
 }

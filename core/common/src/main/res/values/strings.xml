@@ -288,4 +288,49 @@
     <string name="ai_info_puzzle_prompt">Prompt de Geração (exemplo)</string>
     <string name="ai_info_chat_prompt">Prompt do Chat (exemplo)</string>
     <string name="ai_info_change_model">Trocar Modelo nas Configurações</string>
+
+    <!-- Settings: Redesign (Spec 19) -->
+    <string name="settings_section_ai_config">Configuração de IA</string>
+    <string name="settings_ai_model">Modelo de IA</string>
+    <string name="settings_regenerate_puzzles">Regenerar Puzzles</string>
+    <string name="settings_regenerate_puzzles_hint">Criar um novo banco de palavras</string>
+    <string name="settings_section_language">Idioma e Região</string>
+    <string name="settings_language_row">Idioma</string>
+    <string name="settings_section_about">Sobre</string>
+    <string name="settings_about_ai">Sobre o Modelo de IA</string>
+    <string name="settings_about_ai_hint">Como funciona</string>
+    <string name="settings_app_version">Versão do App</string>
+
+    <!-- Model Picker -->
+    <string name="model_picker_title">Selecionar Modelo de IA</string>
+    <string name="model_picker_subtitle">Trocar de modelo fará o download do novo modelo para o seu dispositivo.</string>
+    <string name="model_picker_size_mb">%d MB</string>
+    <string name="model_picker_size_gb">%.1f GB</string>
+    <string name="model_picker_ram_required">RAM necessário: %d GB</string>
+    <string name="model_picker_selected">Selecionado</string>
+    <string name="model_picker_none_title">Modo Light</string>
+    <string name="model_picker_none_hint">Sem IA — banco de palavras curado</string>
+
+    <!-- Model Download (Settings) -->
+    <string name="model_download_title">Baixar Modelo</string>
+    <string name="model_download_start">Iniciar Download</string>
+    <string name="model_download_downloading">Baixando… %d%%</string>
+    <string name="model_download_success">Download concluído!</string>
+    <string name="model_download_generate_now">Gerar Puzzles</string>
+    <string name="model_download_back_settings">Voltar às Configurações</string>
+    <string name="model_download_cancel">Cancelar</string>
+    <string name="model_download_retry">Tentar novamente</string>
+    <string name="model_download_error_prefix">Erro: %s</string>
+
+    <!-- Language Selection -->
+    <string name="language_selection_title">Idioma</string>
+    <string name="language_selection_app_section">Idioma do App</string>
+    <string name="language_selection_game_section">Idioma das Palavras do Jogo</string>
+    <string name="language_selection_confirm_title">Mudar idioma do jogo?</string>
+    <string name="language_selection_confirm_body">Você mudou o idioma das palavras para %s. Deseja gerar novos puzzles neste idioma agora, ou continuar jogando no idioma atual e gerar depois?</string>
+    <string name="language_selection_generate_now">Gerar agora</string>
+    <string name="language_selection_generate_later">Continuar jogando, gerar depois</string>
+    <string name="language_pt">Português (BR)</string>
+    <string name="language_en">English</string>
+    <string name="language_es">Español</string>
 </resources>

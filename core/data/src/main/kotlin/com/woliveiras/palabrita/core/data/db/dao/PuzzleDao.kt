@@ -62,6 +62,9 @@ interface PuzzleDao {
   @Query("DELETE FROM puzzles WHERE isPlayed = 0 AND source = 'AI'")
   suspend fun deleteUnplayedAiPuzzles()
 
+  @Query("DELETE FROM puzzles WHERE isPlayed = 0 AND language = :lang")
+  suspend fun deleteUnplayedByLanguage(lang: String)
+
   @Query("UPDATE puzzles SET isPlayed = 0, playedAt = NULL") suspend fun markAllUnplayed()
 
   @Query("DELETE FROM puzzles") suspend fun deleteAll()

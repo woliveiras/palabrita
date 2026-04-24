@@ -11,6 +11,9 @@ class FakeAppPreferences : AppPreferences {
   private val _generationCycle = MutableStateFlow(0)
   override val generationCycle: Flow<Int> = _generationCycle
 
+  private val _appLanguage = MutableStateFlow(java.util.Locale.getDefault().language)
+  override val appLanguage: Flow<String> = _appLanguage
+
   override suspend fun setOnboardingComplete() {
     _isOnboardingComplete.value = true
   }
@@ -21,5 +24,9 @@ class FakeAppPreferences : AppPreferences {
 
   override suspend fun resetGenerationCycle() {
     _generationCycle.value = 0
+  }
+
+  override suspend fun setAppLanguage(language: String) {
+    _appLanguage.value = language
   }
 }

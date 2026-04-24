@@ -253,6 +253,8 @@ Navigation Compose with type-safe routes (Kotlin Serialization):
 @Serializable data class ChatRoute(val puzzleId: Long)
 @Serializable data object SettingsRoute
 @Serializable data object AiInfoRoute
+@Serializable data object LanguageSelectionRoute
+@Serializable data class ModelDownloadRoute(val modelId: String)
 ```
 
 Navigation flow:
@@ -269,8 +271,43 @@ Game ---> No Puzzles Left ---> Generation (re-gen)
 Difficulty is implicit via word length (4-6 letters). 3-level system:
 Level 1 = 5×4-letter, Level 2 = 10×5-letter, Level 3+ = 10×6-letter (see Spec 15).
 
+Settings ---> Language Selection (app locale + game language)
+Settings ---> Model Download (when selected model is not yet downloaded)
+Settings ---> Generation (re-gen, from model picker or language change)
+Settings ---> AiInfo
+
 Bottom Nav: Home | AI (AiInfoScreen) | More (Settings)
 ```
+
+### Navigation Events Pattern
+
+ViewModels that need to trigger navigation emit a `SharedFlow<Event>` instead of storing navigation state in `UiState`. The Composable collects the flow in a `LaunchedEffect` and calls the appropriate lambda:
+
+```kotlin
+// ViewModel
+sealed class SettingsEvent {
+    data class NavigateToModelDownload(val modelId: ModelId) : SettingsEvent()
+    data object NavigateToGeneration : SettingsEvent()
+    data object NavigateToLanguageSelection : SettingsEvent()
+    data object NavigateToAiInfo : SettingsEvent()
+}
+
+private val _events = MutableSharedFlow<SettingsEvent>()
+val events: SharedFlow<SettingsEvent> = _events.asSharedFlow()
+
+// Composable
+LaunchedEffect(Unit) {
+    viewModel.events.collect { event ->
+        when (event) {
+            is SettingsEvent.NavigateToModelDownload -> onNavigateToModelDownload(event.modelId)
+            is SettingsEvent.NavigateToGeneration -> onNavigateToGeneration()
+            // ...
+        }
+    }
+}
+```
+
+Use this pattern when: navigation is triggered by async logic (post-download, post-confirm) or when multiple actions can lead to the same destination.
 
 ## Long-Term State Management
 
@@ -282,6 +319,7 @@ Bottom Nav: Home | AI (AiInfoScreen) | More (Settings)
 | Chat history | Room (`ChatMessageEntity`) | Permanent |
 | Model configuration | Room (`ModelConfigEntity`) | Permanent |
 | Onboarding completed | DataStore Preferences | Permanent |
+| App language (locale) | DataStore Preferences (`app_language`) | Permanent |
 | UI state (input, etc.) | ViewModel StateFlow | ViewModel lifecycle |
 
 ## Concurrency

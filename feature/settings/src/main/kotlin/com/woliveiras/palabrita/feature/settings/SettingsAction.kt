@@ -3,15 +3,15 @@ package com.woliveiras.palabrita.feature.settings
 import com.woliveiras.palabrita.core.model.ModelId
 
 sealed class SettingsAction {
-  data class ChangeLanguage(val language: String) : SettingsAction()
+  data object ShowModelPicker : SettingsAction()
 
-  data class SwitchModel(val newModelId: ModelId) : SettingsAction()
+  data object DismissModelPicker : SettingsAction()
 
-  data object DeleteModel : SettingsAction()
+  data class SelectModel(val modelId: ModelId) : SettingsAction()
 
-  data object ResetProgress : SettingsAction()
+  data object RegenPuzzles : SettingsAction()
 
-  data object ShareStats : SettingsAction()
+  data object NavigateToLanguageSelection : SettingsAction()
 
-  data object DismissError : SettingsAction()
+  data object NavigateToAiInfo : SettingsAction()
 }

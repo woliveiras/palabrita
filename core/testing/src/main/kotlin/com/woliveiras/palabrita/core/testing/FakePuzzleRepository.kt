@@ -6,13 +6,15 @@ import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepository {
   val markedPlayed = mutableListOf<Long>()
   var unplayedAiPuzzlesCleared = false
+  var unplayedByLanguageDeleted: String? = null
   var allUnplayed = false
   var allDeleted = false
   val savedPuzzles = mutableListOf<Puzzle>()
+  var unplayedCount: Int = if (puzzle != null) 1 else 0
 
   override suspend fun getNextUnplayed(language: String): Puzzle? = puzzle
 
-  override suspend fun countAllUnplayed(language: String): Int = if (puzzle != null) 1 else 0
+  override suspend fun countAllUnplayed(language: String): Int = unplayedCount
 
   override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
 
@@ -33,6 +35,11 @@ class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepositor
 
   override suspend fun deleteUnplayedAiPuzzles() {
     unplayedAiPuzzlesCleared = true
+  }
+
+  override suspend fun deleteUnplayedByLanguage(language: String) {
+    unplayedByLanguageDeleted = language
+    savedPuzzles.removeAll { !it.isPlayed && it.language == language }
   }
 
   override suspend fun markAllUnplayed() {

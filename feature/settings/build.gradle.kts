@@ -27,6 +27,8 @@ dependencies {
   implementation(project(":core:ai"))
   implementation(project(":core:common"))
 
+  implementation(libs.appcompat)
+
   implementation(platform(libs.compose.bom))
   implementation(libs.compose.ui)
   implementation(libs.compose.ui.graphics)
@@ -45,6 +47,7 @@ dependencies {
 
   testImplementation(libs.junit)
   testImplementation(libs.truth)
+  testImplementation(libs.turbine)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(project(":core:testing"))
 }

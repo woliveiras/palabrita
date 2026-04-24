@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,12 +21,18 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext private val con
 
   private val onboardingCompleteKey = booleanPreferencesKey("onboarding_complete")
   private val generationCycleKey = intPreferencesKey("generation_cycle")
+  private val appLanguageKey = stringPreferencesKey("app_language")
 
   override val isOnboardingComplete: Flow<Boolean> =
     context.dataStore.data.map { prefs -> prefs[onboardingCompleteKey] ?: false }
 
   override val generationCycle: Flow<Int> =
     context.dataStore.data.map { prefs -> prefs[generationCycleKey] ?: 0 }
+
+  override val appLanguage: Flow<String> =
+    context.dataStore.data.map { prefs ->
+      prefs[appLanguageKey] ?: java.util.Locale.getDefault().language
+    }
 
   override suspend fun setOnboardingComplete() {
     context.dataStore.edit { prefs -> prefs[onboardingCompleteKey] = true }
@@ -40,5 +47,9 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext private val con
 
   override suspend fun resetGenerationCycle() {
     context.dataStore.edit { prefs -> prefs.remove(generationCycleKey) }
+  }
+
+  override suspend fun setAppLanguage(language: String) {
+    context.dataStore.edit { prefs -> prefs[appLanguageKey] = language }
   }
 }
