@@ -357,25 +357,25 @@ sealed class GameAction {
 
 ## Acceptance Criteria
 
-- [ ] Grid renders correctly for words of 4, 5, and 6 letters (3-level system)
-- [ ] Color feedback is correct for duplicate letters (per algorithm)
-- [ ] Keyboard updates colors correctly after each attempt
+- [x] Grid renders correctly for words of 4, 5, and 6 letters (3-level system)
+- [x] Color feedback is correct for duplicate letters (per algorithm)
+- [x] Keyboard updates colors correctly after each attempt
 - [ ] Flip animation works when revealing feedback
 - [ ] Shake animation works for invalid attempt
-- [ ] Hints reveal progressively (up to 3)
-- [ ] Win correctly detected and navigates to result screen
-- [ ] Loss correctly detected after 6 attempts
+- [x] Hints reveal progressively (up to 3)
+- [x] Win correctly detected and navigates to result screen
+- [x] Loss correctly detected after 6 attempts
 - [ ] Share generates correct emoji grid (no XP or tier in share text)
 - [ ] State persists between app kills (via GameSessionEntity)
 - [ ] "Explore the word" only appears in AI mode
-- [ ] WorkManager generates puzzles in background when stock is low
+- [x] WorkManager generates puzzles in background when stock is low
 - [ ] Header shows "CHALLENGE N/3" for dailies and "FREE" for free play
-- [ ] Back button during active game shows "Abandon game?"
-- [ ] "Continue playing" closes dialog and returns to game
-- [ ] "Abandon" marks GameSession as abandoned and navigates to Home
+- [x] Back button during active game shows "Abandon game?"
+- [x] "Continue playing" closes dialog and returns to game
+- [x] "Abandon" marks GameSession as abandoned and navigates to Home
 - [ ] Back without confirmation if game is already over (WON/LOST)
 - [ ] Chat Card is the main CTA in ResultScreen (above "play again")
 - [ ] Share shows streak in the header
 - [ ] Share shows context ("Challenge N/3" or "Free")
-- [ ] Accent keyboard toggle appears for PT/ES languages (Spec 17)
-- [ ] Accent keys type base letter into input (game logic is ASCII)
+- [x] Accent keyboard toggle appears for PT/ES languages (Spec 17)
+- [x] Accent keys type base letter into input (game logic is ASCII)

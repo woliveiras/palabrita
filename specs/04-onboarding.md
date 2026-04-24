@@ -295,16 +295,16 @@ sealed class OnboardingAction {
 
 ## Acceptance Criteria
 
-- [ ] Full onboarding works on tier HIGH device (Gemma 4 download + generation)
-- [ ] Full onboarding works on tier MEDIUM device (Gemma 3 download + generation)
+- [x] Full onboarding works on tier HIGH device (Gemma 4 download + generation)
+- [x] Full onboarding works on tier MEDIUM device (Gemma 3 download + generation)
 - [ ] Full onboarding works on tier LOW device (Light mode, no download)
-- [ ] Auto-select chooses the correct model based on RAM
+- [x] Auto-select chooses the correct model based on RAM
 - [ ] Warning appears when user chooses model above tier
-- [ ] Download shows real progress (not fake)
-- [ ] Download can be cancelled
+- [x] Download shows real progress (not fake)
+- [x] Download can be cancelled
 - [ ] Download resumes after app is closed (PAD)
-- [ ] Generation produces ≥3 valid puzzles
+- [x] Generation produces ≥3 valid puzzles
 - [ ] If generation fails completely, offers Light mode as fallback
-- [ ] Onboarding does not reappear after being completed
-- [ ] Selected language persists in PlayerStats
+- [x] Onboarding does not reappear after being completed
+- [x] Selected language persists in PlayerStats
 - [ ] Wi-Fi warning appears for downloads >500MB on mobile data

@@ -16,27 +16,27 @@ Additionally, the LLM prompts pass raw ISO codes (`"pt"`, `"en"`, `"es"`) as the
 
 ### Functional
 
-- [ ] Language preference MUST be persisted to the database before puzzle generation is scheduled
-- [ ] LLM prompts MUST use unambiguous full language names instead of ISO codes
-- [ ] The language mapping must cover all supported languages: pt → "Brazilian Portuguese", en → "English", es → "Spanish"
-- [ ] `PuzzleGenerationScheduler.scheduleGeneration()` must accept the language as a parameter to guarantee the correct value is used
+- [x] Language preference MUST be persisted to the database before puzzle generation is scheduled
+- [x] LLM prompts MUST use unambiguous full language names instead of ISO codes
+- [x] The language mapping must cover all supported languages: pt → "Brazilian Portuguese", en → "English", es → "Spanish"
+- [x] `PuzzleGenerationScheduler.scheduleGeneration()` must accept the language as a parameter to guarantee the correct value is used
 
 ### Non-Functional
 
-- [ ] No additional latency: `updateLanguage()` is a single Room upsert (~1ms), negligible
-- [ ] Backward-compatible: existing saved languages ("pt", "en", "es") must map correctly to display names in prompts
+- [x] No additional latency: `updateLanguage()` is a single Room upsert (~1ms), negligible
+- [x] Backward-compatible: existing saved languages ("pt", "en", "es") must map correctly to display names in prompts
 
 ## Acceptance Criteria
 
-- [ ] Given the user selects "pt" in onboarding, when the engine becomes ready, then `statsRepository.updateLanguage("pt")` completes before `enqueueBackgroundGeneration()` is called
-- [ ] Given language "pt" is passed to `puzzleUserPromptLarge()`, then the prompt text contains "Brazilian Portuguese", not "pt"
-- [ ] Given language "en" is passed to `puzzleUserPromptLarge()`, then the prompt text contains "English", not "en"
-- [ ] Given language "es" is passed to `puzzleUserPromptLarge()`, then the prompt text contains "Spanish", not "es"
-- [ ] Given language "pt" is passed to `puzzlePromptCompact()`, then the prompt text contains "Brazilian Portuguese"
-- [ ] Given language "en" is passed to `puzzlePromptCompact()`, then the prompt text contains "English"
-- [ ] Given language "es" is passed to `puzzlePromptCompact()`, then the prompt text contains "Spanish"
-- [ ] Given an unknown language code "fr", then the prompt falls back to the raw code "fr"
-- [ ] Given language "pt" is passed to `chatSystemPrompt()`, then the response instruction contains "Brazilian Portuguese"
+- [x] Given the user selects "pt" in onboarding, when the engine becomes ready, then `statsRepository.updateLanguage("pt")` completes before `enqueueBackgroundGeneration()` is called
+- [x] Given language "pt" is passed to `puzzleUserPromptLarge()`, then the prompt text contains "Brazilian Portuguese", not "pt"
+- [x] Given language "en" is passed to `puzzleUserPromptLarge()`, then the prompt text contains "English", not "en"
+- [x] Given language "es" is passed to `puzzleUserPromptLarge()`, then the prompt text contains "Spanish", not "es"
+- [x] Given language "pt" is passed to `puzzlePromptCompact()`, then the prompt text contains "Brazilian Portuguese"
+- [x] Given language "en" is passed to `puzzlePromptCompact()`, then the prompt text contains "English"
+- [x] Given language "es" is passed to `puzzlePromptCompact()`, then the prompt text contains "Spanish"
+- [x] Given an unknown language code "fr", then the prompt falls back to the raw code "fr"
+- [x] Given language "pt" is passed to `chatSystemPrompt()`, then the response instruction contains "Brazilian Portuguese"
 
 ## Edge Cases
 

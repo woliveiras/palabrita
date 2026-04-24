@@ -350,20 +350,20 @@ fun generatePuzzle(
 
 ## Acceptance Criteria
 
-- [ ] `LlmEngineManager` initializes with Gemma 4 E2B on a device with ≥8GB RAM
-- [ ] `LlmEngineManager` initializes with Qwen3 0.6B on a device with 4-8GB RAM
-- [ ] `PuzzleGenerator` generates a batch of valid puzzles per the 3-level system (Spec 15)
-- [ ] `PuzzleGenerator` exposes `activity: StateFlow<GenerationActivity?>` for live UI updates (Spec 13)
-- [ ] `LlmResponseParser` parses valid JSON correctly
-- [ ] `LlmResponseParser` extracts JSON from responses with extra text via regex fallback
-- [ ] `PuzzleValidator` rejects words outside the expected length range (after normalization)
-- [ ] `PuzzleValidator` normalizes accented words via TextNormalizer and accepts them
-- [ ] `PuzzleValidator` rejects puzzles with hints that contain the word
-- [ ] `PuzzleValidator` rejects duplicate words
-- [ ] `PuzzleValidator` accepts 3 hints; takes first 3 if more are returned
-- [ ] `ChatEngine` streams tokens during response
-- [ ] `ChatEngine` respects the 10-message limit per session
-- [ ] Retry generates a valid puzzle after failure on the first attempt (tested with mock)
-- [ ] Engine is destroyed and recreated correctly when switching models
-- [ ] Prompts use language display names (not raw codes): "Brazilian Portuguese", "English", "Spanish"
-- [ ] Prompts do NOT contain "no accents" restriction
+- [x] `LlmEngineManager` initializes with Gemma 4 E2B on a device with ≥8GB RAM
+- [x] `LlmEngineManager` initializes with Qwen3 0.6B on a device with 4-8GB RAM
+- [x] `PuzzleGenerator` generates a batch of valid puzzles per the 3-level system (Spec 15)
+- [x] `PuzzleGenerator` exposes `activity: StateFlow<GenerationActivity?>` for live UI updates (Spec 13)
+- [x] `LlmResponseParser` parses valid JSON correctly
+- [x] `LlmResponseParser` extracts JSON from responses with extra text via regex fallback
+- [x] `PuzzleValidator` rejects words outside the expected length range (after normalization)
+- [x] `PuzzleValidator` normalizes accented words via TextNormalizer and accepts them
+- [x] `PuzzleValidator` rejects puzzles with hints that contain the word
+- [x] `PuzzleValidator` rejects duplicate words
+- [x] `PuzzleValidator` accepts 3 hints; takes first 3 if more are returned
+- [x] `ChatEngine` streams tokens during response
+- [x] `ChatEngine` respects the 10-message limit per session
+- [x] Retry generates a valid puzzle after failure on the first attempt (tested with mock)
+- [x] Engine is destroyed and recreated correctly when switching models
+- [x] Prompts use language display names (not raw codes): "Brazilian Portuguese", "English", "Spanish"
+- [x] Prompts do NOT contain "no accents" restriction

@@ -216,10 +216,10 @@ interface ModelRepository {
 
 ## Acceptance Criteria
 
-- [ ] All entities correctly create tables via Room
+- [x] All entities correctly create tables via Room
 - [ ] Migrations work (tested with previous schema version)
-- [ ] DAOs return correct data in tests with in-memory DB
-- [ ] Unique constraint on `PuzzleEntity.word` prevents duplicates
+- [x] DAOs return correct data in tests with in-memory DB
+- [x] Unique constraint on `PuzzleEntity.word` prevents duplicates
 - [ ] Static dataset loads correctly from assets
-- [ ] JSON for hints, attempts, and guessDistribution serializes/deserializes without error
-- [ ] `ModelConfigEntity` persists download state between app restarts
+- [x] JSON for hints, attempts, and guessDistribution serializes/deserializes without error
+- [x] `ModelConfigEntity` persists download state between app restarts

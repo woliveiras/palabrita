@@ -24,56 +24,56 @@ This means the user **plays with the ASCII version** but **sees the real word** 
 
 #### Backend: Accent normalization pipeline
 
-- [ ] Add `normalizeToAscii(text: String): String` utility that strips diacritics using `java.text.Normalizer` (NFD decompose → strip combining marks → lowercase)
-- [ ] In `PuzzleGenerator.toPuzzle()`: set `wordDisplay = response.word` (original), set `word = normalizeToAscii(response.word)` (ASCII)
-- [ ] In `PuzzleValidator`: validate `word` (the normalized version) with existing `[a-z]+` regex — accented originals are accepted because they normalize to ASCII
+- [x] Add `normalizeToAscii(text: String): String` utility that strips diacritics using `java.text.Normalizer` (NFD decompose → strip combining marks → lowercase)
+- [x] In `PuzzleGenerator.toPuzzle()`: set `wordDisplay = response.word` (original), set `word = normalizeToAscii(response.word)` (ASCII)
+- [x] In `PuzzleValidator`: validate `word` (the normalized version) with existing `[a-z]+` regex — accented originals are accepted because they normalize to ASCII
 - [ ] In `LlmResponseParser`: apply UTF-8 sanitization on raw LLM output before JSON parsing — replace known mojibake sequences or re-encode if needed
-- [ ] Update the prompt to remove "no accents" instruction — let the LLM generate natural words; we normalize in code
-- [ ] `submitAttempt` validation (`it in 'a'..'z'`) must also accept accented characters when accent keyboard is active — compare against the `word` field (ASCII) internally
+- [x] Update the prompt to remove "no accents" instruction — let the LLM generate natural words; we normalize in code
+- [x] `submitAttempt` validation (`it in 'a'..'z'`) must also accept accented characters when accent keyboard is active — compare against the `word` field (ASCII) internally
 
 #### Frontend: Accent keyboard toggle
 
-- [ ] Add an accent toggle button (e.g., `ÁÀ` icon) on the game keyboard, in the bottom-left row next to backspace
-- [ ] When toggled ON, the keyboard rows change to show accented characters for the current puzzle language
-- [ ] Accent layouts per language:
+- [x] Add an accent toggle button (e.g., `ÁÀ` icon) on the game keyboard, in the bottom-left row next to backspace
+- [x] When toggled ON, the keyboard rows change to show accented characters for the current puzzle language
+- [x] Accent layouts per language:
   - **pt**: Row 1 stays, Row 2 adds `ç`, Row 3 shows `áàâãéêíóôõúü`
   - **es**: Row 1 stays, Row 2 adds `ñ`, Row 3 shows `áéíóúü`
   - **en**: toggle button hidden (English has no accented characters in common use)
-- [ ] Pressing an accented key types the **base letter** into `currentInput` (since `word` is ASCII), but the cell **displays** the accented character as visual feedback
-- [ ] `keyboardState` tracking works on **base letters** only — accented keys inherit the state of their base letter (e.g., `á` shows same color as `a`)
-- [ ] Toggle state resets to OFF when a new puzzle loads
+- [x] Pressing an accented key types the **base letter** into `currentInput` (since `word` is ASCII), but the cell **displays** the accented character as visual feedback
+- [x] `keyboardState` tracking works on **base letters** only — accented keys inherit the state of their base letter (e.g., `á` shows same color as `a`)
+- [x] Toggle state resets to OFF when a new puzzle loads
 
 ### Non-Functional
 
-- [ ] Performance: `normalizeToAscii()` is O(n) on word length (~6 chars), negligible
-- [ ] Backward-compatible: existing puzzles in DB with ASCII words continue to work. New puzzles get proper `wordDisplay` with original accents
+- [x] Performance: `normalizeToAscii()` is O(n) on word length (~6 chars), negligible
+- [x] Backward-compatible: existing puzzles in DB with ASCII words continue to work. New puzzles get proper `wordDisplay` with original accents
 - [ ] Accessibility: accent toggle button has content description for screen readers
 
 ## Acceptance Criteria
 
 ### Normalization pipeline
 
-- [ ] Given the LLM returns word "ação", when `normalizeToAscii("ação")` is called, then the result is "acao"
-- [ ] Given the LLM returns word "niño", when `normalizeToAscii("niño")` is called, then the result is "nino"
-- [ ] Given the LLM returns word "café", when `normalizeToAscii("café")` is called, then the result is "cafe"
-- [ ] Given a word with no accents "gatos", when `normalizeToAscii("gatos")` is called, then the result is "gatos" (unchanged)
-- [ ] Given the LLM returns "ação", when `toPuzzle()` is called, then `word = "acao"` and `wordDisplay = "Ação"` (uppercased original)
-- [ ] Given a normalized word "acao", when `PuzzleValidator.validate()` runs, then it passes the `[a-z]+` regex
+- [x] Given the LLM returns word "ação", when `normalizeToAscii("ação")` is called, then the result is "acao"
+- [x] Given the LLM returns word "niño", when `normalizeToAscii("niño")` is called, then the result is "nino"
+- [x] Given the LLM returns word "café", when `normalizeToAscii("café")` is called, then the result is "cafe"
+- [x] Given a word with no accents "gatos", when `normalizeToAscii("gatos")` is called, then the result is "gatos" (unchanged)
+- [x] Given the LLM returns "ação", when `toPuzzle()` is called, then `word = "acao"` and `wordDisplay = "Ação"` (uppercased original)
+- [x] Given a normalized word "acao", when `PuzzleValidator.validate()` runs, then it passes the `[a-z]+` regex
 - [ ] Given mojibake string "aÃ§Ã£o" from LLM, when UTF-8 sanitization runs, then the output is either "ação" (recovered) or stripped to "ao" (safe fallback)
 
 ### Accent keyboard
 
-- [ ] Given language is "pt" and accent mode is OFF, when the user taps the accent toggle, then the keyboard shows Portuguese accented characters
-- [ ] Given language is "en", then the accent toggle button is not visible
-- [ ] Given accent mode is ON and user taps "á", then `currentInput` receives "a" (the base letter)
-- [ ] Given accent mode is ON and `a` is CORRECT in keyboardState, then `á` key also shows CORRECT color
-- [ ] Given accent mode is ON and user taps the toggle again, then the keyboard returns to standard a-z layout
-- [ ] Given a new puzzle loads, then accent mode resets to OFF
+- [x] Given language is "pt" and accent mode is OFF, when the user taps the accent toggle, then the keyboard shows Portuguese accented characters
+- [x] Given language is "en", then the accent toggle button is not visible
+- [x] Given accent mode is ON and user taps "á", then `currentInput` receives "a" (the base letter)
+- [x] Given accent mode is ON and `a` is CORRECT in keyboardState, then `á` key also shows CORRECT color
+- [x] Given accent mode is ON and user taps the toggle again, then the keyboard returns to standard a-z layout
+- [x] Given a new puzzle loads, then accent mode resets to OFF
 
 ### Display
 
-- [ ] Given puzzle with `wordDisplay = "Ação"`, when the result screen shows, then the text displays "Ação" correctly (no mojibake)
-- [ ] Given puzzle with `word = "acao"`, when playing, then the grid shows "A C A O" (ASCII letters)
+- [x] Given puzzle with `wordDisplay = "Ação"`, when the result screen shows, then the text displays "Ação" correctly (no mojibake)
+- [x] Given puzzle with `word = "acao"`, when playing, then the grid shows "A C A O" (ASCII letters)
 
 ## Edge Cases
 

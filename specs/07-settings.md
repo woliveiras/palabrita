@@ -231,7 +231,7 @@ sealed class SettingsAction {
 
 ## Acceptance Criteria
 
-- [ ] Word language can be changed and persists
+- [x] Word language can be changed and persists
 - [ ] Statistics display correct data from PlayerStats
 - [ ] Attempt histogram renders proportionally
 - [ ] Share stats generates correct text to clipboard
@@ -239,6 +239,6 @@ sealed class SettingsAction {
 - [ ] Switch to Light mode: deletes model, loads static dataset
 - [ ] Switch does not lose already-played puzzles (history preserved)
 - [ ] Delete model correctly frees storage
-- [ ] Reset progress clears stats without affecting model
+- [x] Reset progress clears stats without affecting model
 - [ ] RAM warning appears when selecting a model above the tier
 - [ ] Switch blocked during active game

@@ -33,53 +33,53 @@ iterates through several word lengths per batch, increasing wait time and LLM fa
 
 ### Functional
 
-- [ ] Level 1 (cycle 0): generate exactly 5 words of 4 letters
-- [ ] Level 2 (cycle 1): generate exactly 10 words of 5 letters
-- [ ] Level 3+ (cycle ≥ 2): generate exactly 10 words of 6 letters
-- [ ] Each generation produces words of a single length — no mixed-length loops
-- [ ] Max word length is 6 (down from 8)
-- [ ] Batch size is 5 for level 1, 10 for all others
-- [ ] `generationCycle` counter increments after each successful generation
-- [ ] Puzzles are served in ascending word-length order, then by id
-- [ ] Language is determined by `stats.preferredLanguage` (changeable in Settings)
-- [ ] When all puzzles are played, user sees option to generate more
+- [x] Level 1 (cycle 0): generate exactly 5 words of 4 letters
+- [x] Level 2 (cycle 1): generate exactly 10 words of 5 letters
+- [x] Level 3+ (cycle ≥ 2): generate exactly 10 words of 6 letters
+- [x] Each generation produces words of a single length — no mixed-length loops
+- [x] Max word length is 6 (down from 8)
+- [x] Batch size is 5 for level 1, 10 for all others
+- [x] `generationCycle` counter increments after each successful generation
+- [x] Puzzles are served in ascending word-length order, then by id
+- [x] Language is determined by `stats.preferredLanguage` (changeable in Settings)
+- [x] When all puzzles are played, user sees option to generate more
 
 ### Non-Functional
 
-- [ ] Level 1 generation should be noticeably faster (5 words vs 20)
-- [ ] Simpler generation loop — single word length per batch reduces failure points
+- [x] Level 1 generation should be noticeably faster (5 words vs 20)
+- [x] Simpler generation loop — single word length per batch reduces failure points
 
 ## Acceptance Criteria
 
 ### Worker Logic
 
-- [ ] Given cycle 0, when generation starts, then it requests 5 words of 4 letters
-- [ ] Given cycle 1, when generation starts, then it requests 10 words of 5 letters
-- [ ] Given cycle 2, when generation starts, then it requests 10 words of 6 letters
-- [ ] Given cycle 5 (any value ≥ 2), when generation starts, then it requests 10 words of 6 letters
-- [ ] Given a completed generation, when all words are saved, then generationCycle increments by 1
+- [x] Given cycle 0, when generation starts, then it requests 5 words of 4 letters
+- [x] Given cycle 1, when generation starts, then it requests 10 words of 5 letters
+- [x] Given cycle 2, when generation starts, then it requests 10 words of 6 letters
+- [x] Given cycle 5 (any value ≥ 2), when generation starts, then it requests 10 words of 6 letters
+- [x] Given a completed generation, when all words are saved, then generationCycle increments by 1
 
 ### Batch Size
 
-- [ ] Given cycle 0, when computing batch size, then result is 5
-- [ ] Given cycle 1, when computing batch size, then result is 10
-- [ ] Given cycle 2+, when computing batch size, then result is 10
+- [x] Given cycle 0, when computing batch size, then result is 5
+- [x] Given cycle 1, when computing batch size, then result is 10
+- [x] Given cycle 2+, when computing batch size, then result is 10
 
 ### Word Length
 
-- [ ] Given cycle 0, when computing word length, then result is 4
-- [ ] Given cycle 1, when computing word length, then result is 5
-- [ ] Given cycle 2+, when computing word length, then result is 6
-- [ ] Given any cycle, when generation runs, then all generated words have the same length
+- [x] Given cycle 0, when computing word length, then result is 4
+- [x] Given cycle 1, when computing word length, then result is 5
+- [x] Given cycle 2+, when computing word length, then result is 6
+- [x] Given any cycle, when generation runs, then all generated words have the same length
 
 ### Play Order
 
-- [ ] Given puzzles with mixed word lengths (from prior levels), when serving next puzzle, then shorter words come first
+- [x] Given puzzles with mixed word lengths (from prior levels), when serving next puzzle, then shorter words come first
 
 ### Integration
 
-- [ ] Given user changed language to "en" in Settings, when generation runs, then words are generated in English
-- [ ] Given unplayed count ≥ threshold, when worker starts, then it skips generation (existing behavior)
+- [x] Given user changed language to "en" in Settings, when generation runs, then words are generated in English
+- [x] Given unplayed count ≥ threshold, when worker starts, then it skips generation (existing behavior)
 
 ## Edge Cases
 

@@ -11,43 +11,43 @@ silent wait into an informative experience that builds trust in the AI process.
 
 ### Functional
 
-- [ ] `PuzzleGenerator` exposes a `StateFlow<GenerationActivity?>` that emits the current activity
+- [x] `PuzzleGenerator` exposes a `StateFlow<GenerationActivity?>` that emits the current activity
       during batch generation
-- [ ] `GenerationActivity` is a sealed class (or enum) in `core/ai` covering at least:
+- [x] `GenerationActivity` is a sealed class (or enum) in `core/ai` covering at least:
   - `CREATING` — model is generating a puzzle
   - `VALIDATING` — puzzle was parsed, now being validated
   - `VALIDATION_FAILED` — validation rejected the puzzle
   - `FAILED_RETRYING` — all retries exhausted for this puzzle slot; moving on
   - `ACCEPTED` — puzzle passed validation and was saved
-- [ ] `GenerationViewModel` collects the flow and maps each activity to a `@StringRes` label
-- [ ] `GenerationState` exposes `currentActivityResId: Int?` (null when idle/complete)
-- [ ] `GenerationScreen` renders the current activity label below the puzzle counter card using
+- [x] `GenerationViewModel` collects the flow and maps each activity to a `@StringRes` label
+- [x] `GenerationState` exposes `currentActivityResId: Int?` (null when idle/complete)
+- [x] `GenerationScreen` renders the current activity label below the puzzle counter card using
       `AnimatedContent` so messages transition smoothly
-- [ ] The activity feed is hidden when generation is complete or failed
-- [ ] String resources exist for all activity types in PT, EN, and ES
+- [x] The activity feed is hidden when generation is complete or failed
+- [x] String resources exist for all activity types in PT, EN, and ES
 
 ### Non-Functional
 
 - [ ] Accessibility: activity label has `LiveRegion` semantics so screen readers announce changes
-- [ ] The `StateFlow` must reset to `null` after the batch finishes
+- [x] The `StateFlow` must reset to `null` after the batch finishes
 
 ## Acceptance Criteria
 
-- [ ] Given the model is generating, when `PuzzleGeneratorImpl` calls `sendMessage`, then
+- [x] Given the model is generating, when `PuzzleGeneratorImpl` calls `sendMessage`, then
       `activity` emits `GenerationActivity.CREATING`
-- [ ] Given a raw LLM response was received, when `parser.parsePuzzle` is called, then `activity`
+- [x] Given a raw LLM response was received, when `parser.parsePuzzle` is called, then `activity`
       emits `GenerationActivity.VALIDATING`
-- [ ] Given validation rejected a puzzle, when attempts remain, then `activity` emits
+- [x] Given validation rejected a puzzle, when attempts remain, then `activity` emits
       `GenerationActivity.VALIDATION_FAILED`
-- [ ] Given all retries are exhausted for a slot, then `activity` emits
+- [x] Given all retries are exhausted for a slot, then `activity` emits
       `GenerationActivity.FAILED_RETRYING`
-- [ ] Given a puzzle passed validation, then `activity` emits `GenerationActivity.ACCEPTED`
-- [ ] Given `GenerationViewModel` receives `CREATING`, then `currentActivityResId` maps to
+- [x] Given a puzzle passed validation, then `activity` emits `GenerationActivity.ACCEPTED`
+- [x] Given `GenerationViewModel` receives `CREATING`, then `currentActivityResId` maps to
       `generation_activity_creating`
-- [ ] Given `GenerationViewModel` receives `ACCEPTED`, then `currentActivityResId` maps to
+- [x] Given `GenerationViewModel` receives `ACCEPTED`, then `currentActivityResId` maps to
       `generation_activity_accepted`
-- [ ] Given generation is complete (`isComplete = true`), then `currentActivityResId` is `null`
-- [ ] Given generation has failed (`failed = true`), then `currentActivityResId` is `null`
+- [x] Given generation is complete (`isComplete = true`), then `currentActivityResId` is `null`
+- [x] Given generation has failed (`failed = true`), then `currentActivityResId` is `null`
 
 ## Edge Cases
 
