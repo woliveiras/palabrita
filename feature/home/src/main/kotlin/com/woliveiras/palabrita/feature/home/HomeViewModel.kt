@@ -95,11 +95,17 @@ constructor(
         val info = workInfos.firstOrNull()
         val isRunning =
           info?.state == WorkInfo.State.RUNNING || info?.state == WorkInfo.State.ENQUEUED
-        val isComplete = info?.state == WorkInfo.State.SUCCEEDED
+        val justSucceeded =
+          _state.value.isGeneratingPuzzles && info?.state == WorkInfo.State.SUCCEEDED
+        val generatedCount =
+          if (justSucceeded) info?.outputData?.getInt("generated_count", 0) ?: 0 else 0
         _state.update {
           it.copy(
             isGeneratingPuzzles = isRunning,
-            generationComplete = isComplete && !it.isGeneratingPuzzles,
+            generationComplete =
+              if (justSucceeded && generatedCount > 0) true else it.generationComplete,
+            generatedPuzzleCount =
+              if (justSucceeded && generatedCount > 0) generatedCount else it.generatedPuzzleCount,
           )
         }
       }

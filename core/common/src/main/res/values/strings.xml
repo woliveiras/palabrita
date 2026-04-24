@@ -231,6 +231,9 @@
     <string name="home_stats_streak">Sequência\nAtual</string>
     <string name="home_generating">Gerando novos puzzles…</string>
     <string name="home_generation_complete">✓ Novos puzzles prontos!</string>
+    <string name="home_generation_success_title">Tudo Pronto!</string>
+    <string name="home_generation_success_subtitle">%1$d novos puzzles prontos para jogar</string>
+    <string name="home_generation_success_cta">Começar a Jogar</string>
     <string name="home_how_to_play">Como Jogar</string>
     <string name="home_how_to_play_subtitle">Aprenda as regras</string>
     <string name="home_about_ai">Sobre o Modelo de IA</string>

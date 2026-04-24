@@ -6,6 +6,7 @@ data class HomeState(
   val unplayedCount: Int = 0,
   val isGeneratingPuzzles: Boolean = false,
   val generationComplete: Boolean = false,
+  val generatedPuzzleCount: Int = 0,
   val totalPlayed: Int = 0,
   val winRate: Float = 0f,
   val currentStreak: Int = 0,

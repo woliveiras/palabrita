@@ -47,7 +47,7 @@ constructor(
 
     val unplayedCount = puzzleRepository.countAllUnplayed(language)
     if (unplayedCount >= GameRules.REPLENISHMENT_THRESHOLD) {
-      return Result.success()
+      return Result.success(workDataOf(KEY_GENERATED_COUNT to 0))
     }
 
     if (!engineManager.isReady()) {
@@ -71,6 +71,7 @@ constructor(
 
     setProgress(workDataOf(KEY_GENERATED_COUNT to 0, KEY_TOTAL_EXPECTED to batchSize))
 
+    var generatedCount = 0
     try {
       val puzzles =
         puzzleGenerator.generateBatch(
@@ -86,6 +87,7 @@ constructor(
           )
         }
       puzzleRepository.savePuzzles(puzzles)
+      generatedCount = puzzles.size
       if (puzzles.isNotEmpty()) {
         appPreferences.incrementGenerationCycle()
         showCompletionNotification(puzzles.size)
@@ -94,7 +96,7 @@ constructor(
       // Generation failed entirely
     }
 
-    return Result.success()
+    return Result.success(workDataOf(KEY_GENERATED_COUNT to generatedCount))
   }
 
   private fun createForegroundInfo(): ForegroundInfo {

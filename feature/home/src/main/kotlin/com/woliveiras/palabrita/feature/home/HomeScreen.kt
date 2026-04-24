@@ -1,6 +1,7 @@
 package com.woliveiras.palabrita.feature.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.woliveiras.palabrita.core.common.PalabritaColors
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.GameRules
 
@@ -67,6 +70,17 @@ fun HomeScreen(
 
   if (state.isLoading) {
     LoadingHome()
+    return
+  }
+
+  if (state.generationComplete) {
+    GenerationSuccessScreen(
+      puzzleCount = state.generatedPuzzleCount,
+      onStartPlaying = {
+        viewModel.onAction(HomeAction.DismissGenerationBanner)
+        onNavigateToGame()
+      },
+    )
     return
   }
 
@@ -123,24 +137,6 @@ fun HomeScreen(
     if (state.isGeneratingPuzzles) {
       Spacer(Modifier.height(16.dp))
       GenerationIndicator()
-    }
-
-    // --- Generation complete dialog ---
-    if (state.generationComplete) {
-      AlertDialog(
-        onDismissRequest = { viewModel.onAction(HomeAction.DismissGenerationBanner) },
-        text = {
-          Text(
-            text = stringResource(CommonR.string.home_generation_complete),
-            style = MaterialTheme.typography.bodyMedium,
-          )
-        },
-        confirmButton = {
-          TextButton(onClick = { viewModel.onAction(HomeAction.DismissGenerationBanner) }) {
-            Text(text = stringResource(CommonR.string.close))
-          }
-        },
-      )
     }
 
     // --- How to Play dialog ---
@@ -387,5 +383,75 @@ private fun LoadingHome() {
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     CircularProgressIndicator()
+  }
+}
+
+// --- Generation Success ---
+
+@Composable
+private fun GenerationSuccessScreen(puzzleCount: Int, onStartPlaying: () -> Unit) {
+  Column(
+    modifier =
+      Modifier.fillMaxSize()
+        .background(MaterialTheme.colorScheme.background)
+        .padding(horizontal = 24.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center,
+  ) {
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier =
+        Modifier.size(96.dp)
+          .background(
+            Brush.linearGradient(listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)),
+            RoundedCornerShape(24.dp),
+          ),
+    ) {
+      Icon(
+        imageVector = Icons.Rounded.CheckCircle,
+        contentDescription = null,
+        tint = Color.White,
+        modifier = Modifier.size(48.dp),
+      )
+    }
+
+    Spacer(Modifier.height(32.dp))
+
+    Text(
+      text = stringResource(CommonR.string.home_generation_success_title),
+      style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+      textAlign = TextAlign.Center,
+    )
+
+    Spacer(Modifier.height(8.dp))
+
+    Text(
+      text = stringResource(CommonR.string.home_generation_success_subtitle, puzzleCount),
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      textAlign = TextAlign.Center,
+    )
+
+    Spacer(Modifier.height(32.dp))
+
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier =
+        Modifier.fillMaxWidth()
+          .height(56.dp)
+          .clip(RoundedCornerShape(16.dp))
+          .background(
+            Brush.horizontalGradient(
+              listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
+            )
+          )
+          .clickable(onClick = onStartPlaying),
+    ) {
+      Text(
+        text = stringResource(CommonR.string.home_generation_success_cta),
+        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+        color = Color.White,
+      )
+    }
   }
 }
