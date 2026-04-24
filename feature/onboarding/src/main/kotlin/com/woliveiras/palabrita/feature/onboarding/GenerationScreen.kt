@@ -70,7 +70,7 @@ fun GenerationScreen(
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
 
-  LaunchedEffect(modelId) { modelId?.let { viewModel.triggerGeneration(it) } }
+  LaunchedEffect(Unit) { viewModel.triggerGeneration(modelId) }
 
   LaunchedEffect(state.isComplete) {
     if (state.isComplete && !isRegeneration) {

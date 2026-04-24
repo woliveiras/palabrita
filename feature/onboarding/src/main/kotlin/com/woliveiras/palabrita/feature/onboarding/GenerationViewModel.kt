@@ -58,6 +58,7 @@ constructor(
 
   private val _state = MutableStateFlow(GenerationState())
   val state: StateFlow<GenerationState> = _state.asStateFlow()
+  private var hasTriggered = false
 
   init {
     observeGeneration()
@@ -71,6 +72,7 @@ constructor(
         _state.update { it.copy(isGenerating = false, failed = true) }
         return@launch
       }
+      hasTriggered = true
       _state.update { GenerationState() }
       generationScheduler.scheduleGeneration(resolvedModelId)
     }
@@ -87,6 +89,7 @@ constructor(
           val steps = deriveSteps(engineState, info)
           when (info.state) {
             GenerationWorkState.SUCCEEDED -> {
+              if (!hasTriggered) return@collect
               val completedSteps = steps.map {
                 it.copy(status = StepStatus.COMPLETED, detail = null)
               }
@@ -100,6 +103,7 @@ constructor(
               }
             }
             GenerationWorkState.FAILED -> {
+              if (!hasTriggered) return@collect
               _state.update {
                 it.copy(
                   isGenerating = false,
