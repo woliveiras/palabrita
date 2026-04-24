@@ -96,7 +96,9 @@ constructor(
       // Generation failed entirely
     }
 
-    return Result.success(workDataOf(KEY_GENERATED_COUNT to generatedCount))
+    return Result.success(
+      workDataOf(KEY_GENERATED_COUNT to generatedCount, KEY_TOTAL_EXPECTED to batchSize)
+    )
   }
 
   private fun createForegroundInfo(): ForegroundInfo {

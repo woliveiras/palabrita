@@ -6,7 +6,6 @@ import com.woliveiras.palabrita.core.ai.EngineState
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
-import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
@@ -30,7 +29,6 @@ constructor(
   private val appPreferences: AppPreferences,
   private val downloadManager: ModelDownloadManager,
   private val engineManager: LlmEngineManager,
-  private val generationScheduler: PuzzleGenerationScheduler,
 ) : ViewModel() {
 
   private val _state =
@@ -198,7 +196,6 @@ constructor(
           when (engineState) {
             is EngineState.Ready -> {
               statsRepository.updateLanguage(_state.value.selectedLanguage)
-              enqueueBackgroundGeneration()
               _state.update { it.copy(downloadComplete = true) }
               return@collect
             }
@@ -217,10 +214,5 @@ constructor(
         _state.update { it.copy(downloadComplete = true) }
       }
     }
-  }
-
-  private fun enqueueBackgroundGeneration() {
-    val modelId = _state.value.selectedModel ?: return
-    generationScheduler.scheduleGeneration(modelId)
   }
 }

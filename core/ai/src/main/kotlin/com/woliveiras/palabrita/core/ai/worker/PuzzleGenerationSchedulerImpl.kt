@@ -59,12 +59,21 @@ class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager:
           WorkInfo.State.ENQUEUED -> GenerationWorkState.RUNNING
           else -> GenerationWorkState.IDLE
         }
-      val progressData = info?.progress
       val progress =
-        GenerationProgress(
-          generatedCount = progressData?.getInt(PuzzleGenerationWorker.KEY_GENERATED_COUNT, 0) ?: 0,
-          totalExpected = progressData?.getInt(PuzzleGenerationWorker.KEY_TOTAL_EXPECTED, 0) ?: 0,
-        )
+        if (info?.state == WorkInfo.State.SUCCEEDED) {
+          val outputData = info.outputData
+          GenerationProgress(
+            generatedCount = outputData.getInt(PuzzleGenerationWorker.KEY_GENERATED_COUNT, 0),
+            totalExpected = outputData.getInt(PuzzleGenerationWorker.KEY_TOTAL_EXPECTED, 0),
+          )
+        } else {
+          val progressData = info?.progress
+          GenerationProgress(
+            generatedCount =
+              progressData?.getInt(PuzzleGenerationWorker.KEY_GENERATED_COUNT, 0) ?: 0,
+            totalExpected = progressData?.getInt(PuzzleGenerationWorker.KEY_TOTAL_EXPECTED, 0) ?: 0,
+          )
+        }
       GenerationInfo(state = state, progress = progress)
     }
 }

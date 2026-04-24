@@ -107,6 +107,7 @@ constructor(
                 it.copy(
                   isGenerating = false,
                   isComplete = true,
+                  progress = info.progress,
                   steps = completedSteps,
                   currentActivityResId = null,
                 )

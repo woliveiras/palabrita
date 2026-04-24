@@ -158,6 +158,5 @@ class OnboardingViewModelTest {
       appPreferences = FakeAppPreferences(),
       downloadManager = FakeModelDownloadManager(),
       engineManager = FakeLlmEngineManager(),
-      generationScheduler = FakeGenerationScheduler(),
     )
 }
