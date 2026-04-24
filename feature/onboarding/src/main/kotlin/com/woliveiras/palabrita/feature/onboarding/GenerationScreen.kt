@@ -78,9 +78,10 @@ fun GenerationScreen(
     }
   }
 
-  val totalPuzzles = 50
+  val totalPuzzles = state.progress.totalExpected
   val puzzlesGenerated = state.progress.generatedCount
-  val progressFraction = (puzzlesGenerated.toFloat() / totalPuzzles).coerceIn(0f, 1f)
+  val progressFraction =
+    if (totalPuzzles > 0) (puzzlesGenerated.toFloat() / totalPuzzles).coerceIn(0f, 1f) else 0f
   val isComplete = state.isComplete
   val isFailed = state.failed
   val currentActivityResId = state.currentActivityResId
