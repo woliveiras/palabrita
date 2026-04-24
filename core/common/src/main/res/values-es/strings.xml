@@ -152,6 +152,12 @@
     <!-- Settings -->
     <string name="settings_section_game">Juego</string>
     <string name="settings_language">Idioma de las palabras</string>
+    <string name="settings_section_stats">Estadísticas</string>
+    <string name="stats_played">Jugados</string>
+    <string name="stats_won">Victorias</string>
+    <string name="stats_win_rate">Tasa</string>
+    <string name="stats_avg_attempts">Media</string>
+    <string name="stats_guess_distribution">Distribución de intentos</string>
 
     <string name="settings_section_ai">Inteligencia Artificial</string>
     <string name="settings_current_model">Modelo actual</string>

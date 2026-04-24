@@ -152,6 +152,12 @@
     <!-- Settings -->
     <string name="settings_section_game">Game</string>
     <string name="settings_language">Word language</string>
+    <string name="settings_section_stats">Statistics</string>
+    <string name="stats_played">Played</string>
+    <string name="stats_won">Won</string>
+    <string name="stats_win_rate">Rate</string>
+    <string name="stats_avg_attempts">Average</string>
+    <string name="stats_guess_distribution">Guess distribution</string>
 
     <string name="settings_section_ai">Artificial Intelligence</string>
     <string name="settings_current_model">Current model</string>

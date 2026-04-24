@@ -62,11 +62,15 @@
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun TierWarningDialog(onConfirm: () -&gt; Unit, onChooseOther: () -&gt; Unit)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun WelcomeScreen(onNext: () -&gt; Unit)</ID>
     <ID>FunctionNaming:PalabritaNavGraph.kt$@Composable fun PalabritaNavGraph(appPreferences: AppPreferences)</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun GuessDistributionHistogram(distribution: Map&lt;Int, Int&gt;)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun LanguageDialog(current: String, onSelect: (String) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SectionHeader(title: String)</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun StatItem(value: String, label: String)</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun StatsSection(state: SettingsState)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:SplashScreen.kt$@Composable fun SplashScreen(onNavigationReady: () -&gt; Unit)</ID>
     <ID>FunctionNaming:Theme.kt$@Composable fun PalabritaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -&gt; Unit)</ID>
+    <ID>ImplicitDefaultLocale:SettingsScreen.kt$String.format("%.1f", state.stats.avgAttempts)</ID>
     <ID>LongMethod:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:ChatViewModel.kt$ChatViewModel$private fun ensureSessionAndSend(userText: String, isInitial: Boolean = false)</ID>
     <ID>LongMethod:GameScreen.kt$@Composable private fun GameKeyboard( keyboardState: Map&lt;Char, LetterState&gt;, onKey: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, language: String = "", )</ID>
@@ -180,6 +184,7 @@
     <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$50</ID>
     <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$30</ID>
     <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$300</ID>
+    <ID>MagicNumber:SettingsScreen.kt$0.05f</ID>
     <ID>MagicNumber:SettingsState.kt$SettingsState$100</ID>
     <ID>MagicNumber:SplashScreen.kt$0.5f</ID>
     <ID>MagicNumber:SplashScreen.kt$0.8f</ID>
@@ -227,6 +232,7 @@
     <ID>UnusedParameter:OnboardingScreen.kt$totalBytes: Long</ID>
     <ID>UnusedPrivateMember:OnboardingScreen.kt$private fun formatBytes(bytes: Long): String</ID>
     <ID>UnusedPrivateProperty:OnboardingViewModel.kt$OnboardingViewModel$private val modelRepository: ModelRepository</ID>
+    <ID>UnusedPrivateProperty:SettingsScreen.kt$private const val STAT_PERCENT_MULTIPLIER = 100</ID>
     <ID>UseCheckOrError:LlmEngineManagerImpl.kt$LlmEngineManagerImpl$throw IllegalStateException("Engine not initialized")</ID>
     <ID>WildcardImport:ChatViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
     <ID>WildcardImport:GameViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>

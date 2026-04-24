@@ -1,7 +1,9 @@
 package com.woliveiras.palabrita.feature.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -37,13 +41,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.DownloadState
+import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.ModelId
 
 private val LANGUAGES = listOf("pt" to "Português (BR)", "en" to "English", "es" to "Español")
@@ -102,6 +110,12 @@ fun SettingsScreen(
         leadingContent = { Icon(Icons.Rounded.Language, contentDescription = null) },
         modifier = Modifier.clickable { showLanguageDialog = true },
       )
+
+      HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+      // --- ESTATÍSTICAS ---
+      SectionHeader(stringResource(CommonR.string.settings_section_stats))
+      StatsSection(state = state)
 
       HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -283,4 +297,96 @@ private fun LanguageDialog(current: String, onSelect: (String) -> Unit, onDismis
       TextButton(onClick = onDismiss) { Text(stringResource(CommonR.string.close)) }
     },
   )
+}
+
+// --- Stats Section ---
+
+private const val STAT_PERCENT_MULTIPLIER = 100
+private const val HISTOGRAM_BAR_MIN_WIDTH = 24
+private const val HISTOGRAM_BAR_HEIGHT = 20
+
+@Composable
+private fun StatsSection(state: SettingsState) {
+  Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+      StatItem(
+        value = state.stats.totalPlayed.toString(),
+        label = stringResource(CommonR.string.stats_played),
+      )
+      StatItem(
+        value = state.stats.totalWon.toString(),
+        label = stringResource(CommonR.string.stats_won),
+      )
+      StatItem(value = "${state.winRate}%", label = stringResource(CommonR.string.stats_win_rate))
+      StatItem(
+        value =
+          if (state.stats.totalPlayed > 0) String.format("%.1f", state.stats.avgAttempts) else "-",
+        label = stringResource(CommonR.string.stats_avg_attempts),
+      )
+    }
+
+    if (state.stats.guessDistribution.isNotEmpty()) {
+      Spacer(Modifier.height(16.dp))
+      Text(
+        text = stringResource(CommonR.string.stats_guess_distribution),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+      Spacer(Modifier.height(8.dp))
+      GuessDistributionHistogram(distribution = state.stats.guessDistribution)
+    }
+  }
+}
+
+@Composable
+private fun StatItem(value: String, label: String) {
+  Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Text(text = value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+    Text(
+      text = label,
+      style = MaterialTheme.typography.labelSmall,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+  }
+}
+
+@Composable
+private fun GuessDistributionHistogram(distribution: Map<Int, Int>) {
+  val maxCount = distribution.values.maxOrNull() ?: 1
+  Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    for (attempt in 1..GameRules.MAX_ATTEMPTS) {
+      val count = distribution[attempt] ?: 0
+      val fraction = if (maxCount > 0) count.toFloat() / maxCount else 0f
+      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(
+          text = attempt.toString(),
+          style = MaterialTheme.typography.bodySmall,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.width(16.dp),
+          textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.width(8.dp))
+        Box(
+          modifier =
+            Modifier.weight(1f)
+              .height(HISTOGRAM_BAR_HEIGHT.dp)
+              .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(4.dp))
+        ) {
+          Box(
+            modifier =
+              Modifier.fillMaxWidth(fraction.coerceAtLeast(if (count > 0) 0.05f else 0f))
+                .height(HISTOGRAM_BAR_HEIGHT.dp)
+                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+          )
+        }
+        Spacer(Modifier.width(8.dp))
+        Text(
+          text = count.toString(),
+          style = MaterialTheme.typography.bodySmall,
+          modifier = Modifier.width(HISTOGRAM_BAR_MIN_WIDTH.dp),
+          textAlign = TextAlign.End,
+        )
+      }
+    }
+  }
 }

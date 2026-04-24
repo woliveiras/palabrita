@@ -152,6 +152,12 @@
     <!-- Settings -->
     <string name="settings_section_game">Jogo</string>
     <string name="settings_language">Idioma das palavras</string>
+    <string name="settings_section_stats">Estatísticas</string>
+    <string name="stats_played">Jogados</string>
+    <string name="stats_won">Vitórias</string>
+    <string name="stats_win_rate">Taxa</string>
+    <string name="stats_avg_attempts">Média</string>
+    <string name="stats_guess_distribution">Distribuição de palpites</string>
     <string name="settings_section_ai">Inteligência Artificial</string>
     <string name="settings_current_model">Modelo atual</string>
     <string name="settings_model_gemma4">Gemma 4 2B</string>
