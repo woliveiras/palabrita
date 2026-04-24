@@ -71,6 +71,7 @@ constructor(
         _state.update { it.copy(isGenerating = false, failed = true) }
         return@launch
       }
+      _state.update { GenerationState() }
       generationScheduler.scheduleGeneration(resolvedModelId)
     }
   }
@@ -110,7 +111,13 @@ constructor(
             }
             GenerationWorkState.RUNNING -> {
               _state.update {
-                it.copy(isGenerating = true, progress = info.progress, steps = steps)
+                it.copy(
+                  isGenerating = true,
+                  isComplete = false,
+                  failed = false,
+                  progress = info.progress,
+                  steps = steps,
+                )
               }
             }
             GenerationWorkState.IDLE -> {}
