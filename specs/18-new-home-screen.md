@@ -165,15 +165,15 @@ sealed class HomeAction {
 
 ## Acceptance Criteria
 
-- [ ] Given the home screen loads, when the user has played 24 games with 83% win rate, then stats show "24", "83%", and correct streak
-- [ ] Given there are 5 unplayed puzzles, when the home screen loads, then CTA shows "Play Now" with "5 puzzles available"
-- [ ] Given there are 0 unplayed puzzles, when the home screen loads, then CTA shows "Generate More"
-- [ ] Given the user's language is "pt" and model is GEMMA4_E2B, then subtitle shows "🇧🇷 Português • Gemma 4 2B"
-- [ ] Given the user won the last 7 games in a row, then Current Streak shows 7
-- [ ] Given the user lost the most recent game but won 5 before that, then Current Streak shows 0
-- [ ] Given the user taps the Play CTA, then navigation goes to GameScreen
-- [ ] Given the user taps the settings icon, then navigation goes to SettingsScreen
-- [ ] Given the user taps "How to Play", then a rules dialog/bottom sheet appears
-- [ ] Given the user taps "About AI Model", then navigation goes to AiInfoScreen
-- [ ] Given puzzle generation is running, then a small indicator is visible on the home screen
-- [ ] Given a new user with no games, then all stats show 0 and CTA shows available puzzle count
+- [x] Given the home screen loads, when the user has played 24 games with 83% win rate, then stats show "24", "83%", and correct streak
+- [x] Given there are 5 unplayed puzzles, when the home screen loads, then CTA shows "Play Now" with "5 puzzles available"
+- [x] Given there are 0 unplayed puzzles, when the home screen loads, then CTA shows "Generate More"
+- [x] Given the user's language is "pt" and model is GEMMA4_E2B, then subtitle shows "🇧🇷 Português • Gemma 4 2B"
+- [x] Given the user won the last 7 games in a row, then Current Streak shows 7
+- [x] Given the user lost the most recent game but won 5 before that, then Current Streak shows 0
+- [x] Given the user taps the Play CTA, then navigation goes to GameScreen
+- [x] Given the user taps the settings icon, then navigation goes to SettingsScreen
+- [x] Given the user taps "How to Play", then a rules dialog/bottom sheet appears
+- [x] Given the user taps "About AI Model", then navigation goes to AiInfoScreen
+- [x] Given puzzle generation is running, then a small indicator is visible on the home screen
+- [x] Given a new user with no games, then all stats show 0 and CTA shows available puzzle count
