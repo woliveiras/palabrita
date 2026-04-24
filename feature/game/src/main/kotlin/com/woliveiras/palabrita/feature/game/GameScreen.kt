@@ -1,6 +1,11 @@
 package com.woliveiras.palabrita.feature.game
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -17,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -44,14 +50,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,6 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.LocalGameColors
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.GameRules
+import kotlinx.coroutines.delay
 
 @Composable
 fun GameScreen(
@@ -103,6 +113,7 @@ fun GameScreen(
           onSubmit = { viewModel.onAction(GameAction.SubmitAttempt) },
           onRevealHint = { viewModel.onAction(GameAction.RevealHint) },
           onBack = { viewModel.onAction(GameAction.BackPressed) },
+          onShakeComplete = { viewModel.onAction(GameAction.ClearShake) },
         )
       GameStatus.WON ->
         ResultScreen(
@@ -187,6 +198,7 @@ private fun PlayingScreen(
   onSubmit: () -> Unit,
   onRevealHint: () -> Unit,
   onBack: () -> Unit,
+  onShakeComplete: () -> Unit,
 ) {
   val puzzle = state.puzzle ?: return
   val wordLength = puzzle.word.length
@@ -219,6 +231,9 @@ private fun PlayingScreen(
         wordLength = wordLength,
         maxAttempts = GameRules.MAX_ATTEMPTS,
         tileSize = tileSize,
+        showShake = state.showShake,
+        onShakeComplete = onShakeComplete,
+        gameStatus = state.gameStatus,
       )
     }
 
@@ -270,38 +285,216 @@ private fun WordGrid(
   wordLength: Int,
   maxAttempts: Int,
   tileSize: Dp,
+  showShake: Boolean,
+  onShakeComplete: () -> Unit,
+  gameStatus: GameStatus,
 ) {
+  // Track how many rows have been fully revealed (for flip animation on new rows)
+  var revealedCount by remember { mutableIntStateOf(0) }
+  val newRowIndex = if (attempts.size > revealedCount) attempts.size - 1 else -1
+  LaunchedEffect(attempts.size) {
+    if (attempts.size > revealedCount) {
+      // Wait for flip animations to finish before updating count
+      delay((wordLength * FLIP_STAGGER_MS + FLIP_DURATION_MS).toLong())
+      revealedCount = attempts.size
+    }
+  }
+
   Column(
     verticalArrangement = Arrangement.spacedBy(4.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = Modifier.fillMaxWidth(),
   ) {
     for (row in 0 until maxAttempts) {
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
-      ) {
-        when {
-          row < attempts.size -> {
-            val attempt = attempts[row]
-            attempt.feedback.forEach { fb ->
-              LetterCell(letter = fb.letter, state = fb.state, size = tileSize)
-            }
-          }
-          row == attempts.size -> {
-            for (col in 0 until wordLength) {
-              val letter = currentInput.getOrNull(col)
-              LetterCell(letter = letter, state = LetterState.UNUSED, size = tileSize)
-            }
-          }
-          else -> {
-            repeat(wordLength) {
-              LetterCell(letter = null, state = LetterState.UNUSED, size = tileSize)
-            }
-          }
+      when {
+        row < attempts.size -> {
+          val attempt = attempts[row]
+          val animateFlip = row == newRowIndex
+          val isWinRow = gameStatus == GameStatus.WON && row == attempts.size - 1
+          RevealedRow(
+            attempt = attempt,
+            tileSize = tileSize,
+            wordLength = wordLength,
+            animateFlip = animateFlip,
+            animateBounce = isWinRow,
+          )
+        }
+        row == attempts.size -> {
+          InputRow(
+            currentInput = currentInput,
+            wordLength = wordLength,
+            tileSize = tileSize,
+            showShake = showShake,
+            onShakeComplete = onShakeComplete,
+          )
+        }
+        else -> {
+          EmptyRow(wordLength = wordLength, tileSize = tileSize)
         }
       }
     }
+  }
+}
+
+private const val FLIP_DURATION_MS = 300
+private const val FLIP_STAGGER_MS = 100
+private const val BOUNCE_SCALE = 1.08f
+private const val BOUNCE_TWEEN_MS = 120
+private const val BOUNCE_EXTRA_DELAY_MS = 100
+private const val SHAKE_DURATION_MS = 400
+private const val SHAKE_OFFSET_LARGE = 12f
+private const val SHAKE_OFFSET_MEDIUM = 8f
+private const val SHAKE_OFFSET_SMALL = 4f
+private const val SHAKE_MS_50 = 50
+private const val SHAKE_MS_100 = 100
+private const val SHAKE_MS_175 = 175
+private const val FLIP_HALF_ROTATION = 90f
+private const val FLIP_FULL_ROTATION = 180f
+private const val FLIP_CAMERA_DISTANCE = 12f
+private const val LETTER_FONT_SIZE = 28
+private const val SHAKE_MS_250 = 250
+private const val SHAKE_MS_325 = 325
+
+@Composable
+private fun RevealedRow(
+  attempt: Attempt,
+  tileSize: Dp,
+  wordLength: Int,
+  animateFlip: Boolean,
+  animateBounce: Boolean,
+) {
+  // Bounce animation for winning row
+  val bounceScale = remember { Animatable(1f) }
+  LaunchedEffect(animateBounce) {
+    if (animateBounce) {
+      delay((wordLength * FLIP_STAGGER_MS + FLIP_DURATION_MS + BOUNCE_EXTRA_DELAY_MS).toLong())
+      bounceScale.animateTo(BOUNCE_SCALE, tween(BOUNCE_TWEEN_MS))
+      bounceScale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+    }
+  }
+
+  Row(
+    modifier =
+      Modifier.fillMaxWidth().graphicsLayer {
+        scaleX = bounceScale.value
+        scaleY = bounceScale.value
+      },
+    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+  ) {
+    attempt.feedback.forEachIndexed { index, fb ->
+      FlipLetterCell(
+        letter = fb.letter,
+        state = fb.state,
+        size = tileSize,
+        animate = animateFlip,
+        delayMs = index * FLIP_STAGGER_MS,
+      )
+    }
+  }
+}
+
+@Composable
+private fun FlipLetterCell(
+  letter: Char,
+  state: LetterState,
+  size: Dp,
+  animate: Boolean,
+  delayMs: Int,
+) {
+  val rotation = remember { Animatable(if (animate) 0f else FLIP_FULL_ROTATION) }
+
+  LaunchedEffect(Unit) {
+    if (animate) {
+      delay(delayMs.toLong())
+      rotation.animateTo(FLIP_FULL_ROTATION, tween(FLIP_DURATION_MS))
+    }
+  }
+
+  val showBack = rotation.value >= FLIP_HALF_ROTATION
+  val gameColors = LocalGameColors.current
+  val bgColor =
+    if (showBack) {
+      when (state) {
+        LetterState.CORRECT -> gameColors.correct
+        LetterState.PRESENT -> gameColors.present
+        LetterState.ABSENT -> gameColors.absent
+        LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
+      }
+    } else {
+      MaterialTheme.colorScheme.surfaceVariant
+    }
+  val textColor =
+    if (showBack && state != LetterState.UNUSED) gameColors.onFeedback
+    else MaterialTheme.colorScheme.onSurface
+
+  Box(
+    modifier =
+      Modifier.size(size)
+        .graphicsLayer {
+          rotationX =
+            if (rotation.value <= FLIP_HALF_ROTATION) rotation.value
+            else FLIP_FULL_ROTATION - rotation.value
+          cameraDistance = FLIP_CAMERA_DISTANCE * density
+        }
+        .background(bgColor, RoundedCornerShape(6.dp)),
+    contentAlignment = Alignment.Center,
+  ) {
+    Text(
+      text = letter.uppercaseChar().toString(),
+      fontSize = LETTER_FONT_SIZE.sp,
+      fontWeight = FontWeight.Bold,
+      color = textColor,
+    )
+  }
+}
+
+@Composable
+private fun InputRow(
+  currentInput: String,
+  wordLength: Int,
+  tileSize: Dp,
+  showShake: Boolean,
+  onShakeComplete: () -> Unit,
+) {
+  val shakeOffset = remember { Animatable(0f) }
+
+  LaunchedEffect(showShake) {
+    if (showShake) {
+      shakeOffset.animateTo(
+        targetValue = 0f,
+        animationSpec =
+          keyframes {
+            durationMillis = SHAKE_DURATION_MS
+            -SHAKE_OFFSET_LARGE at SHAKE_MS_50
+            SHAKE_OFFSET_LARGE at SHAKE_MS_100
+            -SHAKE_OFFSET_MEDIUM at SHAKE_MS_175
+            SHAKE_OFFSET_MEDIUM at SHAKE_MS_250
+            -SHAKE_OFFSET_SMALL at SHAKE_MS_325
+            0f at SHAKE_DURATION_MS
+          },
+      )
+      onShakeComplete()
+    }
+  }
+
+  Row(
+    modifier = Modifier.fillMaxWidth().offset { IntOffset(shakeOffset.value.toInt(), 0) },
+    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+  ) {
+    for (col in 0 until wordLength) {
+      val letter = currentInput.getOrNull(col)
+      LetterCell(letter = letter, state = LetterState.UNUSED, size = tileSize)
+    }
+  }
+}
+
+@Composable
+private fun EmptyRow(wordLength: Int, tileSize: Dp) {
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+  ) {
+    repeat(wordLength) { LetterCell(letter = null, state = LetterState.UNUSED, size = tileSize) }
   }
 }
 
@@ -324,7 +517,7 @@ private fun LetterCell(letter: Char?, state: LetterState, size: Dp) {
   ) {
     Text(
       text = letter?.uppercaseChar()?.toString() ?: "",
-      fontSize = 28.sp,
+      fontSize = LETTER_FONT_SIZE.sp,
       fontWeight = FontWeight.Bold,
       color = textColor,
     )

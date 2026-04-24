@@ -22,4 +22,6 @@ sealed class GameAction {
   data object ConfirmAbandon : GameAction()
 
   data object DismissAbandonDialog : GameAction()
+
+  data object ClearShake : GameAction()
 }

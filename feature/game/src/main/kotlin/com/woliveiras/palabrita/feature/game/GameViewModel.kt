@@ -60,6 +60,7 @@ constructor(
       is GameAction.BackPressed -> handleBackPressed()
       is GameAction.ConfirmAbandon -> confirmAbandon()
       is GameAction.DismissAbandonDialog -> _state.update { it.copy(showAbandonDialog = false) }
+      is GameAction.ClearShake -> _state.update { it.copy(showShake = false) }
     }
   }
 
@@ -112,8 +113,14 @@ constructor(
     val current = _state.value
     val puzzle = current.puzzle ?: return
     if (current.gameStatus != GameStatus.PLAYING) return
-    if (current.currentInput.length != puzzle.word.length) return
-    if (!current.currentInput.all { it in 'a'..'z' }) return
+    if (current.currentInput.length != puzzle.word.length) {
+      _state.update { it.copy(showShake = true) }
+      return
+    }
+    if (!current.currentInput.all { it in 'a'..'z' }) {
+      _state.update { it.copy(showShake = true) }
+      return
+    }
 
     val feedback = GameLogic.calculateLetterFeedback(current.currentInput, puzzle.word)
     val attempt = Attempt(word = current.currentInput, feedback = feedback)

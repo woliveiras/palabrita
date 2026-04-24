@@ -12,6 +12,7 @@ data class GameState(
   val isLoading: Boolean = false,
   @StringRes val errorRes: Int? = null,
   val showAbandonDialog: Boolean = false,
+  val showShake: Boolean = false,
 )
 
 data class Attempt(val word: String, val feedback: List<LetterFeedback>)
