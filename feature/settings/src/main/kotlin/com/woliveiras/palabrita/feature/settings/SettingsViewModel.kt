@@ -39,10 +39,17 @@ constructor(
   chatRepository: ChatRepository,
   private val puzzleRepository: PuzzleRepository,
   private val deviceTier: DeviceTier,
+  appPreferences: com.woliveiras.palabrita.core.model.preferences.AppPreferences,
 ) : ViewModel() {
 
   private val resetProgressUseCase =
-    ResetProgressUseCase(statsRepository, gameSessionRepository, chatRepository, puzzleRepository)
+    ResetProgressUseCase(
+      statsRepository,
+      gameSessionRepository,
+      chatRepository,
+      puzzleRepository,
+      appPreferences,
+    )
 
   private val _state = MutableStateFlow(SettingsState())
   val state: StateFlow<SettingsState> = _state.asStateFlow()

@@ -18,4 +18,8 @@ class FakeAppPreferences : AppPreferences {
   override suspend fun incrementGenerationCycle() {
     _generationCycle.value += 1
   }
+
+  override suspend fun resetGenerationCycle() {
+    _generationCycle.value = 0
+  }
 }

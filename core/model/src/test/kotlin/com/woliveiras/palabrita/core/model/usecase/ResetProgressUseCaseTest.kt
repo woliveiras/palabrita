@@ -6,6 +6,7 @@ import com.woliveiras.palabrita.core.model.GameSession
 import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.PlayerStats
 import com.woliveiras.palabrita.core.model.Puzzle
+import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
@@ -27,8 +28,9 @@ class ResetProgressUseCaseTest {
       ChatMessage(puzzleId = 1, role = MessageRole.USER, content = "hi", timestamp = 0)
     )
     val puzzles = InlinePuzzleRepository()
+    val prefs = InlineAppPreferences(cycle = 3)
 
-    val useCase = ResetProgressUseCase(stats, sessions, chat, puzzles)
+    val useCase = ResetProgressUseCase(stats, sessions, chat, puzzles, prefs)
     useCase()
 
     assertThat(stats.stats.totalPlayed).isEqualTo(0)
@@ -36,6 +38,7 @@ class ResetProgressUseCaseTest {
     assertThat(sessions.sessions).isEmpty()
     assertThat(chat.messages).isEmpty()
     assertThat(puzzles.allDeleted).isTrue()
+    assertThat(prefs.cycleValue).isEqualTo(0)
   }
 
   // Minimal inline fakes scoped to this test
@@ -126,5 +129,27 @@ class ResetProgressUseCaseTest {
     }
 
     override suspend fun getById(id: Long) = null
+  }
+
+  private class InlineAppPreferences(cycle: Int = 0) : AppPreferences {
+    private val _onboarding = MutableStateFlow(false)
+    override val isOnboardingComplete: Flow<Boolean> = _onboarding
+
+    private val _cycle = MutableStateFlow(cycle)
+    override val generationCycle: Flow<Int> = _cycle
+    val cycleValue: Int
+      get() = _cycle.value
+
+    override suspend fun setOnboardingComplete() {
+      _onboarding.value = true
+    }
+
+    override suspend fun incrementGenerationCycle() {
+      _cycle.value += 1
+    }
+
+    override suspend fun resetGenerationCycle() {
+      _cycle.value = 0
+    }
   }
 }

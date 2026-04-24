@@ -269,6 +269,7 @@ class SettingsViewModelTest {
     sessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(),
     chatRepo: FakeChatRepository = FakeChatRepository(),
     puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(),
+    appPreferences: FakeAppPreferences = FakeAppPreferences(),
   ): SettingsViewModel =
     SettingsViewModel(
       statsRepository = statsRepo,
@@ -277,5 +278,6 @@ class SettingsViewModelTest {
       chatRepository = chatRepo,
       puzzleRepository = puzzleRepo,
       deviceTier = deviceTier,
+      appPreferences = appPreferences,
     )
 }

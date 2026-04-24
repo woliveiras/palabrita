@@ -10,4 +10,6 @@ interface AppPreferences {
   suspend fun setOnboardingComplete()
 
   suspend fun incrementGenerationCycle()
+
+  suspend fun resetGenerationCycle()
 }

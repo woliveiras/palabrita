@@ -37,4 +37,8 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext private val con
       prefs[generationCycleKey] = current + 1
     }
   }
+
+  override suspend fun resetGenerationCycle() {
+    context.dataStore.edit { prefs -> prefs.remove(generationCycleKey) }
+  }
 }
