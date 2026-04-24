@@ -263,19 +263,29 @@
     <string name="htp_start_playing">Começar a Jogar</string>
 
     <!-- AI Info -->
-    <string name="ai_info_title">Inteligência Artificial</string>
-    <string name="ai_info_model_section">Modelo</string>
-    <string name="ai_info_model_name">Nome</string>
-    <string name="ai_info_model_size">Tamanho</string>
-    <string name="ai_info_model_ram">RAM necessária</string>
-    <string name="ai_info_model_file">Arquivo</string>
+    <string name="ai_info_title">Modelo de IA</string>
+    <string name="ai_info_subtitle">Como funciona</string>
+    <string name="ai_info_what_title">O que faz</string>
+    <string name="ai_info_what_body">O Palabrita usa um modelo de linguagem avançado rodando inteiramente no seu dispositivo. Essa IA gera desafios de palavras únicos, fornece dicas inteligentes e se adapta ao seu nível — tudo sem precisar de internet.</string>
+    <string name="ai_info_feat_generation_title">Geração de Puzzles</string>
+    <string name="ai_info_feat_generation_body">Cria desafios de palavras únicos adaptados ao seu nível</string>
+    <string name="ai_info_feat_instant_title">Respostas Instantâneas</string>
+    <string name="ai_info_feat_instant_body">Gera dicas e feedback em milissegundos</string>
+    <string name="ai_info_feat_privacy_title">Privacidade em Primeiro Lugar</string>
+    <string name="ai_info_feat_privacy_body">Todo o processamento acontece no seu dispositivo, não na nuvem</string>
+    <string name="ai_info_model_section">Modelo Atual</string>
+    <string name="ai_info_model_type">Tipo do Modelo</string>
+    <string name="ai_info_model_size">Tamanho no Dispositivo</string>
+    <string name="ai_info_model_ram">RAM Necessária</string>
     <string name="ai_info_no_model">Nenhum modelo selecionado</string>
-    <string name="ai_info_engine_section">Motor de IA</string>
-    <string name="ai_info_engine_ready">Pronto</string>
-    <string name="ai_info_engine_loading">Inicializando…</string>
-    <string name="ai_info_engine_error">Erro</string>
-    <string name="ai_info_engine_off">Desligado</string>
+    <string name="ai_info_privacy_title">Privacidade e Segurança</string>
+    <string name="ai_info_privacy_body">Seu modelo de IA é armazenado localmente no dispositivo. Nenhum dado é enviado para servidores externos e toda a geração de puzzles acontece offline. Seus dados de jogo permanecem completamente privados.</string>
+    <string name="ai_info_battery_title">Otimização de Bateria</string>
+    <string name="ai_info_battery_body">O modelo de IA é otimizado para minimizar o uso de bateria. Ele só é ativado quando gera novos puzzles ou fornece dicas, e entra em modo de espera durante o jogo.</string>
+    <string name="ai_info_prompts_section">Prompts Utilizados</string>
+    <string name="ai_info_prompts_subtitle">Veja como a IA é instruída para gerar conteúdo</string>
     <string name="ai_info_system_prompt">Prompt do Sistema</string>
     <string name="ai_info_puzzle_prompt">Prompt de Geração (exemplo)</string>
     <string name="ai_info_chat_prompt">Prompt do Chat (exemplo)</string>
+    <string name="ai_info_change_model">Trocar Modelo nas Configurações</string>
 </resources>

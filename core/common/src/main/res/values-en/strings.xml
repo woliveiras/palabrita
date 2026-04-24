@@ -264,19 +264,29 @@
     <string name="htp_start_playing">Start Playing</string>
 
     <!-- AI Info -->
-    <string name="ai_info_title">Artificial Intelligence</string>
-    <string name="ai_info_model_section">Model</string>
-    <string name="ai_info_model_name">Name</string>
-    <string name="ai_info_model_size">Size</string>
+    <string name="ai_info_title">AI Model Info</string>
+    <string name="ai_info_subtitle">How it works</string>
+    <string name="ai_info_what_title">What It Does</string>
+    <string name="ai_info_what_body">Palabrita uses an advanced language model running entirely on your device. This AI generates unique word puzzles, provides intelligent hints, and adapts to your playing style — all without needing an internet connection.</string>
+    <string name="ai_info_feat_generation_title">Puzzle Generation</string>
+    <string name="ai_info_feat_generation_body">Creates unique word challenges tailored to your skill level</string>
+    <string name="ai_info_feat_instant_title">Instant Responses</string>
+    <string name="ai_info_feat_instant_body">Generates hints and feedback in milliseconds</string>
+    <string name="ai_info_feat_privacy_title">Privacy First</string>
+    <string name="ai_info_feat_privacy_body">All processing happens on your device, not in the cloud</string>
+    <string name="ai_info_model_section">Current Model</string>
+    <string name="ai_info_model_type">Model Type</string>
+    <string name="ai_info_model_size">Size on Device</string>
     <string name="ai_info_model_ram">Required RAM</string>
-    <string name="ai_info_model_file">File</string>
     <string name="ai_info_no_model">No model selected</string>
-    <string name="ai_info_engine_section">AI Engine</string>
-    <string name="ai_info_engine_ready">Ready</string>
-    <string name="ai_info_engine_loading">Initializing…</string>
-    <string name="ai_info_engine_error">Error</string>
-    <string name="ai_info_engine_off">Off</string>
+    <string name="ai_info_privacy_title">Privacy &amp; Security</string>
+    <string name="ai_info_privacy_body">Your AI model is stored locally on your device. No data is sent to external servers, and all puzzle generation happens offline. Your gameplay data stays completely private.</string>
+    <string name="ai_info_battery_title">Battery Optimization</string>
+    <string name="ai_info_battery_body">The AI model is optimized to minimize battery usage. It only activates when generating new puzzles or providing hints, and goes into sleep mode during gameplay.</string>
+    <string name="ai_info_prompts_section">Prompts Used</string>
+    <string name="ai_info_prompts_subtitle">See how the AI is instructed to generate content</string>
     <string name="ai_info_system_prompt">System Prompt</string>
     <string name="ai_info_puzzle_prompt">Generation Prompt (example)</string>
     <string name="ai_info_chat_prompt">Chat Prompt (example)</string>
+    <string name="ai_info_change_model">Change Model in Settings</string>
 </resources>

@@ -126,7 +126,12 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
       ChatScreen(puzzleId = route.puzzleId, onBack = { navController.popBackStack() })
     }
     composable<SettingsRoute> { SettingsScreen(onBack = { navController.popBackStack() }) }
-    composable<AiInfoRoute> { AiInfoScreen(onBack = { navController.popBackStack() }) }
+    composable<AiInfoRoute> {
+      AiInfoScreen(
+        onBack = { navController.popBackStack() },
+        onNavigateToSettings = { navController.navigate(SettingsRoute) },
+      )
+    }
     composable<HowToPlayRoute> {
       HowToPlayScreen(
         onBack = { navController.popBackStack() },

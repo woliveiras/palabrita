@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.ai.AiModelInfo
 import com.woliveiras.palabrita.core.ai.AiModelRegistry
-import com.woliveiras.palabrita.core.ai.EngineState
-import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.PromptTemplates
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
@@ -20,28 +18,21 @@ import kotlinx.coroutines.launch
 data class AiInfoState(
   val modelInfo: AiModelInfo? = null,
   val modelId: ModelId = ModelId.NONE,
-  val engineState: EngineState = EngineState.Uninitialized,
   val modelPath: String? = null,
   val puzzleSystemPrompt: String = "",
   val puzzleSamplePrompt: String = "",
   val chatSamplePrompt: String = "",
-  val isLoading: Boolean = true,
 )
 
 @HiltViewModel
-class AiInfoViewModel
-@Inject
-constructor(
-  private val modelRepository: ModelRepository,
-  private val engineManager: LlmEngineManager,
-) : ViewModel() {
+class AiInfoViewModel @Inject constructor(private val modelRepository: ModelRepository) :
+  ViewModel() {
 
   private val _state = MutableStateFlow(AiInfoState())
   val state: StateFlow<AiInfoState> = _state.asStateFlow()
 
   init {
     loadModelInfo()
-    observeEngineState()
   }
 
   private fun loadModelInfo() {
@@ -61,17 +52,8 @@ constructor(
                 recentWords = listOf("gatos", "mesa"),
               ),
             chatSamplePrompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt"),
-            isLoading = false,
           )
         }
-      }
-    }
-  }
-
-  private fun observeEngineState() {
-    viewModelScope.launch {
-      engineManager.engineState.collect { engine ->
-        _state.update { it.copy(engineState = engine) }
       }
     }
   }
