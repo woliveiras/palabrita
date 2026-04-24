@@ -33,6 +33,8 @@ include(":core:data")
 
 include(":core:ai")
 
+include(":core:testing")
+
 include(":feature:onboarding")
 
 include(":feature:game")
