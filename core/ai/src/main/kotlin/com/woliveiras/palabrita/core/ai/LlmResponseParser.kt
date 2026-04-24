@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.core.ai
 
+import com.woliveiras.palabrita.core.model.GameRules
 import javax.inject.Inject
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -83,7 +84,7 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
         }
       }
 
-      if (word != null && hints != null && hints.size >= 3) {
+      if (word != null && hints != null && hints.size >= GameRules.MIN_HINTS) {
         PuzzleResponse(word = word, hints = hints)
       } else {
         null
