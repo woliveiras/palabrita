@@ -245,6 +245,26 @@
     <string name="home_rules_title">Como Jogar</string>
     <string name="home_rules_body">Adivinhe a palavra em %1$d tentativas.\n\n🟩 Verde = letra na posição certa\n🟨 Amarelo = letra certa, posição errada\n⬛ Cinza = letra não está na palavra\n\nUse as dicas para ajudar!\nToque no ícone de lâmpada para revelar uma dica.</string>
 
+    <!-- How to Play Screen -->
+    <string name="htp_title">Como Jogar</string>
+    <string name="htp_subtitle">Aprenda as regras</string>
+    <string name="htp_goal_title">O Objetivo</string>
+    <string name="htp_goal_body">Adivinhe a palavra oculta em %1$d tentativas ou menos. Após cada tentativa, a cor dos blocos muda para mostrar o quão perto você está da palavra.</string>
+    <string name="htp_examples_title">Exemplos</string>
+    <string name="htp_example_correct">P está na palavra e na posição correta</string>
+    <string name="htp_example_present">O está na palavra mas na posição errada</string>
+    <string name="htp_example_absent">Nenhuma dessas letras está na palavra</string>
+    <string name="htp_color_guide_title">Guia de Cores</string>
+    <string name="htp_color_green">Verde</string>
+    <string name="htp_color_green_desc">Letra certa, posição certa</string>
+    <string name="htp_color_yellow">Amarelo</string>
+    <string name="htp_color_yellow_desc">Letra certa, posição errada</string>
+    <string name="htp_color_gray">Cinza</string>
+    <string name="htp_color_gray_desc">Letra não está na palavra</string>
+    <string name="htp_pro_tip_title">Dica</string>
+    <string name="htp_pro_tip_body">Comece com uma palavra que tenha vogais e consoantes comuns. Palavras como "AUDIO" ou "CERTO" são ótimas para começar!</string>
+    <string name="htp_start_playing">Começar a Jogar</string>
+
     <!-- AI Info -->
     <string name="ai_info_title">Inteligência Artificial</string>
     <string name="ai_info_model_section">Modelo</string>

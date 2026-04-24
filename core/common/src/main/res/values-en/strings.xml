@@ -246,6 +246,26 @@
     <string name="home_rules_title">How to Play</string>
     <string name="home_rules_body">Guess the word in %1$d attempts.\n\n🟩 Green = right letter, right position\n🟨 Yellow = right letter, wrong position\n⬛ Gray = letter not in the word\n\nUse hints to help!\nTap the lightbulb icon to reveal a hint.</string>
 
+    <!-- How to Play Screen -->
+    <string name="htp_title">How to Play</string>
+    <string name="htp_subtitle">Learn the rules</string>
+    <string name="htp_goal_title">The Goal</string>
+    <string name="htp_goal_body">Guess the hidden word in %1$d tries or less. After each guess, the color of the tiles will change to show how close your guess was to the word.</string>
+    <string name="htp_examples_title">Examples</string>
+    <string name="htp_example_correct">P is in the word and in the correct spot</string>
+    <string name="htp_example_present">O is in the word but in the wrong spot</string>
+    <string name="htp_example_absent">None of these letters are in the word</string>
+    <string name="htp_color_guide_title">Color Guide</string>
+    <string name="htp_color_green">Green</string>
+    <string name="htp_color_green_desc">Correct letter, correct position</string>
+    <string name="htp_color_yellow">Yellow</string>
+    <string name="htp_color_yellow_desc">Correct letter, wrong position</string>
+    <string name="htp_color_gray">Gray</string>
+    <string name="htp_color_gray_desc">Letter not in the word</string>
+    <string name="htp_pro_tip_title">Pro Tip</string>
+    <string name="htp_pro_tip_body">Start with a word that has common vowels and consonants. Words like "ARISE" or "AUDIO" are great starters!</string>
+    <string name="htp_start_playing">Start Playing</string>
+
     <!-- AI Info -->
     <string name="ai_info_title">Artificial Intelligence</string>
     <string name="ai_info_model_section">Model</string>

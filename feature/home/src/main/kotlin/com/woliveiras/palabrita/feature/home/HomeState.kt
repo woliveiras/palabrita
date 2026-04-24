@@ -10,5 +10,4 @@ data class HomeState(
   val totalPlayed: Int = 0,
   val winRate: Float = 0f,
   val currentStreak: Int = 0,
-  val showHowToPlay: Boolean = false,
 )

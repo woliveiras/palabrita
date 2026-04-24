@@ -32,6 +32,7 @@ import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.feature.chat.ChatScreen
 import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen
+import com.woliveiras.palabrita.feature.home.HowToPlayScreen
 import com.woliveiras.palabrita.feature.onboarding.GenerationScreen
 import com.woliveiras.palabrita.feature.onboarding.OnboardingScreen
 import com.woliveiras.palabrita.feature.settings.AiInfoScreen
@@ -56,6 +57,8 @@ data class GenerationRoute(val modelId: String = "", val isRegeneration: Boolean
 @Serializable data object SettingsRoute
 
 @Serializable data object AiInfoRoute
+
+@Serializable data object HowToPlayRoute
 
 private data class BottomNavItem(val route: Any, val icon: ImageVector, val labelRes: Int)
 
@@ -169,6 +172,7 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
           },
           onNavigateToSettings = { navController.navigate(SettingsRoute) },
           onNavigateToAiInfo = { navController.navigate(AiInfoRoute) },
+          onNavigateToHowToPlay = { navController.navigate(HowToPlayRoute) },
         )
       }
       composable<GameRoute> {
@@ -189,6 +193,12 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
       }
       composable<SettingsRoute> { SettingsScreen(onBack = { navController.popBackStack() }) }
       composable<AiInfoRoute> { AiInfoScreen() }
+      composable<HowToPlayRoute> {
+        HowToPlayScreen(
+          onBack = { navController.popBackStack() },
+          onStartPlaying = { navController.navigate(GameRoute) },
+        )
+      }
     }
   }
 }

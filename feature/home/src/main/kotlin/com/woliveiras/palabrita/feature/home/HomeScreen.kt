@@ -26,7 +26,6 @@ import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,7 +35,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -55,7 +53,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.PalabritaColors
 import com.woliveiras.palabrita.core.common.R as CommonR
-import com.woliveiras.palabrita.core.model.GameRules
 
 @Composable
 fun HomeScreen(
@@ -63,6 +60,7 @@ fun HomeScreen(
   onNavigateToGeneration: () -> Unit,
   onNavigateToSettings: () -> Unit,
   onNavigateToAiInfo: () -> Unit,
+  onNavigateToHowToPlay: () -> Unit,
   modifier: Modifier = Modifier,
   viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -121,7 +119,7 @@ fun HomeScreen(
       icon = Icons.Rounded.HelpOutline,
       title = stringResource(CommonR.string.home_how_to_play),
       subtitle = stringResource(CommonR.string.home_how_to_play_subtitle),
-      onClick = { viewModel.onAction(HomeAction.OpenHowToPlay) },
+      onClick = onNavigateToHowToPlay,
     )
 
     Spacer(Modifier.height(12.dp))
@@ -137,25 +135,6 @@ fun HomeScreen(
     if (state.isGeneratingPuzzles) {
       Spacer(Modifier.height(16.dp))
       GenerationIndicator()
-    }
-
-    // --- How to Play dialog ---
-    if (state.showHowToPlay) {
-      AlertDialog(
-        onDismissRequest = { viewModel.onAction(HomeAction.DismissHowToPlay) },
-        title = { Text(stringResource(CommonR.string.home_rules_title)) },
-        text = {
-          Text(
-            stringResource(CommonR.string.home_rules_body, GameRules.MAX_ATTEMPTS),
-            style = MaterialTheme.typography.bodyMedium,
-          )
-        },
-        confirmButton = {
-          TextButton(onClick = { viewModel.onAction(HomeAction.DismissHowToPlay) }) {
-            Text(stringResource(CommonR.string.close))
-          }
-        },
-      )
     }
 
     Spacer(Modifier.height(24.dp))

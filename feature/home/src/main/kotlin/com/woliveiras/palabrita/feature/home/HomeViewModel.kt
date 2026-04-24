@@ -74,8 +74,6 @@ constructor(
       is HomeAction.OpenAboutAi -> {
         /* navigation handled by UI */
       }
-      is HomeAction.OpenHowToPlay -> _state.update { it.copy(showHowToPlay = true) }
-      is HomeAction.DismissHowToPlay -> _state.update { it.copy(showHowToPlay = false) }
       is HomeAction.DismissGenerationBanner -> _state.update { it.copy(generationComplete = false) }
     }
   }
