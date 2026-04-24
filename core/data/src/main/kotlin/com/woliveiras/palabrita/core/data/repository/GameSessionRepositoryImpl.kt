@@ -38,6 +38,8 @@ class GameSessionRepositoryImpl @Inject constructor(private val dao: GameSession
   override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
     dao.getByPuzzleId(puzzleId)?.toDomain()
 
+  override suspend fun getActiveSession(): GameSession? = dao.getActiveSession()?.toDomain()
+
   override suspend fun hasActiveGame(): Boolean = dao.hasActiveGame()
 
   override suspend fun deleteAll() = dao.deleteAll()

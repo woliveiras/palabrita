@@ -71,6 +71,7 @@
     <ID>LongMethod:ChatViewModel.kt$ChatViewModel$private fun ensureSessionAndSend(userText: String, isInitial: Boolean = false)</ID>
     <ID>LongMethod:GameScreen.kt$@Composable private fun GameKeyboard( keyboardState: Map&lt;Char, LetterState&gt;, onKey: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, language: String = "", )</ID>
     <ID>LongMethod:GameScreen.kt$@Composable private fun PlayingScreen( state: GameState, onTypeLetter: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, onRevealHint: () -&gt; Unit, onBack: () -&gt; Unit, onShakeComplete: () -&gt; Unit, )</ID>
+    <ID>LongMethod:GameViewModel.kt$GameViewModel$private fun submitAttempt()</ID>
     <ID>LongMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable fun OnboardingScreen( onComplete: () -&gt; Unit, onNavigateToGeneration: (com.woliveiras.palabrita.core.model.ModelId) -&gt; Unit, modifier: Modifier = Modifier, viewModel: OnboardingViewModel = hiltViewModel(), )</ID>

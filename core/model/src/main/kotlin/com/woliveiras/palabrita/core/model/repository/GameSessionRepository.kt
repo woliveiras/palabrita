@@ -17,6 +17,8 @@ interface GameSessionRepository {
 
   suspend fun getByPuzzleId(puzzleId: Long): GameSession?
 
+  suspend fun getActiveSession(): GameSession?
+
   suspend fun hasActiveGame(): Boolean
 
   suspend fun deleteAll()

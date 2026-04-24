@@ -65,6 +65,8 @@ class ResetProgressUseCaseTest {
 
     override suspend fun getByPuzzleId(puzzleId: Long) = null
 
+    override suspend fun getActiveSession() = null
+
     override suspend fun hasActiveGame() = false
 
     override suspend fun completeSession(

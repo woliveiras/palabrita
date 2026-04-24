@@ -38,7 +38,7 @@ constructor(
   val events = _events.asSharedFlow()
 
   init {
-    loadNextGame()
+    restoreOrLoadNext()
   }
 
   fun onAction(action: GameAction) {
@@ -64,34 +64,72 @@ constructor(
     }
   }
 
+  private fun restoreOrLoadNext() {
+    viewModelScope.launch {
+      _state.update { it.copy(gameStatus = GameStatus.LOADING) }
+      val session = gameSessionRepository.getActiveSession()
+      if (session != null) {
+        val puzzle = puzzleRepository.getById(session.puzzleId)
+        if (puzzle != null) {
+          val attempts =
+            session.attempts.map { word ->
+              Attempt(word = word, feedback = GameLogic.calculateLetterFeedback(word, puzzle.word))
+            }
+          val keyboardState =
+            attempts.fold(emptyMap<Char, LetterState>()) { acc, attempt ->
+              GameLogic.updateKeyboardState(acc, attempt.feedback)
+            }
+          _state.update {
+            it.copy(
+              puzzle = puzzle,
+              gameStatus = GameStatus.PLAYING,
+              attempts = attempts,
+              currentInput = "",
+              revealedHints = puzzle.hints.take(session.hintsUsed),
+              keyboardState = keyboardState,
+              errorRes = null,
+              isLoading = false,
+            )
+          }
+          return@launch
+        }
+      }
+      loadNextGameInternal()
+    }
+  }
+
   fun loadNextGame() {
     viewModelScope.launch {
       _state.update { it.copy(gameStatus = GameStatus.LOADING) }
-      val stats = statsRepository.getStats()
-      val puzzle = puzzleRepository.getNextUnplayed(stats.preferredLanguage)
-      if (puzzle != null) {
-        _state.update {
-          it.copy(
-            puzzle = puzzle,
-            gameStatus = GameStatus.PLAYING,
-            attempts = emptyList(),
-            currentInput = "",
-            revealedHints = emptyList(),
-            keyboardState = emptyMap(),
-            errorRes = null,
-            isLoading = false,
-          )
-        }
-        gameSessionRepository.create(
-          com.woliveiras.palabrita.core.model.GameSession(
-            puzzleId = puzzle.id,
-            startedAt = System.currentTimeMillis(),
-          )
+      loadNextGameInternal()
+    }
+  }
+
+  private suspend fun loadNextGameInternal() {
+    val stats = statsRepository.getStats()
+    val puzzle = puzzleRepository.getNextUnplayed(stats.preferredLanguage)
+    if (puzzle != null) {
+      _state.update {
+        it.copy(
+          puzzle = puzzle,
+          gameStatus = GameStatus.PLAYING,
+          attempts = emptyList(),
+          currentInput = "",
+          revealedHints = emptyList(),
+          keyboardState = emptyMap(),
+          errorRes = null,
+          isLoading = false,
         )
-      } else {
-        _state.update { it.copy(isLoading = false) }
-        _events.emit(GameEvent.NoPuzzlesLeft)
       }
+      gameSessionRepository.create(
+        com.woliveiras.palabrita.core.model.GameSession(
+          puzzleId = puzzle.id,
+          startedAt = System.currentTimeMillis(),
+        )
+      )
+    } else {
+      _state.update { it.copy(isLoading = false) }
+      _events.emit(GameEvent.NoPuzzlesLeft)
     }
   }
 
@@ -160,6 +198,18 @@ constructor(
           hintsUsed = current.revealedHints.size,
           won = won,
         )
+      }
+    } else {
+      viewModelScope.launch {
+        val session = gameSessionRepository.getByPuzzleId(puzzle.id)
+        if (session != null) {
+          gameSessionRepository.update(
+            session.copy(
+              attempts = newAttempts.map { it.word },
+              hintsUsed = current.revealedHints.size,
+            )
+          )
+        }
       }
     }
   }
