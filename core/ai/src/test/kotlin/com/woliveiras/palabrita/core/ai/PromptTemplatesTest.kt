@@ -202,4 +202,24 @@ class PromptTemplatesTest {
     val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
     assertThat(prompt).contains("Brazilian Portuguese")
   }
+
+  // --- Accent support ---
+
+  @Test
+  fun `puzzle prompts do not restrict accented words`() {
+    val promptLarge =
+      PromptTemplates.puzzleUserPromptLarge(
+        language = "pt",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    val promptCompact =
+      PromptTemplates.puzzlePromptCompact(
+        language = "es",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(promptLarge).doesNotContain("no accents")
+    assertThat(promptCompact).doesNotContain("no accents")
+  }
 }

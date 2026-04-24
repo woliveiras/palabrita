@@ -2,21 +2,19 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ComplexCondition:LlmResponseParser.kt$LlmResponseParserImpl$word != null &amp;&amp; category != null &amp;&amp; hints != null &amp;&amp; hints.isNotEmpty()</ID>
+    <ID>ComplexCondition:LlmResponseParser.kt$LlmResponseParserImpl$strVal != null &amp;&amp; word == null &amp;&amp; strVal.length in 2..8 &amp;&amp; !strVal.contains(' ')</ID>
     <ID>CyclomaticComplexMethod:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
+    <ID>CyclomaticComplexMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
     <ID>CyclomaticComplexMethod:GenerationViewModel.kt$GenerationViewModel$private fun deriveSteps(engineState: EngineState, info: GenerationInfo): List&lt;GenerationStep&gt;</ID>
-    <ID>CyclomaticComplexMethod:LlmResponseParser.kt$LlmResponseParserImpl$private fun tryStructuralParse(text: String): PuzzleResponse?</ID>
-    <ID>CyclomaticComplexMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
-    <ID>CyclomaticComplexMethod:StatsRepositoryImpl.kt$StatsRepositoryImpl$override suspend fun updateAfterGame( won: Boolean, attempts: Int, difficulty: Int, hintsUsed: Int, )</ID>
-    <ID>EmptyFunctionBlock:ChatViewModelTest.kt$FakeChatRepository${}</ID>
-    <ID>EmptyFunctionBlock:ChatViewModelTest.kt$FakeLlmSession${}</ID>
-    <ID>EmptyFunctionBlock:GameViewModelTest.kt$FakePuzzleRepository${}</ID>
-    <ID>EmptyFunctionBlock:GameViewModelTest.kt$FakeStatsRepository${}</ID>
-    <ID>EmptyFunctionBlock:OnboardingViewModelTest.kt$FakeLlmEngineManager.&lt;no name provided&gt;${}</ID>
-    <ID>EmptyFunctionBlock:OnboardingViewModelTest.kt$FakeStatsRepository${}</ID>
-    <ID>EmptyFunctionBlock:SettingsViewModelTest.kt$FakePuzzleRepository${}</ID>
-    <ID>EmptyFunctionBlock:SettingsViewModelTest.kt$FakeStatsRepository${}</ID>
+    <ID>EmptyFunctionBlock:FakeGenerationScheduler.kt$FakeGenerationScheduler${}</ID>
+    <ID>EmptyFunctionBlock:FakeLlmEngineManager.kt$FakeLlmSession${}</ID>
+    <ID>EmptyFunctionBlock:FakeStatsRepository.kt$FakeStatsRepository${}</ID>
+    <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlineChatRepository${}</ID>
+    <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlineGameSessionRepository${}</ID>
+    <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlinePuzzleRepository${}</ID>
+    <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlineStatsRepository${}</ID>
     <ID>FunctionNaming:AiInfoScreen.kt$@Composable fun AiInfoScreen(modifier: Modifier = Modifier, viewModel: AiInfoViewModel = hiltViewModel())</ID>
     <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun EngineStatusCard(engineState: EngineState)</ID>
     <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun InfoRow(label: String, value: String)</ID>
@@ -27,8 +25,9 @@
     <ID>FunctionNaming:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable fun GameScreen( onNavigateToChat: (Long) -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToHome: () -&gt; Unit, onNoPuzzlesLeft: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GameViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun AbandonDialog(onContinue: () -&gt; Unit, onAbandon: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:GameScreen.kt$@Composable private fun AccentKeyButton( accentChar: Char, state: LetterState?, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun ChatCardCta(word: String, onExplore: () -&gt; Unit)</ID>
-    <ID>FunctionNaming:GameScreen.kt$@Composable private fun GameKeyboard( keyboardState: Map&lt;Char, LetterState&gt;, onKey: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:GameScreen.kt$@Composable private fun GameKeyboard( keyboardState: Map&lt;Char, LetterState&gt;, onKey: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, language: String = "", )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun GameTopBar(onBack: () -&gt; Unit, hintsRemaining: Int, totalHints: Int)</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun HintsDialog(hints: List&lt;String&gt;, onDismiss: () -&gt; Unit)</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun KeyButton( letter: Char, state: LetterState?, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
@@ -38,17 +37,18 @@
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun PlayingScreen( state: GameState, onTypeLetter: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, onRevealHint: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun ResultScreen( won: Boolean, puzzle: com.woliveiras.palabrita.core.model.Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onExplore: () -&gt; Unit, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun WordGrid( attempts: List&lt;Attempt&gt;, currentInput: String, wordLength: Int, maxAttempts: Int, tileSize: Dp, )</ID>
-    <ID>FunctionNaming:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
+    <ID>FunctionNaming:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:GenerationScreen.kt$@Composable private fun GradientButton(text: String, onClick: () -&gt; Unit)</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable fun HomeScreen( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable private fun GenerationIndicator()</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable private fun LoadingHome()</ID>
-    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun QuickStatsRow(totalPlayed: Int, winRate: Float, playerTier: String, totalXp: Int)</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun QuickStatsRow(totalPlayed: Int, winRate: Float)</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable private fun StatItem(value: String, label: String)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable fun OnboardingScreen( onComplete: () -&gt; Unit, onNavigateToGeneration: (com.woliveiras.palabrita.core.model.ModelId) -&gt; Unit, modifier: Modifier = Modifier, viewModel: OnboardingViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun BackButton(onBack: () -&gt; Unit)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun Chip(text: String)</ID>
-    <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun CuriositySlider()</ID>
+    <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun GradientButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, enabled: Boolean = true, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun LanguageCard( flag: String, label: String, code: String, selected: String, onSelect: (String) -&gt; Unit, )</ID>
@@ -60,61 +60,57 @@
     <ID>FunctionNaming:PalabritaNavGraph.kt$@Composable fun PalabritaNavGraph(appPreferences: AppPreferences)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun LanguageDialog(current: String, onSelect: (String) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SectionHeader(title: String)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun WordSizeDialog( current: String, isEpicAvailable: Boolean, onSelect: (String) -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:SplashScreen.kt$@Composable fun SplashScreen(onNavigationReady: () -&gt; Unit)</ID>
     <ID>FunctionNaming:Theme.kt$@Composable fun PalabritaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -&gt; Unit)</ID>
     <ID>LongMethod:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:ChatViewModel.kt$ChatViewModel$private fun ensureSessionAndSend(userText: String, isInitial: Boolean = false)</ID>
-    <ID>LongMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
+    <ID>LongMethod:GameScreen.kt$@Composable private fun GameKeyboard( keyboardState: Map&lt;Char, LetterState&gt;, onKey: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, language: String = "", )</ID>
+    <ID>LongMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable fun OnboardingScreen( onComplete: () -&gt; Unit, onNavigateToGeneration: (com.woliveiras.palabrita.core.model.ModelId) -&gt; Unit, modifier: Modifier = Modifier, viewModel: OnboardingViewModel = hiltViewModel(), )</ID>
-    <ID>LongMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, )</ID>
+    <ID>LongMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable private fun ModelSelectionScreen( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable private fun WelcomeScreen(onNext: () -&gt; Unit)</ID>
     <ID>LongMethod:PalabritaNavGraph.kt$@Composable fun PalabritaNavGraph(appPreferences: AppPreferences)</ID>
-    <ID>LongMethod:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$override suspend fun doWork(): Result</ID>
     <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:SplashScreen.kt$@Composable fun SplashScreen(onNavigationReady: () -&gt; Unit)</ID>
-    <ID>LongParameterList:GameLogic.kt$GameLogic$( attempts: List&lt;Attempt&gt;, difficulty: Int, word: String, hintsUsed: Int, xpGained: Int, won: Boolean, )</ID>
     <ID>LongParameterList:GameScreen.kt$( onNavigateToChat: (Long) -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToHome: () -&gt; Unit, onNoPuzzlesLeft: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GameViewModel = hiltViewModel(), )</ID>
     <ID>LongParameterList:GameScreen.kt$( state: GameState, onTypeLetter: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, onRevealHint: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>LongParameterList:GameScreen.kt$( won: Boolean, puzzle: com.woliveiras.palabrita.core.model.Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onExplore: () -&gt; Unit, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:GenerationScreen.kt$( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
     <ID>LongParameterList:OnboardingScreen.kt$( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
-    <ID>LongParameterList:OnboardingScreen.kt$( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:OnboardingScreen.kt$( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
     <ID>LongParameterList:OnboardingScreen.kt$( title: String, subtitle: String, info: String, icon: ImageVector, iconGradient: List&lt;Color&gt;, isSelected: Boolean, onClick: () -&gt; Unit, )</ID>
     <ID>LongParameterList:OnboardingViewModel.kt$OnboardingViewModel$( deviceTier: DeviceTier, private val statsRepository: StatsRepository, private val modelRepository: ModelRepository, private val appPreferences: AppPreferences, private val downloadManager: ModelDownloadManager, private val engineManager: LlmEngineManager, private val generationScheduler: PuzzleGenerationScheduler, )</ID>
-    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGenerator$( count: Int, language: String, targetDifficulty: Int, recentWords: List&lt;String&gt;, allExistingWords: Set&lt;String&gt;, modelId: ModelId, onPuzzleAttempted: suspend (successCount: Int) -&gt; Unit = {}, )</ID>
-    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGeneratorImpl$( modelId: ModelId, language: String, difficulty: Int, wordLength: IntRange, recentWords: List&lt;String&gt;, usedWords: Set&lt;String&gt;, attempt: Int, failureReason: String? = null, )</ID>
-    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGeneratorImpl$( session: LlmSession, language: String, difficulty: Int, wordLength: IntRange, recentWords: List&lt;String&gt;, usedWords: Set&lt;String&gt;, modelId: ModelId, )</ID>
+    <ID>LongParameterList:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$( @Assisted appContext: Context, @Assisted workerParams: WorkerParameters, private val puzzleRepository: PuzzleRepository, private val puzzleGenerator: PuzzleGenerator, private val statsRepository: StatsRepository, private val engineManager: LlmEngineManager, private val appPreferences: AppPreferences, )</ID>
+    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGenerator$( count: Int, language: String, wordLength: Int, recentWords: List&lt;String&gt;, allExistingWords: Set&lt;String&gt;, modelId: ModelId, onPuzzleAttempted: suspend (successCount: Int) -&gt; Unit = {}, )</ID>
+    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGeneratorImpl$( modelId: ModelId, language: String, wordLength: Int, recentWords: List&lt;String&gt;, usedWords: Set&lt;String&gt;, attempt: Int, failureReason: String? = null, )</ID>
+    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGeneratorImpl$( session: LlmSession, language: String, wordLength: Int, lengthRange: IntRange, recentWords: List&lt;String&gt;, usedWords: Set&lt;String&gt;, modelId: ModelId, )</ID>
     <ID>LongParameterList:SettingsViewModelTest.kt$SettingsViewModelTest$( stats: PlayerStats = PlayerStats(), modelConfig: ModelConfig = ModelConfig(), deviceTier: DeviceTier = DeviceTier.HIGH, statsRepo: FakeStatsRepository = FakeStatsRepository(stats), modelRepo: FakeModelRepository = FakeModelRepository(modelConfig), sessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(), chatRepo: FakeChatRepository = FakeChatRepository(), puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(), )</ID>
     <ID>LongParameterList:TestFixtures.kt$( id: Int = 1, modelId: String = "none", downloadState: String = "NOT_DOWNLOADED", modelPath: String? = null, sizeBytes: Long = 0, selectedAt: Long = System.currentTimeMillis(), )</ID>
-    <ID>LongParameterList:TestFixtures.kt$( id: Int = 1, totalPlayed: Int = 0, totalWon: Int = 0, currentStreak: Int = 0, maxStreak: Int = 0, avgAttempts: Float = 0f, preferredLanguage: String = "pt", currentDifficulty: Int = 1, maxUnlockedDifficulty: Int = 1, totalXp: Int = 0, playerTier: String = "NOVATO", gamesWonByDifficulty: String = "{}", winRateByDifficulty: String = "{}", consecutiveLossesAtCurrent: Int = 0, wordSizePreference: String = "DEFAULT", guessDistribution: String = "{}", lastPlayedAt: Long = 0, )</ID>
+    <ID>LongParameterList:TestFixtures.kt$( id: Int = 1, totalPlayed: Int = 0, totalWon: Int = 0, avgAttempts: Float = 0f, preferredLanguage: String = "pt", guessDistribution: String = "{}", lastPlayedAt: Long = 0, )</ID>
     <ID>LongParameterList:TestFixtures.kt$( id: Long = 0, puzzleId: Long = 1, attempts: String = "[]", startedAt: Long = System.currentTimeMillis(), completedAt: Long? = null, hintsUsed: Int = 0, won: Boolean = false, )</ID>
-    <ID>LongParameterList:TestFixtures.kt$( id: Long = 0, word: String = "gatos", wordDisplay: String = word, language: String = "pt", difficulty: Int = 2, category: String = "animal", hints: String = """["Dica 1","Dica 2","Dica 3","Dica 4","Dica 5"]""", source: String = "AI", generatedAt: Long = System.currentTimeMillis(), playedAt: Long? = null, isPlayed: Boolean = false, isValid: Boolean = true, )</ID>
+    <ID>LongParameterList:TestFixtures.kt$( id: Long = 0, word: String = "gatos", wordDisplay: String = word, language: String = "pt", difficulty: Int = 5, category: String = "", hints: String = """["Dica 1","Dica 2","Dica 3"]""", source: String = "AI", generatedAt: Long = System.currentTimeMillis(), playedAt: Long? = null, isPlayed: Boolean = false, isValid: Boolean = true, )</ID>
     <ID>MagicNumber:AiInfoScreen.kt$1024</ID>
     <ID>MagicNumber:AiInfoScreen.kt$1_000_000.0</ID>
     <ID>MagicNumber:AiInfoScreen.kt$1_000_000_000.0</ID>
     <ID>MagicNumber:DeviceCapabilities.kt$DeviceCapabilities$1024</ID>
     <ID>MagicNumber:DeviceCapabilities.kt$DeviceCapabilities$8192</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$10</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$3</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$4</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$5</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$6</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$7</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$8</ID>
-    <ID>MagicNumber:GameLogic.kt$GameLogic$9</ID>
+    <ID>MagicNumber:GameRules.kt$GameRules$10</ID>
+    <ID>MagicNumber:GameRules.kt$GameRules$4</ID>
+    <ID>MagicNumber:GameRules.kt$GameRules$5</ID>
+    <ID>MagicNumber:GameRules.kt$GameRules$6</ID>
     <ID>MagicNumber:GameScreen.kt$0.3f</ID>
     <ID>MagicNumber:GameScreen.kt$0.7f</ID>
     <ID>MagicNumber:GameScreen.kt$1.3f</ID>
-    <ID>MagicNumber:GameViewModel.kt$GameViewModel$6</ID>
     <ID>MagicNumber:GenerationScreen.kt$0xFFF5F3FF</ID>
     <ID>MagicNumber:GenerationScreen.kt$1_800</ID>
     <ID>MagicNumber:GenerationScreen.kt$2_200</ID>
+    <ID>MagicNumber:GenerationScreen.kt$300</ID>
     <ID>MagicNumber:GenerationScreen.kt$50</ID>
     <ID>MagicNumber:GenerationScreen.kt$500</ID>
-    <ID>MagicNumber:LlmResponseParser.kt$LlmResponseParserImpl$9</ID>
+    <ID>MagicNumber:LlmResponseParser.kt$LlmResponseParserImpl$8</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$100_000_000L</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$1_000_000.0</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$1_000_000_000.0</ID>
@@ -134,7 +130,8 @@
     <ID>MagicNumber:OnboardingScreen.kt$100</ID>
     <ID>MagicNumber:OnboardingScreen.kt$1_000_000.0</ID>
     <ID>MagicNumber:OnboardingScreen.kt$1_000_000_000.0</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$2_000</ID>
+    <ID>MagicNumber:OnboardingScreen.kt$400</ID>
+    <ID>MagicNumber:OnboardingScreen.kt$4000</ID>
     <ID>MagicNumber:OnboardingScreen.kt$500</ID>
     <ID>MagicNumber:OnboardingScreen.kt$6</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF121213</ID>
@@ -172,33 +169,10 @@
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFFD700</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFFF7ED</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFFFFFF</ID>
-    <ID>MagicNumber:PlayerTier.kt$PlayerTier.ASTUTO$150</ID>
-    <ID>MagicNumber:PlayerTier.kt$PlayerTier.CURIOSO$50</ID>
-    <ID>MagicNumber:PlayerTier.kt$PlayerTier.EPICO$1000</ID>
-    <ID>MagicNumber:PlayerTier.kt$PlayerTier.LENDARIO$2500</ID>
-    <ID>MagicNumber:PlayerTier.kt$PlayerTier.SABIO$400</ID>
-    <ID>MagicNumber:PromptTemplates.kt$PromptTemplates$3</ID>
-    <ID>MagicNumber:PromptTemplates.kt$PromptTemplates$4</ID>
-    <ID>MagicNumber:PromptTemplates.kt$PromptTemplates$5</ID>
-    <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$3</ID>
-    <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$4</ID>
-    <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$5</ID>
+    <ID>MagicNumber:PalabritaNavGraph.kt$300</ID>
     <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$50</ID>
-    <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$6</ID>
-    <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$7</ID>
-    <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$8</ID>
     <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$30</ID>
     <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$300</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$4</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$5</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl.Companion$3</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl.Companion$4</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl.Companion$5</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl.Companion$6</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl.Companion$7</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl.Companion$8</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl.Companion$9</ID>
-    <ID>MagicNumber:PuzzleValidator.kt$PuzzleValidatorImpl$5</ID>
     <ID>MagicNumber:SettingsState.kt$SettingsState$100</ID>
     <ID>MagicNumber:SplashScreen.kt$0.5f</ID>
     <ID>MagicNumber:SplashScreen.kt$0.8f</ID>
@@ -210,28 +184,11 @@
     <ID>MagicNumber:SplashScreen.kt$500</ID>
     <ID>MagicNumber:SplashScreen.kt$600</ID>
     <ID>MagicNumber:SplashScreen.kt$750</ID>
-    <ID>MagicNumber:StatsRepositoryImpl.kt$3</ID>
-    <ID>MagicNumber:StatsRepositoryImpl.kt$4</ID>
-    <ID>MagicNumber:StatsRepositoryImpl.kt$5</ID>
-    <ID>MagicNumber:StatsRepositoryImpl.kt$8</ID>
-    <ID>MagicNumber:StatsRepositoryImpl.kt$StatsRepositoryImpl$0.70f</ID>
-    <ID>MagicNumber:StatsRepositoryImpl.kt$StatsRepositoryImpl$3</ID>
-    <ID>MagicNumber:StatsRepositoryImpl.kt$StatsRepositoryImpl$5</ID>
     <ID>MatchingDeclarationName:LlmEngineManagerTest.kt$EngineStateTest</ID>
     <ID>MaxLineLength:AiModelRegistry.kt$AiModelRegistry$"https://huggingface.co/litert-community/DeepSeek-R1-Distill-Qwen-1.5B/resolve/main/DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.litertlm"</ID>
     <ID>MaxLineLength:AiModelRegistry.kt$AiModelRegistry$"https://huggingface.co/litert-community/Phi-4-mini-instruct/resolve/main/Phi-4-mini-instruct_multi-prefill-seq_q8_ekv4096.litertlm"</ID>
     <ID>MaxLineLength:AiModelRegistry.kt$AiModelRegistry$"https://huggingface.co/litert-community/Qwen2.5-1.5B-Instruct/resolve/main/Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv4096.litertlm"</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$Text(text = title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold), color = PalabritaColors.ContentPrimary)</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$Triple(ModelId.DEEPSEEK_R1_1_5B, stringResource(CommonR.string.model_deepseek_r1_title), Pair(stringResource(CommonR.string.model_deepseek_r1_subtitle), stringResource(CommonR.string.model_deepseek_r1_info))) to Pair(Icons.Rounded.Spellcheck, listOf(Color(0xFF10B981), Color(0xFF0891B2)))</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$Triple(ModelId.GEMMA4_E2B, stringResource(CommonR.string.model_powerful_title), Pair(stringResource(CommonR.string.model_powerful_subtitle), stringResource(CommonR.string.model_powerful_info))) to Pair(Icons.Rounded.Memory, listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet))</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$Triple(ModelId.GEMMA4_E4B, stringResource(CommonR.string.model_gemma4_e4b_title), Pair(stringResource(CommonR.string.model_gemma4_e4b_subtitle), stringResource(CommonR.string.model_gemma4_e4b_info))) to Pair(Icons.Rounded.AutoAwesome, listOf(Color(0xFFD946EF), Color(0xFF7C3AED)))</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$Triple(ModelId.PHI4_MINI, stringResource(CommonR.string.model_phi4_mini_title), Pair(stringResource(CommonR.string.model_phi4_mini_subtitle), stringResource(CommonR.string.model_phi4_mini_info))) to Pair(Icons.Rounded.Psychology, listOf(Color(0xFF0EA5E9), Color(0xFF6366F1)))</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$Triple(ModelId.QWEN2_5_1_5B, stringResource(CommonR.string.model_qwen25_1_5b_title), Pair(stringResource(CommonR.string.model_qwen25_1_5b_subtitle), stringResource(CommonR.string.model_qwen25_1_5b_info))) to Pair(Icons.Rounded.Bolt, listOf(Color(0xFFF59E0B), Color(0xFFEF4444)))</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$Triple(ModelId.QWEN3_0_6B, stringResource(CommonR.string.model_compact_title), Pair(stringResource(CommonR.string.model_compact_subtitle), stringResource(CommonR.string.model_compact_info))) to Pair(Icons.Rounded.PhoneAndroid, listOf(Color(0xFF06B6D4), Color(0xFF2563EB)))</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$enter = scaleIn(initialScale = 0.9f, animationSpec = tween(500, easing = FastOutSlowInEasing)) + fadeIn(tween(500))</ID>
-    <ID>MaxLineLength:OnboardingScreen.kt$val bgColor = if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f) else PalabritaColors.SurfaceLight</ID>
-    <ID>MaxLineLength:PuzzleGenerator.kt$PuzzleGeneratorImpl$"$base\n\nThe previous response was invalid. Generate a DIFFERENT word with ${wordLength.first}-${wordLength.last} letters."</ID>
-    <ID>MaxLineLength:PuzzleGenerator.kt$PuzzleGeneratorImpl$"$base\n\nYour previous response was rejected: $failureReason. The word MUST have ${wordLength.first}-${wordLength.last} letters. Try again with a DIFFERENT word."</ID>
+    <ID>MaxLineLength:PuzzleGenerator.kt$PuzzleGeneratorImpl$"$base\n\nYour previous response was rejected: $failureReason. The word MUST have exactly $wordLength letters. Try again with a DIFFERENT word."</ID>
     <ID>NestedBlockDepth:LlmResponseParser.kt$LlmResponseParserImpl$private fun tryStructuralParse(text: String): PuzzleResponse?</ID>
     <ID>ReturnCount:ChatViewModel.kt$ChatViewModel$private fun sendMessage()</ID>
     <ID>ReturnCount:ChatViewModel.kt$ChatViewModel$private suspend fun ensureSession(): Boolean</ID>
@@ -261,12 +218,12 @@
     <ID>UnusedParameter:OnboardingScreen.kt$onDismissWarning: () -&gt; Unit</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$showTierWarning: Boolean</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$totalBytes: Long</ID>
-    <ID>UnusedPrivateMember:ChatViewModelTest.kt$ChatViewModelTest$private fun createTestPuzzle()</ID>
     <ID>UnusedPrivateMember:OnboardingScreen.kt$private fun formatBytes(bytes: Long): String</ID>
-    <ID>UnusedPrivateProperty:OnboardingScreen.kt$val spinRotation by infiniteTransition.animateFloat( initialValue = 0f, targetValue = 360f, animationSpec = infiniteRepeatable(tween(2_000, easing = LinearEasing)), label = "spin", )</ID>
     <ID>UnusedPrivateProperty:OnboardingViewModel.kt$OnboardingViewModel$private val modelRepository: ModelRepository</ID>
-    <ID>UnusedPrivateProperty:SettingsViewModel.kt$SettingsViewModel$val currentLang = _state.value.stats.preferredLanguage</ID>
-    <ID>UnusedPrivateProperty:SettingsViewModel.kt$SettingsViewModel$val currentWordSize = _state.value.stats.wordSizePreference</ID>
     <ID>UseCheckOrError:LlmEngineManagerImpl.kt$LlmEngineManagerImpl$throw IllegalStateException("Engine not initialized")</ID>
+    <ID>WildcardImport:ChatViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
+    <ID>WildcardImport:GameViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
+    <ID>WildcardImport:OnboardingViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
+    <ID>WildcardImport:SettingsViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
   </CurrentIssues>
 </SmellBaseline>

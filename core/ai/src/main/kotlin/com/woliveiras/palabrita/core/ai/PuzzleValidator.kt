@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.core.ai
 
+import com.woliveiras.palabrita.core.common.TextNormalizer
 import com.woliveiras.palabrita.core.model.GameRules
 import javax.inject.Inject
 
@@ -13,7 +14,7 @@ class PuzzleValidatorImpl @Inject constructor() : PuzzleValidator {
     expectedWordLength: IntRange,
   ): ValidationResult {
     val reasons = mutableListOf<String>()
-    val word = puzzle.word.lowercase()
+    val word = TextNormalizer.normalizeToAscii(puzzle.word)
 
     // Character validation (before length check, since accents/spaces affect length perception)
     if (!validChars.matches(word)) {

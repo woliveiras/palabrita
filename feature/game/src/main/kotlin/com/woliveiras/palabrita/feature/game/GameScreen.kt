@@ -251,6 +251,7 @@ private fun PlayingScreen(
       onKey = onTypeLetter,
       onDelete = onDelete,
       onSubmit = onSubmit,
+      language = puzzle.language,
     )
   }
 
@@ -366,13 +367,42 @@ private val ROW1 = "qwertyuiop".toList()
 private val ROW2 = "asdfghjkl".toList()
 private val ROW3 = "zxcvbnm".toList()
 
+/** Accented characters per language. Each char maps to its base letter for game logic. */
+private val ACCENT_ROWS =
+  mapOf(
+    "pt" to listOf('á', 'â', 'ã', 'à', 'é', 'ê', 'í', 'ó', 'ô', 'õ', 'ú', 'ç'),
+    "es" to listOf('á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü'),
+  )
+
+private val ACCENT_TO_BASE =
+  mapOf(
+    'á' to 'a',
+    'â' to 'a',
+    'ã' to 'a',
+    'à' to 'a',
+    'é' to 'e',
+    'ê' to 'e',
+    'í' to 'i',
+    'ó' to 'o',
+    'ô' to 'o',
+    'õ' to 'o',
+    'ú' to 'u',
+    'ü' to 'u',
+    'ç' to 'c',
+    'ñ' to 'n',
+  )
+
 @Composable
 private fun GameKeyboard(
   keyboardState: Map<Char, LetterState>,
   onKey: (Char) -> Unit,
   onDelete: () -> Unit,
   onSubmit: () -> Unit,
+  language: String = "",
 ) {
+  val accentChars = ACCENT_ROWS[language]
+  var accentMode by remember { mutableStateOf(false) }
+
   Column(
     modifier = Modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -418,6 +448,44 @@ private fun GameKeyboard(
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.onPrimary,
           )
+        }
+      }
+    }
+
+    // Accent row — visible when language has accents
+    if (accentChars != null) {
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        // Toggle button
+        Surface(
+          onClick = { accentMode = !accentMode },
+          shape = RoundedCornerShape(4.dp),
+          color =
+            if (accentMode) MaterialTheme.colorScheme.primaryContainer
+            else MaterialTheme.colorScheme.surfaceVariant,
+          modifier = Modifier.height(48.dp).weight(1.3f),
+        ) {
+          Box(contentAlignment = Alignment.Center) {
+            Text(
+              text = "ÁÀ",
+              fontSize = 14.sp,
+              fontWeight = FontWeight.Bold,
+              color =
+                if (accentMode) MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSurface,
+            )
+          }
+        }
+
+        if (accentMode) {
+          accentChars.forEach { accentChar ->
+            val baseLetter = ACCENT_TO_BASE[accentChar] ?: accentChar
+            AccentKeyButton(
+              accentChar = accentChar,
+              state = keyboardState[baseLetter],
+              onClick = { onKey(baseLetter) },
+              modifier = Modifier.weight(1f).height(48.dp),
+            )
+          }
         }
       }
     }
@@ -472,6 +540,43 @@ private fun KeyButton(
       Text(
         text = letter.uppercaseChar().toString(),
         fontSize = 18.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = textColor,
+      )
+    }
+  }
+}
+
+@Composable
+private fun AccentKeyButton(
+  accentChar: Char,
+  state: LetterState?,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val gameColors = LocalGameColors.current
+  val bgColor =
+    when (state) {
+      LetterState.CORRECT -> gameColors.correct
+      LetterState.PRESENT -> gameColors.present
+      LetterState.ABSENT -> gameColors.absent
+      null,
+      LetterState.UNUSED -> MaterialTheme.colorScheme.surfaceVariant
+    }
+  val textColor =
+    if (state != null && state != LetterState.UNUSED) gameColors.onFeedback
+    else MaterialTheme.colorScheme.onSurface
+
+  Surface(
+    onClick = onClick,
+    shape = RoundedCornerShape(4.dp),
+    color = bgColor,
+    modifier = modifier,
+  ) {
+    Box(contentAlignment = Alignment.Center) {
+      Text(
+        text = accentChar.uppercaseChar().toString(),
+        fontSize = 14.sp,
         fontWeight = FontWeight.SemiBold,
         color = textColor,
       )

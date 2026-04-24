@@ -49,12 +49,26 @@ class PuzzleValidatorTest {
   // --- Character validation ---
 
   @Test
-  fun `word with accents is rejected`() {
+  fun `word with accents is normalized and accepted`() {
     val puzzle = createTestPuzzleResponse(word = "café")
     val result = validator.validate(puzzle, emptySet(), 4..6)
-    assertThat(result).isInstanceOf(ValidationResult.Invalid::class.java)
-    assertThat((result as ValidationResult.Invalid).reasons.any { "invalid characters" in it })
-      .isTrue()
+    assertThat(result).isEqualTo(ValidationResult.Valid)
+  }
+
+  @Test
+  fun `accented word length is counted after normalization`() {
+    val puzzle = createTestPuzzleResponse(word = "ação")
+    // "ação" normalizes to "acao" (4 chars)
+    val result = validator.validate(puzzle, emptySet(), 4..4)
+    assertThat(result).isEqualTo(ValidationResult.Valid)
+  }
+
+  @Test
+  fun `spanish word with ñ is normalized and accepted`() {
+    val puzzle = createTestPuzzleResponse(word = "niño")
+    // "niño" normalizes to "nino" (4 chars)
+    val result = validator.validate(puzzle, emptySet(), 4..6)
+    assertThat(result).isEqualTo(ValidationResult.Valid)
   }
 
   @Test

@@ -1,6 +1,7 @@
 package com.woliveiras.palabrita.core.ai
 
 import android.util.Log
+import com.woliveiras.palabrita.core.common.TextNormalizer
 import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.Puzzle
@@ -187,7 +188,7 @@ constructor(
     wordLength: Int,
   ): Puzzle =
     Puzzle(
-      word = response.word.lowercase(),
+      word = TextNormalizer.normalizeToAscii(response.word),
       wordDisplay = response.word.uppercase(),
       language = language,
       difficulty = wordLength,

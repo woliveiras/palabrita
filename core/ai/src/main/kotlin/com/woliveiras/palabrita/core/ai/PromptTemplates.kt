@@ -28,7 +28,7 @@ object PromptTemplates {
 
       Rules:
       - Output language for values: $lang
-      - The word MUST be a common noun in $lang, exactly $wordLength lowercase letters, no accents
+      - The word MUST be a common noun in $lang, exactly $wordLength lowercase letters
       - Exactly 3 progressive hints in $lang: from vaguest to most specific
       - Hints MUST NOT contain the word itself
       - Avoid these recent words: ${recentWords.joinToString(", ")}
@@ -50,7 +50,7 @@ object PromptTemplates {
       If the word is "gato", hints cannot contain "gato", "gatos", "gatito" or any form of it.
 
       Other rules:
-      - The word must be a common noun in $lang, lowercase, no accents
+      - The word must be a common noun in $lang, lowercase
       - No proper nouns
       - Exactly 3 progressive hints in $lang: from vaguest to most specific
       - Avoid these recent words: ${recentWords.joinToString(", ")}
