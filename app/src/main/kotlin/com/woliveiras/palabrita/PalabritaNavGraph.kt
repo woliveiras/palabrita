@@ -89,10 +89,15 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
             NavigationBarItem(
               selected = selected,
               onClick = {
-                navController.navigate(item.route) {
-                  popUpTo(HomeRoute) { saveState = true }
-                  launchSingleTop = true
-                  restoreState = true
+                if (selected) return@NavigationBarItem
+                if (item.route is HomeRoute) {
+                  navController.popBackStack(HomeRoute, inclusive = false)
+                } else {
+                  navController.navigate(item.route) {
+                    popUpTo(HomeRoute) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                  }
                 }
               },
               icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
