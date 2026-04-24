@@ -19,6 +19,8 @@ interface GameSessionRepository {
 
   suspend fun markChatExplored(puzzleId: Long)
 
+  suspend fun getCurrentStreak(): Int
+
   suspend fun getActiveSession(): GameSession?
 
   suspend fun hasActiveGame(): Boolean

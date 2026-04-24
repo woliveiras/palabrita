@@ -41,6 +41,13 @@ class FakeGameSessionRepository : GameSessionRepository {
     if (idx >= 0) sessions[idx] = sessions[idx].copy(chatExplored = true)
   }
 
+  override suspend fun getCurrentStreak(): Int =
+    sessions
+      .filter { it.completedAt != null }
+      .sortedByDescending { it.completedAt }
+      .takeWhile { it.won }
+      .count()
+
   override suspend fun deleteAll() {
     sessions.clear()
   }

@@ -221,14 +221,24 @@
     <string name="home_tab">Home</string>
     <string name="ai_tab">AI</string>
     <string name="more_tab">More</string>
-    <string name="home_title">PALABRITA</string>
-    <string name="home_play">PLAY</string>
+    <string name="home_title">Palabrita</string>
+    <string name="home_play">Play Now</string>
     <string name="home_puzzles_remaining">%1$d puzzles available</string>
-    <string name="home_generate_more">GENERATE MORE PUZZLES</string>
-    <string name="home_stats_games">games</string>
-    <string name="home_stats_wins">wins</string>
+    <string name="home_puzzles_new">New puzzle available</string>
+    <string name="home_generate_more">Generate More</string>
+    <string name="home_no_puzzles">No puzzles available</string>
+    <string name="home_stats_games">Games\nPlayed</string>
+    <string name="home_stats_winrate">Win\nRate</string>
+    <string name="home_stats_streak">Current\nStreak</string>
     <string name="home_generating">Generating new puzzles…</string>
     <string name="home_generation_complete">✓ New puzzles ready!</string>
+    <string name="home_how_to_play">How to Play</string>
+    <string name="home_how_to_play_subtitle">Learn the rules</string>
+    <string name="home_about_ai">About AI Model</string>
+    <string name="home_about_ai_subtitle">See how it works</string>
+    <string name="home_settings_cd">Settings</string>
+    <string name="home_rules_title">How to Play</string>
+    <string name="home_rules_body">Guess the word in %1$d attempts.\n\n🟩 Green = right letter, right position\n🟨 Yellow = right letter, wrong position\n⬛ Gray = letter not in the word\n\nUse hints to help!\nTap the lightbulb icon to reveal a hint.</string>
 
     <!-- AI Info -->
     <string name="ai_info_title">Artificial Intelligence</string>

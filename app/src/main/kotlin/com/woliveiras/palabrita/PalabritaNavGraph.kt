@@ -161,6 +161,8 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
           onNavigateToGeneration = {
             navController.navigate(GenerationRoute(isRegeneration = true))
           },
+          onNavigateToSettings = { navController.navigate(SettingsRoute) },
+          onNavigateToAiInfo = { navController.navigate(AiInfoRoute) },
         )
       }
       composable<GameRoute> {

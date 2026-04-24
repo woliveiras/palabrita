@@ -29,6 +29,9 @@ interface GameSessionDao {
   @Query("UPDATE game_sessions SET chatExplored = 1 WHERE puzzleId = :puzzleId")
   suspend fun markChatExplored(puzzleId: Long)
 
+  @Query("SELECT * FROM game_sessions WHERE completedAt IS NOT NULL ORDER BY completedAt DESC")
+  suspend fun getCompletedSessionsDesc(): List<GameSessionEntity>
+
   @Query(
     """
     UPDATE game_sessions SET

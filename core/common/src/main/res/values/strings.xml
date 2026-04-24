@@ -220,14 +220,24 @@
     <string name="home_tab">Home</string>
     <string name="ai_tab">IA</string>
     <string name="more_tab">Mais</string>
-    <string name="home_title">PALABRITA</string>
-    <string name="home_play">JOGAR</string>
+    <string name="home_title">Palabrita</string>
+    <string name="home_play">Play Now</string>
     <string name="home_puzzles_remaining">%1$d puzzles disponíveis</string>
-    <string name="home_generate_more">GERAR MAIS PUZZLES</string>
-    <string name="home_stats_games">jogos</string>
-    <string name="home_stats_wins">wins</string>
+    <string name="home_puzzles_new">Novo puzzle disponível</string>
+    <string name="home_generate_more">Gerar Mais</string>
+    <string name="home_no_puzzles">Sem puzzles disponíveis</string>
+    <string name="home_stats_games">Jogos\nJogados</string>
+    <string name="home_stats_winrate">Taxa de\nVitória</string>
+    <string name="home_stats_streak">Sequência\nAtual</string>
     <string name="home_generating">Gerando novos puzzles…</string>
     <string name="home_generation_complete">✓ Novos puzzles prontos!</string>
+    <string name="home_how_to_play">Como Jogar</string>
+    <string name="home_how_to_play_subtitle">Aprenda as regras</string>
+    <string name="home_about_ai">Sobre o Modelo de IA</string>
+    <string name="home_about_ai_subtitle">Veja como funciona</string>
+    <string name="home_settings_cd">Configurações</string>
+    <string name="home_rules_title">Como Jogar</string>
+    <string name="home_rules_body">Adivinhe a palavra em %1$d tentativas.\n\n🟩 Verde = letra na posição certa\n🟨 Amarelo = letra certa, posição errada\n⬛ Cinza = letra não está na palavra\n\nUse as dicas para ajudar!\nToque no ícone de lâmpada para revelar uma dica.</string>
 
     <!-- AI Info -->
     <string name="ai_info_title">Inteligência Artificial</string>
