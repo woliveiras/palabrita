@@ -74,6 +74,15 @@ constructor(
       }
       hasTriggered = true
       _state.update { GenerationState() }
+
+      if (!engineManager.isReady()) {
+        val config = modelRepository.getConfig()
+        val modelPath = config.modelPath
+        if (modelPath != null) {
+          engineManager.initialize(modelPath)
+        }
+      }
+
       generationScheduler.scheduleGeneration(resolvedModelId)
     }
   }
