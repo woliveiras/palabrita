@@ -149,7 +149,8 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
             }
           },
           onCancel = {
-            navController.navigate(OnboardingRoute) {
+            val destination = if (route.isRegeneration) HomeRoute else OnboardingRoute
+            navController.navigate(destination) {
               popUpTo(GenerationRoute::class) { inclusive = true }
             }
           },

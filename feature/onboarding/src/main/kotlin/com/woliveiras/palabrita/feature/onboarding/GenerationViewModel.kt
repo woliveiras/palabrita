@@ -40,6 +40,7 @@ data class GenerationState(
   val isGenerating: Boolean = true,
   val isComplete: Boolean = false,
   val failed: Boolean = false,
+  val cancelled: Boolean = false,
   val progress: GenerationProgress = GenerationProgress(),
   val steps: List<GenerationStep> = emptyList(),
   val currentActivityResId: Int? = null,
@@ -188,6 +189,7 @@ constructor(
 
   fun cancelGeneration() {
     generationScheduler.cancelGeneration()
+    _state.update { it.copy(isGenerating = false, cancelled = true) }
   }
 
   private fun observeActivity() {

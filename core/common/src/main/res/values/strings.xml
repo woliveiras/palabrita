@@ -95,6 +95,9 @@
     <string name="generation_progress_detail">%1$d de %2$d puzzles — dificuldade %3$d de 5</string>
     <string name="generation_retry">Tentar novamente</string>
     <string name="generation_cancel">Cancelar e escolher outro modelo</string>
+    <string name="generation_cancel_simple">Cancelar</string>
+    <string name="generation_regenerate">Gerar mais desafios</string>
+    <string name="generation_back">Voltar</string>
     <string name="generation_step_verify">Verificando integridade do modelo</string>
     <string name="generation_step_load">Carregando modelo na memória</string>
     <string name="generation_step_init">Inicializando o modelo</string>

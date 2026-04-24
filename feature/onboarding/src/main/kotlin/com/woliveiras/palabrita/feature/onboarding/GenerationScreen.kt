@@ -84,6 +84,7 @@ fun GenerationScreen(
     if (totalPuzzles > 0) (puzzlesGenerated.toFloat() / totalPuzzles).coerceIn(0f, 1f) else 0f
   val isComplete = state.isComplete
   val isFailed = state.failed
+  val isCancelled = state.cancelled
   val currentActivityResId = state.currentActivityResId
 
   // Floating particle animation
@@ -145,8 +146,8 @@ fun GenerationScreen(
             )
       )
 
-      // Floating particles (only when generating)
-      if (!isComplete && !isFailed) {
+      // Floating particles (only when actively generating)
+      if (!isComplete && !isFailed && !isCancelled) {
         Box(
           modifier =
             Modifier.size(8.dp)
@@ -316,20 +317,39 @@ fun GenerationScreen(
     if (isFailed) {
       GradientButton(
         text = stringResource(CommonR.string.generation_retry),
-        onClick = { modelId?.let { viewModel.triggerGeneration(it) } },
+        onClick = { viewModel.triggerGeneration(modelId) },
       )
     }
 
-    if (!isComplete) {
+    if (isCancelled && isRegeneration) {
+      GradientButton(
+        text = stringResource(CommonR.string.generation_regenerate),
+        onClick = { viewModel.triggerGeneration(modelId) },
+      )
+      Spacer(Modifier.height(12.dp))
+      TextButton(onClick = onCancel) {
+        Text(
+          text = stringResource(CommonR.string.generation_back),
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+      }
+    }
+
+    if (!isComplete && !isCancelled) {
       Spacer(Modifier.height(12.dp))
       TextButton(
         onClick = {
           viewModel.cancelGeneration()
-          onCancel()
+          if (!isRegeneration) onCancel()
         }
       ) {
         Text(
-          text = stringResource(CommonR.string.generation_cancel),
+          text =
+            stringResource(
+              if (isRegeneration) CommonR.string.generation_cancel_simple
+              else CommonR.string.generation_cancel
+            ),
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
