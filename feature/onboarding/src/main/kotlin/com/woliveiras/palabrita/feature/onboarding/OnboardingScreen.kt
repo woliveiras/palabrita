@@ -208,7 +208,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(PalabritaColors.BackgroundLight)
+        .background(MaterialTheme.colorScheme.background)
         .statusBarsPadding()
         .navigationBarsPadding()
         .padding(horizontal = 24.dp),
@@ -253,7 +253,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
         text = stringResource(CommonR.string.welcome_title_new),
         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
         textAlign = TextAlign.Center,
-        color = PalabritaColors.ContentPrimary,
+        color = MaterialTheme.colorScheme.onSurface,
       )
     }
 
@@ -268,7 +268,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
         text = stringResource(CommonR.string.welcome_description),
         style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center,
-        color = PalabritaColors.ContentSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
 
@@ -303,8 +303,8 @@ private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int) {
   Row(
     modifier =
       Modifier.fillMaxWidth()
-        .background(PalabritaColors.SurfaceLight, RoundedCornerShape(16.dp))
-        .border(1.dp, PalabritaColors.OutlineDefault, RoundedCornerShape(16.dp))
+        .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
+        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
         .padding(16.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -329,13 +329,13 @@ private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int) {
       Text(
         text = stringResource(titleRes),
         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-        color = PalabritaColors.ContentPrimary,
+        color = MaterialTheme.colorScheme.onSurface,
       )
       Spacer(Modifier.height(2.dp))
       Text(
         text = stringResource(descRes),
         style = MaterialTheme.typography.bodySmall,
-        color = PalabritaColors.ContentSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
   }
@@ -351,7 +351,7 @@ private fun LanguageScreen(
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(PalabritaColors.BackgroundLight)
+        .background(MaterialTheme.colorScheme.background)
         .statusBarsPadding()
         .navigationBarsPadding()
   ) {
@@ -364,13 +364,13 @@ private fun LanguageScreen(
       Text(
         text = stringResource(CommonR.string.language_title),
         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-        color = PalabritaColors.ContentPrimary,
+        color = MaterialTheme.colorScheme.onSurface,
       )
       Spacer(Modifier.height(8.dp))
       Text(
         text = stringResource(CommonR.string.language_hint),
         style = MaterialTheme.typography.bodyMedium,
-        color = PalabritaColors.ContentSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       Spacer(Modifier.height(32.dp))
 
@@ -398,10 +398,11 @@ private fun LanguageCard(
   onSelect: (String) -> Unit,
 ) {
   val isSelected = code == selected
-  val borderColor = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.OutlineDefault
+  val borderColor =
+    if (isSelected) PalabritaColors.BrandPurple else MaterialTheme.colorScheme.outline
   val bgColor =
-    if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f)
-    else PalabritaColors.SurfaceLight
+    if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+    else MaterialTheme.colorScheme.surface
 
   Row(
     modifier =
@@ -416,21 +417,22 @@ private fun LanguageCard(
   ) {
     Surface(
       shape = CircleShape,
-      color = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.SurfaceVariantLight,
+      color =
+        if (isSelected) PalabritaColors.BrandPurple else MaterialTheme.colorScheme.surfaceVariant,
       modifier = Modifier.size(40.dp),
     ) {
       Box(contentAlignment = Alignment.Center) {
         Text(
           text = flag,
           style = MaterialTheme.typography.labelMedium,
-          color = if (isSelected) Color.White else PalabritaColors.ContentSecondary,
+          color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
         )
       }
     }
     Text(
       text = label,
       style = MaterialTheme.typography.titleMedium,
-      color = PalabritaColors.ContentPrimary,
+      color = MaterialTheme.colorScheme.onSurface,
     )
   }
 }
@@ -519,7 +521,7 @@ private fun ModelSelectionScreen(
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(PalabritaColors.BackgroundLight)
+        .background(MaterialTheme.colorScheme.background)
         .statusBarsPadding()
         .navigationBarsPadding()
   ) {
@@ -539,13 +541,13 @@ private fun ModelSelectionScreen(
           Text(
             text = stringResource(CommonR.string.model_selection_title),
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            color = PalabritaColors.ContentPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
           )
           Spacer(Modifier.height(8.dp))
           Text(
             text = stringResource(CommonR.string.model_selection_hint),
             style = MaterialTheme.typography.bodyMedium,
-            color = PalabritaColors.ContentSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
           Spacer(Modifier.height(24.dp))
         }
@@ -608,10 +610,11 @@ private fun ModelCard(
   isSelected: Boolean,
   onClick: () -> Unit,
 ) {
-  val borderColor = if (isSelected) PalabritaColors.BrandPurple else PalabritaColors.OutlineDefault
+  val borderColor =
+    if (isSelected) PalabritaColors.BrandPurple else MaterialTheme.colorScheme.outline
   val bgColor =
-    if (isSelected) PalabritaColors.BrandPurpleContainer.copy(alpha = 0.5f)
-    else PalabritaColors.SurfaceLight
+    if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+    else MaterialTheme.colorScheme.surface
 
   Row(
     modifier =
@@ -646,7 +649,7 @@ private fun ModelCard(
         Text(
           text = title,
           style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-          color = PalabritaColors.ContentPrimary,
+          color = MaterialTheme.colorScheme.onSurface,
         )
         if (isSelected) {
           Icon(
@@ -661,7 +664,7 @@ private fun ModelCard(
       Text(
         text = subtitle,
         style = MaterialTheme.typography.bodySmall,
-        color = PalabritaColors.ContentSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       Spacer(Modifier.height(10.dp))
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { Chip(text = info) }
@@ -707,7 +710,7 @@ private fun DownloadScreen(
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(PalabritaColors.BackgroundLight)
+        .background(MaterialTheme.colorScheme.background)
         .statusBarsPadding()
         .navigationBarsPadding()
         .padding(horizontal = 24.dp),
@@ -750,7 +753,7 @@ private fun DownloadScreen(
         },
       style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
       textAlign = TextAlign.Center,
-      color = PalabritaColors.ContentPrimary,
+      color = MaterialTheme.colorScheme.onSurface,
     )
 
     Spacer(Modifier.height(8.dp))
@@ -764,7 +767,7 @@ private fun DownloadScreen(
           else -> stringResource(CommonR.string.download_subtitle, modelName)
         },
       style = MaterialTheme.typography.bodyMedium,
-      color = PalabritaColors.ContentSecondary,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
       textAlign = TextAlign.Center,
     )
 
@@ -776,12 +779,12 @@ private fun DownloadScreen(
         Text(
           text = stringResource(CommonR.string.download_progress_label),
           style = MaterialTheme.typography.bodySmall,
-          color = PalabritaColors.ContentSecondary,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
           text = "${(animatedProgress * 100).toInt()}%",
           style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-          color = PalabritaColors.ContentPrimary,
+          color = MaterialTheme.colorScheme.onSurface,
         )
       }
       Spacer(Modifier.height(8.dp))
@@ -792,7 +795,7 @@ private fun DownloadScreen(
           Modifier.fillMaxWidth()
             .height(10.dp)
             .clip(RoundedCornerShape(50.dp))
-            .background(PalabritaColors.OutlineDefault)
+            .background(MaterialTheme.colorScheme.outline)
       ) {
         Box(
           modifier =
@@ -904,10 +907,10 @@ private fun CuriositySlider() {
       Row(
         modifier =
           Modifier.fillMaxWidth()
-            .background(PalabritaColors.ContainerBlue, RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(16.dp))
             .border(
               1.dp,
-              PalabritaColors.OnContainerBlue.copy(alpha = 0.2f),
+              MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f),
               RoundedCornerShape(16.dp),
             )
             .padding(16.dp)
@@ -915,7 +918,7 @@ private fun CuriositySlider() {
         Text(
           text = curiosities[index],
           style = MaterialTheme.typography.bodySmall,
-          color = PalabritaColors.OnContainerBlue,
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
         )
       }
     }
@@ -944,7 +947,7 @@ private fun BackButton(onBack: () -> Unit) {
     Icon(
       imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
       contentDescription = stringResource(CommonR.string.back),
-      tint = PalabritaColors.ContentPrimary,
+      tint = MaterialTheme.colorScheme.onSurface,
     )
   }
 }
@@ -953,13 +956,13 @@ private fun BackButton(onBack: () -> Unit) {
 private fun Chip(text: String) {
   Box(
     modifier =
-      Modifier.background(PalabritaColors.SurfaceVariantLight, RoundedCornerShape(50.dp))
+      Modifier.background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(50.dp))
         .padding(horizontal = 12.dp, vertical = 4.dp)
   ) {
     Text(
       text = text,
       style = MaterialTheme.typography.labelSmall,
-      color = PalabritaColors.ContentSecondary,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
   }
 }

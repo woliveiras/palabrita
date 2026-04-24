@@ -85,6 +85,10 @@ object PalabritaColors {
   val ContainerBlue = Color(0xFFDBEAFE) // Battery, info icons
   val ContainerAmber = Color(0xFFFFF7ED) // Tips, warnings
 
+  // Dark-mode icon container tints
+  val ContainerBlueDark = Color(0xFF1A2332)
+  val OnContainerBlueDark = Color(0xFF60A5FA)
+
   val OnContainerPurple = Color(0xFF6C63FF)
   val OnContainerGreen = Color(0xFF15803D)
   val OnContainerBlue = Color(0xFF1D4ED8)

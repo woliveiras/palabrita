@@ -122,7 +122,11 @@ fun GenerationScreen(
     modifier =
       modifier
         .fillMaxSize()
-        .background(Brush.verticalGradient(listOf(Color.White, PalabritaColors.BackgroundLight)))
+        .background(
+          Brush.verticalGradient(
+            listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.background)
+          )
+        )
         .padding(horizontal = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
@@ -193,7 +197,7 @@ fun GenerationScreen(
         else if (isFailed) stringResource(CommonR.string.generation_failed)
         else stringResource(CommonR.string.generation_title),
       style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-      color = PalabritaColors.ContentPrimary,
+      color = MaterialTheme.colorScheme.onSurface,
       textAlign = TextAlign.Center,
     )
 
@@ -204,7 +208,7 @@ fun GenerationScreen(
         if (isComplete) stringResource(CommonR.string.generation_complete_subtitle)
         else if (isFailed) "" else stringResource(CommonR.string.generation_subtitle),
       style = MaterialTheme.typography.bodyMedium,
-      color = PalabritaColors.ContentSecondary,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
       textAlign = TextAlign.Center,
     )
 
@@ -216,9 +220,15 @@ fun GenerationScreen(
         Modifier.fillMaxWidth()
           .clip(RoundedCornerShape(24.dp))
           .background(
-            Brush.linearGradient(listOf(PalabritaColors.ContainerPurple, Color(0xFFF5F3FF)))
+            Brush.linearGradient(
+              listOf(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.surface)
+            )
           )
-          .border(1.dp, PalabritaColors.BrandPurple.copy(alpha = 0.2f), RoundedCornerShape(24.dp))
+          .border(
+            1.dp,
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+            RoundedCornerShape(24.dp),
+          )
           .padding(24.dp)
     ) {
       Row(
@@ -229,7 +239,7 @@ fun GenerationScreen(
         Text(
           text = stringResource(CommonR.string.generation_puzzles_label),
           style = MaterialTheme.typography.bodyMedium,
-          color = PalabritaColors.ContentSecondary,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         // key forces recompose + subtle scale animation on each change
         key(puzzlesGenerated) {
@@ -251,7 +261,7 @@ fun GenerationScreen(
           Modifier.fillMaxWidth()
             .height(6.dp)
             .clip(RoundedCornerShape(50.dp))
-            .background(Color.White.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
       ) {
         Box(
           modifier =
@@ -280,7 +290,7 @@ fun GenerationScreen(
         Text(
           text = stringResource(resId),
           style = MaterialTheme.typography.bodySmall,
-          color = PalabritaColors.ContentSecondary,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
           textAlign = TextAlign.Center,
           modifier = Modifier.fillMaxWidth(),
         )
@@ -320,7 +330,7 @@ fun GenerationScreen(
         Text(
           text = stringResource(CommonR.string.generation_cancel),
           style = MaterialTheme.typography.bodyMedium,
-          color = PalabritaColors.ContentSecondary,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       }
     }
