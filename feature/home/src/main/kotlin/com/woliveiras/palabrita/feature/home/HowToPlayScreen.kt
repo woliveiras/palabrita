@@ -69,14 +69,14 @@ fun HowToPlayScreen(onBack: () -> Unit, onStartPlaying: () -> Unit, modifier: Mo
     Row(verticalAlignment = Alignment.CenterVertically) {
       Surface(
         shape = RoundedCornerShape(12.dp),
-        color = PalabritaColors.BrandPurpleContainer,
+        color = MaterialTheme.colorScheme.primaryContainer,
         modifier = Modifier.size(48.dp),
       ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
           Icon(
             imageVector = Icons.Rounded.HelpOutline,
             contentDescription = null,
-            tint = PalabritaColors.BrandPurple,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(28.dp),
           )
         }
@@ -198,7 +198,8 @@ fun HowToPlayScreen(onBack: () -> Unit, onStartPlaying: () -> Unit, modifier: Mo
     Surface(
       modifier = Modifier.fillMaxWidth(),
       shape = RoundedCornerShape(16.dp),
-      color = PalabritaColors.ContainerAmber,
+      color = MaterialTheme.colorScheme.tertiaryContainer,
+      contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
     ) {
       Column(modifier = Modifier.padding(16.dp)) {
         Text(
@@ -210,7 +211,6 @@ fun HowToPlayScreen(onBack: () -> Unit, onStartPlaying: () -> Unit, modifier: Mo
         Text(
           text = stringResource(CommonR.string.htp_pro_tip_body),
           style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       }
     }
