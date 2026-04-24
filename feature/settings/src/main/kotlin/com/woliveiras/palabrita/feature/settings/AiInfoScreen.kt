@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.HourglassTop
@@ -22,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -39,7 +41,11 @@ import com.woliveiras.palabrita.core.ai.EngineState
 import com.woliveiras.palabrita.core.common.R as CommonR
 
 @Composable
-fun AiInfoScreen(modifier: Modifier = Modifier, viewModel: AiInfoViewModel = hiltViewModel()) {
+fun AiInfoScreen(
+  onBack: () -> Unit,
+  modifier: Modifier = Modifier,
+  viewModel: AiInfoViewModel = hiltViewModel(),
+) {
   val state by viewModel.state.collectAsStateWithLifecycle()
 
   if (state.isLoading) {
@@ -54,6 +60,16 @@ fun AiInfoScreen(modifier: Modifier = Modifier, viewModel: AiInfoViewModel = hil
   }
 
   Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
+    // Back button
+    IconButton(onClick = onBack) {
+      Icon(
+        Icons.AutoMirrored.Rounded.ArrowBack,
+        contentDescription = stringResource(CommonR.string.generation_back),
+      )
+    }
+
+    Spacer(Modifier.height(8.dp))
+
     // Header
     Row(verticalAlignment = Alignment.CenterVertically) {
       Icon(

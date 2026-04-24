@@ -221,9 +221,6 @@
     <string name="chat_card_cta">EXPLORE NOW</string>
 
     <!-- Home -->
-    <string name="home_tab">Home</string>
-    <string name="ai_tab">AI</string>
-    <string name="more_tab">More</string>
     <string name="home_title">Palabrita</string>
     <string name="home_play">Play Now</string>
     <string name="home_puzzles_remaining">%1$d puzzles available</string>
