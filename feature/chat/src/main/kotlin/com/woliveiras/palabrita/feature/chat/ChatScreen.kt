@@ -42,15 +42,42 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.R as CommonR
+import com.woliveiras.palabrita.core.model.ChatSuggestion
 import com.woliveiras.palabrita.core.model.MessageRole
+import com.woliveiras.palabrita.core.model.SuggestionCategory
 
-private val SUGGESTIONS: List<@Composable () -> String> =
+private val SUGGESTIONS =
   listOf(
-    { stringResource(CommonR.string.chat_suggestion_origin) },
-    { stringResource(CommonR.string.chat_suggestion_synonyms) },
-    { stringResource(CommonR.string.chat_suggestion_sentence) },
-    { stringResource(CommonR.string.chat_suggestion_english) },
-    { stringResource(CommonR.string.chat_suggestion_trivia) },
+    ChatSuggestion(
+      icon = "🧬",
+      labelResId = CommonR.string.chat_suggestion_origin,
+      promptTemplate = "chat_suggestion_origin",
+      category = SuggestionCategory.ETYMOLOGY,
+    ),
+    ChatSuggestion(
+      icon = "🔗",
+      labelResId = CommonR.string.chat_suggestion_synonyms,
+      promptTemplate = "chat_suggestion_synonyms",
+      category = SuggestionCategory.RELATED,
+    ),
+    ChatSuggestion(
+      icon = "📝",
+      labelResId = CommonR.string.chat_suggestion_sentence,
+      promptTemplate = "chat_suggestion_sentence",
+      category = SuggestionCategory.USAGE,
+    ),
+    ChatSuggestion(
+      icon = "🌎",
+      labelResId = CommonR.string.chat_suggestion_english,
+      promptTemplate = "chat_suggestion_english",
+      category = SuggestionCategory.CURIOSITY,
+    ),
+    ChatSuggestion(
+      icon = "🎭",
+      labelResId = CommonR.string.chat_suggestion_trivia,
+      promptTemplate = "chat_suggestion_trivia",
+      category = SuggestionCategory.CULTURAL,
+    ),
   )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -144,11 +171,13 @@ fun ChatScreen(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
           ) {
-            SUGGESTIONS.forEach { suggestionProvider ->
-              val suggestion = suggestionProvider()
+            SUGGESTIONS.forEach { suggestion ->
+              val label = stringResource(suggestion.labelResId)
               AssistChip(
-                onClick = { viewModel.onAction(ChatAction.SelectSuggestion(suggestion)) },
-                label = { Text(suggestion, style = MaterialTheme.typography.labelSmall) },
+                onClick = { viewModel.onAction(ChatAction.SelectSuggestion(label)) },
+                label = {
+                  Text("${suggestion.icon} $label", style = MaterialTheme.typography.labelSmall)
+                },
               )
             }
           }
