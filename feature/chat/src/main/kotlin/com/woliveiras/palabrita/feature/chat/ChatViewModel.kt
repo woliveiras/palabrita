@@ -11,6 +11,7 @@ import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
+import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -32,6 +33,7 @@ class ChatViewModel
 constructor(
   savedStateHandle: SavedStateHandle,
   private val chatRepository: ChatRepository,
+  private val puzzleRepository: PuzzleRepository,
   private val engineManager: LlmEngineManager,
   private val modelRepository: ModelRepository,
 ) : ViewModel() {
@@ -61,7 +63,7 @@ constructor(
 
   private fun loadChat() {
     viewModelScope.launch {
-      val puzzle = chatRepository.getPuzzle(puzzleId) ?: return@launch
+      val puzzle = puzzleRepository.getById(puzzleId) ?: return@launch
       val existing = chatRepository.getMessages(puzzleId)
       val userCount = chatRepository.countUserMessages(puzzleId)
 

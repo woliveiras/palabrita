@@ -54,39 +54,31 @@ class PlayerStatsDaoTest {
   fun upsert_updatesExistingStats() = runTest {
     dao.upsert(createTestPlayerStatsEntity(totalPlayed = 5))
 
-    dao.upsert(createTestPlayerStatsEntity(totalPlayed = 10, currentStreak = 3))
+    dao.upsert(createTestPlayerStatsEntity(totalPlayed = 10))
 
     val result = dao.get()
     assertThat(result!!.totalPlayed).isEqualTo(10)
-    assertThat(result.currentStreak).isEqualTo(3)
   }
 
   @Test
   fun observe_emitsStatsAfterUpsert() = runTest {
-    val stats = createTestPlayerStatsEntity(totalXp = 150, playerTier = "ASTUTO")
+    val stats = createTestPlayerStatsEntity(totalPlayed = 42, totalWon = 30)
 
     dao.upsert(stats)
 
     val result = dao.observe().first()
     assertThat(result).isNotNull()
-    assertThat(result!!.totalXp).isEqualTo(150)
-    assertThat(result.playerTier).isEqualTo("ASTUTO")
+    assertThat(result!!.totalPlayed).isEqualTo(42)
+    assertThat(result.totalWon).isEqualTo(30)
   }
 
   @Test
   fun upsert_preservesJsonFields() = runTest {
     val distribution = """{"1":5,"2":12,"3":18,"4":8,"5":3,"6":1}"""
-    val winsPerDiff = """{"1":45,"2":30,"3":12}"""
 
-    dao.upsert(
-      createTestPlayerStatsEntity(
-        guessDistribution = distribution,
-        gamesWonByDifficulty = winsPerDiff,
-      )
-    )
+    dao.upsert(createTestPlayerStatsEntity(guessDistribution = distribution))
 
     val result = dao.get()
     assertThat(result!!.guessDistribution).isEqualTo(distribution)
-    assertThat(result.gamesWonByDifficulty).isEqualTo(winsPerDiff)
   }
 }

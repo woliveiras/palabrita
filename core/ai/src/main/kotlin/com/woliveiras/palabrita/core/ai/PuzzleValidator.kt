@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.core.ai
 
+import com.woliveiras.palabrita.core.model.GameRules
 import javax.inject.Inject
 
 class PuzzleValidatorImpl @Inject constructor() : PuzzleValidator {
@@ -30,8 +31,8 @@ class PuzzleValidatorImpl @Inject constructor() : PuzzleValidator {
     }
 
     // Hints count — at least 3 required
-    if (puzzle.hints.size < 3) {
-      reasons.add("expected at least 3 hints, got ${puzzle.hints.size}")
+    if (puzzle.hints.size < GameRules.MIN_HINTS) {
+      reasons.add("expected at least ${GameRules.MIN_HINTS} hints, got ${puzzle.hints.size}")
     }
 
     // Hints must not contain the word

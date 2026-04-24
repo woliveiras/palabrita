@@ -22,7 +22,7 @@ import com.woliveiras.palabrita.core.data.db.entity.PuzzleEntity
       ChatMessageEntity::class,
       ModelConfigEntity::class,
     ],
-  version = 3,
+  version = 4,
   exportSchema = true,
 )
 abstract class PalabritaDatabase : RoomDatabase() {

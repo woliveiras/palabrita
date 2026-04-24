@@ -18,6 +18,7 @@ import androidx.work.workDataOf
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.common.R as CommonR
+import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
@@ -45,7 +46,7 @@ constructor(
     val language = stats.preferredLanguage
 
     val unplayedCount = puzzleRepository.countAllUnplayed(language)
-    if (unplayedCount >= REPLENISHMENT_THRESHOLD) {
+    if (unplayedCount >= GameRules.REPLENISHMENT_THRESHOLD) {
       return Result.success()
     }
 
@@ -66,7 +67,7 @@ constructor(
     val recentWords = puzzleRepository.getRecentWords(50)
 
     val cycle = appPreferences.generationCycle.first()
-    val (wordLength, batchSize) = levelForCycle(cycle)
+    val (wordLength, batchSize) = GameRules.levelForCycle(cycle)
 
     setProgress(workDataOf(KEY_GENERATED_COUNT to 0, KEY_TOTAL_EXPECTED to batchSize))
 
@@ -166,15 +167,8 @@ constructor(
     const val KEY_MODEL_ID = "model_id"
     const val KEY_GENERATED_COUNT = "generated_count"
     const val KEY_TOTAL_EXPECTED = "total_expected"
-    const val REPLENISHMENT_THRESHOLD = 5
-    const val MAX_WORD_LENGTH = 6
     private const val CHANNEL_ID = "puzzle_generation"
     private const val NOTIFICATION_ID = 1001
     private const val PROGRESS_NOTIFICATION_ID = 1002
-
-    // Each level is (wordLength, batchSize). Last entry repeats forever.
-    val LEVELS = listOf(4 to 5, 5 to 10, 6 to 10)
-
-    fun levelForCycle(cycle: Int): Pair<Int, Int> = LEVELS[cycle.coerceIn(0, LEVELS.lastIndex)]
   }
 }

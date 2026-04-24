@@ -58,6 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.LocalGameColors
 import com.woliveiras.palabrita.core.common.R as CommonR
+import com.woliveiras.palabrita.core.model.GameRules
 
 @Composable
 fun GameScreen(
@@ -216,7 +217,7 @@ private fun PlayingScreen(
         attempts = state.attempts,
         currentInput = state.currentInput,
         wordLength = wordLength,
-        maxAttempts = 6,
+        maxAttempts = GameRules.MAX_ATTEMPTS,
         tileSize = tileSize,
       )
     }

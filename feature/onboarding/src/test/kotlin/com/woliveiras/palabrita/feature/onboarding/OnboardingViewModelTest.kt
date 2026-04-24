@@ -2,27 +2,11 @@ package com.woliveiras.palabrita.feature.onboarding
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.woliveiras.palabrita.core.ai.EngineState
-import com.woliveiras.palabrita.core.ai.LlmEngineManager
-import com.woliveiras.palabrita.core.ai.LlmSession
-import com.woliveiras.palabrita.core.ai.ModelDownloadManager
-import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
-import com.woliveiras.palabrita.core.ai.worker.GenerationInfo
-import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
-import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.DeviceTier
-import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
-import com.woliveiras.palabrita.core.model.PlayerStats
-import com.woliveiras.palabrita.core.model.preferences.AppPreferences
-import com.woliveiras.palabrita.core.model.repository.ModelRepository
-import com.woliveiras.palabrita.core.model.repository.StatsRepository
+import com.woliveiras.palabrita.core.testing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -176,105 +160,4 @@ class OnboardingViewModelTest {
       engineManager = FakeLlmEngineManager(),
       generationScheduler = FakeGenerationScheduler(),
     )
-}
-
-private class FakeStatsRepository : StatsRepository {
-  private var stats = PlayerStats()
-
-  override suspend fun getStats(): PlayerStats = stats
-
-  override suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int) {
-    // no-op for onboarding tests
-  }
-
-  override suspend fun updateLanguage(language: String) {}
-
-  override suspend fun resetProgress() {}
-
-  override fun observeStats(): Flow<PlayerStats> = flowOf(stats)
-}
-
-private class FakeModelRepository : ModelRepository {
-  private var config = ModelConfig()
-
-  override suspend fun getConfig(): ModelConfig = config
-
-  override suspend fun updateConfig(config: ModelConfig) {
-    this.config = config
-  }
-
-  override fun observeConfig(): Flow<ModelConfig> = flowOf(config)
-}
-
-private class FakeAppPreferences : AppPreferences {
-  private val _isOnboardingComplete = MutableStateFlow(false)
-  override val isOnboardingComplete: Flow<Boolean> = _isOnboardingComplete
-
-  private val _generationCycle = MutableStateFlow(0)
-  override val generationCycle: Flow<Int> = _generationCycle
-
-  override suspend fun setOnboardingComplete() {
-    _isOnboardingComplete.value = true
-  }
-
-  override suspend fun incrementGenerationCycle() {
-    _generationCycle.value += 1
-  }
-}
-
-private class FakeModelDownloadManager : ModelDownloadManager {
-  private val _progress = MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)
-  override val progress: StateFlow<ModelDownloadProgress> = _progress
-
-  override suspend fun startDownload(modelId: ModelId) {
-    _progress.value = ModelDownloadProgress.Completed("/fake/model.litertlm")
-  }
-
-  override fun cancelDownload() {
-    _progress.value = ModelDownloadProgress.Idle
-  }
-
-  override fun getModelPath(modelId: ModelId): String? = null
-}
-
-private class FakeLlmEngineManager : LlmEngineManager {
-  private val _state = MutableStateFlow<EngineState>(EngineState.Uninitialized)
-  override val engineState: StateFlow<EngineState> = _state
-
-  override suspend fun initialize(modelPath: String) {
-    _state.value = EngineState.Ready
-  }
-
-  override suspend fun generateSingleTurn(systemPrompt: String?, userPrompt: String): String =
-    """{"word":"teste","category":"test","difficulty":1,"hints":["h1","h2","h3","h4","h5"]}"""
-
-  override suspend fun createChatSession(systemPrompt: String): LlmSession =
-    object : LlmSession {
-      override suspend fun sendMessage(message: String): String = "response"
-
-      override fun sendMessageStreaming(message: String): Flow<String> = flowOf("response")
-
-      override fun close() {}
-    }
-
-  override fun destroy() {
-    _state.value = EngineState.Uninitialized
-  }
-
-  override fun isReady(): Boolean = _state.value is EngineState.Ready
-}
-
-private class FakeGenerationScheduler : PuzzleGenerationScheduler {
-  var scheduledModelId: ModelId? = null
-
-  override fun scheduleGeneration(modelId: ModelId) {
-    scheduledModelId = modelId
-  }
-
-  override fun cancelGeneration() {}
-
-  override fun observeGenerationState(): Flow<GenerationWorkState> =
-    flowOf(GenerationWorkState.IDLE)
-
-  override fun observeGenerationInfo(): Flow<GenerationInfo> = flowOf(GenerationInfo())
 }

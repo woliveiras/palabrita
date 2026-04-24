@@ -20,4 +20,6 @@ interface PuzzleRepository {
   suspend fun deleteUnplayedAiPuzzles()
 
   suspend fun markAllUnplayed()
+
+  suspend fun getById(id: Long): Puzzle?
 }

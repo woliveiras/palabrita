@@ -11,6 +11,7 @@ import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
+import com.woliveiras.palabrita.core.model.usecase.ResetProgressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,10 +27,13 @@ constructor(
   private val statsRepository: StatsRepository,
   private val modelRepository: ModelRepository,
   private val gameSessionRepository: GameSessionRepository,
-  private val chatRepository: ChatRepository,
+  chatRepository: ChatRepository,
   private val puzzleRepository: PuzzleRepository,
   private val deviceTier: DeviceTier,
 ) : ViewModel() {
+
+  private val resetProgressUseCase =
+    ResetProgressUseCase(statsRepository, gameSessionRepository, chatRepository, puzzleRepository)
 
   private val _state = MutableStateFlow(SettingsState())
   val state: StateFlow<SettingsState> = _state.asStateFlow()
@@ -121,10 +125,7 @@ constructor(
 
   private fun resetProgress() {
     viewModelScope.launch {
-      statsRepository.resetProgress()
-      gameSessionRepository.deleteAll()
-      chatRepository.deleteAll()
-      puzzleRepository.markAllUnplayed()
+      resetProgressUseCase()
       val newStats = statsRepository.getStats()
       _state.update { it.copy(stats = newStats) }
     }

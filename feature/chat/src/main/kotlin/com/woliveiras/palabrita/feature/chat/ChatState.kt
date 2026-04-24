@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.feature.chat
 
+import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.MessageRole
 
 data class ChatState(
@@ -11,7 +12,7 @@ data class ChatState(
   val isModelResponding: Boolean = false,
   val isEngineLoading: Boolean = false,
   val userMessageCount: Int = 0,
-  val maxMessages: Int = 10,
+  val maxMessages: Int = GameRules.MAX_CHAT_MESSAGES,
   val isAtLimit: Boolean = false,
   val error: String? = null,
   val suggestionsVisible: Boolean = true,

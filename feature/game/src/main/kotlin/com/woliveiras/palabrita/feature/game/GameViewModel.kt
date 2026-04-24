@@ -2,6 +2,7 @@ package com.woliveiras.palabrita.feature.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
@@ -119,7 +120,7 @@ constructor(
     val newAttempts = current.attempts + attempt
     val newKeyboard = GameLogic.updateKeyboardState(current.keyboardState, feedback)
     val won = feedback.all { it.state == LetterState.CORRECT }
-    val lost = !won && newAttempts.size >= 6
+    val lost = !won && newAttempts.size >= GameRules.MAX_ATTEMPTS
 
     val newStatus =
       when {

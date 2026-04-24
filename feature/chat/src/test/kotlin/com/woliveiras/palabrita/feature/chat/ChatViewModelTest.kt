@@ -3,8 +3,6 @@ package com.woliveiras.palabrita.feature.chat
 import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.assertThat
 import com.woliveiras.palabrita.core.ai.EngineState
-import com.woliveiras.palabrita.core.ai.LlmEngineManager
-import com.woliveiras.palabrita.core.ai.LlmSession
 import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.MessageRole
@@ -12,15 +10,9 @@ import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.PuzzleSource
-import com.woliveiras.palabrita.core.model.repository.ChatRepository
-import com.woliveiras.palabrita.core.model.repository.ModelRepository
+import com.woliveiras.palabrita.core.testing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -122,8 +114,7 @@ class ChatViewModelTest {
           listOf(
             ChatMessage(1, 1L, MessageRole.MODEL, "Hi", 1000),
             ChatMessage(2, 1L, MessageRole.USER, "Hello", 2000),
-          ),
-        userMessageCount = 1,
+          )
       )
     val vm = createViewModel(chatRepo = repo)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -223,7 +214,11 @@ class ChatViewModelTest {
 
   @Test
   fun `reaching message limit sets isAtLimit`() = runTest {
-    val repo = FakeChatRepository(userMessageCount = 9)
+    val repo =
+      FakeChatRepository(
+        existingMessages =
+          (1..9).map { i -> ChatMessage(i.toLong(), 1L, MessageRole.USER, "msg$i", 1000L * i) }
+      )
     val vm = createViewModel(chatRepo = repo)
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(ChatAction.UpdateInput("last question"))
@@ -234,7 +229,11 @@ class ChatViewModelTest {
 
   @Test
   fun `cannot send message when at limit`() = runTest {
-    val repo = FakeChatRepository(userMessageCount = 10)
+    val repo =
+      FakeChatRepository(
+        existingMessages =
+          (1..10).map { i -> ChatMessage(i.toLong(), 1L, MessageRole.USER, "msg$i", 1000L * i) }
+      )
     val vm = createViewModel(chatRepo = repo)
     testDispatcher.scheduler.advanceUntilIdle()
     val msgCountBefore = vm.state.value.messages.size
@@ -271,7 +270,7 @@ class ChatViewModelTest {
   @Test
   fun `shows error when engine not ready and no model path`() = runTest {
     val engine = FakeLlmEngineManager(initialState = EngineState.Uninitialized)
-    val modelRepo = FakeModelRepository(modelPath = null)
+    val modelRepo = FakeModelRepository(ModelConfig())
     val vm = createViewModel(engineManager = engine, modelRepo = modelRepo)
     testDispatcher.scheduler.advanceUntilIdle()
     assertThat(vm.state.value.error).isNotNull()
@@ -306,98 +305,24 @@ class ChatViewModelTest {
   private fun createViewModel(
     chatRepo: FakeChatRepository = FakeChatRepository(),
     engineManager: FakeLlmEngineManager = FakeLlmEngineManager(),
-    modelRepo: FakeModelRepository = FakeModelRepository(),
+    modelRepo: FakeModelRepository =
+      FakeModelRepository(
+        ModelConfig(
+          modelId = ModelId.GEMMA4_E2B,
+          downloadState = DownloadState.DOWNLOADED,
+          modelPath = "/fake/model/path",
+        )
+      ),
+    puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(createTestPuzzle()),
     puzzleId: Long = 1L,
   ): ChatViewModel {
     val savedState = SavedStateHandle(mapOf("puzzleId" to puzzleId))
     return ChatViewModel(
       savedStateHandle = savedState,
       chatRepository = chatRepo,
+      puzzleRepository = puzzleRepo,
       engineManager = engineManager,
       modelRepository = modelRepo,
     )
   }
-}
-
-private class FakeLlmSession(private val response: String = "Fake LLM response") : LlmSession {
-  override suspend fun sendMessage(message: String): String = response
-
-  override fun sendMessageStreaming(message: String): Flow<String> = flowOf(response)
-
-  override fun close() {}
-}
-
-private class FakeLlmEngineManager(
-  initialState: EngineState = EngineState.Ready,
-  private val sessionResponse: String = "Fake LLM response",
-) : LlmEngineManager {
-  private val _engineState = MutableStateFlow(initialState)
-  override val engineState: StateFlow<EngineState> = _engineState.asStateFlow()
-
-  override suspend fun initialize(modelPath: String) {
-    _engineState.value = EngineState.Ready
-  }
-
-  override suspend fun generateSingleTurn(systemPrompt: String?, userPrompt: String): String =
-    sessionResponse
-
-  override suspend fun createChatSession(systemPrompt: String): LlmSession =
-    FakeLlmSession(sessionResponse)
-
-  override fun destroy() {
-    _engineState.value = EngineState.Uninitialized
-  }
-
-  override fun isReady(): Boolean = _engineState.value is EngineState.Ready
-}
-
-private class FakeChatRepository(
-  private val existingMessages: List<ChatMessage> = emptyList(),
-  private var userMessageCount: Int = existingMessages.count { it.role == MessageRole.USER },
-  private val puzzle: Puzzle =
-    Puzzle(
-      id = 1,
-      word = "gatos",
-      wordDisplay = "GATOS",
-      language = "pt",
-      difficulty = 1,
-      category = "",
-      hints = listOf("Dica 1", "Dica 2", "Dica 3"),
-      source = PuzzleSource.AI,
-      generatedAt = 1000,
-    ),
-) : ChatRepository {
-  val savedMessages = mutableListOf<ChatMessage>()
-
-  override suspend fun getMessages(puzzleId: Long): List<ChatMessage> = existingMessages
-
-  override suspend fun saveMessage(message: ChatMessage) {
-    savedMessages.add(message)
-    if (message.role == MessageRole.USER) userMessageCount++
-  }
-
-  override suspend fun countUserMessages(puzzleId: Long): Int = userMessageCount
-
-  override suspend fun getPuzzle(puzzleId: Long): Puzzle? = puzzle
-
-  override suspend fun deleteAll() {}
-}
-
-private class FakeModelRepository(private val modelPath: String? = "/fake/model/path") :
-  ModelRepository {
-  private var config =
-    ModelConfig(
-      modelId = ModelId.GEMMA4_E2B,
-      downloadState = DownloadState.DOWNLOADED,
-      modelPath = modelPath,
-    )
-
-  override suspend fun getConfig(): ModelConfig = config
-
-  override suspend fun updateConfig(config: ModelConfig) {
-    this.config = config
-  }
-
-  override fun observeConfig(): kotlinx.coroutines.flow.Flow<ModelConfig> =
-    kotlinx.coroutines.flow.flowOf(config)
 }

@@ -1,6 +1,7 @@
 package com.woliveiras.palabrita.core.ai
 
 import android.util.Log
+import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.PuzzleSource
@@ -77,7 +78,10 @@ constructor(
             usedWords.add(puzzle.word)
             Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
           } else {
-            Log.w(TAG, "  puzzle ${i + 1}/$count FAILED after $MAX_RETRIES retries")
+            Log.w(
+              TAG,
+              "  puzzle ${i + 1}/$count FAILED after ${GameRules.MAX_GENERATION_RETRIES} retries",
+            )
           }
           onPuzzleAttempted(generated.size)
         }
@@ -100,7 +104,7 @@ constructor(
     modelId: ModelId,
   ): Puzzle? {
     var lastFailureReason: String? = null
-    repeat(MAX_RETRIES) { attempt ->
+    repeat(GameRules.MAX_GENERATION_RETRIES) { attempt ->
       _activity.value = GenerationActivity.CREATING
       val userPrompt =
         buildUserPrompt(
@@ -188,14 +192,13 @@ constructor(
       language = language,
       difficulty = wordLength,
       category = "",
-      hints = response.hints.take(3),
+      hints = response.hints.take(GameRules.MIN_HINTS),
       source = PuzzleSource.AI,
       generatedAt = System.currentTimeMillis(),
     )
 
   companion object {
     private const val TAG = "PuzzleGenerator"
-    private const val MAX_RETRIES = 5
     private const val SESSION_ROTATION = 3
   }
 }

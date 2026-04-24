@@ -2,17 +2,12 @@ package com.woliveiras.palabrita.feature.game
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.woliveiras.palabrita.core.model.GameSession
 import com.woliveiras.palabrita.core.model.PlayerStats
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.PuzzleSource
-import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
-import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
-import com.woliveiras.palabrita.core.model.repository.StatsRepository
+import com.woliveiras.palabrita.core.testing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -296,78 +291,5 @@ class GameViewModelTest {
       )
     testDispatcher.scheduler.advanceUntilIdle()
     return vm
-  }
-}
-
-private class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepository {
-  val markedPlayed = mutableListOf<Long>()
-
-  override suspend fun getNextUnplayed(language: String): Puzzle? = puzzle
-
-  override suspend fun countAllUnplayed(language: String): Int = if (puzzle != null) 1 else 0
-
-  override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
-
-  override suspend fun getRecentWords(limit: Int): List<String> = emptyList()
-
-  override suspend fun savePuzzle(puzzle: Puzzle): Long = puzzle.id
-
-  override suspend fun savePuzzles(puzzles: List<Puzzle>) {}
-
-  override suspend fun markAsPlayed(puzzleId: Long) {
-    markedPlayed.add(puzzleId)
-  }
-
-  override suspend fun deleteUnplayedAiPuzzles() {}
-
-  override suspend fun markAllUnplayed() {}
-}
-
-private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()) :
-  StatsRepository {
-  override suspend fun getStats(): PlayerStats = stats
-
-  override suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int) {}
-
-  override suspend fun updateLanguage(language: String) {}
-
-  override suspend fun resetProgress() {}
-
-  override fun observeStats(): Flow<PlayerStats> = flowOf(stats)
-}
-
-private class FakeGameSessionRepository : GameSessionRepository {
-  val sessions = mutableListOf<GameSession>()
-
-  override suspend fun create(session: GameSession): Long {
-    sessions.add(session)
-    return session.id
-  }
-
-  override suspend fun update(session: GameSession) {
-    sessions.removeAll { it.puzzleId == session.puzzleId }
-    sessions.add(session)
-  }
-
-  override suspend fun getByPuzzleId(puzzleId: Long): GameSession? = sessions.find {
-    it.puzzleId == puzzleId
-  }
-
-  override suspend fun hasActiveGame(): Boolean = sessions.any { it.completedAt == null }
-
-  override suspend fun completeSession(
-    puzzleId: Long,
-    attempts: List<String>,
-    completedAt: Long,
-    hintsUsed: Int,
-    won: Boolean,
-  ) {
-    val session = sessions.find { it.puzzleId == puzzleId } ?: return
-    sessions.remove(session)
-    sessions.add(session.copy(completedAt = completedAt, won = won))
-  }
-
-  override suspend fun deleteAll() {
-    sessions.clear()
   }
 }

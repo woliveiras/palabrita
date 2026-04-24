@@ -8,16 +8,9 @@ import com.woliveiras.palabrita.core.model.GameSession
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
-import com.woliveiras.palabrita.core.model.Puzzle
-import com.woliveiras.palabrita.core.model.repository.ChatRepository
-import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
-import com.woliveiras.palabrita.core.model.repository.ModelRepository
-import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
-import com.woliveiras.palabrita.core.model.repository.StatsRepository
+import com.woliveiras.palabrita.core.testing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -285,126 +278,4 @@ class SettingsViewModelTest {
       puzzleRepository = puzzleRepo,
       deviceTier = deviceTier,
     )
-}
-
-// --- Fakes ---
-
-private class FakeStatsRepository(private var stats: PlayerStats = PlayerStats()) :
-  StatsRepository {
-  private val _flow = MutableStateFlow(stats)
-
-  override suspend fun getStats(): PlayerStats = stats
-
-  override suspend fun updateAfterGame(won: Boolean, attempts: Int, hintsUsed: Int) {}
-
-  override suspend fun updateLanguage(language: String) {
-    stats = stats.copy(preferredLanguage = language)
-    _flow.value = stats
-  }
-
-  override suspend fun resetProgress() {
-    stats = PlayerStats(preferredLanguage = stats.preferredLanguage)
-    _flow.value = stats
-  }
-
-  override fun observeStats(): Flow<PlayerStats> = _flow
-}
-
-private class FakeModelRepository(private var config: ModelConfig = ModelConfig()) :
-  ModelRepository {
-  private val _flow = MutableStateFlow(config)
-
-  override suspend fun getConfig(): ModelConfig = config
-
-  override suspend fun updateConfig(config: ModelConfig) {
-    this.config = config
-    _flow.value = config
-  }
-
-  override fun observeConfig(): Flow<ModelConfig> = _flow
-}
-
-private class FakeGameSessionRepository : GameSessionRepository {
-  val sessions = mutableListOf<GameSession>()
-
-  override suspend fun create(session: GameSession): Long {
-    sessions.add(session)
-    return session.id
-  }
-
-  override suspend fun update(session: GameSession) {
-    sessions.removeAll { it.puzzleId == session.puzzleId }
-    sessions.add(session)
-  }
-
-  override suspend fun getByPuzzleId(puzzleId: Long): GameSession? = sessions.find {
-    it.puzzleId == puzzleId
-  }
-
-  override suspend fun hasActiveGame(): Boolean = sessions.any { it.completedAt == null }
-
-  override suspend fun completeSession(
-    puzzleId: Long,
-    attempts: List<String>,
-    completedAt: Long,
-    hintsUsed: Int,
-    won: Boolean,
-  ) {
-    val session = sessions.find { it.puzzleId == puzzleId } ?: return
-    sessions.remove(session)
-    sessions.add(session.copy(completedAt = completedAt, won = won))
-  }
-
-  override suspend fun deleteAll() {
-    sessions.clear()
-  }
-}
-
-private class FakeChatRepository : ChatRepository {
-  val savedMessages = mutableListOf<ChatMessage>()
-
-  override suspend fun getMessages(puzzleId: Long): List<ChatMessage> = savedMessages.filter {
-    it.puzzleId == puzzleId
-  }
-
-  override suspend fun saveMessage(message: ChatMessage) {
-    savedMessages.add(message)
-  }
-
-  override suspend fun countUserMessages(puzzleId: Long): Int = savedMessages.count {
-    it.puzzleId == puzzleId && it.role == com.woliveiras.palabrita.core.model.MessageRole.USER
-  }
-
-  override suspend fun getPuzzle(puzzleId: Long): Puzzle? = null
-
-  override suspend fun deleteAll() {
-    savedMessages.clear()
-  }
-}
-
-private class FakePuzzleRepository : PuzzleRepository {
-  var unplayedAiPuzzlesCleared = false
-  var allUnplayed = false
-
-  override suspend fun getNextUnplayed(language: String): Puzzle? = null
-
-  override suspend fun countAllUnplayed(language: String): Int = 0
-
-  override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
-
-  override suspend fun getRecentWords(limit: Int): List<String> = emptyList()
-
-  override suspend fun savePuzzle(puzzle: Puzzle): Long = 0
-
-  override suspend fun savePuzzles(puzzles: List<Puzzle>) {}
-
-  override suspend fun markAsPlayed(puzzleId: Long) {}
-
-  override suspend fun deleteUnplayedAiPuzzles() {
-    unplayedAiPuzzlesCleared = true
-  }
-
-  override suspend fun markAllUnplayed() {
-    allUnplayed = true
-  }
 }
