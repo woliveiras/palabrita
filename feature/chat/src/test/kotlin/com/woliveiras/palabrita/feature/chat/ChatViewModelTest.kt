@@ -314,6 +314,7 @@ class ChatViewModelTest {
         )
       ),
     puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(createTestPuzzle()),
+    gameSessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(),
     puzzleId: Long = 1L,
   ): ChatViewModel {
     val savedState = SavedStateHandle(mapOf("puzzleId" to puzzleId))
@@ -321,6 +322,7 @@ class ChatViewModelTest {
       savedStateHandle = savedState,
       chatRepository = chatRepo,
       puzzleRepository = puzzleRepo,
+      gameSessionRepository = gameSessionRepo,
       engineManager = engineManager,
       modelRepository = modelRepo,
     )

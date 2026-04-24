@@ -77,6 +77,8 @@ class ResetProgressUseCaseTest {
       won: Boolean,
     ) {}
 
+    override suspend fun markChatExplored(puzzleId: Long) {}
+
     override suspend fun deleteAll() {
       sessions.clear()
     }

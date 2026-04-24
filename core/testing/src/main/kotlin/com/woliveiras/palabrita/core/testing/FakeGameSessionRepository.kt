@@ -36,6 +36,11 @@ class FakeGameSessionRepository : GameSessionRepository {
     sessions.add(session.copy(completedAt = completedAt, won = won))
   }
 
+  override suspend fun markChatExplored(puzzleId: Long) {
+    val idx = sessions.indexOfFirst { it.puzzleId == puzzleId }
+    if (idx >= 0) sessions[idx] = sessions[idx].copy(chatExplored = true)
+  }
+
   override suspend fun deleteAll() {
     sessions.clear()
   }

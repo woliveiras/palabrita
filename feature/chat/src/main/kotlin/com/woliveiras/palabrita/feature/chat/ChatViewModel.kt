@@ -10,6 +10,7 @@ import com.woliveiras.palabrita.core.ai.PromptTemplates
 import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
+import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,7 @@ constructor(
   savedStateHandle: SavedStateHandle,
   private val chatRepository: ChatRepository,
   private val puzzleRepository: PuzzleRepository,
+  private val gameSessionRepository: GameSessionRepository,
   private val engineManager: LlmEngineManager,
   private val modelRepository: ModelRepository,
 ) : ViewModel() {
@@ -242,6 +244,10 @@ constructor(
           timestamp = System.currentTimeMillis(),
         )
       )
+
+      if (newUserCount == 1) {
+        gameSessionRepository.markChatExplored(puzzleId)
+      }
 
       _state.update {
         it.copy(

@@ -388,18 +388,18 @@ data class BadgeEntity(
 
 ## Acceptance Criteria
 
-- [ ] Chat Card is the main CTA on ResultScreen (above "play again")
-- [ ] Chat Card shows 3+ contextual suggestions with icons
-- [ ] Tapping a suggestion automatically sends the message to the LLM
-- [ ] Suggestions disappear after the 1st interaction
-- [ ] ~~+1 XP bonus~~ (Removed — no XP system)
+- [x] Chat Card is the main CTA on ResultScreen (above "play again")
+- [x] Chat Card shows 3+ contextual suggestions with icons
+- [x] Tapping a suggestion automatically sends the message to the LLM
+- [x] Suggestions disappear after the 1st interaction
+- [x] ~~+1 XP bonus~~ (Removed — no XP system)
 - [ ] "Explorer" badge unlocked after 10 chat sessions
 - [ ] "Linguist" badge unlocked after 50 chat sessions
 - [ ] Inline notification when a new badge is earned
-- [ ] ChatNudge appears on HomeScreen for a completed daily without chat
-- [ ] ChatNudge does not appear in Light mode
-- [ ] Daily card shows "💬 Explore?" for daily without chat
-- [ ] Light mode shows static curiosity on ResultScreen
-- [ ] `chatExplored` saved in GameSession
+- [x] ~~ChatNudge appears on HomeScreen for a completed daily without chat~~ (Removed — no dailies)
+- [x] ~~ChatNudge does not appear in Light mode~~ (Removed — no Light mode)
+- [x] ~~Daily card shows "💬 Explore?" for daily without chat~~ (Removed — no dailies)
+- [x] ~~Light mode shows static curiosity on ResultScreen~~ (Removed — no Light mode)
+- [x] `chatExplored` saved in GameSession
 - [ ] ChatSessionEntity records messages and suggestions used
 - [ ] BadgeEntity persists progress across sessions
