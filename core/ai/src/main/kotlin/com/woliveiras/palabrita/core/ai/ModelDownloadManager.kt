@@ -10,16 +10,16 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 sealed class ModelDownloadProgress {
@@ -47,6 +47,12 @@ interface ModelDownloadManager {
 
 private class ModelGatedException : Exception()
 
+private const val MAX_REDIRECTS = 10
+private const val CONNECT_TIMEOUT_MS = 30_000
+private const val READ_TIMEOUT_MS = 30_000
+private const val BUFFER_SIZE = 32_768
+private const val PROGRESS_EMIT_THRESHOLD = 0.005f
+
 @Singleton
 class ModelDownloadManagerImpl
 @Inject
@@ -59,6 +65,8 @@ constructor(
   override val progress: StateFlow<ModelDownloadProgress> = _progress.asStateFlow()
 
   private var downloadJob: Job? = null
+  private val attemptId = AtomicInteger(0)
+  private val activeConnection = AtomicReference<HttpURLConnection?>(null)
 
   private val modelsDir: File
     get() = File(context.filesDir, "models").also { it.mkdirs() }
@@ -70,6 +78,15 @@ constructor(
   }
 
   override suspend fun startDownload(modelId: ModelId) {
+    // Cancel any in-flight download before starting a new one
+    downloadJob?.let {
+      it.cancel()
+      it.join()
+    }
+    activeConnection.getAndSet(null)?.disconnect()
+
+    val currentAttempt = attemptId.incrementAndGet()
+
     val info =
       AiModelRegistry.getInfo(modelId)
         ?: run {
@@ -98,45 +115,51 @@ constructor(
       return
     }
 
-    coroutineScope {
-      downloadJob = launch {
-        try {
-          downloadFile(info.downloadUrl, targetFile)
-          completeDownload(modelId, targetFile)
-        } catch (e: kotlin.coroutines.cancellation.CancellationException) {
-          _progress.value = ModelDownloadProgress.Idle
-          throw e
-        } catch (_: ModelGatedException) {
-          _progress.value =
-            ModelDownloadProgress.Failed(
-              context.getString(com.woliveiras.palabrita.core.common.R.string.error_model_gated)
-            )
-        } catch (e: Exception) {
-          _progress.value =
-            ModelDownloadProgress.Failed(
-              e.message
-                ?: context.getString(
-                  com.woliveiras.palabrita.core.common.R.string.error_download_unknown
-                )
-            )
-        }
+    try {
+      downloadFile(info.downloadUrl, targetFile, currentAttempt)
+      if (attemptId.get() == currentAttempt) {
+        completeDownload(modelId, targetFile)
       }
-      downloadJob?.join()
+    } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+      if (attemptId.get() == currentAttempt) {
+        _progress.value = ModelDownloadProgress.Idle
+      }
+      throw e
+    } catch (_: ModelGatedException) {
+      if (attemptId.get() == currentAttempt) {
+        _progress.value =
+          ModelDownloadProgress.Failed(
+            context.getString(com.woliveiras.palabrita.core.common.R.string.error_model_gated)
+          )
+      }
+    } catch (e: Exception) {
+      if (attemptId.get() == currentAttempt) {
+        _progress.value =
+          ModelDownloadProgress.Failed(
+            e.message
+              ?: context.getString(
+                com.woliveiras.palabrita.core.common.R.string.error_download_unknown
+              )
+          )
+      }
     }
   }
 
   override fun cancelDownload() {
+    attemptId.incrementAndGet()
+    activeConnection.getAndSet(null)?.disconnect()
     downloadJob?.cancel()
     downloadJob = null
     _progress.value = ModelDownloadProgress.Idle
   }
 
-  private suspend fun downloadFile(url: String, targetFile: File) {
+  private suspend fun downloadFile(url: String, targetFile: File, attempt: Int) {
     withContext(Dispatchers.IO) {
       val tempFile = File(targetFile.parentFile, "${targetFile.name}.tmp")
       val existingBytes = if (tempFile.exists()) tempFile.length() else 0L
 
-      val connection = openConnection(url, existingBytes)
+      val connection = openConnectionWithRedirects(url, existingBytes)
+      activeConnection.set(connection)
       try {
         val responseCode = connection.responseCode
         val totalBytes: Long
@@ -145,8 +168,9 @@ constructor(
         if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED || responseCode == 403) {
           throw ModelGatedException()
         } else if (responseCode == HttpURLConnection.HTTP_PARTIAL) {
-          totalBytes = existingBytes + connection.contentLengthLong()
-          startOffset = existingBytes
+          startOffset = parseContentRangeOffset(connection) ?: existingBytes
+          totalBytes =
+            parseContentRangeTotal(connection) ?: (startOffset + connection.contentLengthLong())
         } else if (responseCode == HttpURLConnection.HTTP_OK) {
           totalBytes = connection.contentLengthLong()
           startOffset = 0L
@@ -157,40 +181,90 @@ constructor(
 
         val inputStream = connection.inputStream
         val outputStream = FileOutputStream(tempFile, startOffset > 0)
-        val buffer = ByteArray(8192)
+        val buffer = ByteArray(BUFFER_SIZE)
         var downloadedBytes = startOffset
+        var lastEmittedProgress = 0f
 
         inputStream.use { input ->
           outputStream.use { output ->
             while (true) {
               ensureActive()
+              if (attemptId.get() != attempt) return@withContext
               val bytesRead = input.read(buffer)
               if (bytesRead == -1) break
               output.write(buffer, 0, bytesRead)
               downloadedBytes += bytesRead
+
               val progress = if (totalBytes > 0) downloadedBytes.toFloat() / totalBytes else 0f
-              _progress.value =
-                ModelDownloadProgress.Downloading(progress, downloadedBytes, totalBytes)
+              if (progress - lastEmittedProgress >= PROGRESS_EMIT_THRESHOLD || progress >= 1f) {
+                if (attemptId.get() == attempt) {
+                  _progress.value =
+                    ModelDownloadProgress.Downloading(progress, downloadedBytes, totalBytes)
+                }
+                lastEmittedProgress = progress
+              }
             }
           }
         }
 
-        tempFile.renameTo(targetFile)
+        val renamed = tempFile.renameTo(targetFile)
+        if (!renamed) {
+          throw java.io.IOException("Failed to move downloaded file to final location")
+        }
       } finally {
+        activeConnection.compareAndSet(connection, null)
         connection.disconnect()
       }
     }
   }
 
-  private fun openConnection(url: String, existingBytes: Long): HttpURLConnection {
-    val connection = URL(url).openConnection() as HttpURLConnection
-    connection.connectTimeout = 30_000
-    connection.readTimeout = 30_000
-    connection.instanceFollowRedirects = true
-    if (existingBytes > 0) {
-      connection.setRequestProperty("Range", "bytes=$existingBytes-")
+  /**
+   * Opens a connection following redirects manually so that the Range header is preserved across
+   * CDN redirect chains (HttpURLConnection can strip it on auto-redirect).
+   */
+  private fun openConnectionWithRedirects(url: String, existingBytes: Long): HttpURLConnection {
+    var currentUrl = url
+    var redirectCount = 0
+
+    while (true) {
+      val connection = URL(currentUrl).openConnection() as HttpURLConnection
+      connection.connectTimeout = CONNECT_TIMEOUT_MS
+      connection.readTimeout = READ_TIMEOUT_MS
+      connection.instanceFollowRedirects = false
+      if (existingBytes > 0) {
+        connection.setRequestProperty("Range", "bytes=$existingBytes-")
+      }
+
+      val responseCode = connection.responseCode
+      if (responseCode in 301..308 && responseCode != 304) {
+        val location = connection.getHeaderField("Location")
+        connection.disconnect()
+
+        if (location == null) {
+          throw java.io.IOException("Redirect $responseCode without Location header")
+        }
+
+        currentUrl = URL(URL(currentUrl), location).toExternalForm()
+        redirectCount++
+        if (redirectCount > MAX_REDIRECTS) {
+          throw java.io.IOException("Too many redirects ($redirectCount)")
+        }
+      } else {
+        return connection
+      }
     }
-    return connection
+  }
+
+  private fun parseContentRangeOffset(connection: HttpURLConnection): Long? {
+    val header = connection.getHeaderField("Content-Range") ?: return null
+    val match = Regex("""bytes (\d+)-""").find(header)
+    return match?.groupValues?.get(1)?.toLongOrNull()
+  }
+
+  private fun parseContentRangeTotal(connection: HttpURLConnection): Long? {
+    val header = connection.getHeaderField("Content-Range") ?: return null
+    val match = Regex("""/(\d+)""").find(header)
+    return match?.groupValues?.get(1)?.toLongOrNull()
   }
 
   private fun HttpURLConnection.contentLengthLong(): Long {

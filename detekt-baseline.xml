@@ -6,6 +6,8 @@
     <ID>CyclomaticComplexMethod:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
     <ID>CyclomaticComplexMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
     <ID>CyclomaticComplexMethod:GenerationViewModel.kt$GenerationViewModel$private fun deriveSteps(engineState: EngineState, info: GenerationInfo): List&lt;GenerationStep&gt;</ID>
+    <ID>CyclomaticComplexMethod:ModelDownloadManager.kt$ModelDownloadManagerImpl$override suspend fun startDownload(modelId: ModelId)</ID>
+    <ID>CyclomaticComplexMethod:ModelDownloadManager.kt$ModelDownloadManagerImpl$private suspend fun downloadFile(url: String, targetFile: File, attempt: Int)</ID>
     <ID>CyclomaticComplexMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
     <ID>EmptyFunctionBlock:FakeGenerationScheduler.kt$FakeGenerationScheduler${}</ID>
@@ -81,6 +83,7 @@
     <ID>LongMethod:GameViewModel.kt$GameViewModel$private fun submitAttempt()</ID>
     <ID>LongMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
+    <ID>LongMethod:ModelDownloadManager.kt$ModelDownloadManagerImpl$override suspend fun startDownload(modelId: ModelId)</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable fun OnboardingScreen( onComplete: () -&gt; Unit, onNavigateToGeneration: (com.woliveiras.palabrita.core.model.ModelId) -&gt; Unit, modifier: Modifier = Modifier, viewModel: OnboardingViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable private fun ModelSelectionScreen( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
@@ -132,9 +135,10 @@
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$100_000_000L</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$1_000_000.0</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$1_000_000_000.0</ID>
-    <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$30_000</ID>
+    <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$301</ID>
+    <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$304</ID>
+    <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$308</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$403</ID>
-    <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$8192</ID>
     <ID>MagicNumber:OnboardingScreen.kt$0xFF06B6D4</ID>
     <ID>MagicNumber:OnboardingScreen.kt$0xFF0891B2</ID>
     <ID>MagicNumber:OnboardingScreen.kt$0xFF0EA5E9</ID>
@@ -219,6 +223,7 @@
     <ID>ReturnCount:ModelDownloadManager.kt$ModelDownloadManagerImpl$override suspend fun startDownload(modelId: ModelId)</ID>
     <ID>ReturnCount:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$override suspend fun doWork(): Result</ID>
     <ID>SwallowedException:OnboardingViewModel.kt$OnboardingViewModel$e: Exception</ID>
+    <ID>ThrowsCount:ModelDownloadManager.kt$ModelDownloadManagerImpl$private suspend fun downloadFile(url: String, targetFile: File, attempt: Int)</ID>
     <ID>TooGenericExceptionCaught:ChatViewModel.kt$ChatViewModel$e: Exception</ID>
     <ID>TooGenericExceptionCaught:LlmEngineManagerImpl.kt$LlmEngineManagerImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:ModelDownloadManager.kt$ModelDownloadManagerImpl$e: Exception</ID>

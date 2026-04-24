@@ -3,6 +3,7 @@ package com.woliveiras.palabrita.feature.onboarding
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -685,6 +686,13 @@ private fun DownloadScreen(
   val isComplete = downloadProgress >= 1f && !downloadFailed
   val isVerifying = downloadProgress >= 1f && !isComplete && !downloadFailed
 
+  val animatedProgress by
+    animateFloatAsState(
+      targetValue = downloadProgress,
+      animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+      label = "download-progress",
+    )
+
   val modelName =
     when (modelId) {
       ModelId.GEMMA4_E4B -> stringResource(CommonR.string.download_model_gemma4_e4b)
@@ -771,7 +779,7 @@ private fun DownloadScreen(
           color = PalabritaColors.ContentSecondary,
         )
         Text(
-          text = "${(downloadProgress * 100).toInt()}%",
+          text = "${(animatedProgress * 100).toInt()}%",
           style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
           color = PalabritaColors.ContentPrimary,
         )
@@ -788,7 +796,7 @@ private fun DownloadScreen(
       ) {
         Box(
           modifier =
-            Modifier.fillMaxWidth(fraction = downloadProgress.coerceIn(0f, 1f))
+            Modifier.fillMaxWidth(fraction = animatedProgress.coerceIn(0f, 1f))
               .height(10.dp)
               .clip(RoundedCornerShape(50.dp))
               .background(
