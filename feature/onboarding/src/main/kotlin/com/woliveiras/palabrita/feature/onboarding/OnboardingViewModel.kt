@@ -197,8 +197,8 @@ constructor(
         engineManager.engineState.collect { engineState ->
           when (engineState) {
             is EngineState.Ready -> {
-              enqueueBackgroundGeneration()
               statsRepository.updateLanguage(_state.value.selectedLanguage)
+              enqueueBackgroundGeneration()
               _state.update { it.copy(downloadComplete = true) }
               return@collect
             }

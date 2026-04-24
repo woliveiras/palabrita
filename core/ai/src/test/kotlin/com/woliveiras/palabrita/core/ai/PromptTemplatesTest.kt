@@ -20,14 +20,14 @@ class PromptTemplatesTest {
   }
 
   @Test
-  fun `puzzle user prompt large includes language parameter`() {
+  fun `puzzle user prompt large includes language display name`() {
     val prompt =
       PromptTemplates.puzzleUserPromptLarge(
         language = "pt",
         wordLength = 6,
         recentWords = emptyList(),
       )
-    assertThat(prompt).contains("pt")
+    assertThat(prompt).contains("Brazilian Portuguese")
     assertThat(prompt).contains("6 letters")
   }
 
@@ -69,14 +69,14 @@ class PromptTemplatesTest {
   }
 
   @Test
-  fun `puzzle prompt compact includes language output instruction`() {
+  fun `puzzle prompt compact includes language display name`() {
     val prompt =
       PromptTemplates.puzzlePromptCompact(
         language = "es",
         wordLength = 5,
         recentWords = emptyList(),
       )
-    assertThat(prompt).contains("es")
+    assertThat(prompt).contains("Spanish")
   }
 
   @Test
@@ -97,14 +97,109 @@ class PromptTemplatesTest {
   }
 
   @Test
-  fun `chat system prompt includes language`() {
+  fun `chat system prompt includes language display name`() {
     val prompt = PromptTemplates.chatSystemPrompt(word = "cats", language = "en")
-    assertThat(prompt).contains("en")
+    assertThat(prompt).contains("English")
   }
 
   @Test
   fun `chat system prompt is in english`() {
     val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
     assertThat(prompt).contains("educational assistant")
+  }
+
+  // --- Language display name mapping ---
+
+  @Test
+  fun `languageDisplayName maps pt to Brazilian Portuguese`() {
+    assertThat(PromptTemplates.languageDisplayName("pt")).isEqualTo("Brazilian Portuguese")
+  }
+
+  @Test
+  fun `languageDisplayName maps en to English`() {
+    assertThat(PromptTemplates.languageDisplayName("en")).isEqualTo("English")
+  }
+
+  @Test
+  fun `languageDisplayName maps es to Spanish`() {
+    assertThat(PromptTemplates.languageDisplayName("es")).isEqualTo("Spanish")
+  }
+
+  @Test
+  fun `languageDisplayName falls back to raw code for unknown language`() {
+    assertThat(PromptTemplates.languageDisplayName("fr")).isEqualTo("fr")
+  }
+
+  @Test
+  fun `puzzle user prompt large uses Brazilian Portuguese for pt`() {
+    val prompt =
+      PromptTemplates.puzzleUserPromptLarge(
+        language = "pt",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(prompt).contains("Brazilian Portuguese")
+    assertThat(prompt).doesNotContain("Output language for values: pt\n")
+  }
+
+  @Test
+  fun `puzzle user prompt large uses English for en`() {
+    val prompt =
+      PromptTemplates.puzzleUserPromptLarge(
+        language = "en",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(prompt).contains("English")
+  }
+
+  @Test
+  fun `puzzle user prompt large uses Spanish for es`() {
+    val prompt =
+      PromptTemplates.puzzleUserPromptLarge(
+        language = "es",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(prompt).contains("Spanish")
+  }
+
+  @Test
+  fun `puzzle prompt compact uses Brazilian Portuguese for pt`() {
+    val prompt =
+      PromptTemplates.puzzlePromptCompact(
+        language = "pt",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(prompt).contains("Brazilian Portuguese")
+  }
+
+  @Test
+  fun `puzzle prompt compact uses English for en`() {
+    val prompt =
+      PromptTemplates.puzzlePromptCompact(
+        language = "en",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(prompt).contains("English")
+  }
+
+  @Test
+  fun `puzzle prompt compact uses Spanish for es`() {
+    val prompt =
+      PromptTemplates.puzzlePromptCompact(
+        language = "es",
+        wordLength = 5,
+        recentWords = emptyList(),
+      )
+    assertThat(prompt).contains("Spanish")
+  }
+
+  @Test
+  fun `chat system prompt uses Brazilian Portuguese for pt`() {
+    val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
+    assertThat(prompt).contains("Brazilian Portuguese")
   }
 }
