@@ -21,5 +21,7 @@ interface PuzzleRepository {
 
   suspend fun markAllUnplayed()
 
+  suspend fun deleteAll()
+
   suspend fun getById(id: Long): Puzzle?
 }

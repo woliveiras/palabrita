@@ -7,6 +7,7 @@ class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepositor
   val markedPlayed = mutableListOf<Long>()
   var unplayedAiPuzzlesCleared = false
   var allUnplayed = false
+  var allDeleted = false
   val savedPuzzles = mutableListOf<Puzzle>()
 
   override suspend fun getNextUnplayed(language: String): Puzzle? = puzzle
@@ -36,6 +37,11 @@ class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepositor
 
   override suspend fun markAllUnplayed() {
     allUnplayed = true
+  }
+
+  override suspend fun deleteAll() {
+    allDeleted = true
+    savedPuzzles.clear()
   }
 
   override suspend fun getById(id: Long): Puzzle? = puzzle?.takeIf { it.id == id }

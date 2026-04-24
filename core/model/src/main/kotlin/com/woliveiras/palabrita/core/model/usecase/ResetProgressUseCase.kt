@@ -15,6 +15,6 @@ class ResetProgressUseCase(
     statsRepository.resetProgress()
     gameSessionRepository.deleteAll()
     chatRepository.deleteAll()
-    puzzleRepository.markAllUnplayed()
+    puzzleRepository.deleteAll()
   }
 }

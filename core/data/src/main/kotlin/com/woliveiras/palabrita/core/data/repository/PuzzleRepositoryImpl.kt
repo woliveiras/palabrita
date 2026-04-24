@@ -35,5 +35,7 @@ class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao)
 
   override suspend fun markAllUnplayed() = puzzleDao.markAllUnplayed()
 
+  override suspend fun deleteAll() = puzzleDao.deleteAll()
+
   override suspend fun getById(id: Long): Puzzle? = puzzleDao.getById(id)?.toDomain()
 }

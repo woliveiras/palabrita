@@ -180,14 +180,14 @@ class SettingsViewModelTest {
   }
 
   @Test
-  fun `reset progress marks all puzzles as unplayed`() = runTest {
+  fun `reset progress deletes all puzzles`() = runTest {
     val puzzleRepo = FakePuzzleRepository()
-    puzzleRepo.allUnplayed = false
+    puzzleRepo.allDeleted = false
     val vm = createViewModel(puzzleRepo = puzzleRepo)
     testDispatcher.scheduler.advanceUntilIdle()
     vm.onAction(SettingsAction.ResetProgress)
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(puzzleRepo.allUnplayed).isTrue()
+    assertThat(puzzleRepo.allDeleted).isTrue()
   }
 
   // --- Delete model ---

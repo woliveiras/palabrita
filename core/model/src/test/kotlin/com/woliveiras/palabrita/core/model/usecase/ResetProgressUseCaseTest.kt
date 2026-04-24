@@ -35,7 +35,7 @@ class ResetProgressUseCaseTest {
     assertThat(stats.stats.totalWon).isEqualTo(0)
     assertThat(sessions.sessions).isEmpty()
     assertThat(chat.messages).isEmpty()
-    assertThat(puzzles.allMarkedUnplayed).isTrue()
+    assertThat(puzzles.allDeleted).isTrue()
   }
 
   // Minimal inline fakes scoped to this test
@@ -101,7 +101,7 @@ class ResetProgressUseCaseTest {
   }
 
   private class InlinePuzzleRepository : PuzzleRepository {
-    var allMarkedUnplayed = false
+    var allDeleted = false
 
     override suspend fun getNextUnplayed(language: String) = null
 
@@ -119,8 +119,10 @@ class ResetProgressUseCaseTest {
 
     override suspend fun deleteUnplayedAiPuzzles() {}
 
-    override suspend fun markAllUnplayed() {
-      allMarkedUnplayed = true
+    override suspend fun markAllUnplayed() {}
+
+    override suspend fun deleteAll() {
+      allDeleted = true
     }
 
     override suspend fun getById(id: Long) = null

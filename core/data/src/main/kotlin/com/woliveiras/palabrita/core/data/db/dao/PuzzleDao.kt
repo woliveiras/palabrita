@@ -63,4 +63,6 @@ interface PuzzleDao {
   suspend fun deleteUnplayedAiPuzzles()
 
   @Query("UPDATE puzzles SET isPlayed = 0, playedAt = NULL") suspend fun markAllUnplayed()
+
+  @Query("DELETE FROM puzzles") suspend fun deleteAll()
 }
