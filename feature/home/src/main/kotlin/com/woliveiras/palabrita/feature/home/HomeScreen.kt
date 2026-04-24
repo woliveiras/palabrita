@@ -370,10 +370,7 @@ private fun LoadingHome() {
 @Composable
 private fun GenerationSuccessScreen(puzzleCount: Int, onStartPlaying: () -> Unit) {
   Column(
-    modifier =
-      Modifier.fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
-        .padding(horizontal = 24.dp),
+    modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {

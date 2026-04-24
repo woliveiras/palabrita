@@ -62,11 +62,7 @@ fun AiInfoScreen(
 
   Column(
     modifier =
-      modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
-        .verticalScroll(rememberScrollState())
-        .padding(horizontal = 20.dp)
+      modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)
   ) {
     Spacer(Modifier.height(16.dp))
 

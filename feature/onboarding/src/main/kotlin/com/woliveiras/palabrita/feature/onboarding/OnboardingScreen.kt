@@ -208,7 +208,6 @@ private fun WelcomeScreen(onNext: () -> Unit) {
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
         .statusBarsPadding()
         .navigationBarsPadding()
         .padding(horizontal = 24.dp),
@@ -348,13 +347,7 @@ private fun LanguageScreen(
   onNext: () -> Unit,
   onBack: () -> Unit,
 ) {
-  Column(
-    modifier =
-      Modifier.fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
-        .statusBarsPadding()
-        .navigationBarsPadding()
-  ) {
+  Column(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
     BackButton(onBack)
     Column(
       modifier = Modifier.weight(1f).padding(horizontal = 24.dp),
@@ -518,13 +511,7 @@ private fun ModelSelectionScreen(
       ) to Pair(Icons.Rounded.PhoneAndroid, listOf(Color(0xFF06B6D4), Color(0xFF2563EB))),
     )
 
-  Column(
-    modifier =
-      Modifier.fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
-        .statusBarsPadding()
-        .navigationBarsPadding()
-  ) {
+  Column(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
     BackButton(onBack)
 
     Column(
@@ -710,7 +697,6 @@ private fun DownloadScreen(
   Column(
     modifier =
       Modifier.fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
         .statusBarsPadding()
         .navigationBarsPadding()
         .padding(horizontal = 24.dp),

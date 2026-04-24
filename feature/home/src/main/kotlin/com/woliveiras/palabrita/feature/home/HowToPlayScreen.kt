@@ -50,7 +50,6 @@ fun HowToPlayScreen(onBack: () -> Unit, onStartPlaying: () -> Unit, modifier: Mo
     modifier =
       modifier
         .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
         .windowInsetsPadding(WindowInsets.statusBars)
         .verticalScroll(rememberScrollState())
         .padding(horizontal = 20.dp, vertical = 16.dp)
