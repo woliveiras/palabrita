@@ -77,7 +77,8 @@ data class GameState(
     val currentInput: String = "",
     val revealedHints: List<String> = emptyList(),
     val keyboardState: Map<Char, LetterState> = emptyMap(),
-    val gameStatus: GameStatus = GameStatus.LOADING,  // LOADING -> PLAYING -> WON/LOST
+    val gameStatus: GameStatus = GameStatus.LOADING,
+    val showShake: Boolean = false,    // triggers shake animation on invalid attempt
     val isLoading: Boolean = false,
     val errorRes: Int? = null,
     val showAbandonDialog: Boolean = false,
@@ -90,6 +91,7 @@ sealed class GameAction {
     data object SubmitAttempt : GameAction()
     data object RevealHint : GameAction()
     data object LoadNextPuzzle : GameAction()
+    data object ClearShake : GameAction()
     // ...
 }
 
@@ -99,7 +101,7 @@ class GameViewModel @Inject constructor(
     private val puzzleRepository: PuzzleRepository,
     // ...
 ) : ViewModel() {
-    init { loadNextGame() }  // auto-start, no picker
+    init { restoreOrLoadNext() }  // restores active session or loads next puzzle
 
     private fun loadNextGame() {
         viewModelScope.launch {
@@ -306,7 +308,18 @@ Strategy by layer:
 
 | Type | Framework | Focus |
 |---|---|---|
-| Unit | JUnit 5 + MockK | Validator, parser, difficulty algorithm |
+| Unit | JUnit + Truth + Turbine | Validator, parser, game rules, use cases |
 | Integration | Room in-memory + Turbine | DAOs, repositories, flows |
 | UI | Compose Testing | Screens, navigation, interactions |
 | E2E (manual) | Physical device | Full flow with real model |
+
+### Shared Fakes (core/testing)
+
+The `core/testing` module provides fake implementations of all repository interfaces for use in unit tests. Prefer real objects (Fakes) over mocks; mock only at system boundaries.
+
+```kotlin
+// Available fakes:
+FakePuzzleRepository, FakeChatRepository, FakeGameSessionRepository,
+FakeStatsRepository, FakeModelRepository, FakePreferencesRepository,
+FakeLlmEngineManager, FakePuzzleGenerator
+```
