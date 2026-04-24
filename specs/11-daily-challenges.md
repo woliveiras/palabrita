@@ -2,7 +2,7 @@
 
 ## Summary
 
-The player receives 3 daily challenges with progressive difficulty (easy → normal → hard). Completing challenges unlocks the next one, generates XP with a 2x bonus, and maintaining streak requires only 1 game per day. Puzzles are unique per player (local AI), non-deterministic.
+The player receives 3 daily challenges with progressive difficulty (easy → normal → hard). Completing challenges unlocks the next one. Maintaining streak requires only 1 game per day. Puzzles are unique per player (local AI), non-deterministic.
 
 ## Context & Motivation
 
@@ -14,16 +14,11 @@ Without daily challenges, the app doesn't create habit. Wordle proved that scarc
 
 | Challenge | Difficulty | Unlock |
 |---------|-------------|-------------|
-| ① | current tier - 1 (min 1) | Always available |
-| ② | current tier | Complete ① |
-| ③ | current tier + 1 (max 5) | Complete ② |
+| ① | shorter word length (easier) | Always available |
+| ② | current word length | Complete ① |
+| ③ | longer word length (harder) | Complete ② |
 
-**Where "current tier" = `currentDifficulty` from `PlayerStats`** (existing adaptive difficulty, spec 05).
-
-Examples:
-- Player level 1: challenges ⭐/⭐/⭐⭐
-- Player level 3: challenges ⭐⭐/⭐⭐⭐/⭐⭐⭐⭐
-- Player level 5: challenges ⭐⭐⭐⭐/⭐⭐⭐⭐⭐/⭐⭐⭐⭐⭐
+**Difficulty is implicit via word length**, controlled by the 3-level generation system (Spec 15). No `currentDifficulty` field — word length determines difficulty (4, 5, or 6 letters).
 
 ### Puzzle Selection
 
@@ -109,35 +104,37 @@ fun updateStreak(stats: PlayerStats, now: LocalDate): PlayerStats {
 
 ### Streak Milestones
 
-| Days | Milestone | Bonus |
-|------|-------|-------|
-| 7 | 🔥 1 week | +5 XP |
-| 30 | 🔥🔥 1 month | +20 XP |
-| 100 | 🔥🔥🔥 100 days | +50 XP (new!) |
-| 365 | 🏆 1 year | +100 XP + "Legendary" badge |
+| Days | Milestone |
+|------|-------|
+| 7 | 🔥 1 week |
+| 30 | 🔥🔥 1 month |
+| 100 | 🔥🔥🔥 100 days |
+| 365 | 🏆 1 year |
+
+> **Note:** XP system was removed. Streak milestones are purely visual — no XP bonuses.
 
 ## Sharing
 
 Format (puzzles unique per player, no shared number):
 
 ```
-Palabrita 🔥12 · Savvy · 350 XP
+Palabrita 🔥12
 
-Challenge 1 ⭐ — 3/6
+Challenge 1 — 3/6
 🟩🟩🟨⬜⬜
 🟩🟩🟩⬜🟩
 🟩🟩🟩🟩🟩
 
-Challenge 2 ⭐⭐ — 4/6
+Challenge 2 — 4/6
 🟩🟨🟨⬜⬜⬜
 🟩🟩🟨⬜🟩⬜
 🟩🟩🟩⬜🟩🟩
 🟩🟩🟩🟩🟩🟩
 
-💡 1 hint used · +22 XP today
+💡 1 hint used
 ```
 
-Highlights: streak, tier and XP (player identity, not puzzle).
+Highlights: streak and performance (no XP or tier — those systems were removed).
 
 ## Data Model — Changes
 
@@ -195,9 +192,9 @@ This separates `lastPlayedAt` (any game) from `lastDailyDate` (daily-specific fo
 ## Acceptance Criteria
 
 - [ ] 3 daily challenges appear on HomeScreen with correct state
-- [ ] Difficulty of daily 1 = `currentDifficulty - 1` (min 1)
-- [ ] Difficulty of daily 2 = `currentDifficulty`
-- [ ] Difficulty of daily 3 = `currentDifficulty + 1` (max 5)
+- [ ] Daily 1 = shorter word length (easier)
+- [ ] Daily 2 = current word length
+- [ ] Daily 3 = longer word length (harder)
 - [ ] Daily 2 unlocks when daily 1 is completed (win or loss)
 - [ ] Daily 3 unlocks when daily 2 is completed (win or loss)
 - [ ] Tap on daily navigates directly to PlayingScreen (no difficulty picker)
@@ -207,7 +204,7 @@ This separates `lastPlayedAt` (any game) from `lastDailyDate` (daily-specific fo
 - [ ] Streak resets if no daily played the previous day
 - [ ] Dailies reset at local midnight
 - [ ] `dailyChallengeIndex` and `dailyChallengeDate` saved in GameSession
-- [ ] Sharing shows streak + tier + XP (not puzzle number)
-- [ ] Streak bonus at 7, 30, 100 and 365 days works
+- [ ] Sharing shows streak (no XP or tier)
+- [ ] Streak milestones at 7, 30, 100 and 365 days are purely visual
 - [ ] Daily puzzles are unique per player
 - [ ] Daily started before midnight counts for the day it started

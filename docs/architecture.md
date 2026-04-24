@@ -41,6 +41,11 @@ Palabrita follows a multi-module Android architecture with clear separation betw
                   +------+------+
                   | core/common |
                   +-------------+
+
+  (test-only)
+  +---------------+
+  | core/testing  | ──→ core/model, core/ai
+  +---------------+
 ```
 
 ## Architectural Patterns
@@ -254,13 +259,13 @@ Navigation flow:
 Start ---> Onboarding completed? ---> Yes ---> Home
                                   `---> No ---> Onboarding ---> Generation ---> Home
 
-Home ---> Play ---> Game (next puzzle by word length from current cycle)
+Home ---> Play ---> Game (next puzzle by word length from 3-level system)
 Home ---> Generate More ---> Generation (re-gen)
 Game ---> Win/Lose ---> Result ---> Chat (post-game, real LLM with streaming)
 Game ---> No Puzzles Left ---> Generation (re-gen)
 
-Difficulty is implicit via word length (4-8 letters). Progressive cycles
-increase the minimum word length over time (see Spec 14).
+Difficulty is implicit via word length (4-6 letters). 3-level system:
+Level 1 = 5×4-letter, Level 2 = 10×5-letter, Level 3+ = 10×6-letter (see Spec 15).
 
 Bottom Nav: Home | AI (AiInfoScreen) | More (Settings)
 ```

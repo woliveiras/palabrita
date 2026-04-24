@@ -116,7 +116,8 @@ Screen 3: AI Selection ──── RAM < 4GB ────→ Light mode (auto) 
   - Size: {size}
   - Available space: {available}
 - Progress bar (determinate, with %)
-- Estimated speed / remaining time (if possible)
+- **Curiosity Slider**: while downloading, a slider with facts about local/offline/open-source AI auto-advances every 4 seconds with fade transitions and dot indicators (replaced the old spinner)
+- "Continue" button appears when download completes (no auto-navigation)
 - Button "Cancel"
 
 **Rules:**
@@ -186,7 +187,8 @@ sealed class DownloadEvent {
 **Content (AI mode):**
 - Title: "Generating your first challenges..."
 - Subtitle: "This only happens the first time"
-- Progress: "Puzzle 3 of 7..."
+- Live activity feed showing generation states: CREATING → VALIDATING → ACCEPTED / FAILED_RETRYING (see Spec 13)
+- Progress: "Puzzle 3 of 5..."
 - Subtle animation (loading with personality)
 
 **Content (Light mode):**
@@ -195,12 +197,14 @@ sealed class DownloadEvent {
 - Quick progress (< 1s, asset loading)
 
 **Rules (AI mode):**
-- Generate 7 puzzles in the selected language
-- Use `PuzzleGenerator.generateBatch(count=7, ...)`
-- Show progress per puzzle
-- If a puzzle fails validation after 3 retries: skip and continue
+- Generate 5 puzzles of 4 letters in the selected language (Level 1 — see Spec 15)
+- Use `PuzzleGenerator.generateBatch(count=5, wordLength=4, ...)`
+- Show progress per puzzle via live activity feed
+- If a puzzle fails validation after retries: skip and continue
 - Minimum acceptable: 3 valid puzzles (if < 3, show error and offer retry or Light mode)
-- On completion: save puzzles to Room, navigate to Game
+- On completion: save puzzles to Room, navigate to Home
+
+> **Note:** Language is saved to `PlayerStatsEntity.preferredLanguage` BEFORE generation starts (race condition fix — Spec 16). Prompts use language display names ("Brazilian Portuguese", not "pt").
 
 **Rules (Light mode):**
 - Load static dataset from assets

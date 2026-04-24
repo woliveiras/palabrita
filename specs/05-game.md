@@ -15,7 +15,7 @@ The game screen is the core of Palabrita. The player tries to discover the word 
   - 🟦 **Mint/Teal** (`#4ECDC4`): correct letter in the correct position
   - 🟧 **Amber/Gold** (`#FFB347`): letter exists in the word but is in the wrong position
   - 🟥 **Coral** (`#FF6B6B`): letter does not exist in the word
-- The player can reveal **hints** (maximum 3, progressive from vaguest to most specific; legacy puzzles may have up to 5)
+- The player can reveal **hints** (maximum 3, progressive from vaguest to most specific)
 - **Win**: guessing the word in any attempt
 - **Loss**: using all 6 attempts without guessing correctly
 
@@ -112,10 +112,11 @@ Before accepting an attempt:
   - ABSENT in all attempts: coral (`#FF6B6B`)
 - Special keys: Backspace (⌫) and Enter (↵)
 - Keys with accessible touch size
+- **Accent keyboard toggle** (Spec 17): a 4th row appears for PT/ES languages with accented characters (á, ã, ç, ñ, etc.). Toggle button "ÁÀ" shows/hides the row. Pressing an accent key types the **base letter** into the input (game logic is ASCII). Accent key colors inherit from the base letter's keyboard state. Hidden for English.
 
 **HintButton**
 - Floating or fixed below the grid
-- Shows: lightbulb icon + "Hint (X/N)" where N is the total hints available for this puzzle (3 or 5 for legacy)
+- Shows: lightbulb icon + "Hint (X/N)" where N is the total hints available for this puzzle (3)
 - On click: reveals the next hint (card slide-in animation)
 - Revealed hint stays visible until the end of the game
 - If all hints revealed: button disabled
@@ -265,17 +266,17 @@ The word was: GATOS 🐱
 
 ## Word Length Progression
 
-Difficulty is implicit via word length (4–8 letters). Players progress through generation cycles that increase the minimum word length over time. See Spec 14 for full details on the cycle system.
+Difficulty is implicit via word length (4–6 letters). Players progress through a simple 3-level system (see Spec 15 for full details):
 
-| Cycle | Lengths generated |
-|-------|-------------------|
-| 0     | 4, 5, 6, 7, 8    |
-| 1     | 5, 6, 7, 8       |
-| 2     | 6, 7, 8          |
-| 3     | 7, 8             |
-| 4+    | 8                 |
+| Level | Word length | Words per batch |
+|-------|-------------|-----------------|
+| 1 (first gen) | 4 letters | 5 words |
+| 2 | 5 letters | 10 words |
+| 3+ | 6 letters | 10 words |
 
-Within each batch, puzzles are served in ascending word-length order (4-letter first, then 5, etc.).
+Level 1 generates only 5 words of 4 letters (fast first experience). After playing them, the user clicks "Generate More" for Level 2 (10 × 5 letters), then Level 3+ (always 10 × 6 letters). Constants are centralized in `GameRules` object (`core/model`).
+
+Within each batch, puzzles are served in order of generation.
 
 ## GameViewModel
 
@@ -356,12 +357,12 @@ sealed class GameAction {
 
 ## Acceptance Criteria
 
-- [ ] Grid renders correctly for words of 4, 5, 6, 7, and 8 letters
+- [ ] Grid renders correctly for words of 4, 5, and 6 letters (3-level system)
 - [ ] Color feedback is correct for duplicate letters (per algorithm)
 - [ ] Keyboard updates colors correctly after each attempt
 - [ ] Flip animation works when revealing feedback
 - [ ] Shake animation works for invalid attempt
-- [ ] Hints reveal progressively (up to 3 for new puzzles, up to 5 for legacy)
+- [ ] Hints reveal progressively (up to 3)
 - [ ] Win correctly detected and navigates to result screen
 - [ ] Loss correctly detected after 6 attempts
 - [ ] Share generates correct emoji grid (no XP or tier in share text)
@@ -376,3 +377,5 @@ sealed class GameAction {
 - [ ] Chat Card is the main CTA in ResultScreen (above "play again")
 - [ ] Share shows streak in the header
 - [ ] Share shows context ("Challenge N/3" or "Free")
+- [ ] Accent keyboard toggle appears for PT/ES languages (Spec 17)
+- [ ] Accent keys type base letter into input (game logic is ASCII)

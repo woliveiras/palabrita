@@ -176,7 +176,7 @@ Static information (no action):
 
 - Confirmation dialog: "This will erase all your statistics, played puzzles, and chat history. This action cannot be undone."
 - Buttons: "Cancel" / "Reset"
-- On confirm:
+- On confirm (handled by `ResetProgressUseCase`):
   1. Clear `PlayerStatsEntity` (reset to initial values)
   2. Clear `GameSessionEntity` (all)
   3. Clear `ChatMessageEntity` (all)

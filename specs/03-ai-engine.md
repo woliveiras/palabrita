@@ -102,17 +102,20 @@ Generates puzzles in batch using the LLM.
 
 ```kotlin
 interface PuzzleGenerator {
+    val activity: StateFlow<GenerationActivity?>
     suspend fun generateBatch(
         count: Int,
         language: String,
-        wordLengths: List<Int>,
+        wordLength: Int,
         recentWords: List<String>,
-        allExistingWords: Set<String>
+        allExistingWords: Set<String>,
+        modelId: ModelId,
+        onPuzzleAttempted: suspend (successCount: Int) -> Unit,
     ): List<Puzzle>
 }
 ```
 
-> **Note:** `targetDifficulty` was removed. Instead, `wordLengths` specifies which word lengths to generate (e.g., `[4, 5, 6, 7, 8]`). Word length distribution is determined by the generation cycle (see Spec 14).
+> **Note:** Generation uses a 3-level system (see Spec 15): Level 1 = 5 words × 4 letters, Level 2 = 10 words × 5 letters, Level 3+ = 10 words × 6 letters. Constants are centralized in `GameRules` (`core/model`).
 
 **Word exclusion strategy:**
 - `recentWords`: last ~50 played words, injected into the prompt as a variety hint for the LLM
@@ -175,56 +178,87 @@ Prompt constants organized by model and use case.
 ```kotlin
 object PromptTemplates {
 
+    private val LANGUAGE_NAMES = mapOf(
+        "pt" to "Brazilian Portuguese",
+        "en" to "English",
+        "es" to "Spanish",
+    )
+
+    fun languageDisplayName(code: String): String = LANGUAGE_NAMES[code] ?: code
+
     // --- Puzzle Generation ---
 
-    fun puzzleSystemPromptGemma4(): String = """
-        You are a word generator for a guessing game.
-        Always respond using the provided function. Never add text outside the function call.
+    fun puzzleSystemPrompt(): String = """
+        You are a word generator for a guessing game. Your function is to return exactly one JSON object per request.
+        Always respond with ONLY a JSON object. No markdown, no code fences, no explanation.
+        The JSON keys MUST be in English: "word", "hints".
+        The values for word and hints must be in the requested language.
     """.trimIndent()
 
-    fun puzzleUserPromptGemma4(
+    fun puzzleUserPromptLarge(
         language: String,
         wordLength: Int,
         recentWords: List<String>
     ): String {
+        val lang = languageDisplayName(language)
         return """
-            Generate a word for the game.
-            Output language: $language
-            Length: exactly $wordLength letters
-            The word and hints MUST be in $language.
-            Avoid these recent words: ${recentWords.joinToString(", ")}
+            Generate a word for the game. Return ONLY a JSON object, no markdown.
+
+            Required JSON format (keys MUST be in English):
+            {"word": "string", "hints": ["h1","h2","h3"]}
+
+            CRITICAL: The word MUST have exactly $wordLength letters.
+
+            Rules:
+            - Output language for values: $lang
+            - The word MUST be a common noun in $lang, exactly $wordLength lowercase letters
+            - Exactly 3 progressive hints in $lang: from vaguest to most specific
+            - Hints MUST NOT contain the word itself
+            - Avoid these recent words: ${recentWords.joinToString(", ")}
         """.trimIndent()
     }
 
-    fun puzzlePromptGemma3(
+    fun puzzlePromptCompact(
         language: String,
         wordLength: Int,
         recentWords: List<String>
     ): String {
+        val lang = languageDisplayName(language)
         return """
-            You are a word generator for a game. Return ONLY valid JSON, no extra text.
+            You are a word generator for a game. Return ONLY a JSON object, no markdown, no code fences.
 
-            Schema:
-            {"word": "string", "hints": ["string","string","string"]}
+            Required JSON format (keys MUST be in English exactly as shown):
+            {"word": "string", "hints": ["h1","h2","h3"]}
 
-            Rules:
-            - The word MUST be a common noun in $language, exactly $wordLength letters
-            - No proper nouns, no accents, lowercase only
-            - 3 progressive hints: from vaguest to most specific, written in $language
-            - Hints MUST NOT contain the word
+            CRITICAL RULE 1 — Word length: the word MUST have exactly $wordLength letters.
+            CRITICAL RULE 2 — Hints: NEVER include the word itself inside any hint.
+
+            Other rules:
+            - The word must be a common noun in $lang, lowercase
+            - No proper nouns
+            - Exactly 3 progressive hints in $lang: from vaguest to most specific
             - Avoid these recent words: ${recentWords.joinToString(", ")}
         """.trimIndent()
     }
 
     // --- Chat ---
 
-    fun chatSystemPrompt(word: String, language: String): String = """
-        You are an educational assistant. The player just guessed the word "$word".
-        Answer questions about: word origin, etymology, fun facts, usage in sentences, synonyms, translations to other languages.
-        Keep responses short (max 3 paragraphs). Always respond in $language.
-    """.trimIndent()
+    fun chatSystemPrompt(word: String, language: String): String {
+        val lang = languageDisplayName(language)
+        return """
+            You are an educational assistant. The player just guessed the word "$word".
+            Answer questions about: word origin, etymology, fun facts, usage in sentences, synonyms, translations to other languages.
+            Keep responses short (max 3 paragraphs). Always respond in $lang.
+        """.trimIndent()
+    }
 }
 ```
+
+> **Key changes from earlier versions:**
+> - Language codes are mapped to display names (`"pt"` → `"Brazilian Portuguese"`) to avoid ambiguous LLM output
+> - No "no accents" constraint — LLM can generate accented words naturally; `TextNormalizer` handles normalization
+> - `category` and `difficulty` removed from prompts entirely
+> - Single system prompt (not model-specific); two user prompts: `large` (Gemma 4 E2B) and `compact` (Qwen3 0.6B)
 
 ### LlmResponseParser
 
@@ -262,12 +296,14 @@ Deterministic validation (without LLM).
 
 | Rule | Criterion | Action if failed |
 |---|---|---|
-| Word length | Within 4-8 letters, matching the requested length | Reject |
-| Valid characters | Only `[a-z]` (no accents, no spaces, no hyphens) | Reject |
-| Lowercase | Entire word in lowercase | Normalize (toLowerCase) |
+| Word length | Within 4–6 letters (per 3-level system), matching the requested length | Reject |
+| Valid characters | Only `[a-z]` after normalization (accented input is normalized via `TextNormalizer`) | Reject |
+| Lowercase | Entire word in lowercase (after normalization) | Normalize |
 | Not duplicated | Word does not exist in the database | Reject |
 | Hints count | At least 3 hints (if more, take first 3) | Reject if < 3 |
 | Hints do not reveal | No hint contains the word | Reject |
+
+> **Accent handling:** The validator normalizes words via `TextNormalizer.normalizeToAscii()` before checking. Accented words like "café" are normalized to "cafe" and then validated against `[a-z]+`. This means accented LLM output is accepted and properly handled.
 
 **Interface:**
 
@@ -315,12 +351,13 @@ fun generatePuzzle(
 ## Acceptance Criteria
 
 - [ ] `LlmEngineManager` initializes with Gemma 4 E2B on a device with ≥8GB RAM
-- [ ] `LlmEngineManager` initializes with Gemma 3 1B on a device with 4-8GB RAM
-- [ ] `PuzzleGenerator` generates a batch of 20 valid puzzles in <60s (Gemma 4) or <30s (Gemma 3)
+- [ ] `LlmEngineManager` initializes with Qwen3 0.6B on a device with 4-8GB RAM
+- [ ] `PuzzleGenerator` generates a batch of valid puzzles per the 3-level system (Spec 15)
+- [ ] `PuzzleGenerator` exposes `activity: StateFlow<GenerationActivity?>` for live UI updates (Spec 13)
 - [ ] `LlmResponseParser` parses valid JSON correctly
 - [ ] `LlmResponseParser` extracts JSON from responses with extra text via regex fallback
-- [ ] `PuzzleValidator` rejects words outside the 4-8 character range
-- [ ] `PuzzleValidator` rejects words with accents or special characters
+- [ ] `PuzzleValidator` rejects words outside the expected length range (after normalization)
+- [ ] `PuzzleValidator` normalizes accented words via TextNormalizer and accepts them
 - [ ] `PuzzleValidator` rejects puzzles with hints that contain the word
 - [ ] `PuzzleValidator` rejects duplicate words
 - [ ] `PuzzleValidator` accepts 3 hints; takes first 3 if more are returned
@@ -328,3 +365,5 @@ fun generatePuzzle(
 - [ ] `ChatEngine` respects the 10-message limit per session
 - [ ] Retry generates a valid puzzle after failure on the first attempt (tested with mock)
 - [ ] Engine is destroyed and recreated correctly when switching models
+- [ ] Prompts use language display names (not raw codes): "Brazilian Portuguese", "English", "Spanish"
+- [ ] Prompts do NOT contain "no accents" restriction

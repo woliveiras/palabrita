@@ -2,11 +2,11 @@
 
 ## Summary
 
-The AI Chat is Palabrita's differentiator. After each game, the player can chat with the AI about the word, learning etymology, trivia, and usage. This spec defines the incentive system to encourage players to use the chat: bonus XP, contextual suggestions, Home nudges, and explorer badges.
+The AI Chat is Palabrita's differentiator. After each game, the player can chat with the AI about the word, learning etymology, trivia, and usage. This spec defines the incentive system to encourage players to use the chat: contextual suggestions, Home nudges, and explorer badges.
 
 ## Context & Motivation
 
-The AI Chat already exists (Spec 06), but without clear incentives for use, most players will ignore it. Successful educational games (Duolingo, Quizlet) show that tangible rewards for curiosity increase engagement. In Palabrita: **knowledge = XP**.
+The AI Chat already exists (Spec 06), but without clear incentives for use, most players will ignore it. Successful educational games (Duolingo, Quizlet) show that tangible rewards for curiosity increase engagement. In Palabrita: **knowledge = engagement**.
 
 ## Chat Entry Flow
 
@@ -26,8 +26,6 @@ The Chat Card is the **main CTA** on the ResultScreen (win or loss). It should b
 │  │  🧬 Etymology          │  │
 │  │  🌎 Trivia             │  │
 │  │  📝 Example sentences  │  │
-│  │                        │  │
-│  │  +1 bonus XP ✨        │  │
 │  │                        │  │
 │  │  [ EXPLORE NOW ]       │  │
 │  └────────────────────────┘  │
@@ -134,14 +132,16 @@ fun generateSuggestions(
 
 Tap on a suggestion → automatically sends the prompt → AI responds → suggestions disappear (free chat from that point on).
 
-## Bonus XP — "Curiosity Bonus"
+## ~~Bonus XP — "Curiosity Bonus"~~ (Removed)
 
-### Rule
+> **Note:** The XP system was removed from the app entirely. There is no XP tracking, no bonus XP for chat, and no XP display. Chat engagement is driven by contextual suggestions, badges, and the intrinsic value of learning about words. The sections below are kept for historical context but are NOT implemented.
 
-- Each chat session grants **+1 XP** ("Curiosity Bonus")
-- Maximum 1 bonus per puzzle (does not stack if the chat is opened twice for the same puzzle)
-- Requires a minimum of **1 message sent** (opening and closing without interacting does not count)
-- Applies to dailies AND free play
+### ~~Rule~~ (Not implemented)
+
+- ~~Each chat session grants **+1 XP** ("Curiosity Bonus")~~
+- ~~Maximum 1 bonus per puzzle~~
+- ~~Requires a minimum of **1 message sent**~~
+- ~~Applies to dailies AND free play~~
 
 ### Calculation
 
@@ -372,8 +372,8 @@ data class BadgeEntity(
 
 | Decision | Choice | Reason |
 |---------|---------|-------|
-| Bonus XP per chat | Fixed +1 XP | Simple, predictable, does not break economy |
-| Badges vs XP only | Both | XP = progression, badges = collectibles |
+| ~~Bonus XP per chat~~ | ~~Fixed +1 XP~~ | Removed — XP system no longer exists |
+| Badges vs XP only | Badges only | XP removed; badges provide collectible engagement |
 | Chat as main CTA | Yes | App differentiator, should be prominent |
 | Suggestions disappear after 1st | Yes | Guides entry, frees chat for open conversation |
 | Home nudge | 1 at a time | Not intrusive, gentle reminder |
@@ -392,9 +392,7 @@ data class BadgeEntity(
 - [ ] Chat Card shows 3+ contextual suggestions with icons
 - [ ] Tapping a suggestion automatically sends the message to the LLM
 - [ ] Suggestions disappear after the 1st interaction
-- [ ] +1 XP bonus when sending 1st message in chat (per puzzle)
-- [ ] Bonus does not duplicate if chat is reopened for the same puzzle
-- [ ] Visual feedback "✨ +1 XP — Curiosity Bonus" appears in chat
+- [ ] ~~+1 XP bonus~~ (Removed — no XP system)
 - [ ] "Explorer" badge unlocked after 10 chat sessions
 - [ ] "Linguist" badge unlocked after 50 chat sessions
 - [ ] Inline notification when a new badge is earned

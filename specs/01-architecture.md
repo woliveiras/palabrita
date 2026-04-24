@@ -26,13 +26,14 @@ Palabrita is a native Android app (Kotlin + Jetpack Compose) with a multi-module
 palabrita/
 ├── app/                        → Entry point, navigation, DI root
 ├── core/
-│   ├── model/                  → Data classes, enums, repository interfaces
-│   ├── data/                   → Room DB, DAOs, repository implementations, static dataset
+│   ├── model/                  → Data classes, enums, repository interfaces, GameRules
+│   ├── data/                   → Room DB (v4), DAOs, repository implementations, static dataset
 │   ├── ai/                     → LiteRT-LM wrapper, prompts, parser, validator
-│   └── common/                 → Device capabilities, storage checker, extensions
+│   ├── common/                 → Device capabilities, storage checker, TextNormalizer, StateMachine, extensions
+│   └── testing/                → Shared test fakes (test-only dependency)
 ├── feature/
 │   ├── onboarding/             → Onboarding, model selection, download
-│   ├── game/                   → Game screen (Wordle-style)
+│   ├── game/                   → Game screen (Wordle-style), accent keyboard
 │   ├── chat/                   → Post-guess chat
 │   └── settings/               → Settings, model switching, statistics
 └── gradle/
@@ -53,9 +54,10 @@ feature/chat       ──→ core/ai, core/data, core/model
 feature/settings   ──→ core/ai, core/data, core/model, core/common
 
 core/data ──→ core/model
-core/ai   ──→ core/model
+core/ai   ──→ core/model, core/common
 core/common ──→ (no internal dependencies)
 core/model  ──→ (no internal dependencies)
+core/testing ──→ core/model, core/ai (testImplementation only)
 ```
 
 **Rule**: no `feature/*` module depends on another `feature/*`.
@@ -93,6 +95,7 @@ core/model  ──→ (no internal dependencies)
 - `DeviceCapabilities`: RAM detection, tier classification
 - `StorageChecker`: available storage
 - `StateMachine<S, E>`: generic mini state machine (~30 lines), used in complex flows
+- `TextNormalizer`: NFD-based accent normalization (accented chars → ASCII, e.g. "ação" → "acao")
 - Shared extension functions
 
 **When to use StateMachine vs sealed class + when:**
@@ -113,7 +116,11 @@ core/model  ──→ (no internal dependencies)
 
 ### `feature/settings`
 - Settings: language, model, statistics, storage
-- `SettingsViewModel`
+- `SettingsViewModel` (uses `ResetProgressUseCase` for reset logic)
+
+### `core/testing` (test-only module)
+- Shared test fakes: `FakeStatsRepository`, `FakePuzzleRepository`, `FakeGameSessionRepository`, `FakeChatRepository`, `FakeModelRepository`, `FakeLlmEngineManager`, `FakeLlmSession`, `FakeGenerationScheduler`, `FakeAppPreferences`
+- Used by all feature module tests to avoid duplicating fakes
 
 ## Acceptance Criteria
 

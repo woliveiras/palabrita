@@ -11,12 +11,12 @@ All local persistence uses Room (SQLite). The entities represent puzzles, game s
 | Field | Type | Description |
 |---|---|---|
 | `id` | `Long` (auto-generate) | PK |
-| `word` | `String` | Puzzle word (no accents, lowercase) |
-| `wordDisplay` | `String` | Word with accents for post-game display |
+| `word` | `String` | Puzzle word (ASCII normalized via `TextNormalizer`, lowercase). Accents stripped: "ação" → "acao" |
+| `wordDisplay` | `String` | Original word preserved with accents for display (e.g. "AÇÃO"). Game logic uses `word` (ASCII); UI shows `wordDisplay`. |
 | `language` | `String` | ISO 639-1 code (e.g., "pt", "en", "es") |
 | `difficulty` | `Int` | Word length (4–8) |
 | `category` | `String` | Always empty string `""`. Column kept for backward compatibility (no Room migration). |
-| `hints` | `String` | JSON array of 3 strings (progressive hints). Legacy rows may have 5. |
+| `hints` | `String` | JSON array of 3 strings (progressive hints) |
 | `source` | `String` | Enum: `"AI"` or `"STATIC"` |
 | `generatedAt` | `Long` | Generation timestamp (epoch ms) |
 | `playedAt` | `Long?` | Timestamp when played (null if not played) |
@@ -32,14 +32,12 @@ All local persistence uses Room (SQLite). The entities represent puzzles, game s
 | `id` | `Int` | PK (always 1 — singleton) |
 | `totalPlayed` | `Int` | Total games completed |
 | `totalWon` | `Int` | Total wins |
-| `currentStreak` | `Int` | Consecutive days played (regardless of win/loss) |
-| `maxStreak` | `Int` | Longest streak of consecutive days |
 | `avgAttempts` | `Float` | Average attempts per game |
 | `preferredLanguage` | `String` | Preferred language (ISO 639-1) |
 | `guessDistribution` | `String` | JSON: `{"1": 5, "2": 10, "3": 8, "4": 3, "5": 1, "6": 0}` |
 | `lastPlayedAt` | `Long` | Timestamp of last game (for day streak) |
 
-> **Note:** Legacy columns (`totalXp`, `playerTier`, `currentDifficulty`, `maxUnlockedDifficulty`, `gamesWonByDifficulty`, `winRateByDifficulty`, `consecutiveLossesAtCurrent`, `wordSizePreference`) are kept in the DB schema for backward compatibility (no Room migration) but are no longer used by the application.
+> **Note (Room v4):** Legacy columns (`totalXp`, `playerTier`, `currentDifficulty`, `maxUnlockedDifficulty`, `gamesWonByDifficulty`, `winRateByDifficulty`, `consecutiveLossesAtCurrent`, `wordSizePreference`, `currentStreak`, `maxStreak`) were removed in a destructive migration (v3→v4). The app is pre-production so no data migration was needed. `fallbackToDestructiveMigration(true)` is enabled.
 
 ### GameSessionEntity
 
