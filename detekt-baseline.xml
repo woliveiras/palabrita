@@ -66,7 +66,7 @@
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun LanguageDialog(current: String, onSelect: (String) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SectionHeader(title: String)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun StatItem(value: String, label: String)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun StatsSection(state: SettingsState)</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun StatsSection(state: SettingsState, onShareStats: () -&gt; Unit)</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:SplashScreen.kt$@Composable fun SplashScreen(onNavigationReady: () -&gt; Unit)</ID>
     <ID>FunctionNaming:Theme.kt$@Composable fun PalabritaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -&gt; Unit)</ID>

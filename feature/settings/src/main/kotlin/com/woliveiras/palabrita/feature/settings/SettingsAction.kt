@@ -11,5 +11,7 @@ sealed class SettingsAction {
 
   data object ResetProgress : SettingsAction()
 
+  data object ShareStats : SettingsAction()
+
   data object DismissError : SettingsAction()
 }

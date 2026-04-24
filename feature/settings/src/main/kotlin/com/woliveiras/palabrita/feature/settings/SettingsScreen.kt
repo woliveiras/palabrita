@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.feature.settings
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,10 +73,27 @@ fun SettingsScreen(
   var showDeleteModelDialog by remember { mutableStateOf(false) }
   var showResetDialog by remember { mutableStateOf(false) }
 
+  val context = LocalContext.current
+
   LaunchedEffect(errorMessage) {
     errorMessage?.let {
       snackbarHostState.showSnackbar(it)
       viewModel.onAction(SettingsAction.DismissError)
+    }
+  }
+
+  LaunchedEffect(Unit) {
+    viewModel.events.collect { event ->
+      when (event) {
+        is SettingsEvent.ShareText -> {
+          val sendIntent =
+            Intent(Intent.ACTION_SEND).apply {
+              putExtra(Intent.EXTRA_TEXT, event.text)
+              type = "text/plain"
+            }
+          context.startActivity(Intent.createChooser(sendIntent, null))
+        }
+      }
     }
   }
 
@@ -115,7 +134,7 @@ fun SettingsScreen(
 
       // --- ESTATÍSTICAS ---
       SectionHeader(stringResource(CommonR.string.settings_section_stats))
-      StatsSection(state = state)
+      StatsSection(state = state, onShareStats = { viewModel.onAction(SettingsAction.ShareStats) })
 
       HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -306,7 +325,7 @@ private const val HISTOGRAM_BAR_MIN_WIDTH = 24
 private const val HISTOGRAM_BAR_HEIGHT = 20
 
 @Composable
-private fun StatsSection(state: SettingsState) {
+private fun StatsSection(state: SettingsState, onShareStats: () -> Unit) {
   Column(modifier = Modifier.padding(horizontal = 16.dp)) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
       StatItem(
@@ -334,6 +353,13 @@ private fun StatsSection(state: SettingsState) {
       )
       Spacer(Modifier.height(8.dp))
       GuessDistributionHistogram(distribution = state.stats.guessDistribution)
+    }
+
+    if (state.stats.totalPlayed > 0) {
+      Spacer(Modifier.height(12.dp))
+      TextButton(onClick = onShareStats, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        Text(stringResource(CommonR.string.share))
+      }
     }
   }
 }
