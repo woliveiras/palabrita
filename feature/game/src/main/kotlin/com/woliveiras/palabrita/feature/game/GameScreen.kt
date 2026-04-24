@@ -58,6 +58,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -595,6 +597,7 @@ private fun GameKeyboard(
 ) {
   val accentChars = ACCENT_ROWS[language]
   var accentMode by remember { mutableStateOf(false) }
+  val accentToggleLabel = stringResource(CommonR.string.accent_toggle)
 
   Column(
     modifier = Modifier.fillMaxWidth(),
@@ -655,7 +658,8 @@ private fun GameKeyboard(
           color =
             if (accentMode) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.surfaceVariant,
-          modifier = Modifier.height(48.dp).weight(1.3f),
+          modifier =
+            Modifier.height(48.dp).weight(1.3f).semantics { contentDescription = accentToggleLabel },
         ) {
           Box(contentAlignment = Alignment.Center) {
             Text(

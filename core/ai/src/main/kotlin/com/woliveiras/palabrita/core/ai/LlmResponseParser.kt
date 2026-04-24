@@ -23,7 +23,8 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
       return ParseResult.Error("empty response", rawResponse)
     }
 
-    val cleaned = stripCodeFences(rawResponse)
+    val sanitized = sanitizeUtf8(rawResponse)
+    val cleaned = stripCodeFences(sanitized)
 
     // Attempt 1: direct decode with canonical keys
     tryDecode(cleaned)?.let {
@@ -50,6 +51,11 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
   private fun stripCodeFences(text: String): String {
     val match = codeFenceRegex.find(text) ?: return text
     return match.groupValues[1].trim()
+  }
+
+  private fun sanitizeUtf8(text: String): String {
+    val bytes = text.toByteArray(Charsets.UTF_8)
+    return String(bytes, Charsets.UTF_8).replace("\uFFFD", "")
   }
 
   private fun tryDecode(text: String): PuzzleResponse? =

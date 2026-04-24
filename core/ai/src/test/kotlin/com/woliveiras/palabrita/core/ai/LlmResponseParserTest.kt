@@ -129,4 +129,18 @@ class LlmResponseParserTest {
 
     assertThat(result).isInstanceOf(ParseResult.Success::class.java)
   }
+
+  // --- Mojibake / UTF-8 recovery ---
+
+  @Test
+  fun `strips replacement characters from mojibake input`() {
+    val replacementChar = '\uFFFD'
+    val json = """{"word":"a${replacementChar}o","hints":["Dica 1","Dica 2","Dica 3"]}"""
+
+    val result = parser.parsePuzzle(json)
+
+    assertThat(result).isInstanceOf(ParseResult.Success::class.java)
+    val puzzle = (result as ParseResult.Success).data
+    assertThat(puzzle.word).isEqualTo("ao")
+  }
 }
