@@ -19,6 +19,7 @@ import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.GameRules
+import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
@@ -57,8 +58,9 @@ constructor(
     val modelId =
       inputData.getString(KEY_MODEL_ID)?.let {
         try {
-          com.woliveiras.palabrita.core.model.ModelId.valueOf(it)
-        } catch (_: Exception) {
+          ModelId.valueOf(it)
+        } catch (e: Exception) {
+          android.util.Log.e("PuzzleGenerationWorker", "Invalid ModelId: $it", e)
           null
         }
       } ?: return Result.failure()
@@ -92,8 +94,9 @@ constructor(
         appPreferences.incrementGenerationCycle()
         showCompletionNotification(puzzles.size)
       }
-    } catch (_: Exception) {
-      // Generation failed entirely
+    } catch (e: Exception) {
+      android.util.Log.e("PuzzleGenerationWorker", "Batch generation failed", e)
+      // Generation failed entirely — return with zero count
     }
 
     return Result.success(
