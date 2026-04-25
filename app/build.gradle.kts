@@ -59,6 +59,7 @@ dependencies {
   debugImplementation(libs.compose.ui.tooling)
   debugImplementation(libs.compose.ui.test.manifest)
 
+  implementation(libs.appcompat)
   implementation(libs.core.ktx)
   implementation(libs.core.splashscreen)
   implementation(libs.activity.compose)
