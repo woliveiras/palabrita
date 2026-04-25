@@ -22,17 +22,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,62 +82,75 @@ fun HomeScreen(
     return
   }
 
-  Column(
+  Box(
     modifier =
       modifier
         .fillMaxSize()
+        .background(PalabritaColors.ContentPrimary)
         .windowInsetsPadding(WindowInsets.statusBars)
-        .verticalScroll(rememberScrollState())
-        .padding(horizontal = 20.dp, vertical = 16.dp)
+        .padding(horizontal = 12.dp)
+        .padding(top = 8.dp, bottom = 12.dp)
   ) {
-    // --- Header ---
-    Header(languageDisplay = state.languageDisplay, onSettingsTap = onNavigateToSettings)
+    Surface(
+      modifier = Modifier.fillMaxSize(),
+      shape = RoundedCornerShape(24.dp),
+      color = MaterialTheme.colorScheme.surface,
+    ) {
+      Column(
+        modifier =
+          Modifier.verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 20.dp)
+      ) {
+        // --- Header ---
+        Header(languageDisplay = state.languageDisplay, onSettingsTap = onNavigateToSettings)
 
-    Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-    // --- Play CTA Card ---
-    PlayCtaCard(
-      unplayedCount = state.unplayedCount,
-      isGenerating = state.isGeneratingPuzzles,
-      onPlay = onNavigateToGame,
-      onGenerate = onNavigateToGeneration,
-    )
+        // --- Play CTA Card ---
+        PlayCtaCard(
+          unplayedCount = state.unplayedCount,
+          isGenerating = state.isGeneratingPuzzles,
+          onPlay = onNavigateToGame,
+          onGenerate = onNavigateToGeneration,
+        )
 
-    Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-    // --- Quick Stats Row ---
-    QuickStatsRow(
-      totalPlayed = state.totalPlayed,
-      winRate = state.winRate,
-      currentStreak = state.currentStreak,
-    )
+        // --- Quick Stats Row ---
+        QuickStatsRow(
+          totalPlayed = state.totalPlayed,
+          winRate = state.winRate,
+          currentStreak = state.currentStreak,
+        )
 
-    Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(24.dp))
 
-    // --- Info Cards ---
-    InfoCard(
-      icon = Icons.Rounded.HelpOutline,
-      title = stringResource(CommonR.string.home_how_to_play),
-      subtitle = stringResource(CommonR.string.home_how_to_play_subtitle),
-      onClick = onNavigateToHowToPlay,
-    )
+        // --- Info Cards ---
+        InfoCard(
+          icon = Icons.Rounded.HelpOutline,
+          title = stringResource(CommonR.string.home_how_to_play),
+          subtitle = stringResource(CommonR.string.home_how_to_play_subtitle),
+          onClick = onNavigateToHowToPlay,
+        )
 
-    Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-    InfoCard(
-      icon = Icons.Rounded.Info,
-      title = stringResource(CommonR.string.home_about_ai),
-      subtitle = stringResource(CommonR.string.home_about_ai_subtitle),
-      onClick = onNavigateToAiInfo,
-    )
+        InfoCard(
+          icon = Icons.Rounded.Info,
+          title = stringResource(CommonR.string.home_about_ai),
+          subtitle = stringResource(CommonR.string.home_about_ai_subtitle),
+          onClick = onNavigateToAiInfo,
+        )
 
-    // --- Generation indicator ---
-    if (state.isGeneratingPuzzles) {
-      Spacer(Modifier.height(16.dp))
-      GenerationIndicator()
+        // --- Generation indicator ---
+        if (state.isGeneratingPuzzles) {
+          Spacer(Modifier.height(16.dp))
+          GenerationIndicator()
+        }
+
+        Spacer(Modifier.height(24.dp))
+      }
     }
-
-    Spacer(Modifier.height(24.dp))
   }
 }
 
@@ -166,15 +179,20 @@ private fun Header(languageDisplay: String, onSettingsTap: () -> Unit) {
       }
     }
     val settingsCd = stringResource(CommonR.string.home_settings_cd)
-    IconButton(
+    Surface(
       onClick = onSettingsTap,
-      modifier = Modifier.semantics { contentDescription = settingsCd },
+      shape = RoundedCornerShape(12.dp),
+      color = MaterialTheme.colorScheme.surfaceVariant,
+      modifier = Modifier.size(44.dp).semantics { contentDescription = settingsCd },
     ) {
-      Icon(
-        imageVector = Icons.Rounded.Settings,
-        contentDescription = null,
-        modifier = Modifier.size(28.dp),
-      )
+      Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        Icon(
+          imageVector = Icons.Rounded.Settings,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.size(22.dp),
+        )
+      }
     }
   }
 }
@@ -249,32 +267,56 @@ private fun QuickStatsRow(totalPlayed: Int, winRate: Float, currentStreak: Int) 
     StatCard(
       value = "$totalPlayed",
       label = stringResource(CommonR.string.home_stats_games),
+      icon = Icons.Rounded.PlayArrow,
       modifier = Modifier.weight(1f),
     )
     StatCard(
       value = "${(winRate * 100).toInt()}%",
       label = stringResource(CommonR.string.home_stats_winrate),
+      icon = Icons.Rounded.EmojiEvents,
       modifier = Modifier.weight(1f),
     )
     StatCard(
       value = "$currentStreak",
       label = stringResource(CommonR.string.home_stats_streak),
+      icon = Icons.Rounded.TrendingUp,
       modifier = Modifier.weight(1f),
     )
   }
 }
 
 @Composable
-private fun StatCard(value: String, label: String, modifier: Modifier = Modifier) {
-  Surface(
+private fun StatCard(
+  value: String,
+  label: String,
+  icon: androidx.compose.ui.graphics.vector.ImageVector,
+  modifier: Modifier = Modifier,
+) {
+  Card(
     modifier = modifier,
     shape = RoundedCornerShape(16.dp),
-    color = MaterialTheme.colorScheme.surfaceVariant,
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
   ) {
     Column(
       modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+      Surface(
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.size(36.dp),
+      ) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+          Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(18.dp),
+          )
+        }
+      }
+      Spacer(Modifier.height(8.dp))
       Text(
         text = value,
         style = MaterialTheme.typography.headlineSmall,
@@ -295,10 +337,12 @@ private fun StatCard(value: String, label: String, modifier: Modifier = Modifier
 
 @Composable
 private fun InfoCard(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
-  OutlinedCard(
+  Card(
     onClick = onClick,
     modifier = Modifier.fillMaxWidth(),
     shape = RoundedCornerShape(16.dp),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
   ) {
     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
       Surface(
@@ -336,7 +380,12 @@ private fun InfoCard(icon: ImageVector, title: String, subtitle: String, onClick
 
 @Composable
 private fun GenerationIndicator() {
-  OutlinedCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+  Card(
+    modifier = Modifier.fillMaxWidth(),
+    shape = RoundedCornerShape(12.dp),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+  ) {
     Row(
       modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
