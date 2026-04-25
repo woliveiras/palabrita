@@ -8,6 +8,8 @@ import com.woliveiras.palabrita.core.ai.LlmResponseParserImpl
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadManagerImpl
 import com.woliveiras.palabrita.core.ai.ModelRegistry
+import com.woliveiras.palabrita.core.ai.PromptProvider
+import com.woliveiras.palabrita.core.ai.PromptTemplates
 import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.ai.PuzzleGeneratorImpl
 import com.woliveiras.palabrita.core.ai.PuzzleValidator
@@ -45,5 +47,7 @@ abstract class AiModule {
 
   companion object {
     @Provides @Singleton fun provideModelRegistry(): ModelRegistry = AiModelRegistry
+
+    @Provides @Singleton fun providePromptProvider(): PromptProvider = PromptTemplates
   }
 }

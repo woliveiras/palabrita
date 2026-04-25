@@ -1,13 +1,25 @@
 package com.woliveiras.palabrita.core.ai
 
-object PromptTemplates {
+interface PromptProvider {
+  fun puzzleSystemPrompt(): String
+
+  fun puzzleUserPromptLarge(language: String, wordLength: Int, recentWords: List<String>): String
+
+  fun puzzlePromptCompact(language: String, wordLength: Int, recentWords: List<String>): String
+
+  fun chatSystemPrompt(word: String, language: String): String
+
+  fun languageDisplayName(code: String): String
+}
+
+object PromptTemplates : PromptProvider {
 
   private val LANGUAGE_NAMES =
     mapOf("pt" to "Brazilian Portuguese", "en" to "English", "es" to "Spanish")
 
-  fun languageDisplayName(code: String): String = LANGUAGE_NAMES[code] ?: code
+  override fun languageDisplayName(code: String): String = LANGUAGE_NAMES[code] ?: code
 
-  fun puzzleSystemPrompt(): String =
+  override fun puzzleSystemPrompt(): String =
     """
     You are a word generator for a guessing game. Your function is to return exactly one JSON object per request.
     Always respond with ONLY a JSON object. No markdown, no code fences, no explanation.
@@ -16,7 +28,7 @@ object PromptTemplates {
     """
       .trimIndent()
 
-  fun puzzleUserPromptLarge(language: String, wordLength: Int, recentWords: List<String>): String {
+  override fun puzzleUserPromptLarge(language: String, wordLength: Int, recentWords: List<String>): String {
     val lang = languageDisplayName(language)
     return """
       Generate a word for the game. Return ONLY a JSON object, no markdown.
@@ -36,7 +48,7 @@ object PromptTemplates {
       .trimIndent()
   }
 
-  fun puzzlePromptCompact(language: String, wordLength: Int, recentWords: List<String>): String {
+  override fun puzzlePromptCompact(language: String, wordLength: Int, recentWords: List<String>): String {
     val lang = languageDisplayName(language)
     return """
       You are a word generator for a game. Return ONLY a JSON object, no markdown, no code fences.
@@ -58,7 +70,7 @@ object PromptTemplates {
       .trimIndent()
   }
 
-  fun chatSystemPrompt(word: String, language: String): String {
+  override fun chatSystemPrompt(word: String, language: String): String {
     val lang = languageDisplayName(language)
     return """
     You are an educational assistant. The player just guessed the word "$word".

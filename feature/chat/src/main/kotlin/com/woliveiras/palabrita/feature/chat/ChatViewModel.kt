@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.ai.EngineState
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.LlmSession
-import com.woliveiras.palabrita.core.ai.PromptTemplates
+import com.woliveiras.palabrita.core.ai.PromptProvider
 import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.repository.ChatRepository
@@ -38,6 +38,7 @@ constructor(
   private val gameSessionRepository: GameSessionRepository,
   private val engineManager: LlmEngineManager,
   private val modelRepository: ModelRepository,
+  private val promptProvider: PromptProvider,
 ) : ViewModel() {
 
   private val puzzleId: Long = savedStateHandle["puzzleId"] ?: 0L
@@ -135,7 +136,7 @@ constructor(
     }
 
     val current = _state.value
-    val systemPrompt = PromptTemplates.chatSystemPrompt(current.word, current.language)
+    val systemPrompt = promptProvider.chatSystemPrompt(current.word, current.language)
     session = engineManager.createChatSession(systemPrompt)
     return true
   }

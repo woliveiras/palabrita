@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.ai.AiModelInfo
 import com.woliveiras.palabrita.core.ai.ModelRegistry
-import com.woliveiras.palabrita.core.ai.PromptTemplates
+import com.woliveiras.palabrita.core.ai.PromptProvider
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +30,7 @@ class AiInfoViewModel
 constructor(
   private val modelRepository: ModelRepository,
   private val modelRegistry: ModelRegistry,
+  private val promptProvider: PromptProvider,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(AiInfoState())
@@ -48,14 +49,14 @@ constructor(
             modelInfo = info,
             modelId = config.modelId,
             modelPath = config.modelPath,
-            puzzleSystemPrompt = PromptTemplates.puzzleSystemPrompt(),
+            puzzleSystemPrompt = promptProvider.puzzleSystemPrompt(),
             puzzleSamplePrompt =
-              PromptTemplates.puzzleUserPromptLarge(
+              promptProvider.puzzleUserPromptLarge(
                 language = "pt",
                 wordLength = 5,
                 recentWords = listOf("gatos", "mesa"),
               ),
-            chatSamplePrompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt"),
+            chatSamplePrompt = promptProvider.chatSystemPrompt(word = "gatos", language = "pt"),
           )
         }
       }

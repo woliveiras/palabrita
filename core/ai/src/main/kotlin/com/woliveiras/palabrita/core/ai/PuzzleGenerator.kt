@@ -32,6 +32,7 @@ constructor(
   private val engineManager: LlmEngineManager,
   private val parser: LlmResponseParser,
   private val validator: PuzzleValidator,
+  private val promptProvider: PromptProvider,
 ) : PuzzleGenerator {
 
   private val _activity = MutableStateFlow<GenerationActivity?>(null)
@@ -54,7 +55,7 @@ constructor(
 
     Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count")
 
-    val systemPrompt = PromptTemplates.puzzleSystemPrompt()
+    val systemPrompt = promptProvider.puzzleSystemPrompt()
     var puzzleIndex = 0
 
     while (puzzleIndex < count) {
@@ -166,11 +167,11 @@ constructor(
       when (modelId) {
         ModelId.GEMMA4_E4B,
         ModelId.GEMMA4_E2B ->
-          PromptTemplates.puzzleUserPromptLarge(language, wordLength, avoidWords)
+          promptProvider.puzzleUserPromptLarge(language, wordLength, avoidWords)
         ModelId.PHI4_MINI,
         ModelId.DEEPSEEK_R1_1_5B,
         ModelId.QWEN2_5_1_5B,
-        ModelId.QWEN3_0_6B -> PromptTemplates.puzzlePromptCompact(language, wordLength, avoidWords)
+        ModelId.QWEN3_0_6B -> promptProvider.puzzlePromptCompact(language, wordLength, avoidWords)
         ModelId.NONE -> throw IllegalArgumentException("No model selected")
       }
     return if (attempt > 0 && failureReason != null) {
