@@ -129,6 +129,7 @@
     <string name="hint_view_all">Ver dicas</string>
     <string name="hint_label">Dica %1$d: %2$s</string>
     <string name="hints_dialog_title">Dicas</string>
+    <string name="hint_counter_description">%1$d de %2$d dicas restantes</string>
 
     <!-- Game: Result -->
     <string name="result_won">Parabéns!</string>

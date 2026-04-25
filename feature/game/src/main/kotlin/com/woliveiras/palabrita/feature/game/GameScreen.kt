@@ -182,9 +182,23 @@ private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int)
     )
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-      Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(16.dp))
-      Spacer(Modifier.width(2.dp))
-      Text(text = "$hintsRemaining/$totalHints", style = MaterialTheme.typography.labelMedium)
+      val hintCounterDescription =
+        stringResource(CommonR.string.hint_counter_description, hintsRemaining, totalHints)
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier =
+          Modifier.semantics(mergeDescendants = true) {
+            contentDescription = hintCounterDescription
+          },
+      ) {
+        Icon(
+          Icons.Rounded.Lightbulb,
+          contentDescription = null,
+          modifier = Modifier.size(16.dp),
+        )
+        Spacer(Modifier.width(2.dp))
+        Text(text = "$hintsRemaining/$totalHints", style = MaterialTheme.typography.labelMedium)
+      }
       Spacer(Modifier.width(8.dp))
     }
   }
