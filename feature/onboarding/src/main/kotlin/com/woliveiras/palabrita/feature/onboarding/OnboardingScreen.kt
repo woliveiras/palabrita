@@ -33,7 +33,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Download
@@ -42,7 +41,6 @@ import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.Shield
-import androidx.compose.material.icons.rounded.Spellcheck
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -441,74 +439,28 @@ private fun ModelSelectionScreen(
   onNext: () -> Unit,
   onBack: () -> Unit,
 ) {
-  var headerVisible by remember { mutableStateOf(false) }
-  val cardVisibilities = remember { List(6) { mutableStateOf(false) } }
-  var buttonVisible by remember { mutableStateOf(false) }
-
-  LaunchedEffect(Unit) {
-    headerVisible = true
-    cardVisibilities.forEach { state ->
-      delay(100)
-      state.value = true
-    }
-    delay(100)
-    buttonVisible = true
-  }
-
-  val modelOptions =
+  val models =
     listOf(
-      Triple(
-        ModelId.GEMMA4_E4B,
-        stringResource(CommonR.string.model_gemma4_e4b_title),
-        Pair(
-          stringResource(CommonR.string.model_gemma4_e4b_subtitle),
-          stringResource(CommonR.string.model_gemma4_e4b_info),
-        ),
-      ) to Pair(Icons.Rounded.AutoAwesome, listOf(Color(0xFFD946EF), Color(0xFF7C3AED))),
-      Triple(
-        ModelId.GEMMA4_E2B,
-        stringResource(CommonR.string.model_powerful_title),
-        Pair(
-          stringResource(CommonR.string.model_powerful_subtitle),
-          stringResource(CommonR.string.model_powerful_info),
-        ),
-      ) to
-        Pair(
-          Icons.Rounded.Memory,
-          listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet),
-        ),
-      Triple(
-        ModelId.PHI4_MINI,
-        stringResource(CommonR.string.model_phi4_mini_title),
-        Pair(
-          stringResource(CommonR.string.model_phi4_mini_subtitle),
-          stringResource(CommonR.string.model_phi4_mini_info),
-        ),
-      ) to Pair(Icons.Rounded.Psychology, listOf(Color(0xFF0EA5E9), Color(0xFF6366F1))),
-      Triple(
-        ModelId.DEEPSEEK_R1_1_5B,
-        stringResource(CommonR.string.model_deepseek_r1_title),
-        Pair(
-          stringResource(CommonR.string.model_deepseek_r1_subtitle),
-          stringResource(CommonR.string.model_deepseek_r1_info),
-        ),
-      ) to Pair(Icons.Rounded.Spellcheck, listOf(Color(0xFF10B981), Color(0xFF0891B2))),
-      Triple(
-        ModelId.QWEN2_5_1_5B,
-        stringResource(CommonR.string.model_qwen25_1_5b_title),
-        Pair(
-          stringResource(CommonR.string.model_qwen25_1_5b_subtitle),
-          stringResource(CommonR.string.model_qwen25_1_5b_info),
-        ),
-      ) to Pair(Icons.Rounded.Bolt, listOf(Color(0xFFF59E0B), Color(0xFFEF4444))),
-      Triple(
-        ModelId.QWEN3_0_6B,
-        stringResource(CommonR.string.model_compact_title),
-        Pair(
-          stringResource(CommonR.string.model_compact_subtitle),
-          stringResource(CommonR.string.model_compact_info),
-        ),
-      ) to Pair(Icons.Rounded.PhoneAndroid, listOf(Color(0xFF06B6D4), Color(0xFF2563EB))),
+      ModelOption(
+        id = ModelId.GEMMA4_E2B,
+        name = stringResource(CommonR.string.model_selection_performance_name),
+        description = stringResource(CommonR.string.model_selection_performance_desc),
+        size = stringResource(CommonR.string.model_selection_performance_size),
+        requirement = stringResource(CommonR.string.model_selection_performance_req),
+        icon = Icons.Rounded.Memory,
+        gradientStart = PalabritaColors.BrandIndigo,
+        gradientEnd = PalabritaColors.BrandViolet,
+      ),
+      ModelOption(
+        id = ModelId.QWEN3_0_6B,
+        name = stringResource(CommonR.string.model_selection_efficient_name),
+        description = stringResource(CommonR.string.model_selection_efficient_desc),
+        size = stringResource(CommonR.string.model_selection_efficient_size),
+        requirement = stringResource(CommonR.string.model_selection_efficient_req),
+        icon = Icons.Rounded.PhoneAndroid,
+        gradientStart = Color(0xFF06B6D4),
+        gradientEnd = Color(0xFF2563EB),
+      ),
     )
 
   Column(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
@@ -516,91 +468,61 @@ private fun ModelSelectionScreen(
 
     Column(
       modifier =
-        Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)
+        Modifier.weight(1f)
+          .verticalScroll(rememberScrollState())
+          .padding(horizontal = 24.dp)
+          .padding(top = 16.dp)
     ) {
-      AnimatedVisibility(
-        visible = headerVisible,
-        enter =
-          slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } +
-            fadeIn(tween(500)),
-      ) {
-        Column {
-          Text(
-            text = stringResource(CommonR.string.model_selection_title),
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface,
-          )
-          Spacer(Modifier.height(8.dp))
-          Text(
-            text = stringResource(CommonR.string.model_selection_hint),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          Spacer(Modifier.height(24.dp))
-        }
-      }
-
-      modelOptions.forEachIndexed { index, (modelTriple, iconPair) ->
-        val (modelId, title, subtitleInfo) = modelTriple
-        val (subtitle, info) = subtitleInfo
-        val (icon, gradient) = iconPair
-        AnimatedVisibility(
-          visible = cardVisibilities[index].value,
-          enter =
-            slideInHorizontally(tween(500, easing = FastOutSlowInEasing)) { -it / 2 } +
-              fadeIn(tween(500)),
-        ) {
-          ModelCard(
-            title = title,
-            subtitle = subtitle,
-            info = info,
-            icon = icon,
-            iconGradient = gradient,
-            isSelected = selectedModel == modelId,
-            onClick = { onSelectModel(modelId) },
-          )
-        }
-        if (index < modelOptions.lastIndex) Spacer(Modifier.height(12.dp))
-      }
-
-      Spacer(Modifier.height(16.dp))
-
-      TextButton(onClick = onAutoSelect, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(CommonR.string.model_auto_select), color = PalabritaColors.BrandPurple)
-      }
-
-      Spacer(Modifier.height(16.dp))
-    }
-
-    AnimatedVisibility(
-      visible = buttonVisible,
-      enter =
-        slideInVertically(tween(500, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(500)),
-      modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp),
-    ) {
-      GradientButton(
-        text = stringResource(CommonR.string.continue_button),
-        onClick = onNext,
-        enabled = selectedModel != null,
+      Text(
+        text = stringResource(CommonR.string.model_selection_title),
+        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+        color = MaterialTheme.colorScheme.onSurface,
       )
+      Spacer(Modifier.height(12.dp))
+      Text(
+        text = stringResource(CommonR.string.model_selection_hint),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+      Spacer(Modifier.height(32.dp))
+
+      models.forEachIndexed { index, option ->
+        ModelOptionCard(
+          option = option,
+          isSelected = selectedModel == option.id,
+          onClick = { onSelectModel(option.id) },
+        )
+        if (index < models.lastIndex) Spacer(Modifier.height(16.dp))
+      }
     }
+
+    GradientButton(
+      text = stringResource(CommonR.string.continue_button),
+      onClick = onNext,
+      enabled = selectedModel != null,
+      modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp),
+    )
   }
 }
 
+private data class ModelOption(
+  val id: ModelId,
+  val name: String,
+  val description: String,
+  val size: String,
+  val requirement: String,
+  val icon: ImageVector,
+  val gradientStart: Color,
+  val gradientEnd: Color,
+)
+
 @Composable
-private fun ModelCard(
-  title: String,
-  subtitle: String,
-  info: String,
-  icon: ImageVector,
-  iconGradient: List<Color>,
-  isSelected: Boolean,
-  onClick: () -> Unit,
-) {
+private fun ModelOptionCard(option: ModelOption, isSelected: Boolean, onClick: () -> Unit) {
   val borderColor =
-    if (isSelected) PalabritaColors.BrandPurple else MaterialTheme.colorScheme.outline
+    if (isSelected) PalabritaColors.BrandIndigo else MaterialTheme.colorScheme.outline
+  val borderWidth = if (isSelected) 2.dp else 1.dp
   val bgColor =
-    if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+    if (isSelected) PalabritaColors.BrandIndigo.copy(alpha = 0.05f)
     else MaterialTheme.colorScheme.surface
 
   Row(
@@ -608,7 +530,7 @@ private fun ModelCard(
       Modifier.fillMaxWidth()
         .clip(RoundedCornerShape(24.dp))
         .background(bgColor)
-        .border(if (isSelected) 2.dp else 1.dp, borderColor, RoundedCornerShape(24.dp))
+        .border(borderWidth, borderColor, RoundedCornerShape(24.dp))
         .clickable { onClick() }
         .padding(20.dp),
     verticalAlignment = Alignment.Top,
@@ -618,10 +540,13 @@ private fun ModelCard(
       contentAlignment = Alignment.Center,
       modifier =
         Modifier.size(56.dp)
-          .background(Brush.linearGradient(iconGradient), RoundedCornerShape(16.dp)),
+          .background(
+            Brush.linearGradient(listOf(option.gradientStart, option.gradientEnd)),
+            RoundedCornerShape(16.dp),
+          ),
     ) {
       Icon(
-        imageVector = icon,
+        imageVector = option.icon,
         contentDescription = null,
         tint = Color.White,
         modifier = Modifier.size(28.dp),
@@ -634,27 +559,48 @@ private fun ModelCard(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
         Text(
-          text = title,
+          text = option.name,
           style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
           color = MaterialTheme.colorScheme.onSurface,
+          modifier = Modifier.weight(1f),
         )
         if (isSelected) {
           Icon(
             imageVector = Icons.Rounded.Check,
             contentDescription = null,
-            tint = PalabritaColors.BrandPurple,
-            modifier = Modifier.size(18.dp),
+            tint = PalabritaColors.BrandIndigo,
+            modifier = Modifier.size(20.dp),
           )
         }
       }
       Spacer(Modifier.height(4.dp))
       Text(
-        text = subtitle,
-        style = MaterialTheme.typography.bodySmall,
+        text = option.description,
+        style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
-      Spacer(Modifier.height(10.dp))
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { Chip(text = info) }
+      Spacer(Modifier.height(12.dp))
+      Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Box(
+          modifier =
+            Modifier.background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(50.dp))
+              .padding(horizontal = 12.dp, vertical = 4.dp)
+        ) {
+          Text(
+            text = option.size,
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+        }
+        Text(
+          text = option.requirement,
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+      }
     }
   }
 }

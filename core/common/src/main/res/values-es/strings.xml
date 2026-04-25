@@ -35,6 +35,14 @@
     <!-- Onboarding: Model Selection -->
     <string name="model_selection_title">Elige tu modelo de IA</string>
     <string name="model_selection_hint">Selecciona la IA ideal para tu dispositivo. Puedes cambiar después.</string>
+    <string name="model_selection_performance_name">Performance Model</string>
+    <string name="model_selection_performance_desc">La mejor calidad de puzzles y respuestas de IA</string>
+    <string name="model_selection_performance_size">2,6 GB</string>
+    <string name="model_selection_performance_req">Dispositivos de alta gama</string>
+    <string name="model_selection_efficient_name">Efficient Model</string>
+    <string name="model_selection_efficient_desc">Optimizado para velocidad y batería</string>
+    <string name="model_selection_efficient_size">614 MB</string>
+    <string name="model_selection_efficient_req">Todos los dispositivos</string>
     <string name="model_powerful_title">Gemma 4 2B</string>
     <string name="model_powerful_subtitle">Mejor calidad de puzzles y respuestas de IA</string>
     <string name="model_powerful_info">Dispositivos high-end · 2,6 GB</string>

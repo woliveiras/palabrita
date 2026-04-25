@@ -34,8 +34,14 @@
 
     <!-- Onboarding: Model Selection -->
     <string name="model_selection_title">Choose your AI model</string>
-    <string name="model_selection_hint">Select the AI that best fits your device. You can change this later.</string>
-    <string name="model_powerful_title">Gemma 4 2B</string>
+    <string name="model_selection_hint">Select the AI that best fits your device. You can change this later.</string>    <string name="model_selection_performance_name">Performance Model</string>
+    <string name="model_selection_performance_desc">Best quality puzzles and AI responses</string>
+    <string name="model_selection_performance_size">2.6 GB</string>
+    <string name="model_selection_performance_req">High-end devices</string>
+    <string name="model_selection_efficient_name">Efficient Model</string>
+    <string name="model_selection_efficient_desc">Optimized for speed and battery life</string>
+    <string name="model_selection_efficient_size">614 MB</string>
+    <string name="model_selection_efficient_req">All devices</string>    <string name="model_powerful_title">Gemma 4 2B</string>
     <string name="model_powerful_subtitle">Best quality puzzles and AI responses</string>
     <string name="model_powerful_info">High-end devices · 2.6 GB</string>
     <string name="model_compact_title">Qwen3 0.6B</string>
