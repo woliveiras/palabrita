@@ -301,4 +301,51 @@
     <string name="ai_info_puzzle_prompt">Generation Prompt (example)</string>
     <string name="ai_info_chat_prompt">Chat Prompt (example)</string>
     <string name="ai_info_change_model">Change Model in Settings</string>
+
+    <!-- Settings screen -->
+    <string name="settings_section_ai_config">AI Configuration</string>
+    <string name="settings_ai_model">AI Model</string>
+    <string name="settings_regenerate_puzzles">Regenerate Puzzles</string>
+    <string name="settings_regenerate_puzzles_hint">Create a new word bank</string>
+    <string name="settings_section_language">Language &amp; Region</string>
+    <string name="settings_language_row">Language</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_about_ai">About the AI Model</string>
+    <string name="settings_about_ai_hint">How it works</string>
+    <string name="settings_app_version">App Version</string>
+
+    <!-- Model picker -->
+    <string name="model_picker_title">Select AI Model</string>
+    <string name="model_picker_subtitle">Switching models will download the new model to your device.</string>
+    <string name="model_picker_size_mb">%d MB</string>
+    <string name="model_picker_size_gb">%.1f GB</string>
+    <string name="model_picker_ram_required">Required RAM: %d GB</string>
+    <string name="model_picker_selected">Selected</string>
+    <string name="model_picker_none_title">Light Mode</string>
+    <string name="model_picker_none_hint">No AI — curated word bank</string>
+
+    <!-- Model download screen -->
+    <string name="model_download_title">Download Model</string>
+    <string name="model_download_start">Start Download</string>
+    <string name="model_download_downloading">Downloading… %d%%</string>
+    <string name="model_download_success">Download complete!</string>
+    <string name="model_download_generate_now">Generate Puzzles</string>
+    <string name="model_download_back_settings">Back to Settings</string>
+    <string name="model_download_cancel">Cancel</string>
+    <string name="model_download_retry">Try again</string>
+    <string name="model_download_error_prefix">Error: %s</string>
+
+    <!-- Language selection screen -->
+    <string name="language_selection_title">Language</string>
+    <string name="language_selection_app_section">App Language</string>
+    <string name="language_selection_game_section">Game Words Language</string>
+    <string name="language_selection_confirm_title">Change game language?</string>
+    <string name="language_selection_confirm_body">You changed the word language to %s. Do you want to generate new puzzles in this language now, or keep playing in the current language and generate later?</string>
+    <string name="language_selection_generate_now">Generate now</string>
+    <string name="language_selection_generate_later">Keep playing, generate later</string>
+
+    <!-- Language names -->
+    <string name="language_pt">Português (BR)</string>
+    <string name="language_en">English</string>
+    <string name="language_es">Español</string>
 </resources>
