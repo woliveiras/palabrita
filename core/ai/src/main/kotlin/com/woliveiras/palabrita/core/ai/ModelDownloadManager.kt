@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,7 +63,6 @@ constructor(
   private val _progress = MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)
   override val progress: StateFlow<ModelDownloadProgress> = _progress.asStateFlow()
 
-  private var downloadJob: Job? = null
   private val attemptId = AtomicInteger(0)
   private val activeConnection = AtomicReference<HttpURLConnection?>(null)
 
@@ -79,10 +77,6 @@ constructor(
 
   override suspend fun startDownload(modelId: ModelId) {
     // Cancel any in-flight download before starting a new one
-    downloadJob?.let {
-      it.cancel()
-      it.join()
-    }
     activeConnection.getAndSet(null)?.disconnect()
 
     val currentAttempt = attemptId.incrementAndGet()
@@ -146,8 +140,6 @@ constructor(
   override fun cancelDownload() {
     attemptId.incrementAndGet()
     activeConnection.getAndSet(null)?.disconnect()
-    downloadJob?.cancel()
-    downloadJob = null
     _progress.value = ModelDownloadProgress.Idle
   }
 
