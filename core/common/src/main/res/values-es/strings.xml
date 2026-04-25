@@ -307,6 +307,10 @@
     <string name="settings_regenerate_puzzles_hint">Crear un nuevo banco de palabras</string>
     <string name="settings_section_language">Idioma y Región</string>
     <string name="settings_language_row">Idioma</string>
+    <string name="settings_theme_row">Tema</string>
+    <string name="settings_theme_system">Predeterminado del sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
     <string name="settings_section_about">Acerca de</string>
     <string name="settings_about_ai">Acerca del Modelo de IA</string>
     <string name="settings_about_ai_hint">Cómo funciona</string>

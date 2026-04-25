@@ -8,6 +8,7 @@ import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
+import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +41,7 @@ constructor(
   private val deviceTier: DeviceTier,
   private val modelRegistry: ModelRegistry,
   private val downloadManager: ModelDownloadManager,
+  private val appPreferences: AppPreferences,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(SettingsState())
@@ -52,6 +54,9 @@ constructor(
     loadData()
     viewModelScope.launch {
       statsRepository.observeStats().collect { stats -> _state.update { it.copy(stats = stats) } }
+    }
+    viewModelScope.launch {
+      appPreferences.themeMode.collect { mode -> _state.update { it.copy(themeMode = mode) } }
     }
   }
 
@@ -67,6 +72,13 @@ constructor(
         viewModelScope.launch { _events.emit(SettingsEvent.NavigateToLanguageSelection) }
       is SettingsAction.NavigateToAiInfo ->
         viewModelScope.launch { _events.emit(SettingsEvent.NavigateToAiInfo) }
+      is SettingsAction.ChangeTheme -> {
+        _state.update { it.copy(isThemePickerVisible = false) }
+        viewModelScope.launch { appPreferences.setThemeMode(action.mode) }
+      }
+      is SettingsAction.ShowThemePicker -> _state.update { it.copy(isThemePickerVisible = true) }
+      is SettingsAction.DismissThemePicker ->
+        _state.update { it.copy(isThemePickerVisible = false) }
     }
   }
 

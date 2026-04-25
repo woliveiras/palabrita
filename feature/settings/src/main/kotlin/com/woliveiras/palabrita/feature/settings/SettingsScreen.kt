@@ -16,9 +16,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +51,7 @@ import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelId
+import com.woliveiras.palabrita.core.model.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,6 +147,27 @@ fun SettingsScreen(
         onClick = { viewModel.onAction(SettingsAction.NavigateToLanguageSelection) },
       )
 
+      HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+
+      val themeIcon =
+        when (state.themeMode) {
+          ThemeMode.DARK -> Icons.Rounded.DarkMode
+          ThemeMode.LIGHT -> Icons.Rounded.WbSunny
+          ThemeMode.SYSTEM -> Icons.Rounded.WbSunny
+        }
+      val themeLabel =
+        when (state.themeMode) {
+          ThemeMode.DARK -> stringResource(CommonR.string.settings_theme_dark)
+          ThemeMode.LIGHT -> stringResource(CommonR.string.settings_theme_light)
+          ThemeMode.SYSTEM -> stringResource(CommonR.string.settings_theme_system)
+        }
+      SettingsRow(
+        icon = { Icon(themeIcon, contentDescription = null) },
+        title = stringResource(CommonR.string.settings_theme_row),
+        subtitle = themeLabel,
+        onClick = { viewModel.onAction(SettingsAction.ShowThemePicker) },
+      )
+
       Spacer(Modifier.height(8.dp))
 
       SettingsSectionHeader(stringResource(CommonR.string.settings_section_about))
@@ -180,6 +204,14 @@ fun SettingsScreen(
       deviceTier = state.deviceTier,
       onSelect = { viewModel.onAction(SettingsAction.SelectModel(it)) },
       onDismiss = { viewModel.onAction(SettingsAction.DismissModelPicker) },
+    )
+  }
+
+  if (state.isThemePickerVisible) {
+    ThemePickerBottomSheet(
+      currentMode = state.themeMode,
+      onSelect = { viewModel.onAction(SettingsAction.ChangeTheme(it)) },
+      onDismiss = { viewModel.onAction(SettingsAction.DismissThemePicker) },
     )
   }
 }
@@ -364,6 +396,67 @@ private fun LightModeOptionCard(
           modifier = Modifier.size(24.dp),
         )
       }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ThemePickerBottomSheet(
+  currentMode: ThemeMode,
+  onSelect: (ThemeMode) -> Unit,
+  onDismiss: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+  ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, modifier = modifier) {
+    Column(modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 32.dp)) {
+      Text(
+        text = stringResource(CommonR.string.settings_theme_row),
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.SemiBold,
+      )
+      Spacer(Modifier.height(16.dp))
+
+      listOf(
+          ThemeMode.SYSTEM to CommonR.string.settings_theme_system,
+          ThemeMode.LIGHT to CommonR.string.settings_theme_light,
+          ThemeMode.DARK to CommonR.string.settings_theme_dark,
+        )
+        .forEach { (mode, labelRes) ->
+          val isSelected = mode == currentMode
+          Card(
+            onClick = { onSelect(mode) },
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            colors =
+              CardDefaults.cardColors(
+                containerColor =
+                  if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                  else MaterialTheme.colorScheme.surfaceVariant
+              ),
+            shape = RoundedCornerShape(12.dp),
+          ) {
+            Row(
+              modifier = Modifier.fillMaxWidth().padding(16.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text(
+                text = stringResource(labelRes),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+              )
+              if (isSelected) {
+                Icon(
+                  imageVector = Icons.Rounded.CheckCircle,
+                  contentDescription = null,
+                  tint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.size(24.dp),
+                )
+              }
+            }
+          }
+        }
     }
   }
 }

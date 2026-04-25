@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.core.testing
 
+import com.woliveiras.palabrita.core.model.ThemeMode
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,9 @@ class FakeAppPreferences : AppPreferences {
 
   private val _appLanguage = MutableStateFlow(java.util.Locale.getDefault().language)
   override val appLanguage: Flow<String> = _appLanguage
+
+  private val _themeMode = MutableStateFlow(ThemeMode.SYSTEM)
+  override val themeMode: Flow<ThemeMode> = _themeMode
 
   override suspend fun setOnboardingComplete() {
     _isOnboardingComplete.value = true
@@ -28,5 +32,9 @@ class FakeAppPreferences : AppPreferences {
 
   override suspend fun setAppLanguage(language: String) {
     _appLanguage.value = language
+  }
+
+  override suspend fun setThemeMode(mode: ThemeMode) {
+    _themeMode.value = mode
   }
 }

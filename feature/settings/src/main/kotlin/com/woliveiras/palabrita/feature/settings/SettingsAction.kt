@@ -1,6 +1,7 @@
 package com.woliveiras.palabrita.feature.settings
 
 import com.woliveiras.palabrita.core.model.ModelId
+import com.woliveiras.palabrita.core.model.ThemeMode
 
 sealed class SettingsAction {
   data object ShowModelPicker : SettingsAction()
@@ -14,4 +15,10 @@ sealed class SettingsAction {
   data object NavigateToLanguageSelection : SettingsAction()
 
   data object NavigateToAiInfo : SettingsAction()
+
+  data class ChangeTheme(val mode: ThemeMode) : SettingsAction()
+
+  data object ShowThemePicker : SettingsAction()
+
+  data object DismissThemePicker : SettingsAction()
 }

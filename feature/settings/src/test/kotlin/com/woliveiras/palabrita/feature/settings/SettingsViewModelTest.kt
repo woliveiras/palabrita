@@ -8,6 +8,7 @@ import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
+import com.woliveiras.palabrita.core.testing.FakeAppPreferences
 import com.woliveiras.palabrita.core.testing.FakeModelDownloadManager
 import com.woliveiras.palabrita.core.testing.FakeModelRepository
 import com.woliveiras.palabrita.core.testing.FakeStatsRepository
@@ -197,6 +198,7 @@ class SettingsViewModelTest {
     statsRepo: FakeStatsRepository = FakeStatsRepository(stats),
     modelRepo: FakeModelRepository = FakeModelRepository(modelConfig),
     downloadManager: FakeModelDownloadManager = FakeModelDownloadManager(),
+    appPrefs: FakeAppPreferences = FakeAppPreferences(),
   ): SettingsViewModel =
     SettingsViewModel(
       statsRepository = statsRepo,
@@ -204,5 +206,6 @@ class SettingsViewModelTest {
       deviceTier = deviceTier,
       modelRegistry = AiModelRegistry,
       downloadManager = downloadManager,
+      appPreferences = appPrefs,
     )
 }

@@ -50,7 +50,7 @@ data class GenerationRoute(val modelId: String = "", val isRegeneration: Boolean
 @Serializable data class ModelDownloadRoute(val modelId: String)
 
 @Composable
-fun PalabritaNavGraph(appPreferences: AppPreferences) {
+fun PalabritaNavGraph(appPreferences: AppPreferences, darkTheme: Boolean) {
   val isOnboardingComplete: Boolean? by
     remember(appPreferences) { appPreferences.isOnboardingComplete.map { it as Boolean? } }
       .collectAsState(initial = null)
