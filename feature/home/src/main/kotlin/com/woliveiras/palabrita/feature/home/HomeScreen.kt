@@ -8,15 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -82,79 +79,65 @@ fun HomeScreen(
     return
   }
 
-  Box(
+  Column(
     modifier =
       modifier
         .fillMaxSize()
-        .background(PalabritaColors.ContentPrimary)
-        .windowInsetsPadding(WindowInsets.statusBars)
-        .padding(horizontal = 12.dp)
-        .padding(top = 8.dp, bottom = 12.dp)
+        .verticalScroll(rememberScrollState())
+        .padding(horizontal = 20.dp, vertical = 20.dp)
   ) {
-    Surface(
-      modifier = Modifier.fillMaxSize(),
-      shape = RoundedCornerShape(24.dp),
-      color = MaterialTheme.colorScheme.surface,
-    ) {
-      Column(
-        modifier =
-          Modifier.verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 20.dp)
-      ) {
-        // --- Header ---
-        Header(languageDisplay = state.languageDisplay, onSettingsTap = onNavigateToSettings)
+    // --- Header ---
+    Header(languageDisplay = state.languageDisplay, onSettingsTap = onNavigateToSettings)
 
-        Spacer(Modifier.height(32.dp))
+    Spacer(Modifier.height(32.dp))
 
-        // --- Play CTA Card ---
-        PlayCtaCard(
-          unplayedCount = state.unplayedCount,
-          isGenerating = state.isGeneratingPuzzles,
-          onPlay = onNavigateToGame,
-          onGenerate = onNavigateToGeneration,
-        )
+    // --- Play CTA Card ---
+    PlayCtaCard(
+      unplayedCount = state.unplayedCount,
+      isGenerating = state.isGeneratingPuzzles,
+      onPlay = onNavigateToGame,
+      onGenerate = onNavigateToGeneration,
+    )
 
-        Spacer(Modifier.height(24.dp))
+    Spacer(Modifier.height(24.dp))
 
-        // --- Quick Stats Row ---
-        QuickStatsRow(
-          totalPlayed = state.totalPlayed,
-          winRate = state.winRate,
-          currentStreak = state.currentStreak,
-        )
+    // --- Quick Stats Row ---
+    QuickStatsRow(
+      totalPlayed = state.totalPlayed,
+      winRate = state.winRate,
+      currentStreak = state.currentStreak,
+    )
 
-        Spacer(Modifier.height(24.dp))
+    Spacer(Modifier.height(24.dp))
 
-        // --- Info Cards ---
-        InfoCard(
-          icon = Icons.Rounded.HelpOutline,
-          title = stringResource(CommonR.string.home_how_to_play),
-          subtitle = stringResource(CommonR.string.home_how_to_play_subtitle),
-          onClick = onNavigateToHowToPlay,
-          iconContainerColor = PalabritaColors.ContainerBlue,
-          iconTint = PalabritaColors.OnContainerBlue,
-        )
+    // --- Info Cards ---
+    InfoCard(
+      icon = Icons.Rounded.HelpOutline,
+      title = stringResource(CommonR.string.home_how_to_play),
+      subtitle = stringResource(CommonR.string.home_how_to_play_subtitle),
+      onClick = onNavigateToHowToPlay,
+      iconContainerColor = PalabritaColors.ContainerBlue,
+      iconTint = PalabritaColors.OnContainerBlue,
+    )
 
-        Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(12.dp))
 
-        InfoCard(
-          icon = Icons.Rounded.Info,
-          title = stringResource(CommonR.string.home_about_ai),
-          subtitle = stringResource(CommonR.string.home_about_ai_subtitle),
-          onClick = onNavigateToAiInfo,
-          iconContainerColor = PalabritaColors.ContainerPurple,
-          iconTint = PalabritaColors.OnContainerPurple,
-        )
+    InfoCard(
+      icon = Icons.Rounded.Info,
+      title = stringResource(CommonR.string.home_about_ai),
+      subtitle = stringResource(CommonR.string.home_about_ai_subtitle),
+      onClick = onNavigateToAiInfo,
+      iconContainerColor = PalabritaColors.ContainerPurple,
+      iconTint = PalabritaColors.OnContainerPurple,
+    )
 
-        // --- Generation indicator ---
-        if (state.isGeneratingPuzzles) {
-          Spacer(Modifier.height(16.dp))
-          GenerationIndicator()
-        }
-
-        Spacer(Modifier.height(24.dp))
-      }
+    // --- Generation indicator ---
+    if (state.isGeneratingPuzzles) {
+      Spacer(Modifier.height(16.dp))
+      GenerationIndicator()
     }
+
+    Spacer(Modifier.height(24.dp))
   }
 }
 
