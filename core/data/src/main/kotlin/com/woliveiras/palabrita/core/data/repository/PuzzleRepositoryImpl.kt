@@ -33,6 +33,8 @@ class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao)
 
   override suspend fun deleteUnplayedAiPuzzles() = puzzleDao.deleteUnplayedAiPuzzles()
 
+  override suspend fun deleteAllAiPuzzles() = puzzleDao.deleteAllAiPuzzles()
+
   override suspend fun deleteUnplayedByLanguage(language: String) =
     puzzleDao.deleteUnplayedByLanguage(language)
 

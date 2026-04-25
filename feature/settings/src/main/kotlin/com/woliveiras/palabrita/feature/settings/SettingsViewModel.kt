@@ -95,9 +95,9 @@ constructor(
   private fun resetProgress() {
     viewModelScope.launch {
       _state.update { it.copy(isResetDialogVisible = false, isResetting = true) }
-      // Delete AI-generated unplayed puzzles and reset played status of static ones FIRST,
+      // Delete ALL AI puzzles (played + unplayed) and restore static puzzles to unplayed FIRST,
       // so that HomeViewModel reads the correct count when stats emission triggers a refresh.
-      puzzleRepository.deleteUnplayedAiPuzzles()
+      puzzleRepository.deleteAllAiPuzzles()
       puzzleRepository.markAllUnplayed()
       gameSessionRepository.deleteAll()
       chatRepository.deleteAll()
