@@ -3,7 +3,7 @@ package com.woliveiras.palabrita.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.ai.AiModelInfo
-import com.woliveiras.palabrita.core.ai.AiModelRegistry
+import com.woliveiras.palabrita.core.ai.ModelRegistry
 import com.woliveiras.palabrita.core.ai.PromptTemplates
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
@@ -25,8 +25,12 @@ data class AiInfoState(
 )
 
 @HiltViewModel
-class AiInfoViewModel @Inject constructor(private val modelRepository: ModelRepository) :
-  ViewModel() {
+class AiInfoViewModel
+@Inject
+constructor(
+  private val modelRepository: ModelRepository,
+  private val modelRegistry: ModelRegistry,
+) : ViewModel() {
 
   private val _state = MutableStateFlow(AiInfoState())
   val state: StateFlow<AiInfoState> = _state.asStateFlow()
@@ -38,7 +42,7 @@ class AiInfoViewModel @Inject constructor(private val modelRepository: ModelRepo
   private fun loadModelInfo() {
     viewModelScope.launch {
       modelRepository.observeConfig().collect { config ->
-        val info = AiModelRegistry.getInfo(config.modelId)
+        val info = modelRegistry.getInfo(config.modelId)
         _state.update {
           it.copy(
             modelInfo = info,

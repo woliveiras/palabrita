@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.ai.AiModelInfo
-import com.woliveiras.palabrita.core.ai.AiModelRegistry
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.DownloadState
@@ -107,7 +106,9 @@ fun SettingsScreen(
       SettingsSectionHeader(stringResource(CommonR.string.settings_section_ai_config))
 
       val modelName =
-        AiModelRegistry.getInfo(state.currentModel.modelId)?.displayName
+        state.availableModels
+          .firstOrNull { it.modelId == state.currentModel.modelId }
+          ?.displayName
           ?: stringResource(CommonR.string.settings_model_none)
 
       SettingsRow(

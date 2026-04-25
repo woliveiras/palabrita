@@ -3,6 +3,7 @@ package com.woliveiras.palabrita.feature.settings
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.woliveiras.palabrita.core.ai.AiModelRegistry
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
 import com.woliveiras.palabrita.core.model.DownloadState
@@ -178,5 +179,6 @@ class ModelDownloadViewModelTest {
       modelRepository = modelRepo,
       puzzleRepository = puzzleRepo,
       statsRepository = statsRepo,
+      modelRegistry = AiModelRegistry,
     )
 }

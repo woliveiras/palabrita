@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.ai.AiModelInfo
-import com.woliveiras.palabrita.core.ai.AiModelRegistry
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadProgress
+import com.woliveiras.palabrita.core.ai.ModelRegistry
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
@@ -58,6 +58,7 @@ constructor(
   private val modelRepository: ModelRepository,
   private val puzzleRepository: PuzzleRepository,
   private val statsRepository: StatsRepository,
+  private val modelRegistry: ModelRegistry,
 ) : ViewModel() {
 
   private val modelIdArg: ModelId =
@@ -71,7 +72,7 @@ constructor(
   val events: SharedFlow<ModelDownloadUiEvent> = _events.asSharedFlow()
 
   init {
-    val info = AiModelRegistry.getInfo(modelIdArg)
+    val info = modelRegistry.getInfo(modelIdArg)
     _state.update { it.copy(modelId = modelIdArg, modelInfo = info) }
     observeDownload()
   }

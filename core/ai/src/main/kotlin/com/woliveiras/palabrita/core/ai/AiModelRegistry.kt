@@ -11,7 +11,13 @@ data class AiModelInfo(
   val requiredRamMb: Long,
 )
 
-object AiModelRegistry {
+interface ModelRegistry {
+  fun getInfo(modelId: ModelId): AiModelInfo?
+
+  fun allModels(): List<AiModelInfo>
+}
+
+object AiModelRegistry : ModelRegistry {
 
   val GEMMA4_E4B =
     AiModelInfo(
@@ -79,7 +85,7 @@ object AiModelRegistry {
       requiredRamMb = 2048,
     )
 
-  fun getInfo(modelId: ModelId): AiModelInfo? =
+  override fun getInfo(modelId: ModelId): AiModelInfo? =
     when (modelId) {
       ModelId.GEMMA4_E4B -> GEMMA4_E4B
       ModelId.GEMMA4_E2B -> GEMMA4_E2B
@@ -90,6 +96,6 @@ object AiModelRegistry {
       ModelId.NONE -> null
     }
 
-  fun allModels(): List<AiModelInfo> =
+  override fun allModels(): List<AiModelInfo> =
     listOf(GEMMA4_E4B, GEMMA4_E2B, PHI4_MINI, DEEPSEEK_R1_1_5B, QWEN2_5_1_5B, QWEN3_0_6B)
 }

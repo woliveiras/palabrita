@@ -5,7 +5,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.woliveiras.palabrita.core.ai.AiModelRegistry
+import com.woliveiras.palabrita.core.ai.ModelRegistry
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
@@ -37,6 +37,7 @@ constructor(
   private val gameSessionRepository: GameSessionRepository,
   private val modelRepository: ModelRepository,
   private val workManager: WorkManager,
+  private val modelRegistry: ModelRegistry,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(HomeState())
@@ -82,7 +83,7 @@ constructor(
     val langLabel = LANGUAGE_DISPLAY[language] ?: language
     val config = modelRepository.getConfig()
     if (config.modelId == ModelId.NONE) return langLabel
-    val modelName = AiModelRegistry.getInfo(config.modelId)?.displayName ?: return langLabel
+    val modelName = modelRegistry.getInfo(config.modelId)?.displayName ?: return langLabel
     return "$langLabel \u2022 $modelName"
   }
 

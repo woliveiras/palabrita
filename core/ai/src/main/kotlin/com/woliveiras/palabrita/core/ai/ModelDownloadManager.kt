@@ -58,6 +58,7 @@ class ModelDownloadManagerImpl
 constructor(
   @ApplicationContext private val context: Context,
   private val modelRepository: ModelRepository,
+  private val modelRegistry: ModelRegistry,
 ) : ModelDownloadManager {
 
   private val _progress = MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)
@@ -70,7 +71,7 @@ constructor(
     get() = File(context.filesDir, "models").also { it.mkdirs() }
 
   override fun getModelPath(modelId: ModelId): String? {
-    val info = AiModelRegistry.getInfo(modelId) ?: return null
+    val info = modelRegistry.getInfo(modelId) ?: return null
     val file = File(modelsDir, info.fileName)
     return if (file.exists()) file.absolutePath else null
   }
@@ -82,7 +83,7 @@ constructor(
     val currentAttempt = attemptId.incrementAndGet()
 
     val info =
-      AiModelRegistry.getInfo(modelId)
+      modelRegistry.getInfo(modelId)
         ?: run {
           _progress.value = ModelDownloadProgress.Failed("Unknown model: $modelId")
           return

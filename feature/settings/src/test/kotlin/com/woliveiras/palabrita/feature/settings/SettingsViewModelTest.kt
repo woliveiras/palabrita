@@ -2,6 +2,7 @@ package com.woliveiras.palabrita.feature.settings
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.woliveiras.palabrita.core.ai.AiModelRegistry
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
@@ -170,5 +171,6 @@ class SettingsViewModelTest {
       statsRepository = statsRepo,
       modelRepository = modelRepo,
       deviceTier = deviceTier,
+      modelRegistry = AiModelRegistry,
     )
 }

@@ -2,7 +2,7 @@ package com.woliveiras.palabrita.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.woliveiras.palabrita.core.ai.AiModelRegistry
+import com.woliveiras.palabrita.core.ai.ModelRegistry
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
@@ -37,6 +37,7 @@ constructor(
   private val statsRepository: StatsRepository,
   private val modelRepository: ModelRepository,
   private val deviceTier: DeviceTier,
+  private val modelRegistry: ModelRegistry,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(SettingsState())
@@ -76,7 +77,7 @@ constructor(
           stats = stats,
           currentModel = config,
           deviceTier = deviceTier,
-          availableModels = AiModelRegistry.allModels(),
+          availableModels = modelRegistry.allModels(),
         )
       }
     }
