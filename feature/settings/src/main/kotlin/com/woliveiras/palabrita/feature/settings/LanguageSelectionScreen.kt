@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
@@ -172,7 +173,7 @@ private fun LanguageRadioRow(
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
-    modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
+    modifier = modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.padding(vertical = 4.dp),
   ) {
     RadioButton(selected = selected, onClick = onClick)
     Text(
