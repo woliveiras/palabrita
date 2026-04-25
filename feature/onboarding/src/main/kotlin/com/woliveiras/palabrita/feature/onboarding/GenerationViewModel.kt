@@ -153,7 +153,11 @@ constructor(
                 )
               }
             }
-            GenerationWorkState.IDLE -> {}
+            GenerationWorkState.IDLE -> {
+              if (hasTriggered) {
+                _state.update { it.copy(steps = steps) }
+              }
+            }
           }
         }
     }

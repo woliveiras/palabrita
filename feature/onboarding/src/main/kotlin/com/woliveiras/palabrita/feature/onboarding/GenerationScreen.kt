@@ -27,11 +27,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -86,6 +88,7 @@ fun GenerationScreen(
   val isFailed = state.failed
   val isCancelled = state.cancelled
   val currentActivityResId = state.currentActivityResId
+  val steps = state.steps
 
   // Floating particle animation
   val infiniteTransition = rememberInfiniteTransition(label = "gen_particles")
@@ -214,7 +217,18 @@ fun GenerationScreen(
       textAlign = TextAlign.Center,
     )
 
-    Spacer(Modifier.height(32.dp))
+    Spacer(Modifier.height(24.dp))
+
+    // Loading steps (model init + generation pipeline)
+    if (steps.isNotEmpty()) {
+      Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+      ) {
+        steps.forEach { step -> GenerationStepRow(step = step) }
+      }
+      Spacer(Modifier.height(24.dp))
+    }
 
     // Puzzle counter card
     Column(
@@ -354,6 +368,59 @@ fun GenerationScreen(
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       }
+    }
+  }
+}
+
+@Composable
+private fun GenerationStepRow(step: GenerationStep) {
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = Modifier.fillMaxWidth(),
+  ) {
+    when (step.status) {
+      StepStatus.COMPLETED ->
+        Icon(
+          imageVector = Icons.Rounded.CheckCircle,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.size(20.dp),
+        )
+      StepStatus.IN_PROGRESS ->
+        CircularProgressIndicator(
+          modifier = Modifier.size(20.dp),
+          strokeWidth = 2.dp,
+          color = PalabritaColors.BrandIndigo,
+        )
+      StepStatus.PENDING ->
+        Box(
+          modifier =
+            Modifier.size(20.dp)
+              .border(
+                1.5.dp,
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                CircleShape,
+              )
+        )
+    }
+    Spacer(Modifier.width(12.dp))
+    Text(
+      text = stringResource(step.labelResId),
+      style = MaterialTheme.typography.bodyMedium,
+      color =
+        when (step.status) {
+          StepStatus.PENDING ->
+            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+          else -> MaterialTheme.colorScheme.onSurface
+        },
+    )
+    if (step.detail != null) {
+      Spacer(Modifier.weight(1f))
+      Text(
+        text = step.detail,
+        style = MaterialTheme.typography.bodySmall,
+        color = PalabritaColors.BrandIndigo,
+      )
     }
   }
 }
