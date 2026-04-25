@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.feature.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -104,7 +104,7 @@ fun HomeScreen(
         // --- Header ---
         Header(languageDisplay = state.languageDisplay, onSettingsTap = onNavigateToSettings)
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(32.dp))
 
         // --- Play CTA Card ---
         PlayCtaCard(
@@ -131,6 +131,8 @@ fun HomeScreen(
           title = stringResource(CommonR.string.home_how_to_play),
           subtitle = stringResource(CommonR.string.home_how_to_play_subtitle),
           onClick = onNavigateToHowToPlay,
+          iconContainerColor = PalabritaColors.ContainerBlue,
+          iconTint = PalabritaColors.OnContainerBlue,
         )
 
         Spacer(Modifier.height(12.dp))
@@ -140,6 +142,8 @@ fun HomeScreen(
           title = stringResource(CommonR.string.home_about_ai),
           subtitle = stringResource(CommonR.string.home_about_ai_subtitle),
           onClick = onNavigateToAiInfo,
+          iconContainerColor = PalabritaColors.ContainerPurple,
+          iconTint = PalabritaColors.OnContainerPurple,
         )
 
         // --- Generation indicator ---
@@ -181,16 +185,17 @@ private fun Header(languageDisplay: String, onSettingsTap: () -> Unit) {
     val settingsCd = stringResource(CommonR.string.home_settings_cd)
     Surface(
       onClick = onSettingsTap,
-      shape = RoundedCornerShape(12.dp),
-      color = MaterialTheme.colorScheme.surfaceVariant,
-      modifier = Modifier.size(44.dp).semantics { contentDescription = settingsCd },
+      shape = RoundedCornerShape(16.dp),
+      color = MaterialTheme.colorScheme.surface,
+      border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+      modifier = Modifier.size(48.dp).semantics { contentDescription = settingsCd },
     ) {
       Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Icon(
           imageVector = Icons.Rounded.Settings,
           contentDescription = null,
-          tint = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.size(22.dp),
+          tint = MaterialTheme.colorScheme.onSurface,
+          modifier = Modifier.size(20.dp),
         )
       }
     }
@@ -199,7 +204,8 @@ private fun Header(languageDisplay: String, onSettingsTap: () -> Unit) {
 
 // --- Play CTA Card ---
 
-private val GradientPurple = Brush.horizontalGradient(listOf(Color(0xFF7C3AED), Color(0xFFC084FC)))
+private val GradientPurple =
+  Brush.linearGradient(listOf(Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFA855F7)))
 
 @Composable
 private fun PlayCtaCard(
@@ -212,12 +218,12 @@ private fun PlayCtaCard(
   Card(
     onClick = if (hasPlayable) onPlay else onGenerate,
     modifier = Modifier.fillMaxWidth(),
-    shape = RoundedCornerShape(20.dp),
+    shape = RoundedCornerShape(24.dp),
     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
   ) {
     Box(
       modifier =
-        Modifier.fillMaxWidth().background(GradientPurple, RoundedCornerShape(20.dp)).padding(24.dp)
+        Modifier.fillMaxWidth().background(GradientPurple, RoundedCornerShape(24.dp)).padding(32.dp)
     ) {
       Column {
         Text(
@@ -243,9 +249,9 @@ private fun PlayCtaCard(
       Box(
         modifier =
           Modifier.align(Alignment.CenterEnd)
-            .size(56.dp)
-            .clip(CircleShape)
-            .background(Color.White.copy(alpha = 0.25f)),
+            .size(64.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White.copy(alpha = 0.2f)),
         contentAlignment = Alignment.Center,
       ) {
         Icon(
@@ -298,23 +304,19 @@ private fun StatCard(
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
   ) {
-    Column(
-      modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-      Surface(
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.size(36.dp),
+    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+      Box(
+        modifier =
+          Modifier.size(40.dp)
+            .background(PalabritaColors.ContainerPurple, RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center,
       ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-          Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(18.dp),
-          )
-        }
+        Icon(
+          imageVector = icon,
+          contentDescription = null,
+          tint = PalabritaColors.BrandIndigo,
+          modifier = Modifier.size(20.dp),
+        )
       }
       Spacer(Modifier.height(8.dp))
       Text(
@@ -336,7 +338,14 @@ private fun StatCard(
 // --- Info Cards ---
 
 @Composable
-private fun InfoCard(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+private fun InfoCard(
+  icon: ImageVector,
+  title: String,
+  subtitle: String,
+  onClick: () -> Unit,
+  iconContainerColor: Color,
+  iconTint: Color,
+) {
   Card(
     onClick = onClick,
     modifier = Modifier.fillMaxWidth(),
@@ -345,19 +354,16 @@ private fun InfoCard(icon: ImageVector, title: String, subtitle: String, onClick
     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
   ) {
     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-      Surface(
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.size(40.dp),
+      Box(
+        modifier = Modifier.size(48.dp).background(iconContainerColor, RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center,
       ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-          Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(20.dp),
-          )
-        }
+        Icon(
+          imageVector = icon,
+          contentDescription = null,
+          tint = iconTint,
+          modifier = Modifier.size(24.dp),
+        )
       }
       Spacer(Modifier.width(16.dp))
       Column {
