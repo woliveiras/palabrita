@@ -131,21 +131,6 @@
 				"cwd": "${workspaceFolder}"
 			},
 			"problemMatcher": []
-		},
-		{
-			"label": "Test Settings Module",
-			"type": "shell",
-			"command": "./gradlew :feature:settings:testDebugUnitTest :core:testing:testDebugUnitTest 2>&1 | grep -E \"(PASS|FAIL|ERROR|^e:|BUILD SUCCESSFUL|BUILD FAILED|> Task.*FAILED|tests.passed|tests.failed)\" | head -40"
-		},
-		{
-			"label": "Commit review fixes",
-			"type": "shell",
-			"command": "git add core/testing/src/main/kotlin/com/woliveiras/palabrita/core/testing/FakeModelDownloadManager.kt feature/settings/src/main/kotlin/com/woliveiras/palabrita/feature/settings/SettingsViewModel.kt feature/settings/src/test/kotlin/com/woliveiras/palabrita/feature/settings/SettingsViewModelTest.kt feature/settings/src/test/kotlin/com/woliveiras/palabrita/feature/settings/ModelDownloadViewModelTest.kt && git commit -m \"fix(settings): use downloadManager.getModelPath for already-downloaded check\n\n- Inject ModelDownloadManager into SettingsViewModel\n- Check file presence on disk instead of comparing stored config\n- Remove redundant one-shot getStats() from loadData(); observeStats() covers it\n- Fix availableModels test assertion: isNotEmpty -> hasSize(6)\n- Add test: download progress at 50% reflected in state\n- Add test: download failure sets non-null errorMessage\""
-		},
-		{
-			"label": "Commit formatting",
-			"type": "shell",
-			"command": "git add -A && git diff --cached --stat && git commit -m \"style: apply spotless formatting\""
 		}
 	]
 }
