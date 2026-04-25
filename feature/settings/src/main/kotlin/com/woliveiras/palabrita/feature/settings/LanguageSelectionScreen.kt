@@ -48,7 +48,7 @@ private val LANGUAGES =
 @Composable
 fun LanguageSelectionScreen(
   onBack: () -> Unit,
-  onNavigateToGeneration: () -> Unit,
+  onNavigateToGeneration: (String) -> Unit,
   modifier: Modifier = Modifier,
   viewModel: LanguageSelectionViewModel = hiltViewModel(),
 ) {
@@ -64,7 +64,8 @@ fun LanguageSelectionScreen(
           val localeList = LocaleListCompat.forLanguageTags(event.language)
           androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(localeList)
         }
-        is LanguageSelectionEvent.NavigateToGeneration -> currentOnNavigateToGeneration()
+        is LanguageSelectionEvent.NavigateToGeneration ->
+          currentOnNavigateToGeneration(event.language)
         is LanguageSelectionEvent.NavigateBack -> currentOnBack()
       }
     }
@@ -173,7 +174,8 @@ private fun LanguageRadioRow(
 ) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
-    modifier = modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.padding(vertical = 4.dp),
+    modifier =
+      modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.padding(vertical = 4.dp),
   ) {
     RadioButton(selected = selected, onClick = onClick)
     Text(

@@ -87,6 +87,21 @@ constructor(
     _state.update { it.copy(isModelPickerVisible = false) }
     if (modelId == _state.value.currentModel.modelId) return
 
+    // Light Mode (NONE) has no file to download — activate directly
+    if (modelId == ModelId.NONE) {
+      viewModelScope.launch {
+        modelRepository.updateConfig(
+          ModelConfig(
+            modelId = ModelId.NONE,
+            downloadState = DownloadState.DOWNLOADED,
+            selectedAt = System.currentTimeMillis(),
+          )
+        )
+        _state.update { it.copy(currentModel = modelRepository.getConfig()) }
+      }
+      return
+    }
+
     val modelInfo = _state.value.availableModels.firstOrNull { it.modelId == modelId }
     if (modelInfo == null) return
 

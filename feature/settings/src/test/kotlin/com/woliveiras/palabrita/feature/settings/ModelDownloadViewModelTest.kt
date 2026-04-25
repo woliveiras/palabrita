@@ -68,10 +68,10 @@ class ModelDownloadViewModelTest {
     vm.events.test {
       vm.onAction(ModelDownloadUiAction.StartDownload)
       testDispatcher.scheduler.advanceUntilIdle()
-      // FakeModelDownloadManager emits Completed immediately on startDownload
-      // So we should get a navigation event
+      // FakeModelDownloadManager emits Completed immediately on startDownload.
+      // Default FakePuzzleRepository has unplayedCount = 0, so NavigateToGeneration is emitted.
       val event = awaitItem()
-      assertThat(event).isNotNull()
+      assertThat(event).isInstanceOf(ModelDownloadUiEvent.NavigateToGeneration::class.java)
       cancelAndIgnoreRemainingEvents()
     }
   }

@@ -157,7 +157,7 @@ fun PalabritaNavGraph(appPreferences: AppPreferences) {
     composable<LanguageSelectionRoute> {
       LanguageSelectionScreen(
         onBack = { navController.popBackStack() },
-        onNavigateToGeneration = {
+        onNavigateToGeneration = { _ ->
           navController.navigate(GenerationRoute(isRegeneration = true)) {
             popUpTo(LanguageSelectionRoute) { inclusive = true }
           }

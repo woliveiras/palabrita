@@ -28,7 +28,11 @@ object PromptTemplates : PromptProvider {
     """
       .trimIndent()
 
-  override fun puzzleUserPromptLarge(language: String, wordLength: Int, recentWords: List<String>): String {
+  override fun puzzleUserPromptLarge(
+    language: String,
+    wordLength: Int,
+    recentWords: List<String>,
+  ): String {
     val lang = languageDisplayName(language)
     return """
       Generate a word for the game. Return ONLY a JSON object, no markdown.
@@ -48,7 +52,11 @@ object PromptTemplates : PromptProvider {
       .trimIndent()
   }
 
-  override fun puzzlePromptCompact(language: String, wordLength: Int, recentWords: List<String>): String {
+  override fun puzzlePromptCompact(
+    language: String,
+    wordLength: Int,
+    recentWords: List<String>,
+  ): String {
     val lang = languageDisplayName(language)
     return """
       You are a word generator for a game. Return ONLY a JSON object, no markdown, no code fences.

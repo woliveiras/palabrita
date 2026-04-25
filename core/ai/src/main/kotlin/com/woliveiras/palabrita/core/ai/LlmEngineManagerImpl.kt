@@ -70,7 +70,10 @@ class LlmEngineManagerImpl @Inject constructor(@ApplicationContext private val c
           )
         val engine = Engine(config)
         engine.initialize()
-        android.util.Log.i("LlmEngineManager", "Initialized with backend: ${backend::class.simpleName}")
+        android.util.Log.i(
+          "LlmEngineManager",
+          "Initialized with backend: ${backend::class.simpleName}",
+        )
         return engine
       } catch (e: Exception) {
         android.util.Log.w(

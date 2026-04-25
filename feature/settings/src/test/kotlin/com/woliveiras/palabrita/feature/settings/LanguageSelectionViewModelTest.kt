@@ -8,6 +8,7 @@ import com.woliveiras.palabrita.core.testing.FakePuzzleRepository
 import com.woliveiras.palabrita.core.testing.FakeStatsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -67,6 +68,7 @@ class LanguageSelectionViewModelTest {
       assertThat((event as LanguageSelectionEvent.RestartForLocale).language).isEqualTo("en")
       cancelAndIgnoreRemainingEvents()
     }
+    assertThat(prefs.appLanguage.first()).isEqualTo("en")
   }
 
   @Test

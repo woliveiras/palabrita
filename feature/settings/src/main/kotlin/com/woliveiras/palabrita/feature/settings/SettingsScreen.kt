@@ -106,9 +106,7 @@ fun SettingsScreen(
       SettingsSectionHeader(stringResource(CommonR.string.settings_section_ai_config))
 
       val modelName =
-        state.availableModels
-          .firstOrNull { it.modelId == state.currentModel.modelId }
-          ?.displayName
+        state.availableModels.firstOrNull { it.modelId == state.currentModel.modelId }?.displayName
           ?: stringResource(CommonR.string.settings_model_none)
 
       SettingsRow(

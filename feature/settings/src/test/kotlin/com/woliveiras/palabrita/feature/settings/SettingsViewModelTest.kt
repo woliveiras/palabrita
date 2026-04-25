@@ -109,21 +109,37 @@ class SettingsViewModelTest {
   }
 
   @Test
-  fun `selecting non-downloaded model emits NavigateToModelDownload event`() = runTest {
+  fun `selecting non-downloaded model emits NavigateToModelDownload event and closes picker`() =
+    runTest {
+      val config =
+        ModelConfig(modelId = ModelId.QWEN3_0_6B, downloadState = DownloadState.DOWNLOADED)
+      val modelRepo = FakeModelRepository(config)
+      val vm = createViewModel(modelConfig = config, modelRepo = modelRepo)
+      testDispatcher.scheduler.advanceUntilIdle()
+
+      vm.events.test {
+        vm.onAction(SettingsAction.SelectModel(ModelId.GEMMA4_E2B))
+        testDispatcher.scheduler.advanceUntilIdle()
+        val event = awaitItem()
+        assertThat(event).isInstanceOf(SettingsEvent.NavigateToModelDownload::class.java)
+        assertThat((event as SettingsEvent.NavigateToModelDownload).modelId)
+          .isEqualTo(ModelId.GEMMA4_E2B)
+        cancelAndIgnoreRemainingEvents()
+      }
+      assertThat(vm.state.value.isModelPickerVisible).isFalse()
+    }
+
+  @Test
+  fun `selecting NONE (Light Mode) activates it directly and closes picker`() = runTest {
     val config = ModelConfig(modelId = ModelId.QWEN3_0_6B, downloadState = DownloadState.DOWNLOADED)
     val modelRepo = FakeModelRepository(config)
     val vm = createViewModel(modelConfig = config, modelRepo = modelRepo)
     testDispatcher.scheduler.advanceUntilIdle()
-
-    vm.events.test {
-      vm.onAction(SettingsAction.SelectModel(ModelId.GEMMA4_E2B))
-      testDispatcher.scheduler.advanceUntilIdle()
-      val event = awaitItem()
-      assertThat(event).isInstanceOf(SettingsEvent.NavigateToModelDownload::class.java)
-      assertThat((event as SettingsEvent.NavigateToModelDownload).modelId)
-        .isEqualTo(ModelId.GEMMA4_E2B)
-      cancelAndIgnoreRemainingEvents()
-    }
+    vm.onAction(SettingsAction.ShowModelPicker)
+    vm.onAction(SettingsAction.SelectModel(ModelId.NONE))
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.isModelPickerVisible).isFalse()
+    assertThat(vm.state.value.currentModel.modelId).isEqualTo(ModelId.NONE)
   }
 
   // --- Navigation events ---

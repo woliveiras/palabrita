@@ -126,7 +126,9 @@ constructor(
           targetFile.delete()
           _progress.value =
             ModelDownloadProgress.Failed(
-              context.getString(com.woliveiras.palabrita.core.common.R.string.error_download_unknown)
+              context.getString(
+                com.woliveiras.palabrita.core.common.R.string.error_download_unknown
+              )
             )
           return
         }
@@ -283,7 +285,10 @@ constructor(
   private suspend fun verifyIntegrity(file: File, info: AiModelInfo): Boolean {
     val expected = info.sha256
     if (expected == null) {
-      android.util.Log.w("ModelDownloadManager", "No SHA-256 hash for ${info.modelId} — skipping verification")
+      android.util.Log.w(
+        "ModelDownloadManager",
+        "No SHA-256 hash for ${info.modelId} — skipping verification",
+      )
       return true
     }
     return withContext(Dispatchers.IO) {
@@ -297,7 +302,10 @@ constructor(
       }
       val actual = digest.digest().joinToString("") { "%02x".format(it) }
       if (actual != expected) {
-        android.util.Log.e("ModelDownloadManager", "SHA-256 mismatch for ${info.modelId}: expected=$expected actual=$actual")
+        android.util.Log.e(
+          "ModelDownloadManager",
+          "SHA-256 mismatch for ${info.modelId}: expected=$expected actual=$actual",
+        )
         false
       } else {
         true

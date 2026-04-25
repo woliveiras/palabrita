@@ -78,11 +78,7 @@ fun ModelDownloadScreen(
       verticalArrangement = Arrangement.Center,
     ) {
       when {
-        state.isComplete ->
-          DownloadCompleteContent(
-            onBack = onBack,
-            onGeneratePuzzles = { viewModel.onAction(ModelDownloadUiAction.StartDownload) },
-          )
+        state.isComplete -> DownloadCompleteContent()
         state.errorMessage != null ->
           DownloadErrorContent(
             errorMessage = state.errorMessage!!,
@@ -176,11 +172,7 @@ private fun DownloadingContent(
 }
 
 @Composable
-private fun DownloadCompleteContent(
-  onBack: () -> Unit,
-  onGeneratePuzzles: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
+private fun DownloadCompleteContent(modifier: Modifier = Modifier) {
   Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
     Icon(
       imageVector = Icons.Rounded.CheckCircle,

@@ -71,7 +71,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.LocalGameColors
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.GameRules
-import kotlinx.coroutines.delay@Composable
+import kotlinx.coroutines.delay
+
+@Composable
 fun GameScreen(
   onNavigateToChat: (Long) -> Unit,
   onNavigateToSettings: () -> Unit,
@@ -213,11 +215,7 @@ private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int)
             contentDescription = hintCounterDescription
           },
       ) {
-        Icon(
-          Icons.Rounded.Lightbulb,
-          contentDescription = null,
-          modifier = Modifier.size(16.dp),
-        )
+        Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(16.dp))
         Spacer(Modifier.width(2.dp))
         Text(text = "$hintsRemaining/$totalHints", style = MaterialTheme.typography.labelMedium)
       }
@@ -473,7 +471,8 @@ private fun FlipLetterCell(
         stringResource(CommonR.string.tile_letter_present, letter.uppercaseChar())
       LetterState.ABSENT ->
         stringResource(CommonR.string.tile_letter_absent, letter.uppercaseChar())
-      LetterState.UNUSED -> stringResource(CommonR.string.tile_letter_unused, letter.uppercaseChar())
+      LetterState.UNUSED ->
+        stringResource(CommonR.string.tile_letter_unused, letter.uppercaseChar())
     }
 
   Box(
@@ -575,9 +574,9 @@ private fun LetterCell(letter: Char?, state: LetterState, size: Dp) {
 
   Box(
     modifier =
-      Modifier.size(size)
-        .background(bgColor, RoundedCornerShape(6.dp))
-        .semantics { contentDescription = tileDescription },
+      Modifier.size(size).background(bgColor, RoundedCornerShape(6.dp)).semantics {
+        contentDescription = tileDescription
+      },
     contentAlignment = Alignment.Center,
   ) {
     Text(
