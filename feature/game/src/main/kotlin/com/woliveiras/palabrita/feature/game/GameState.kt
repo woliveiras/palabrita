@@ -9,7 +9,6 @@ data class GameState(
   val revealedHints: List<String> = emptyList(),
   val keyboardState: Map<Char, LetterState> = emptyMap(),
   val gameStatus: GameStatus = GameStatus.LOADING,
-  val isLoading: Boolean = false,
   @StringRes val errorRes: Int? = null,
   val showAbandonDialog: Boolean = false,
   val showShake: Boolean = false,

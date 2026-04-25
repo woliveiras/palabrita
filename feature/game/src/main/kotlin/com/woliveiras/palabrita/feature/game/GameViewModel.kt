@@ -88,7 +88,6 @@ constructor(
               revealedHints = puzzle.hints.take(session.hintsUsed),
               keyboardState = keyboardState,
               errorRes = null,
-              isLoading = false,
             )
           }
           return@launch
@@ -118,7 +117,6 @@ constructor(
           revealedHints = emptyList(),
           keyboardState = emptyMap(),
           errorRes = null,
-          isLoading = false,
         )
       }
       gameSessionRepository.create(
@@ -128,7 +126,6 @@ constructor(
         )
       )
     } else {
-      _state.update { it.copy(isLoading = false) }
       _events.emit(GameEvent.NoPuzzlesLeft)
     }
   }
