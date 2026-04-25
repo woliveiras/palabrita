@@ -60,6 +60,7 @@ constructor(
   private val _state = MutableStateFlow(GenerationState())
   val state: StateFlow<GenerationState> = _state.asStateFlow()
   private var hasTriggered = false
+  private var hasSeenRunning = false
 
   init {
     observeGeneration()
@@ -74,6 +75,7 @@ constructor(
         return@launch
       }
       hasTriggered = true
+      hasSeenRunning = false
       _state.update { GenerationState() }
 
       if (!engineManager.isReady()) {
@@ -99,7 +101,7 @@ constructor(
           val steps = deriveSteps(engineState, info)
           when (info.state) {
             GenerationWorkState.SUCCEEDED -> {
-              if (!hasTriggered) return@collect
+              if (!hasTriggered || !hasSeenRunning) return@collect
               val progress = info.progress
               // totalExpected > 0 means the worker actually tried to generate but produced nothing
               val allRetriesFailed = progress.totalExpected > 0 && progress.generatedCount == 0
@@ -129,7 +131,7 @@ constructor(
               }
             }
             GenerationWorkState.FAILED -> {
-              if (!hasTriggered) return@collect
+              if (!hasTriggered || !hasSeenRunning) return@collect
               _state.update {
                 it.copy(
                   isGenerating = false,
@@ -140,6 +142,7 @@ constructor(
               }
             }
             GenerationWorkState.RUNNING -> {
+              hasSeenRunning = true
               _state.update {
                 it.copy(
                   isGenerating = true,
@@ -175,10 +178,10 @@ constructor(
       }
 
     val initStatus =
-      when {
-        engineState is EngineState.Ready && hasGenerationProgress -> StepStatus.COMPLETED
-        engineState is EngineState.Ready -> StepStatus.IN_PROGRESS
-        else -> StepStatus.PENDING
+      when (engineState) {
+          is EngineState.Ready if hasGenerationProgress -> StepStatus.COMPLETED
+          is EngineState.Ready -> StepStatus.IN_PROGRESS
+          else -> StepStatus.PENDING
       }
 
     val generateStatus =
