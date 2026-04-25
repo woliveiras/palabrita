@@ -9,6 +9,7 @@ data class AiModelInfo(
   val downloadUrl: String,
   val sizeBytes: Long,
   val requiredRamMb: Long,
+  val sha256: String? = null,
 )
 
 interface ModelRegistry {

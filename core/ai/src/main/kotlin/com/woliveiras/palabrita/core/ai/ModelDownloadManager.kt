@@ -10,6 +10,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -93,6 +94,14 @@ constructor(
 
     val targetFile = File(modelsDir, info.fileName)
     if (targetFile.exists() && targetFile.length() == info.sizeBytes) {
+      if (!verifyIntegrity(targetFile, info)) {
+        targetFile.delete()
+        _progress.value =
+          ModelDownloadProgress.Failed(
+            context.getString(com.woliveiras.palabrita.core.common.R.string.error_download_unknown)
+          )
+        return
+      }
       completeDownload(modelId, targetFile)
       return
     }
@@ -113,6 +122,14 @@ constructor(
     try {
       downloadFile(info.downloadUrl, targetFile, currentAttempt)
       if (attemptId.get() == currentAttempt) {
+        if (!verifyIntegrity(targetFile, info)) {
+          targetFile.delete()
+          _progress.value =
+            ModelDownloadProgress.Failed(
+              context.getString(com.woliveiras.palabrita.core.common.R.string.error_download_unknown)
+            )
+          return
+        }
         completeDownload(modelId, targetFile)
       }
     } catch (e: kotlin.coroutines.cancellation.CancellationException) {
@@ -261,6 +278,31 @@ constructor(
   private fun HttpURLConnection.contentLengthLong(): Long {
     val header = getHeaderField("Content-Length") ?: return -1L
     return header.toLongOrNull() ?: -1L
+  }
+
+  private suspend fun verifyIntegrity(file: File, info: AiModelInfo): Boolean {
+    val expected = info.sha256
+    if (expected == null) {
+      android.util.Log.w("ModelDownloadManager", "No SHA-256 hash for ${info.modelId} — skipping verification")
+      return true
+    }
+    return withContext(Dispatchers.IO) {
+      val digest = MessageDigest.getInstance("SHA-256")
+      file.inputStream().use { input ->
+        val buffer = ByteArray(BUFFER_SIZE)
+        var bytesRead: Int
+        while (input.read(buffer).also { bytesRead = it } != -1) {
+          digest.update(buffer, 0, bytesRead)
+        }
+      }
+      val actual = digest.digest().joinToString("") { "%02x".format(it) }
+      if (actual != expected) {
+        android.util.Log.e("ModelDownloadManager", "SHA-256 mismatch for ${info.modelId}: expected=$expected actual=$actual")
+        false
+      } else {
+        true
+      }
+    }
   }
 
   private suspend fun completeDownload(modelId: ModelId, file: File) {
