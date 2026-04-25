@@ -131,6 +131,13 @@
     <string name="hints_dialog_title">Pistas</string>
     <string name="hint_counter_description">%1$d de %2$d pistas restantes</string>
 
+    <!-- Game: Accessibility (TalkBack) -->
+    <string name="tile_empty">posición vacía</string>
+    <string name="tile_letter_unused">letra %s</string>
+    <string name="tile_letter_correct">letra %s, posición correcta</string>
+    <string name="tile_letter_present">letra %s, presente pero posición incorrecta</string>
+    <string name="tile_letter_absent">letra %s, ausente</string>
+
     <!-- Game: Result -->
     <string name="result_won">¡Felicidades!</string>
     <string name="result_lost">No fue esta vez</string>

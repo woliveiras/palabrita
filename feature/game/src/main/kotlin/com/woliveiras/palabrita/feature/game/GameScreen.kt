@@ -443,6 +443,17 @@ private fun FlipLetterCell(
     if (showBack && state != LetterState.UNUSED) gameColors.onFeedback
     else MaterialTheme.colorScheme.onSurface
 
+  val tileDescription =
+    when (state) {
+      LetterState.CORRECT ->
+        stringResource(CommonR.string.tile_letter_correct, letter.uppercaseChar())
+      LetterState.PRESENT ->
+        stringResource(CommonR.string.tile_letter_present, letter.uppercaseChar())
+      LetterState.ABSENT ->
+        stringResource(CommonR.string.tile_letter_absent, letter.uppercaseChar())
+      LetterState.UNUSED -> stringResource(CommonR.string.tile_letter_unused, letter.uppercaseChar())
+    }
+
   Box(
     modifier =
       Modifier.size(size)
@@ -452,7 +463,8 @@ private fun FlipLetterCell(
             else FLIP_FULL_ROTATION - rotation.value
           cameraDistance = FLIP_CAMERA_DISTANCE * density
         }
-        .background(bgColor, RoundedCornerShape(6.dp)),
+        .background(bgColor, RoundedCornerShape(6.dp))
+        .semantics { contentDescription = tileDescription },
     contentAlignment = Alignment.Center,
   ) {
     Text(
@@ -527,8 +539,23 @@ private fun LetterCell(letter: Char?, state: LetterState, size: Dp) {
   val textColor =
     if (state == LetterState.UNUSED) MaterialTheme.colorScheme.onSurface else gameColors.onFeedback
 
+  val tileDescription =
+    when {
+      letter == null -> stringResource(CommonR.string.tile_empty)
+      state == LetterState.CORRECT ->
+        stringResource(CommonR.string.tile_letter_correct, letter.uppercaseChar())
+      state == LetterState.PRESENT ->
+        stringResource(CommonR.string.tile_letter_present, letter.uppercaseChar())
+      state == LetterState.ABSENT ->
+        stringResource(CommonR.string.tile_letter_absent, letter.uppercaseChar())
+      else -> stringResource(CommonR.string.tile_letter_unused, letter.uppercaseChar())
+    }
+
   Box(
-    modifier = Modifier.size(size).background(bgColor, RoundedCornerShape(6.dp)),
+    modifier =
+      Modifier.size(size)
+        .background(bgColor, RoundedCornerShape(6.dp))
+        .semantics { contentDescription = tileDescription },
     contentAlignment = Alignment.Center,
   ) {
     Text(

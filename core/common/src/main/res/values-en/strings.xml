@@ -131,6 +131,13 @@
     <string name="hints_dialog_title">Hints</string>
     <string name="hint_counter_description">%1$d of %2$d hints remaining</string>
 
+    <!-- Game: Accessibility (TalkBack) -->
+    <string name="tile_empty">empty position</string>
+    <string name="tile_letter_unused">letter %s</string>
+    <string name="tile_letter_correct">letter %s, correct position</string>
+    <string name="tile_letter_present">letter %s, present but wrong position</string>
+    <string name="tile_letter_absent">letter %s, absent</string>
+
     <!-- Game: Result -->
     <string name="result_won">Congratulations!</string>
     <string name="result_lost">Better luck next time</string>
