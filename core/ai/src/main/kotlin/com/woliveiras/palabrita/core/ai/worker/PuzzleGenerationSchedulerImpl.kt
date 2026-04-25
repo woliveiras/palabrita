@@ -7,6 +7,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.woliveiras.palabrita.core.model.ModelId
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -16,8 +17,8 @@ import kotlinx.coroutines.flow.map
 class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager: WorkManager) :
   PuzzleGenerationScheduler {
 
-  override fun scheduleGeneration(modelId: ModelId) {
-    if (modelId == ModelId.NONE) return
+  override fun scheduleGeneration(modelId: ModelId): UUID {
+    if (modelId == ModelId.NONE) return UUID.randomUUID()
 
     val workRequest =
       OneTimeWorkRequestBuilder<PuzzleGenerationWorker>()
@@ -30,6 +31,7 @@ class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager:
       ExistingWorkPolicy.REPLACE,
       workRequest,
     )
+    return workRequest.id
   }
 
   override fun cancelGeneration() {
@@ -74,6 +76,6 @@ class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager:
             totalExpected = progressData?.getInt(PuzzleGenerationWorker.KEY_TOTAL_EXPECTED, 0) ?: 0,
           )
         }
-      GenerationInfo(state = state, progress = progress)
+      GenerationInfo(state = state, progress = progress, workId = info?.id)
     }
 }

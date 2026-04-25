@@ -16,6 +16,7 @@ import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -61,6 +62,7 @@ constructor(
   val state: StateFlow<GenerationState> = _state.asStateFlow()
   private var hasTriggered = false
   private var hasSeenRunning = false
+  private var expectedWorkId: UUID? = null
 
   init {
     observeGeneration()
@@ -76,6 +78,7 @@ constructor(
       }
       hasTriggered = true
       hasSeenRunning = false
+      expectedWorkId = null
       _state.update { GenerationState() }
 
       if (!engineManager.isReady()) {
@@ -86,7 +89,7 @@ constructor(
         }
       }
 
-      generationScheduler.scheduleGeneration(resolvedModelId)
+      expectedWorkId = generationScheduler.scheduleGeneration(resolvedModelId)
     }
   }
 
@@ -102,6 +105,10 @@ constructor(
           when (info.state) {
             GenerationWorkState.SUCCEEDED -> {
               if (!hasTriggered || !hasSeenRunning) return@collect
+              val expected = expectedWorkId
+              if (expected != null && info.workId != null && info.workId != expected) {
+                return@collect
+              }
               val progress = info.progress
               // totalExpected > 0 means the worker actually tried to generate but produced nothing
               val allRetriesFailed = progress.totalExpected > 0 && progress.generatedCount == 0
@@ -132,6 +139,10 @@ constructor(
             }
             GenerationWorkState.FAILED -> {
               if (!hasTriggered || !hasSeenRunning) return@collect
+              val expected = expectedWorkId
+              if (expected != null && info.workId != null && info.workId != expected) {
+                return@collect
+              }
               _state.update {
                 it.copy(
                   isGenerating = false,
