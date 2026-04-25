@@ -1,5 +1,6 @@
 package com.woliveiras.palabrita.feature.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -88,6 +89,12 @@ fun OnboardingScreen(
       OnboardingStep.COMPLETE -> onComplete()
       else -> Unit
     }
+  }
+
+  // Intercept the system back gesture to navigate between internal steps
+  // instead of popping the entire OnboardingRoute from the nav back stack.
+  BackHandler(enabled = state.currentStep != OnboardingStep.WELCOME) {
+    viewModel.onAction(OnboardingAction.Back)
   }
 
   // Map transient navigation steps to DOWNLOAD so the screen keeps rendering
