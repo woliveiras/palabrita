@@ -11,8 +11,11 @@ class FakeModelDownloadManager : ModelDownloadManager {
   override val progress: StateFlow<ModelDownloadProgress> = _progress
 
   val modelPaths: MutableMap<ModelId, String> = mutableMapOf()
+  var startDownloadCallCount: Int = 0
+    private set
 
   override suspend fun startDownload(modelId: ModelId) {
+    startDownloadCallCount++
     _progress.value = ModelDownloadProgress.Completed("/fake/model.litertlm")
   }
 

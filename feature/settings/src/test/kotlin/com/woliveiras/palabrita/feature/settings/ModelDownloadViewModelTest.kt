@@ -219,6 +219,20 @@ class ModelDownloadViewModelTest {
     assertThat(vm.state.value.errorMessage).isNull()
   }
 
+  @Test
+  fun `StartDownload while already downloading is a no-op`() = runTest {
+    val downloadManager = FakeModelDownloadManager()
+    val vm = createViewModel(downloadManager = downloadManager, modelId = ModelId.QWEN3_0_6B)
+    testDispatcher.scheduler.advanceUntilIdle()
+    vm.onAction(ModelDownloadUiAction.StartDownload)
+    testDispatcher.scheduler.advanceUntilIdle()
+    // After first call the state is isComplete=true; a second call must be ignored
+    val countAfterFirst = downloadManager.startDownloadCallCount
+    vm.onAction(ModelDownloadUiAction.StartDownload)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(downloadManager.startDownloadCallCount).isEqualTo(countAfterFirst)
+  }
+
   // --- Helpers ---
 
   private fun createViewModel(
