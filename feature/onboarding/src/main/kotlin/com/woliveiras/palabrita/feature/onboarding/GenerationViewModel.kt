@@ -100,6 +100,21 @@ constructor(
           when (info.state) {
             GenerationWorkState.SUCCEEDED -> {
               if (!hasTriggered) return@collect
+              val progress = info.progress
+              // totalExpected > 0 means the worker actually tried to generate but produced nothing
+              val allRetriesFailed = progress.totalExpected > 0 && progress.generatedCount == 0
+              if (allRetriesFailed) {
+                _state.update {
+                  it.copy(
+                    isGenerating = false,
+                    failed = true,
+                    progress = progress,
+                    steps = steps,
+                    currentActivityResId = null,
+                  )
+                }
+                return@collect
+              }
               val completedSteps = steps.map {
                 it.copy(status = StepStatus.COMPLETED, detail = null)
               }
@@ -107,7 +122,7 @@ constructor(
                 it.copy(
                   isGenerating = false,
                   isComplete = true,
-                  progress = info.progress,
+                  progress = progress,
                   steps = completedSteps,
                   currentActivityResId = null,
                 )

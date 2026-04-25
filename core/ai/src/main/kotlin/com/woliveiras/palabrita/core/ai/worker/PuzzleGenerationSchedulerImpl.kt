@@ -27,7 +27,7 @@ class PuzzleGenerationSchedulerImpl @Inject constructor(private val workManager:
 
     workManager.enqueueUniqueWork(
       PuzzleGenerationWorker.WORK_NAME,
-      ExistingWorkPolicy.KEEP,
+      ExistingWorkPolicy.REPLACE,
       workRequest,
     )
   }

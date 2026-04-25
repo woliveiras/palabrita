@@ -98,6 +98,13 @@ constructor(
           _state.value.isGeneratingPuzzles && info?.state == WorkInfo.State.SUCCEEDED
         val generatedCount =
           if (justSucceeded) info?.outputData?.getInt("generated_count", 0) ?: 0 else 0
+
+        val freshUnplayedCount =
+          if (justSucceeded && generatedCount > 0) {
+            val language = statsRepository.getStats().preferredLanguage
+            puzzleRepository.countAllUnplayed(language)
+          } else null
+
         _state.update {
           it.copy(
             isGeneratingPuzzles = isRunning,
@@ -105,6 +112,7 @@ constructor(
               if (justSucceeded && generatedCount > 0) true else it.generationComplete,
             generatedPuzzleCount =
               if (justSucceeded && generatedCount > 0) generatedCount else it.generatedPuzzleCount,
+            unplayedCount = freshUnplayedCount ?: it.unplayedCount,
           )
         }
       }
