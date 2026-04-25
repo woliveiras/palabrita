@@ -48,6 +48,14 @@ class SettingsViewModelTest {
   }
 
   @Test
+  fun `loads current game language on init`() = runTest {
+    val stats = PlayerStats(preferredLanguage = "es")
+    val vm = createViewModel(stats = stats)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.currentLanguage).isEqualTo("es")
+  }
+
+  @Test
   fun `loads current model config on init`() = runTest {
     val config =
       ModelConfig(

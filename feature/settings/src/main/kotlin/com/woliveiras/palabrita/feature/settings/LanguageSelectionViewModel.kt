@@ -85,7 +85,10 @@ constructor(
   }
 
   private fun changeGameLanguage(language: String) {
-    if (language == _state.value.gameLanguage) return
+    if (language == _state.value.gameLanguage) {
+      _state.update { it.copy(pendingGameLanguage = null, showConfirmDialog = false) }
+      return
+    }
     _state.update { it.copy(pendingGameLanguage = language, showConfirmDialog = true) }
   }
 

@@ -173,6 +173,18 @@ class LanguageSelectionViewModelTest {
     assertThat(statsRepo.getStats().preferredLanguage).isEqualTo("en")
   }
 
+  @Test
+  fun `changing game language to same value while dialog is open closes dialog`() = runTest {
+    val statsRepo = FakeStatsRepository(PlayerStats(preferredLanguage = "pt"))
+    val vm = createViewModel(statsRepo = statsRepo)
+    testDispatcher.scheduler.advanceUntilIdle()
+    vm.onAction(LanguageSelectionAction.ChangeGameLanguage("en")) // opens dialog
+    assertThat(vm.state.value.showConfirmDialog).isTrue()
+    vm.onAction(LanguageSelectionAction.ChangeGameLanguage("pt")) // same as current
+    assertThat(vm.state.value.showConfirmDialog).isFalse()
+    assertThat(vm.state.value.pendingGameLanguage).isNull()
+  }
+
   // --- Helpers ---
 
   private fun createViewModel(

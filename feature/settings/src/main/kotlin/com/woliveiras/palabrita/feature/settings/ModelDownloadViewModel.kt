@@ -86,6 +86,7 @@ constructor(
   }
 
   private fun startDownload() {
+    if (_state.value.isDownloading || _state.value.isComplete) return
     viewModelScope.launch { downloadManager.startDownload(modelIdArg) }
   }
 
