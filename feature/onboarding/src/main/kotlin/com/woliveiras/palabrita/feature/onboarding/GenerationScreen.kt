@@ -1,6 +1,5 @@
 package com.woliveiras.palabrita.feature.onboarding
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -12,7 +11,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,9 +47,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -87,7 +82,6 @@ fun GenerationScreen(
   val isComplete = state.isComplete
   val isFailed = state.failed
   val isCancelled = state.cancelled
-  val currentActivityResId = state.currentActivityResId
   val steps = state.steps
 
   // Floating particle animation
@@ -219,17 +213,6 @@ fun GenerationScreen(
 
     Spacer(Modifier.height(24.dp))
 
-    // Loading steps (model init + generation pipeline)
-    if (steps.isNotEmpty()) {
-      Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-      ) {
-        steps.forEach { step -> GenerationStepRow(step = step) }
-      }
-      Spacer(Modifier.height(24.dp))
-    }
-
     // Puzzle counter card
     Column(
       modifier =
@@ -295,27 +278,16 @@ fun GenerationScreen(
 
     Spacer(Modifier.height(24.dp))
 
-    // Live activity feed
-    AnimatedContent(
-      targetState = currentActivityResId,
-      transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(300)) },
-      label = "generation-activity",
-      modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
-    ) { resId ->
-      if (resId != null) {
-        Text(
-          text = stringResource(resId),
-          style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.fillMaxWidth(),
-        )
-      } else {
-        Spacer(Modifier.height(20.dp))
+    // Loading steps (model init + generation pipeline)
+    if (steps.isNotEmpty()) {
+      Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+      ) {
+        steps.forEach { step -> GenerationStepRow(step = step) }
       }
+      Spacer(Modifier.height(24.dp))
     }
-
-    Spacer(Modifier.height(8.dp))
 
     AnimatedVisibility(
       visible = isComplete,
