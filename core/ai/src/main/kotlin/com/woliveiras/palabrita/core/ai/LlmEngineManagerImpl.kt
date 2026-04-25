@@ -38,15 +38,7 @@ class LlmEngineManagerImpl @Inject constructor(@ApplicationContext private val c
 
     try {
       withContext(Dispatchers.IO) {
-        val config =
-          EngineConfig(
-            modelPath = modelPath,
-            backend = Backend.CPU(),
-            cacheDir = context.cacheDir.absolutePath,
-          )
-        val newEngine = Engine(config)
-        newEngine.initialize()
-
+        val newEngine = initializeWithFallback(modelPath)
         mutex.withLock {
           engine?.close()
           engine = newEngine
@@ -62,6 +54,34 @@ class LlmEngineManagerImpl @Inject constructor(@ApplicationContext private val c
           )
       }
     }
+  }
+
+  /** Attempts GPU backend first; falls back to CPU if GPU is unavailable. */
+  private fun initializeWithFallback(modelPath: String): Engine {
+    val backends = listOf(Backend.GPU(), Backend.CPU())
+    var lastException: Exception? = null
+    for (backend in backends) {
+      try {
+        val config =
+          EngineConfig(
+            modelPath = modelPath,
+            backend = backend,
+            cacheDir = context.cacheDir.absolutePath,
+          )
+        val engine = Engine(config)
+        engine.initialize()
+        android.util.Log.i("LlmEngineManager", "Initialized with backend: ${backend::class.simpleName}")
+        return engine
+      } catch (e: Exception) {
+        android.util.Log.w(
+          "LlmEngineManager",
+          "Backend ${backend::class.simpleName} unavailable, trying next",
+          e,
+        )
+        lastException = e
+      }
+    }
+    throw lastException ?: IllegalStateException("No available backend")
   }
 
   override suspend fun generateSingleTurn(systemPrompt: String?, userPrompt: String): String {
