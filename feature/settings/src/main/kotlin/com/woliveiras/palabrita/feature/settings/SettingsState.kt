@@ -14,6 +14,8 @@ data class SettingsState(
   val isModelPickerVisible: Boolean = false,
   val isThemePickerVisible: Boolean = false,
   val themeMode: ThemeMode = ThemeMode.SYSTEM,
+  val isResetDialogVisible: Boolean = false,
+  val isResetting: Boolean = false,
 ) {
   val currentLanguage: String
     get() = stats.preferredLanguage

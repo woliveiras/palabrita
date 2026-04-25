@@ -9,7 +9,10 @@ import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
+import com.woliveiras.palabrita.core.model.repository.ChatRepository
+import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
+import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -42,6 +45,9 @@ constructor(
   private val modelRegistry: ModelRegistry,
   private val downloadManager: ModelDownloadManager,
   private val appPreferences: AppPreferences,
+  private val gameSessionRepository: GameSessionRepository,
+  private val chatRepository: ChatRepository,
+  private val puzzleRepository: PuzzleRepository,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(SettingsState())
@@ -79,6 +85,26 @@ constructor(
       is SettingsAction.ShowThemePicker -> _state.update { it.copy(isThemePickerVisible = true) }
       is SettingsAction.DismissThemePicker ->
         _state.update { it.copy(isThemePickerVisible = false) }
+      is SettingsAction.ShowResetDialog -> _state.update { it.copy(isResetDialogVisible = true) }
+      is SettingsAction.DismissResetDialog ->
+        _state.update { it.copy(isResetDialogVisible = false) }
+      is SettingsAction.ConfirmReset -> resetProgress()
+    }
+  }
+
+  private fun resetProgress() {
+    viewModelScope.launch {
+      _state.update { it.copy(isResetDialogVisible = false, isResetting = true) }
+      // Delete AI-generated unplayed puzzles and reset played status of static ones FIRST,
+      // so that HomeViewModel reads the correct count when stats emission triggers a refresh.
+      puzzleRepository.deleteUnplayedAiPuzzles()
+      puzzleRepository.markAllUnplayed()
+      gameSessionRepository.deleteAll()
+      chatRepository.deleteAll()
+      appPreferences.resetGenerationCycle()
+      // Reset stats last — this triggers HomeViewModel.observeStats() which re-reads countAllUnplayed.
+      statsRepository.resetProgress()
+      _state.update { it.copy(isResetting = false) }
     }
   }
 

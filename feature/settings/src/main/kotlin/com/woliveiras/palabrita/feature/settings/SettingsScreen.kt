@@ -17,10 +17,14 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.WbSunny
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -192,6 +197,23 @@ fun SettingsScreen(
         },
       )
 
+      Spacer(Modifier.height(8.dp))
+
+      SettingsSectionHeader(stringResource(CommonR.string.settings_section_data))
+
+      SettingsRow(
+        icon = {
+          Icon(
+            Icons.Rounded.DeleteForever,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+          )
+        },
+        title = stringResource(CommonR.string.settings_reset_progress),
+        subtitle = stringResource(CommonR.string.settings_reset_hint),
+        onClick = { viewModel.onAction(SettingsAction.ShowResetDialog) },
+      )
+
       Spacer(Modifier.height(32.dp))
     }
   }
@@ -204,6 +226,38 @@ fun SettingsScreen(
       deviceTier = state.deviceTier,
       onSelect = { viewModel.onAction(SettingsAction.SelectModel(it)) },
       onDismiss = { viewModel.onAction(SettingsAction.DismissModelPicker) },
+    )
+  }
+
+  if (state.isResetDialogVisible) {
+    AlertDialog(
+      onDismissRequest = { viewModel.onAction(SettingsAction.DismissResetDialog) },
+      icon = {
+        Icon(
+          Icons.Rounded.DeleteForever,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.error,
+        )
+      },
+      title = { Text(stringResource(CommonR.string.settings_reset_progress)) },
+      text = { Text(stringResource(CommonR.string.settings_reset_message)) },
+      confirmButton = {
+        Button(
+          onClick = { viewModel.onAction(SettingsAction.ConfirmReset) },
+          colors =
+            ButtonDefaults.buttonColors(
+              containerColor = MaterialTheme.colorScheme.error,
+              contentColor = MaterialTheme.colorScheme.onError,
+            ),
+        ) {
+          Text(stringResource(CommonR.string.settings_reset_confirm))
+        }
+      },
+      dismissButton = {
+        TextButton(onClick = { viewModel.onAction(SettingsAction.DismissResetDialog) }) {
+          Text(stringResource(CommonR.string.cancel))
+        }
+      },
     )
   }
 

@@ -21,4 +21,10 @@ sealed class SettingsAction {
   data object ShowThemePicker : SettingsAction()
 
   data object DismissThemePicker : SettingsAction()
+
+  data object ShowResetDialog : SettingsAction()
+
+  data object DismissResetDialog : SettingsAction()
+
+  data object ConfirmReset : SettingsAction()
 }
