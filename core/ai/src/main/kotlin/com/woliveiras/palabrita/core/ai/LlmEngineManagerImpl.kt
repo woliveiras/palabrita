@@ -55,10 +55,10 @@ class LlmEngineManagerImpl @Inject constructor(@ApplicationContext private val c
       }
     } catch (e: Exception) {
       mutex.withLock {
+        android.util.Log.e("LlmEngineManager", "Failed to initialize engine", e)
         _engineState.value =
           EngineState.Error(
-            e.message
-              ?: context.getString(com.woliveiras.palabrita.core.common.R.string.error_engine_init)
+            context.getString(com.woliveiras.palabrita.core.common.R.string.error_engine_init)
           )
       }
     }

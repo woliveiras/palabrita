@@ -134,12 +134,10 @@ constructor(
       }
     } catch (e: Exception) {
       if (attemptId.get() == currentAttempt) {
+        android.util.Log.e("ModelDownloadManager", "Download failed", e)
         _progress.value =
           ModelDownloadProgress.Failed(
-            e.message
-              ?: context.getString(
-                com.woliveiras.palabrita.core.common.R.string.error_download_unknown
-              )
+            context.getString(com.woliveiras.palabrita.core.common.R.string.error_download_unknown)
           )
       }
     }
