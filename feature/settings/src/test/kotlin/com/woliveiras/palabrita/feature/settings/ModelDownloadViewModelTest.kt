@@ -138,6 +138,61 @@ class ModelDownloadViewModelTest {
   }
 
   @Test
+  fun `download progress is reflected in state`() = runTest {
+    val fakeProgress =
+      kotlinx.coroutines.flow.MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)
+    val downloadManager =
+      object : com.woliveiras.palabrita.core.ai.ModelDownloadManager {
+        override val progress: kotlinx.coroutines.flow.StateFlow<ModelDownloadProgress> =
+          fakeProgress
+
+        override suspend fun startDownload(modelId: ModelId) {
+          fakeProgress.value =
+            ModelDownloadProgress.Downloading(
+              progress = 0.5f,
+              downloadedBytes = 500_000L,
+              totalBytes = 1_000_000L,
+            )
+        }
+
+        override fun cancelDownload() {}
+
+        override fun getModelPath(modelId: ModelId): String? = null
+      }
+    val vm = createViewModel(downloadManager = downloadManager, modelId = ModelId.QWEN3_0_6B)
+    testDispatcher.scheduler.advanceUntilIdle()
+    vm.onAction(ModelDownloadUiAction.StartDownload)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.downloadProgress).isEqualTo(0.5f)
+    assertThat(vm.state.value.isDownloading).isTrue()
+  }
+
+  @Test
+  fun `download failure sets non-null errorMessage`() = runTest {
+    val fakeProgress =
+      kotlinx.coroutines.flow.MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)
+    val downloadManager =
+      object : com.woliveiras.palabrita.core.ai.ModelDownloadManager {
+        override val progress: kotlinx.coroutines.flow.StateFlow<ModelDownloadProgress> =
+          fakeProgress
+
+        override suspend fun startDownload(modelId: ModelId) {
+          fakeProgress.value = ModelDownloadProgress.Failed("network error")
+        }
+
+        override fun cancelDownload() {}
+
+        override fun getModelPath(modelId: ModelId): String? = null
+      }
+    val vm = createViewModel(downloadManager = downloadManager, modelId = ModelId.QWEN3_0_6B)
+    testDispatcher.scheduler.advanceUntilIdle()
+    vm.onAction(ModelDownloadUiAction.StartDownload)
+    testDispatcher.scheduler.advanceUntilIdle()
+    assertThat(vm.state.value.errorMessage).isNotNull()
+    assertThat(vm.state.value.isDownloading).isFalse()
+  }
+
+  @Test
   fun `DismissError clears error message`() = runTest {
     val fakeProgress =
       kotlinx.coroutines.flow.MutableStateFlow<ModelDownloadProgress>(ModelDownloadProgress.Idle)

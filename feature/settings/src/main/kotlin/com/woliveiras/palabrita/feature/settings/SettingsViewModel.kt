@@ -2,6 +2,7 @@ package com.woliveiras.palabrita.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.woliveiras.palabrita.core.ai.ModelDownloadManager
 import com.woliveiras.palabrita.core.ai.ModelRegistry
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.DownloadState
@@ -38,6 +39,7 @@ constructor(
   private val modelRepository: ModelRepository,
   private val deviceTier: DeviceTier,
   private val modelRegistry: ModelRegistry,
+  private val downloadManager: ModelDownloadManager,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(SettingsState())
@@ -70,11 +72,9 @@ constructor(
 
   private fun loadData() {
     viewModelScope.launch {
-      val stats = statsRepository.getStats()
       val config = modelRepository.getConfig()
       _state.update {
         it.copy(
-          stats = stats,
           currentModel = config,
           deviceTier = deviceTier,
           availableModels = modelRegistry.allModels(),
@@ -85,25 +85,21 @@ constructor(
 
   private fun selectModel(modelId: ModelId) {
     _state.update { it.copy(isModelPickerVisible = false) }
-    val currentConfig = _state.value.currentModel
-    if (modelId == currentConfig.modelId) return
+    if (modelId == _state.value.currentModel.modelId) return
 
-    val config = _state.value.availableModels.firstOrNull { it.modelId == modelId }
-    if (config == null) return
+    val modelInfo = _state.value.availableModels.firstOrNull { it.modelId == modelId }
+    if (modelInfo == null) return
 
     viewModelScope.launch {
-      val storedConfig = modelRepository.getConfig()
-      val alreadyDownloaded =
-        storedConfig.modelId == modelId && storedConfig.downloadState == DownloadState.DOWNLOADED
-
-      if (alreadyDownloaded) {
-        // Already downloaded — just update config
+      val modelPath = downloadManager.getModelPath(modelId)
+      if (modelPath != null) {
+        // File already on disk — activate without re-downloading
         modelRepository.updateConfig(
           ModelConfig(
             modelId = modelId,
             downloadState = DownloadState.DOWNLOADED,
-            modelPath = storedConfig.modelPath,
-            sizeBytes = storedConfig.sizeBytes,
+            modelPath = modelPath,
+            sizeBytes = modelInfo.sizeBytes,
             selectedAt = System.currentTimeMillis(),
           )
         )

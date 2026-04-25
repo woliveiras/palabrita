@@ -8,6 +8,7 @@ import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
+import com.woliveiras.palabrita.core.testing.FakeModelDownloadManager
 import com.woliveiras.palabrita.core.testing.FakeModelRepository
 import com.woliveiras.palabrita.core.testing.FakeStatsRepository
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +64,7 @@ class SettingsViewModelTest {
   fun `loads all available models on init`() = runTest {
     val vm = createViewModel()
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.availableModels).isNotEmpty()
+    assertThat(vm.state.value.availableModels).hasSize(6)
   }
 
   // --- Model picker ---
@@ -89,12 +90,17 @@ class SettingsViewModelTest {
   fun `selecting already-downloaded model updates config and closes picker`() = runTest {
     val config = ModelConfig(modelId = ModelId.QWEN3_0_6B, downloadState = DownloadState.DOWNLOADED)
     val modelRepo = FakeModelRepository(config)
-    val vm = createViewModel(modelConfig = config, modelRepo = modelRepo)
+    val downloadManager =
+      FakeModelDownloadManager().apply {
+        modelPaths[ModelId.GEMMA4_E2B] = "/models/gemma4.litertlm"
+      }
+    val vm =
+      createViewModel(
+        modelConfig = config,
+        modelRepo = modelRepo,
+        downloadManager = downloadManager,
+      )
     testDispatcher.scheduler.advanceUntilIdle()
-    // Select a DIFFERENT model that is also stored in the repo as downloaded
-    val secondConfig =
-      ModelConfig(modelId = ModelId.GEMMA4_E2B, downloadState = DownloadState.DOWNLOADED)
-    modelRepo.updateConfig(secondConfig)
     vm.onAction(SettingsAction.ShowModelPicker)
     vm.onAction(SettingsAction.SelectModel(ModelId.GEMMA4_E2B))
     testDispatcher.scheduler.advanceUntilIdle()
@@ -166,11 +172,13 @@ class SettingsViewModelTest {
     deviceTier: DeviceTier = DeviceTier.HIGH,
     statsRepo: FakeStatsRepository = FakeStatsRepository(stats),
     modelRepo: FakeModelRepository = FakeModelRepository(modelConfig),
+    downloadManager: FakeModelDownloadManager = FakeModelDownloadManager(),
   ): SettingsViewModel =
     SettingsViewModel(
       statsRepository = statsRepo,
       modelRepository = modelRepo,
       deviceTier = deviceTier,
       modelRegistry = AiModelRegistry,
+      downloadManager = downloadManager,
     )
 }
