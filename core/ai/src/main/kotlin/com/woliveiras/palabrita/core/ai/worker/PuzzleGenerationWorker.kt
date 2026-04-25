@@ -48,7 +48,10 @@ constructor(
 
     val unplayedCount = puzzleRepository.countAllUnplayed(language)
     if (unplayedCount >= GameRules.REPLENISHMENT_THRESHOLD) {
-      return Result.success(workDataOf(KEY_GENERATED_COUNT to 0))
+      // Already have enough puzzles — report as skipped (0/0) so ViewModel treats as IDLE-like.
+      return Result.success(
+        workDataOf(KEY_GENERATED_COUNT to 0, KEY_TOTAL_EXPECTED to -1)
+      )
     }
 
     if (!engineManager.isReady()) {

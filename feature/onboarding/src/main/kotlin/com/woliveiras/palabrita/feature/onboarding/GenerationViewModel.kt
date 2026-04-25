@@ -110,6 +110,8 @@ constructor(
                 return@collect
               }
               val progress = info.progress
+              // totalExpected == -1 → worker skipped (already had enough puzzles). Ignore.
+              if (progress.totalExpected == -1) return@collect
               // totalExpected > 0 means the worker actually tried to generate but produced nothing
               val allRetriesFailed = progress.totalExpected > 0 && progress.generatedCount == 0
               if (allRetriesFailed) {

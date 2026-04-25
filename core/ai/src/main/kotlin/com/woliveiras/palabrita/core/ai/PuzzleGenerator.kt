@@ -200,6 +200,9 @@ constructor(
 
   companion object {
     private const val TAG = "PuzzleGenerator"
-    private const val SESSION_ROTATION = 3
+    // Rotate LLM sessions every N puzzles to keep context manageable.
+    // Must not leave a remainder of 1 for any expected batch size (5, 10).
+    // SESSION_ROTATION=5 → batchSize=5: [5], batchSize=10: [5,5]. No isolated single-puzzle sessions.
+    private const val SESSION_ROTATION = 5
   }
 }
