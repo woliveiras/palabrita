@@ -289,10 +289,6 @@ private fun ModelPickerBottomSheet(
         )
       }
 
-      LightModeOptionCard(
-        isSelected = currentModelId == ModelId.NONE,
-        onClick = { onSelect(ModelId.NONE) },
-      )
     }
   }
 }
@@ -342,51 +338,6 @@ private fun ModelOptionCard(
             color = MaterialTheme.colorScheme.error,
           )
         }
-      }
-      if (isSelected) {
-        Icon(
-          imageVector = Icons.Rounded.CheckCircle,
-          contentDescription = stringResource(CommonR.string.model_picker_selected),
-          tint = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.size(24.dp),
-        )
-      }
-    }
-  }
-}
-
-@Composable
-private fun LightModeOptionCard(
-  isSelected: Boolean,
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  Card(
-    onClick = onClick,
-    modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-    colors =
-      CardDefaults.cardColors(
-        containerColor =
-          if (isSelected) MaterialTheme.colorScheme.primaryContainer
-          else MaterialTheme.colorScheme.surfaceVariant
-      ),
-    shape = RoundedCornerShape(12.dp),
-  ) {
-    Row(
-      modifier = Modifier.fillMaxWidth().padding(16.dp),
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Column(modifier = Modifier.weight(1f)) {
-        Text(
-          text = stringResource(CommonR.string.model_picker_none_title),
-          style = MaterialTheme.typography.bodyLarge,
-          fontWeight = FontWeight.SemiBold,
-        )
-        Text(
-          text = stringResource(CommonR.string.model_picker_none_hint),
-          style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
       }
       if (isSelected) {
         Icon(
