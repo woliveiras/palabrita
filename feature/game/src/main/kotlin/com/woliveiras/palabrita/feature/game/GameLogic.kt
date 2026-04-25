@@ -55,6 +55,8 @@ object GameLogic {
     word: String,
     hintsUsed: Int,
     won: Boolean,
+    wordLabel: String = "A palavra era:",
+    hintsLabel: String = "dicas usadas",
   ): String {
     val stars = "⭐".repeat(difficulty)
     val score = if (won) "${attempts.size}/6" else "X/6"
@@ -71,9 +73,9 @@ object GameLogic {
       }
 
     val footer = buildString {
-      append("A palavra era: $word")
+      append("$wordLabel $word")
       if (hintsUsed > 0) {
-        append("\n$hintsUsed dicas usadas")
+        append("\n$hintsUsed $hintsLabel")
       }
     }
 

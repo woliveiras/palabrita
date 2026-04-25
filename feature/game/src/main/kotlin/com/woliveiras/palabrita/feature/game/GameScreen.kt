@@ -57,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -70,9 +71,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.LocalGameColors
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.GameRules
-import kotlinx.coroutines.delay
-
-@Composable
+import kotlinx.coroutines.delay@Composable
 fun GameScreen(
   onNavigateToChat: (Long) -> Unit,
   onNavigateToSettings: () -> Unit,
@@ -82,6 +81,29 @@ fun GameScreen(
   viewModel: GameViewModel = hiltViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
+  val context = LocalContext.current
+
+  fun shareResult(won: Boolean) {
+    val puzzle = state.puzzle ?: return
+    val wordLabel = context.getString(CommonR.string.share_word_label)
+    val hintsLabel = context.getString(CommonR.string.share_hints_label)
+    val shareText =
+      GameLogic.generateShareText(
+        attempts = state.attempts,
+        difficulty = puzzle.difficulty,
+        word = puzzle.wordDisplay,
+        hintsUsed = state.revealedHints.size,
+        won = won,
+        wordLabel = wordLabel,
+        hintsLabel = hintsLabel,
+      )
+    val intent =
+      android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+      }
+    context.startActivity(android.content.Intent.createChooser(intent, null))
+  }
 
   LaunchedEffect(Unit) {
     viewModel.events.collect { event ->
@@ -124,7 +146,7 @@ fun GameScreen(
           attempts = state.attempts,
           hintsUsed = state.revealedHints.size,
           onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
-          onShare = { viewModel.onAction(GameAction.ShareResult) },
+          onShare = { shareResult(won = true) },
           onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
           onHome = onNavigateToHome,
         )
@@ -135,7 +157,7 @@ fun GameScreen(
           attempts = state.attempts,
           hintsUsed = state.revealedHints.size,
           onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
-          onShare = { viewModel.onAction(GameAction.ShareResult) },
+          onShare = { shareResult(won = false) },
           onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
           onHome = onNavigateToHome,
         )

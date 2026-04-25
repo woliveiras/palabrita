@@ -138,6 +138,10 @@
     <string name="tile_letter_present">letra %s, presente pero posición incorrecta</string>
     <string name="tile_letter_absent">letra %s, ausente</string>
 
+    <!-- Game: Share text -->
+    <string name="share_word_label">La palabra era:</string>
+    <string name="share_hints_label">pistas usadas</string>
+
     <!-- Game: Result -->
     <string name="result_won">¡Felicidades!</string>
     <string name="result_lost">No fue esta vez</string>
