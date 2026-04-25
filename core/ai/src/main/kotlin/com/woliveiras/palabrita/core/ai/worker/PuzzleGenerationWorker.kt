@@ -93,9 +93,32 @@ constructor(
         }
       puzzleRepository.savePuzzles(puzzles)
       generatedCount = puzzles.size
-      if (puzzles.isNotEmpty()) {
+
+      // Retry for any slots that failed — one additional pass with fresh sessions
+      val missing = batchSize - generatedCount
+      if (missing > 0) {
+        android.util.Log.w(
+          "PuzzleGenerationWorker",
+          "$generatedCount/$batchSize puzzles generated; retrying $missing missing slot(s)",
+        )
+        val retryExistingWords = existingWords + puzzles.map { it.word }.toSet()
+        val retryRecentWords = recentWords + puzzles.map { it.word }
+        val retryPuzzles =
+          puzzleGenerator.generateBatch(
+            count = missing,
+            language = language,
+            wordLength = wordLength,
+            recentWords = retryRecentWords,
+            allExistingWords = retryExistingWords,
+            modelId = modelId,
+          )
+        puzzleRepository.savePuzzles(retryPuzzles)
+        generatedCount += retryPuzzles.size
+      }
+
+      if (generatedCount > 0) {
         appPreferences.incrementGenerationCycle()
-        showCompletionNotification(puzzles.size)
+        showCompletionNotification(generatedCount)
       }
     } catch (e: Exception) {
       android.util.Log.e("PuzzleGenerationWorker", "Batch generation failed", e)

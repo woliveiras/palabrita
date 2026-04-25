@@ -174,9 +174,9 @@ constructor(
         ModelId.NONE -> throw IllegalArgumentException("No model selected")
       }
     return if (attempt > 0 && failureReason != null) {
-      "$base\n\nYour previous response was rejected: $failureReason. The word MUST have exactly $wordLength letters. Try again with a DIFFERENT word."
+      "$base\n\nYour previous response was REJECTED for this reason: $failureReason. Fix exactly that issue and choose a DIFFERENT word."
     } else if (attempt > 0) {
-      "$base\n\nThe previous response was invalid. Generate a DIFFERENT word with exactly $wordLength letters."
+      "$base\n\nThe previous response was invalid. Generate a DIFFERENT word."
     } else {
       base
     }
