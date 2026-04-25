@@ -87,18 +87,9 @@ constructor(
     val currentConfig = _state.value.currentModel
     if (modelId == currentConfig.modelId) return
 
-    val modelPath =
-      AiModelRegistry.getInfo(modelId)?.let {
-        modelRepository::class
-      } // check existence below via config
     val config = _state.value.availableModels.firstOrNull { it.modelId == modelId }
     if (config == null) return
 
-    // Check if already downloaded by consulting the current stored config or model path
-    val isDownloaded =
-      currentConfig.modelId == modelId && currentConfig.downloadState == DownloadState.DOWNLOADED
-
-    // More precise: load config from repository to check any previously downloaded model
     viewModelScope.launch {
       val storedConfig = modelRepository.getConfig()
       val alreadyDownloaded =
