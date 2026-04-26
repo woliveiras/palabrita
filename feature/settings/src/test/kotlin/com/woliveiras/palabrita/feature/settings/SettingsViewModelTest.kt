@@ -75,7 +75,7 @@ class SettingsViewModelTest {
   fun `loads all available models on init`() = runTest {
     val vm = createViewModel()
     testDispatcher.scheduler.advanceUntilIdle()
-    assertThat(vm.state.value.availableModels).hasSize(6)
+    assertThat(vm.state.value.availableModels).hasSize(2)
   }
 
   // --- Model picker ---

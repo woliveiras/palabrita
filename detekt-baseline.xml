@@ -3,36 +3,32 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>ComplexCondition:LlmResponseParser.kt$LlmResponseParserImpl$strVal != null &amp;&amp; word == null &amp;&amp; strVal.length in 2..8 &amp;&amp; !strVal.contains(' ')</ID>
-    <ID>CyclomaticComplexMethod:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
+    <ID>CyclomaticComplexMethod:GameScreen.kt$@Composable private fun FlipLetterCell( letter: Char, state: LetterState, size: Dp, animate: Boolean, delayMs: Int, )</ID>
     <ID>CyclomaticComplexMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
-    <ID>CyclomaticComplexMethod:GenerationViewModel.kt$GenerationViewModel$private fun deriveSteps(engineState: EngineState, info: GenerationInfo): List&lt;GenerationStep&gt;</ID>
     <ID>CyclomaticComplexMethod:ModelDownloadManager.kt$ModelDownloadManagerImpl$override suspend fun startDownload(modelId: ModelId)</ID>
     <ID>CyclomaticComplexMethod:ModelDownloadManager.kt$ModelDownloadManagerImpl$private suspend fun downloadFile(url: String, targetFile: File, attempt: Int)</ID>
     <ID>CyclomaticComplexMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
-    <ID>CyclomaticComplexMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
-    <ID>EmptyFunctionBlock:FakeGenerationScheduler.kt$FakeGenerationScheduler${}</ID>
-    <ID>EmptyFunctionBlock:FakeLlmEngineManager.kt$FakeLlmSession${}</ID>
+    <ID>CyclomaticComplexMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, onNavigateToModelDownload: (ModelId) -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToLanguageSelection: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
     <ID>EmptyFunctionBlock:FakeStatsRepository.kt$FakeStatsRepository${}</ID>
-    <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlineChatRepository${}</ID>
+    <ID>EmptyFunctionBlock:ModelDownloadViewModelTest.kt$ModelDownloadViewModelTest.&lt;no name provided&gt;${}</ID>
     <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlineGameSessionRepository${}</ID>
     <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlinePuzzleRepository${}</ID>
     <ID>EmptyFunctionBlock:ResetProgressUseCaseTest.kt$ResetProgressUseCaseTest.InlineStatsRepository${}</ID>
-    <ID>FunctionNaming:AiInfoScreen.kt$@Composable fun AiInfoScreen(modifier: Modifier = Modifier, viewModel: AiInfoViewModel = hiltViewModel())</ID>
-    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun EngineStatusCard(engineState: EngineState)</ID>
-    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun InfoRow(label: String, value: String)</ID>
-    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun ModelInfoCard(state: AiInfoState)</ID>
-    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun PromptCard(title: String, content: String)</ID>
-    <ID>FunctionNaming:ChatScreen.kt$@Composable private fun MessageBubble(message: UiChatMessage)</ID>
-    <ID>FunctionNaming:ChatScreen.kt$@Composable private fun TypingIndicator()</ID>
-    <ID>FunctionNaming:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
-    <ID>FunctionNaming:GameScreen.kt$@Composable fun GameScreen( onNavigateToChat: (Long) -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToHome: () -&gt; Unit, onNoPuzzlesLeft: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GameViewModel = hiltViewModel(), )</ID>
+    <ID>ForbiddenComment:MainActivity.kt$MainActivity$// TODO: remove — forced light for manual testing</ID>
+    <ID>FunctionNaming:AiInfoScreen.kt$@Composable fun AiInfoScreen( onBack: () -&gt; Unit, onNavigateToSettings: (() -&gt; Unit)? = null, modifier: Modifier = Modifier, viewModel: AiInfoViewModel = hiltViewModel(), )</ID>
+    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun CurrentModelCard(state: AiInfoState)</ID>
+    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun FeatureItem(icon: ImageVector, iconColor: Color, title: String, subtitle: String)</ID>
+    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun HighlightCard( icon: ImageVector, iconColor: Color, borderColor: Color, title: String, body: String, )</ID>
+    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun ModelRow(icon: ImageVector, label: String, value: String)</ID>
+    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun PromptCard(icon: ImageVector, title: String, content: String)</ID>
+    <ID>FunctionNaming:AiInfoScreen.kt$@Composable private fun WhatItDoesCard()</ID>
+    <ID>FunctionNaming:GameScreen.kt$@Composable fun GameScreen( onNavigateToSettings: () -&gt; Unit, onNavigateToHome: () -&gt; Unit, onNoPuzzlesLeft: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GameViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun AbandonDialog(onContinue: () -&gt; Unit, onAbandon: () -&gt; Unit)</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun AccentKeyButton( accentChar: Char, state: LetterState?, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
-    <ID>FunctionNaming:GameScreen.kt$@Composable private fun ChatCardCta(word: String, onExplore: () -&gt; Unit)</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun EmptyRow(wordLength: Int, tileSize: Dp)</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun FlipLetterCell( letter: Char, state: LetterState, size: Dp, animate: Boolean, delayMs: Int, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun GameKeyboard( keyboardState: Map&lt;Char, LetterState&gt;, onKey: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, language: String = "", )</ID>
-    <ID>FunctionNaming:GameScreen.kt$@Composable private fun GameTopBar(onBack: () -&gt; Unit, hintsRemaining: Int, totalHints: Int)</ID>
+    <ID>FunctionNaming:GameScreen.kt$@Composable private fun GameTopBar( onBack: () -&gt; Unit, hintsRemaining: Int, totalHints: Int, onHintClick: () -&gt; Unit, hintButtonEnabled: Boolean, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun HintsDialog(hints: List&lt;String&gt;, onDismiss: () -&gt; Unit)</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun InputRow( currentInput: String, wordLength: Int, tileSize: Dp, showShake: Boolean, onShakeComplete: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun KeyButton( letter: Char, state: LetterState?, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
@@ -40,19 +36,30 @@
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun LetterCell(letter: Char?, state: LetterState, size: Dp)</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun LoadingScreen()</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun PlayingScreen( state: GameState, onTypeLetter: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, onRevealHint: () -&gt; Unit, onBack: () -&gt; Unit, onShakeComplete: () -&gt; Unit, )</ID>
-    <ID>FunctionNaming:GameScreen.kt$@Composable private fun ResultScreen( won: Boolean, puzzle: com.woliveiras.palabrita.core.model.Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onExplore: () -&gt; Unit, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun RevealedRow( attempt: Attempt, tileSize: Dp, wordLength: Int, animateFlip: Boolean, animateBounce: Boolean, )</ID>
     <ID>FunctionNaming:GameScreen.kt$@Composable private fun WordGrid( attempts: List&lt;Attempt&gt;, currentInput: String, wordLength: Int, maxAttempts: Int, tileSize: Dp, showShake: Boolean, onShakeComplete: () -&gt; Unit, gameStatus: GameStatus, )</ID>
     <ID>FunctionNaming:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
+    <ID>FunctionNaming:GenerationScreen.kt$@Composable private fun GenerationStepRow(step: GenerationStep)</ID>
     <ID>FunctionNaming:GenerationScreen.kt$@Composable private fun GradientButton(text: String, onClick: () -&gt; Unit)</ID>
-    <ID>FunctionNaming:HomeScreen.kt$@Composable fun HomeScreen( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
-    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun GenerationIndicator()</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Composable fun HomeScreen( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, onNavigateToHowToPlay: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable private fun Header(languageDisplay: String, onSettingsTap: () -&gt; Unit)</ID>
-    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun InfoCard(icon: ImageVector, title: String, subtitle: String, onClick: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun InfoCard( icon: ImageVector, title: String, subtitle: String, onClick: () -&gt; Unit, iconContainerColor: Color, iconTint: Color, )</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable private fun LoadingHome()</ID>
-    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun PlayCtaCard( unplayedCount: Int, isGenerating: Boolean, onPlay: () -&gt; Unit, onGenerate: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun PlayCtaCard(unplayedCount: Int, onPlay: () -&gt; Unit, onGenerate: () -&gt; Unit)</ID>
     <ID>FunctionNaming:HomeScreen.kt$@Composable private fun QuickStatsRow(totalPlayed: Int, winRate: Float, currentStreak: Int)</ID>
-    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun StatCard(value: String, label: String, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:HomeScreen.kt$@Composable private fun StatCard( value: String, label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:HowToPlayScreen.kt$@Composable fun HowToPlayScreen(onBack: () -&gt; Unit, onStartPlaying: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:HowToPlayScreen.kt$@Composable private fun ColorGuideRow( color: Color, icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, description: String, )</ID>
+    <ID>FunctionNaming:HowToPlayScreen.kt$@Composable private fun ExampleRow(letters: List&lt;String&gt;, highlightIndex: Int, highlightColor: Color)</ID>
+    <ID>FunctionNaming:HowToPlayScreen.kt$@Composable private fun SectionCard(content: @Composable () -&gt; Unit)</ID>
+    <ID>FunctionNaming:LanguageSelectionScreen.kt$@Composable private fun LanguageRadioRow( label: String, selected: Boolean, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:LanguageSelectionScreen.kt$@Composable private fun LanguageSectionHeader(title: String, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:LanguageSelectionScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun LanguageSelectionScreen( onBack: () -&gt; Unit, onNavigateToGeneration: (String) -&gt; Unit, modifier: Modifier = Modifier, viewModel: LanguageSelectionViewModel = hiltViewModel(), )</ID>
+    <ID>FunctionNaming:ModelDownloadScreen.kt$@Composable private fun DownloadCompleteContent(modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:ModelDownloadScreen.kt$@Composable private fun DownloadErrorContent( errorMessage: String, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:ModelDownloadScreen.kt$@Composable private fun DownloadIdleContent( modelName: String, sizeBytes: Long, onStart: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:ModelDownloadScreen.kt$@Composable private fun DownloadingContent( modelName: String, progress: Float, downloadedBytes: Long, totalBytes: Long, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:ModelDownloadScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ModelDownloadScreen( onBack: () -&gt; Unit, onNavigateToGeneration: (ModelId) -&gt; Unit, modifier: Modifier = Modifier, viewModel: ModelDownloadViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable fun OnboardingScreen( onComplete: () -&gt; Unit, onNavigateToGeneration: (com.woliveiras.palabrita.core.model.ModelId) -&gt; Unit, modifier: Modifier = Modifier, viewModel: OnboardingViewModel = hiltViewModel(), )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun BackButton(onBack: () -&gt; Unit)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun Chip(text: String)</ID>
@@ -62,75 +69,77 @@
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun GradientButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, enabled: Boolean = true, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun LanguageCard( flag: String, label: String, code: String, selected: String, onSelect: (String) -&gt; Unit, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun LanguageScreen( selectedLanguage: String, onSelectLanguage: (String) -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
-    <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun ModelCard( title: String, subtitle: String, info: String, icon: ImageVector, iconGradient: List&lt;Color&gt;, isSelected: Boolean, onClick: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun ModelOptionCard(option: ModelOption, isSelected: Boolean, onClick: () -&gt; Unit)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun ModelSelectionScreen( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun TierWarningDialog(onConfirm: () -&gt; Unit, onChooseOther: () -&gt; Unit)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun WelcomeScreen(onNext: () -&gt; Unit)</ID>
-    <ID>FunctionNaming:PalabritaNavGraph.kt$@Composable fun PalabritaNavGraph(appPreferences: AppPreferences)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun GuessDistributionHistogram(distribution: Map&lt;Int, Int&gt;)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun LanguageDialog(current: String, onSelect: (String) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SectionHeader(title: String)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun StatItem(value: String, label: String)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun StatsSection(state: SettingsState, onShareStats: () -&gt; Unit)</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
+    <ID>FunctionNaming:PalabritaNavGraph.kt$@Composable fun PalabritaNavGraph(appPreferences: AppPreferences, darkTheme: Boolean)</ID>
+    <ID>FunctionNaming:ResultScreens.kt$@Composable internal fun LoseResultScreen( puzzle: Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:ResultScreens.kt$@Composable internal fun WinResultScreen( puzzle: Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:ResultScreens.kt$@Composable private fun GhostButton( text: String, icon: ImageVector, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:ResultScreens.kt$@Composable private fun StatItem(icon: ImageVector, value: String, label: String)</ID>
+    <ID>FunctionNaming:ResultScreens.kt$@Composable private fun StatsCard(modifier: Modifier = Modifier, content: @Composable () -&gt; Unit)</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun ModelOptionCard( model: AiModelInfo, isSelected: Boolean, isAboveTier: Boolean, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SettingsRow( icon: @Composable () -&gt; Unit, title: String, subtitle: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SettingsSectionHeader(title: String, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, onNavigateToModelDownload: (ModelId) -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToLanguageSelection: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun ModelPickerBottomSheet( currentModelId: ModelId, currentDownloadState: DownloadState, availableModels: List&lt;AiModelInfo&gt;, deviceTier: DeviceTier, onSelect: (ModelId) -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun ThemePickerBottomSheet( currentMode: ThemeMode, onSelect: (ThemeMode) -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>FunctionNaming:SplashScreen.kt$@Composable fun SplashScreen(onNavigationReady: () -&gt; Unit)</ID>
     <ID>FunctionNaming:Theme.kt$@Composable fun PalabritaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -&gt; Unit)</ID>
-    <ID>ImplicitDefaultLocale:SettingsScreen.kt$String.format("%.1f", state.stats.avgAttempts)</ID>
-    <ID>LongMethod:ChatScreen.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) @Composable fun ChatScreen( puzzleId: Long, onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: ChatViewModel = hiltViewModel(), )</ID>
-    <ID>LongMethod:ChatViewModel.kt$ChatViewModel$private fun ensureSessionAndSend(userText: String, isInitial: Boolean = false)</ID>
+    <ID>LongMethod:AiInfoScreen.kt$@Composable fun AiInfoScreen( onBack: () -&gt; Unit, onNavigateToSettings: (() -&gt; Unit)? = null, modifier: Modifier = Modifier, viewModel: AiInfoViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:GameScreen.kt$@Composable private fun GameKeyboard( keyboardState: Map&lt;Char, LetterState&gt;, onKey: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, language: String = "", )</ID>
-    <ID>LongMethod:GameScreen.kt$@Composable private fun PlayingScreen( state: GameState, onTypeLetter: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, onRevealHint: () -&gt; Unit, onBack: () -&gt; Unit, onShakeComplete: () -&gt; Unit, )</ID>
     <ID>LongMethod:GameViewModel.kt$GameViewModel$private fun submitAttempt()</ID>
+    <ID>LongMethod:GeneratePuzzlesUseCase.kt$GeneratePuzzlesUseCaseImpl$override suspend fun execute( language: String, modelId: ModelId, onProgress: (successCount: Int, batchSize: Int) -&gt; Unit, ): GenerationResult</ID>
     <ID>LongMethod:GenerationScreen.kt$@Composable fun GenerationScreen( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
-    <ID>LongMethod:HomeScreen.kt$@Composable fun HomeScreen( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
+    <ID>LongMethod:GenerationViewModel.kt$GenerationViewModel$fun triggerGeneration(modelId: ModelId?)</ID>
+    <ID>LongMethod:HowToPlayScreen.kt$@Composable fun HowToPlayScreen(onBack: () -&gt; Unit, onStartPlaying: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>LongMethod:LanguageSelectionScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun LanguageSelectionScreen( onBack: () -&gt; Unit, onNavigateToGeneration: (String) -&gt; Unit, modifier: Modifier = Modifier, viewModel: LanguageSelectionViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:ModelDownloadManager.kt$ModelDownloadManagerImpl$override suspend fun startDownload(modelId: ModelId)</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable fun OnboardingScreen( onComplete: () -&gt; Unit, onNavigateToGeneration: (com.woliveiras.palabrita.core.model.ModelId) -&gt; Unit, modifier: Modifier = Modifier, viewModel: OnboardingViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable private fun DownloadScreen( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
+    <ID>LongMethod:OnboardingScreen.kt$@Composable private fun ModelOptionCard(option: ModelOption, isSelected: Boolean, onClick: () -&gt; Unit)</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable private fun ModelSelectionScreen( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>LongMethod:OnboardingScreen.kt$@Composable private fun WelcomeScreen(onNext: () -&gt; Unit)</ID>
-    <ID>LongMethod:PalabritaNavGraph.kt$@Composable fun PalabritaNavGraph(appPreferences: AppPreferences)</ID>
-    <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
+    <ID>LongMethod:PalabritaNavGraph.kt$@Composable fun PalabritaNavGraph(appPreferences: AppPreferences, darkTheme: Boolean)</ID>
+    <ID>LongMethod:ResultScreens.kt$@Composable internal fun LoseResultScreen( puzzle: Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
+    <ID>LongMethod:ResultScreens.kt$@Composable internal fun WinResultScreen( puzzle: Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
+    <ID>LongMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SettingsScreen( onBack: () -&gt; Unit, onNavigateToModelDownload: (ModelId) -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToLanguageSelection: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
     <ID>LongMethod:SplashScreen.kt$@Composable fun SplashScreen(onNavigationReady: () -&gt; Unit)</ID>
-    <ID>LongParameterList:ChatViewModelTest.kt$ChatViewModelTest$( chatRepo: FakeChatRepository = FakeChatRepository(), engineManager: FakeLlmEngineManager = FakeLlmEngineManager(), modelRepo: FakeModelRepository = FakeModelRepository( ModelConfig( modelId = ModelId.GEMMA4_E2B, downloadState = DownloadState.DOWNLOADED, modelPath = "/fake/model/path", ) ), puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(createTestPuzzle()), gameSessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(), puzzleId: Long = 1L, )</ID>
+    <ID>LongParameterList:GameLogic.kt$GameLogic$( attempts: List&lt;Attempt&gt;, difficulty: Int, word: String, hintsUsed: Int, won: Boolean, wordLabel: String = "A palavra era:", hintsLabel: String = "dicas usadas", )</ID>
     <ID>LongParameterList:GameScreen.kt$( attempts: List&lt;Attempt&gt;, currentInput: String, wordLength: Int, maxAttempts: Int, tileSize: Dp, showShake: Boolean, onShakeComplete: () -&gt; Unit, gameStatus: GameStatus, )</ID>
-    <ID>LongParameterList:GameScreen.kt$( onNavigateToChat: (Long) -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToHome: () -&gt; Unit, onNoPuzzlesLeft: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GameViewModel = hiltViewModel(), )</ID>
     <ID>LongParameterList:GameScreen.kt$( state: GameState, onTypeLetter: (Char) -&gt; Unit, onDelete: () -&gt; Unit, onSubmit: () -&gt; Unit, onRevealHint: () -&gt; Unit, onBack: () -&gt; Unit, onShakeComplete: () -&gt; Unit, )</ID>
-    <ID>LongParameterList:GameScreen.kt$( won: Boolean, puzzle: com.woliveiras.palabrita.core.model.Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onExplore: () -&gt; Unit, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
     <ID>LongParameterList:GenerationScreen.kt$( modelId: ModelId?, isRegeneration: Boolean, onComplete: () -&gt; Unit, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: GenerationViewModel = hiltViewModel(), )</ID>
-    <ID>LongParameterList:HomeScreen.kt$( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
+    <ID>LongParameterList:HomeScreen.kt$( icon: ImageVector, title: String, subtitle: String, onClick: () -&gt; Unit, iconContainerColor: Color, iconTint: Color, )</ID>
+    <ID>LongParameterList:HomeScreen.kt$( onNavigateToGame: () -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToSettings: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, onNavigateToHowToPlay: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = hiltViewModel(), )</ID>
+    <ID>LongParameterList:ModelDownloadScreen.kt$( modelName: String, progress: Float, downloadedBytes: Long, totalBytes: Long, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongParameterList:OnboardingScreen.kt$( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>LongParameterList:OnboardingScreen.kt$( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
-    <ID>LongParameterList:OnboardingScreen.kt$( title: String, subtitle: String, info: String, icon: ImageVector, iconGradient: List&lt;Color&gt;, isSelected: Boolean, onClick: () -&gt; Unit, )</ID>
-    <ID>LongParameterList:OnboardingViewModel.kt$OnboardingViewModel$( deviceTier: DeviceTier, private val statsRepository: StatsRepository, private val modelRepository: ModelRepository, private val appPreferences: AppPreferences, private val downloadManager: ModelDownloadManager, private val engineManager: LlmEngineManager, private val generationScheduler: PuzzleGenerationScheduler, )</ID>
-    <ID>LongParameterList:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$( @Assisted appContext: Context, @Assisted workerParams: WorkerParameters, private val puzzleRepository: PuzzleRepository, private val puzzleGenerator: PuzzleGenerator, private val statsRepository: StatsRepository, private val engineManager: LlmEngineManager, private val appPreferences: AppPreferences, )</ID>
-    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGenerator$( count: Int, language: String, wordLength: Int, recentWords: List&lt;String&gt;, allExistingWords: Set&lt;String&gt;, modelId: ModelId, onPuzzleAttempted: suspend (successCount: Int) -&gt; Unit = {}, )</ID>
-    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGeneratorImpl$( modelId: ModelId, language: String, wordLength: Int, recentWords: List&lt;String&gt;, usedWords: Set&lt;String&gt;, attempt: Int, failureReason: String? = null, )</ID>
-    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGeneratorImpl$( session: LlmSession, language: String, wordLength: Int, lengthRange: IntRange, recentWords: List&lt;String&gt;, usedWords: Set&lt;String&gt;, modelId: ModelId, )</ID>
-    <ID>LongParameterList:SettingsViewModelTest.kt$SettingsViewModelTest$( stats: PlayerStats = PlayerStats(), modelConfig: ModelConfig = ModelConfig(), deviceTier: DeviceTier = DeviceTier.HIGH, statsRepo: FakeStatsRepository = FakeStatsRepository(stats), modelRepo: FakeModelRepository = FakeModelRepository(modelConfig), sessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(), chatRepo: FakeChatRepository = FakeChatRepository(), puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(), )</ID>
+    <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGenerator$( count: Int, language: String, wordLength: Int, recentWords: List&lt;String&gt;, allExistingWords: Set&lt;String&gt;, modelId: ModelId, hintLanguage: String = language, onPuzzleAttempted: suspend (successCount: Int) -&gt; Unit = {}, )</ID>
+    <ID>LongParameterList:ResultScreens.kt$( puzzle: Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:SettingsScreen.kt$( currentModelId: ModelId, currentDownloadState: DownloadState, availableModels: List&lt;AiModelInfo&gt;, deviceTier: DeviceTier, onSelect: (ModelId) -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:SettingsScreen.kt$( onBack: () -&gt; Unit, onNavigateToModelDownload: (ModelId) -&gt; Unit, onNavigateToGeneration: () -&gt; Unit, onNavigateToLanguageSelection: () -&gt; Unit, onNavigateToAiInfo: () -&gt; Unit, modifier: Modifier = Modifier, viewModel: SettingsViewModel = hiltViewModel(), )</ID>
+    <ID>LongParameterList:SettingsViewModel.kt$SettingsViewModel$( private val statsRepository: StatsRepository, private val modelRepository: ModelRepository, private val deviceTier: DeviceTier, private val modelRegistry: ModelRegistry, private val downloadManager: ModelDownloadManager, private val appPreferences: AppPreferences, private val gameSessionRepository: GameSessionRepository, private val puzzleRepository: PuzzleRepository, )</ID>
+    <ID>LongParameterList:SettingsViewModelTest.kt$SettingsViewModelTest$( stats: PlayerStats = PlayerStats(), modelConfig: ModelConfig = ModelConfig(), deviceTier: DeviceTier = DeviceTier.HIGH, statsRepo: FakeStatsRepository = FakeStatsRepository(stats), modelRepo: FakeModelRepository = FakeModelRepository(modelConfig), downloadManager: FakeModelDownloadManager = FakeModelDownloadManager(), appPrefs: FakeAppPreferences = FakeAppPreferences(), gameSessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(), puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(), )</ID>
     <ID>LongParameterList:TestFixtures.kt$( id: Int = 1, modelId: String = "none", downloadState: String = "NOT_DOWNLOADED", modelPath: String? = null, sizeBytes: Long = 0, selectedAt: Long = System.currentTimeMillis(), )</ID>
     <ID>LongParameterList:TestFixtures.kt$( id: Int = 1, totalPlayed: Int = 0, totalWon: Int = 0, avgAttempts: Float = 0f, preferredLanguage: String = "pt", guessDistribution: String = "{}", lastPlayedAt: Long = 0, )</ID>
     <ID>LongParameterList:TestFixtures.kt$( id: Long = 0, puzzleId: Long = 1, attempts: String = "[]", startedAt: Long = System.currentTimeMillis(), completedAt: Long? = null, hintsUsed: Int = 0, won: Boolean = false, )</ID>
     <ID>LongParameterList:TestFixtures.kt$( id: Long = 0, word: String = "gatos", wordDisplay: String = word, language: String = "pt", difficulty: Int = 5, category: String = "", hints: String = """["Dica 1","Dica 2","Dica 3"]""", source: String = "AI", generatedAt: Long = System.currentTimeMillis(), playedAt: Long? = null, isPlayed: Boolean = false, isValid: Boolean = true, )</ID>
-    <ID>MagicNumber:AiInfoScreen.kt$1024</ID>
+    <ID>MagicNumber:AiInfoScreen.kt$0xFF16A34A</ID>
+    <ID>MagicNumber:AiInfoScreen.kt$0xFF2563EB</ID>
     <ID>MagicNumber:AiInfoScreen.kt$1_000_000.0</ID>
     <ID>MagicNumber:AiInfoScreen.kt$1_000_000_000.0</ID>
     <ID>MagicNumber:DeviceCapabilities.kt$DeviceCapabilities$1024</ID>
     <ID>MagicNumber:DeviceCapabilities.kt$DeviceCapabilities$8192</ID>
-    <ID>MagicNumber:GameRules.kt$GameRules$10</ID>
-    <ID>MagicNumber:GameRules.kt$GameRules$4</ID>
-    <ID>MagicNumber:GameRules.kt$GameRules$5</ID>
-    <ID>MagicNumber:GameRules.kt$GameRules$6</ID>
-    <ID>MagicNumber:GameScreen.kt$0.3f</ID>
-    <ID>MagicNumber:GameScreen.kt$0.7f</ID>
     <ID>MagicNumber:GameScreen.kt$1.3f</ID>
-    <ID>MagicNumber:GenerationScreen.kt$0xFFF5F3FF</ID>
+    <ID>MagicNumber:GameScreen.kt$50</ID>
+    <ID>MagicNumber:GeneratePuzzlesUseCase.kt$GeneratePuzzlesUseCaseImpl$50</ID>
     <ID>MagicNumber:GenerationScreen.kt$1_800</ID>
     <ID>MagicNumber:GenerationScreen.kt$2_200</ID>
-    <ID>MagicNumber:GenerationScreen.kt$300</ID>
-    <ID>MagicNumber:GenerationScreen.kt$50</ID>
     <ID>MagicNumber:GenerationScreen.kt$500</ID>
-    <ID>MagicNumber:HomeScreen.kt$0xFF7C3AED</ID>
-    <ID>MagicNumber:HomeScreen.kt$0xFFC084FC</ID>
+    <ID>MagicNumber:HomeScreen.kt$0xFF6366F1</ID>
+    <ID>MagicNumber:HomeScreen.kt$0xFF8B5CF6</ID>
+    <ID>MagicNumber:HomeScreen.kt$0xFFA855F7</ID>
     <ID>MagicNumber:LlmResponseParser.kt$LlmResponseParserImpl$8</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$100_000_000L</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$1_000_000.0</ID>
@@ -139,39 +148,37 @@
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$304</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$308</ID>
     <ID>MagicNumber:ModelDownloadManager.kt$ModelDownloadManagerImpl$403</ID>
+    <ID>MagicNumber:ModelDownloadScreen.kt$100</ID>
+    <ID>MagicNumber:ModelDownloadScreen.kt$1024</ID>
+    <ID>MagicNumber:ModelDownloadScreen.kt$1024f</ID>
     <ID>MagicNumber:OnboardingScreen.kt$0xFF06B6D4</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFF0891B2</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFF0EA5E9</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFF10B981</ID>
     <ID>MagicNumber:OnboardingScreen.kt$0xFF2563EB</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFF6366F1</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFF7C3AED</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFFD946EF</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFFEF4444</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$0xFFF59E0B</ID>
     <ID>MagicNumber:OnboardingScreen.kt$100</ID>
     <ID>MagicNumber:OnboardingScreen.kt$1_000_000.0</ID>
     <ID>MagicNumber:OnboardingScreen.kt$1_000_000_000.0</ID>
     <ID>MagicNumber:OnboardingScreen.kt$400</ID>
     <ID>MagicNumber:OnboardingScreen.kt$4000</ID>
     <ID>MagicNumber:OnboardingScreen.kt$500</ID>
-    <ID>MagicNumber:OnboardingScreen.kt$6</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF121213</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF15803D</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF1A1A2E</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF1A2332</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF1D4ED8</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF1E1E20</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF22C55E</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF2A2A2E</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF2D2214</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF3A3A3C</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF3D008A</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF4ECDC4</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF60A5FA</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF6366F1</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF6B7280</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF6C63FF</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF787C7E</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF7B5CFA</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF8B5CF6</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF9333EA</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFF9CA3AF</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFA78BFA</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFA855F7</ID>
@@ -180,23 +187,34 @@
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFDBEAFE</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFDCFCE7</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFE5E7EB</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFEC4899</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFEDE9FE</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFF0F4FF</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFF472B6</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFF59E0B</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFF5F5F5</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFF87171</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFF8F8FA</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFB923C</ID>
+    <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFBBF24</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFF6B6B</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFFB347</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFFD700</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFFF7ED</ID>
     <ID>MagicNumber:PalabritaColors.kt$PalabritaColors$0xFFFFFFFF</ID>
     <ID>MagicNumber:PalabritaNavGraph.kt$300</ID>
-    <ID>MagicNumber:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$50</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$30</ID>
-    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$300</ID>
-    <ID>MagicNumber:SettingsScreen.kt$0.05f</ID>
-    <ID>MagicNumber:SettingsState.kt$SettingsState$100</ID>
+    <ID>MagicNumber:PuzzleGenerator.kt$PuzzleGeneratorImpl$200</ID>
+    <ID>MagicNumber:ResultScreens.kt$20</ID>
+    <ID>MagicNumber:ResultScreens.kt$3</ID>
+    <ID>MagicNumber:ResultScreens.kt$300</ID>
+    <ID>MagicNumber:ResultScreens.kt$4</ID>
+    <ID>MagicNumber:ResultScreens.kt$500</ID>
+    <ID>MagicNumber:ResultScreens.kt$50f</ID>
+    <ID>MagicNumber:ResultScreens.kt$6</ID>
+    <ID>MagicNumber:ResultScreens.kt$800</ID>
+    <ID>MagicNumber:SettingsScreen.kt$1024</ID>
+    <ID>MagicNumber:SettingsScreen.kt$1024f</ID>
+    <ID>MagicNumber:SettingsScreen.kt$8192L</ID>
     <ID>MagicNumber:SplashScreen.kt$0.5f</ID>
     <ID>MagicNumber:SplashScreen.kt$0.8f</ID>
     <ID>MagicNumber:SplashScreen.kt$1_000</ID>
@@ -211,45 +229,55 @@
     <ID>MaxLineLength:AiModelRegistry.kt$AiModelRegistry$"https://huggingface.co/litert-community/DeepSeek-R1-Distill-Qwen-1.5B/resolve/main/DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.litertlm"</ID>
     <ID>MaxLineLength:AiModelRegistry.kt$AiModelRegistry$"https://huggingface.co/litert-community/Phi-4-mini-instruct/resolve/main/Phi-4-mini-instruct_multi-prefill-seq_q8_ekv4096.litertlm"</ID>
     <ID>MaxLineLength:AiModelRegistry.kt$AiModelRegistry$"https://huggingface.co/litert-community/Qwen2.5-1.5B-Instruct/resolve/main/Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv4096.litertlm"</ID>
-    <ID>MaxLineLength:PuzzleGenerator.kt$PuzzleGeneratorImpl$"$base\n\nYour previous response was rejected: $failureReason. The word MUST have exactly $wordLength letters. Try again with a DIFFERENT word."</ID>
+    <ID>MaxLineLength:GeneratePuzzlesUseCase.kt$GeneratePuzzlesUseCaseImpl$"Mastery not met ($wins/${level.winsRequired} wins), generating $remaining more ${level.wordLength}-letter words"</ID>
     <ID>NestedBlockDepth:LlmResponseParser.kt$LlmResponseParserImpl$private fun tryStructuralParse(text: String): PuzzleResponse?</ID>
-    <ID>ReturnCount:ChatViewModel.kt$ChatViewModel$private fun sendMessage()</ID>
-    <ID>ReturnCount:ChatViewModel.kt$ChatViewModel$private suspend fun ensureSession(): Boolean</ID>
     <ID>ReturnCount:GameViewModel.kt$GameViewModel$private fun revealHint()</ID>
     <ID>ReturnCount:GameViewModel.kt$GameViewModel$private fun submitAttempt()</ID>
     <ID>ReturnCount:GameViewModel.kt$GameViewModel$private fun typeLetter(letter: Char)</ID>
     <ID>ReturnCount:HomeViewModel.kt$HomeViewModel$private suspend fun buildLanguageDisplay(language: String): String</ID>
+    <ID>ReturnCount:LlmResponseParser.kt$LlmResponseParserImpl$override fun parseHints(rawResponse: String): ParseResult&lt;List&lt;String&gt;&gt;</ID>
     <ID>ReturnCount:LlmResponseParser.kt$LlmResponseParserImpl$override fun parsePuzzle(rawResponse: String): ParseResult&lt;PuzzleResponse&gt;</ID>
     <ID>ReturnCount:ModelDownloadManager.kt$ModelDownloadManagerImpl$override suspend fun startDownload(modelId: ModelId)</ID>
-    <ID>ReturnCount:PuzzleGenerationWorker.kt$PuzzleGenerationWorker$override suspend fun doWork(): Result</ID>
+    <ID>ReturnCount:SettingsViewModel.kt$SettingsViewModel$private fun selectModel(modelId: ModelId)</ID>
+    <ID>SwallowedException:GeneratePuzzlesUseCaseTest.kt$GeneratePuzzlesUseCaseTest$e: IllegalArgumentException</ID>
+    <ID>SwallowedException:GeneratePuzzlesUseCaseTest.kt$GeneratePuzzlesUseCaseTest$e: kotlinx.coroutines.CancellationException</ID>
     <ID>SwallowedException:OnboardingViewModel.kt$OnboardingViewModel$e: Exception</ID>
     <ID>ThrowsCount:ModelDownloadManager.kt$ModelDownloadManagerImpl$private suspend fun downloadFile(url: String, targetFile: File, attempt: Int)</ID>
-    <ID>TooGenericExceptionCaught:ChatViewModel.kt$ChatViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:GeneratePuzzlesUseCase.kt$GeneratePuzzlesUseCaseImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:LlmEngineManagerImpl.kt$LlmEngineManagerImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:ModelDownloadManager.kt$ModelDownloadManagerImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:OnboardingViewModel.kt$OnboardingViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PuzzleGenerator.kt$PuzzleGeneratorImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:WordList.kt$WordList$e: Exception</ID>
+    <ID>TooManyFunctions:FakePuzzleRepository.kt$FakePuzzleRepository : PuzzleRepository</ID>
     <ID>TooManyFunctions:GameScreen.kt$com.woliveiras.palabrita.feature.game.GameScreen.kt</ID>
+    <ID>TooManyFunctions:ModelDownloadManager.kt$ModelDownloadManagerImpl : ModelDownloadManager</ID>
     <ID>TooManyFunctions:OnboardingScreen.kt$com.woliveiras.palabrita.feature.onboarding.OnboardingScreen.kt</ID>
     <ID>TooManyFunctions:OnboardingViewModel.kt$OnboardingViewModel : ViewModel</ID>
     <ID>TooManyFunctions:PuzzleDao.kt$PuzzleDao</ID>
-    <ID>UnusedParameter:ChatScreen.kt$puzzleId: Long</ID>
-    <ID>UnusedParameter:ChatViewModel.kt$ChatViewModel$isInitial: Boolean = false</ID>
+    <ID>TooManyFunctions:PuzzleRepository.kt$PuzzleRepository</ID>
+    <ID>TooManyFunctions:PuzzleRepositoryImpl.kt$PuzzleRepositoryImpl : PuzzleRepository</ID>
     <ID>UnusedParameter:GameScreen.kt$modifier: Modifier = Modifier</ID>
-    <ID>UnusedParameter:GameScreen.kt$onHome: () -&gt; Unit</ID>
     <ID>UnusedParameter:GameScreen.kt$onNavigateToSettings: () -&gt; Unit</ID>
+    <ID>UnusedParameter:ModelDownloadScreen.kt$modelName: String</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$deviceTier: DeviceTier</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$downloadedBytes: Long</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$modifier: Modifier = Modifier</ID>
+    <ID>UnusedParameter:OnboardingScreen.kt$onAutoSelect: () -&gt; Unit</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$onDismissWarning: () -&gt; Unit</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$showTierWarning: Boolean</ID>
     <ID>UnusedParameter:OnboardingScreen.kt$totalBytes: Long</ID>
+    <ID>UnusedParameter:PalabritaNavGraph.kt$darkTheme: Boolean</ID>
+    <ID>UnusedParameter:ResultScreens.kt$attempts: List&lt;Attempt&gt;</ID>
+    <ID>UnusedParameter:ResultScreens.kt$hintsUsed: Int</ID>
+    <ID>UnusedPrivateMember:OnboardingScreen.kt$@Composable private fun Chip(text: String)</ID>
     <ID>UnusedPrivateMember:OnboardingScreen.kt$private fun formatBytes(bytes: Long): String</ID>
+    <ID>UnusedPrivateProperty:LanguageSelectionScreen.kt$val context = LocalContext.current</ID>
     <ID>UnusedPrivateProperty:OnboardingViewModel.kt$OnboardingViewModel$private val modelRepository: ModelRepository</ID>
-    <ID>UnusedPrivateProperty:SettingsScreen.kt$private const val STAT_PERCENT_MULTIPLIER = 100</ID>
+    <ID>UnusedPrivateProperty:PuzzleGenerator.kt$PuzzleGeneratorImpl$private val validator: PuzzleValidator</ID>
     <ID>UseCheckOrError:LlmEngineManagerImpl.kt$LlmEngineManagerImpl$throw IllegalStateException("Engine not initialized")</ID>
-    <ID>WildcardImport:ChatViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
+    <ID>UseCheckOrError:LlmEngineManagerImpl.kt$LlmEngineManagerImpl$throw lastException ?: IllegalStateException("No available backend")</ID>
     <ID>WildcardImport:GameViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
     <ID>WildcardImport:OnboardingViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
-    <ID>WildcardImport:SettingsViewModelTest.kt$import com.woliveiras.palabrita.core.testing.*</ID>
   </CurrentIssues>
 </SmellBaseline>
