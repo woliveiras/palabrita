@@ -79,11 +79,11 @@ fun GameScreen(
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val wordLabel = stringResource(CommonR.string.share_word_label)
+  val hintsLabel = stringResource(CommonR.string.share_hints_label)
 
   fun shareResult(won: Boolean) {
     val puzzle = state.puzzle ?: return
-    val wordLabel = context.getString(CommonR.string.share_word_label)
-    val hintsLabel = context.getString(CommonR.string.share_hints_label)
     val shareText =
       GameLogic.generateShareText(
         attempts = state.attempts,
