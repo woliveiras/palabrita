@@ -49,7 +49,7 @@ constructor(
             modelInfo = info,
             modelId = config.modelId,
             modelPath = config.modelPath,
-            hintSystemPrompt = promptProvider.hintSystemPrompt(),
+            hintSystemPrompt = promptProvider.hintSystemPrompt("pt"),
             hintSamplePrompt =
               promptProvider.hintUserPrompt(
                 word = "gatos",

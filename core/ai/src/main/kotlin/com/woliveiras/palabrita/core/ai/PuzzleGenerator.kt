@@ -66,7 +66,7 @@ constructor(
 
     Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count words=${words.size}")
 
-    val systemPrompt = promptProvider.hintSystemPrompt()
+    val systemPrompt = promptProvider.hintSystemPrompt(language)
 
     try {
       for ((index, word) in words.withIndex()) {

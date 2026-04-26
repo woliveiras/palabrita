@@ -7,14 +7,14 @@ class PromptTemplatesTest {
 
   @Test
   fun `hint system prompt contains rules`() {
-    val prompt = PromptTemplates.hintSystemPrompt()
+    val prompt = PromptTemplates.hintSystemPrompt("pt")
     assertThat(prompt).contains("hints")
     assertThat(prompt).contains("3")
   }
 
   @Test
   fun `hint system prompt does not ask for word generation`() {
-    val prompt = PromptTemplates.hintSystemPrompt()
+    val prompt = PromptTemplates.hintSystemPrompt("en")
     assertThat(prompt).doesNotContain("generate a word")
     assertThat(prompt).doesNotContain("JSON")
   }
@@ -75,6 +75,26 @@ class PromptTemplatesTest {
   @Test
   fun `languageDisplayName falls back to raw code for unknown language`() {
     assertThat(PromptTemplates.languageDisplayName("fr")).isEqualTo("fr")
+  }
+
+  @Test
+  fun `hint system prompt enforces language for pt`() {
+    val prompt = PromptTemplates.hintSystemPrompt("pt")
+    assertThat(prompt).contains("Brazilian Portuguese")
+    assertThat(prompt).contains("MUST be written in Brazilian Portuguese")
+  }
+
+  @Test
+  fun `hint system prompt enforces language for es`() {
+    val prompt = PromptTemplates.hintSystemPrompt("es")
+    assertThat(prompt).contains("Spanish")
+    assertThat(prompt).contains("MUST be written in Spanish")
+  }
+
+  @Test
+  fun `hint user prompt enforces language for pt`() {
+    val prompt = PromptTemplates.hintUserPrompt(word = "mesa", language = "pt")
+    assertThat(prompt).contains("IN Brazilian Portuguese")
   }
 
   @Test
