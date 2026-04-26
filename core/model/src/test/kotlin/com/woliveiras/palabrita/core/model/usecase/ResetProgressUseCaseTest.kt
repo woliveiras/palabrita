@@ -1,13 +1,10 @@
 package com.woliveiras.palabrita.core.model.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.woliveiras.palabrita.core.model.ChatMessage
 import com.woliveiras.palabrita.core.model.GameSession
-import com.woliveiras.palabrita.core.model.MessageRole
 import com.woliveiras.palabrita.core.model.PlayerStats
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
-import com.woliveiras.palabrita.core.model.repository.ChatRepository
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
@@ -23,20 +20,15 @@ class ResetProgressUseCaseTest {
     val stats = InlineStatsRepository(PlayerStats(totalPlayed = 10, totalWon = 5))
     val sessions = InlineGameSessionRepository()
     sessions.sessions.add(GameSession(id = 1, puzzleId = 1, startedAt = 0L))
-    val chat = InlineChatRepository()
-    chat.messages.add(
-      ChatMessage(puzzleId = 1, role = MessageRole.USER, content = "hi", timestamp = 0)
-    )
     val puzzles = InlinePuzzleRepository()
     val prefs = InlineAppPreferences(cycle = 3)
 
-    val useCase = ResetProgressUseCase(stats, sessions, chat, puzzles, prefs)
+    val useCase = ResetProgressUseCase(stats, sessions, puzzles, prefs)
     useCase()
 
     assertThat(stats.stats.totalPlayed).isEqualTo(0)
     assertThat(stats.stats.totalWon).isEqualTo(0)
     assertThat(sessions.sessions).isEmpty()
-    assertThat(chat.messages).isEmpty()
     assertThat(puzzles.allDeleted).isTrue()
     assertThat(prefs.cycleValue).isEqualTo(0)
   }
@@ -80,26 +72,10 @@ class ResetProgressUseCaseTest {
       won: Boolean,
     ) {}
 
-    override suspend fun markChatExplored(puzzleId: Long) {}
-
     override suspend fun getCurrentStreak(): Int = 0
 
     override suspend fun deleteAll() {
       sessions.clear()
-    }
-  }
-
-  private class InlineChatRepository : ChatRepository {
-    val messages = mutableListOf<ChatMessage>()
-
-    override suspend fun getMessages(puzzleId: Long) = messages.toList()
-
-    override suspend fun saveMessage(message: ChatMessage) {}
-
-    override suspend fun countUserMessages(puzzleId: Long) = 0
-
-    override suspend fun deleteAll() {
-      messages.clear()
     }
   }
 

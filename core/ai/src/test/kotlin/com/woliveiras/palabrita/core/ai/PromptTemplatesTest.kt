@@ -37,24 +37,6 @@ class PromptTemplatesTest {
     assertThat(prompt).contains("Bad hints")
   }
 
-  @Test
-  fun `chat system prompt includes word`() {
-    val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
-    assertThat(prompt).contains("gatos")
-  }
-
-  @Test
-  fun `chat system prompt includes language display name`() {
-    val prompt = PromptTemplates.chatSystemPrompt(word = "cats", language = "en")
-    assertThat(prompt).contains("English")
-  }
-
-  @Test
-  fun `chat system prompt is in english`() {
-    val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
-    assertThat(prompt).contains("educational assistant")
-  }
-
   // --- Language display name mapping ---
 
   @Test
@@ -107,11 +89,5 @@ class PromptTemplatesTest {
   fun `hint user prompt uses Spanish for es`() {
     val prompt = PromptTemplates.hintUserPrompt(word = "mesa", language = "es")
     assertThat(prompt).contains("Spanish")
-  }
-
-  @Test
-  fun `chat system prompt uses Brazilian Portuguese for pt`() {
-    val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
-    assertThat(prompt).contains("Brazilian Portuguese")
   }
 }

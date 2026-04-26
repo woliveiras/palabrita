@@ -328,7 +328,6 @@
     <string name="ai_info_prompts_subtitle">Veja como a IA é instruída para gerar conteúdo</string>
     <string name="ai_info_system_prompt">Prompt do Sistema</string>
     <string name="ai_info_puzzle_prompt">Prompt de Geração (exemplo)</string>
-    <string name="ai_info_chat_prompt">Prompt do Chat (exemplo)</string>
     <string name="ai_info_change_model">Trocar Modelo nas Configurações</string>
 
     <!-- Settings: Redesign (Spec 19) -->

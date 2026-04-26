@@ -11,8 +11,6 @@ sealed class GameAction {
 
   data object ShareResult : GameAction()
 
-  data object NavigateToChat : GameAction()
-
   data object NavigateToStats : GameAction()
 
   data object LoadNextPuzzle : GameAction()

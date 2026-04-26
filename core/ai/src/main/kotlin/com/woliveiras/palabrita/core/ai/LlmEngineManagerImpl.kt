@@ -11,11 +11,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -104,21 +102,6 @@ class LlmEngineManagerImpl @Inject constructor(@ApplicationContext private val c
     }
   }
 
-  override suspend fun createChatSession(systemPrompt: String): LlmSession {
-    val currentEngine = engine ?: throw IllegalStateException("Engine not initialized")
-
-    return withContext(Dispatchers.IO) {
-      val conversationConfig =
-        ConversationConfig(
-          systemInstruction = Contents.of(systemPrompt),
-          samplerConfig = SamplerConfig(topK = 40, topP = 0.95, temperature = 0.8),
-        )
-
-      val conversation = currentEngine.createConversation(conversationConfig)
-      LlmSessionImpl(conversation)
-    }
-  }
-
   override fun destroy() {
     engine?.close()
     engine = null
@@ -126,23 +109,4 @@ class LlmEngineManagerImpl @Inject constructor(@ApplicationContext private val c
   }
 
   override fun isReady(): Boolean = _engineState.value is EngineState.Ready
-}
-
-private class LlmSessionImpl(private val conversation: com.google.ai.edge.litertlm.Conversation) :
-  LlmSession {
-
-  override suspend fun sendMessage(message: String): String {
-    return withContext(Dispatchers.IO) {
-      val response = conversation.sendMessage(message)
-      response.toString()
-    }
-  }
-
-  override fun sendMessageStreaming(message: String): Flow<String> {
-    return conversation.sendMessageAsync(message).map { msg -> msg.toString() }
-  }
-
-  override fun close() {
-    conversation.close()
-  }
 }

@@ -327,7 +327,6 @@
     <string name="ai_info_prompts_subtitle">See how the AI is instructed to generate content</string>
     <string name="ai_info_system_prompt">System Prompt</string>
     <string name="ai_info_puzzle_prompt">Generation Prompt (example)</string>
-    <string name="ai_info_chat_prompt">Chat Prompt (example)</string>
     <string name="ai_info_change_model">Change Model in Settings</string>
 
     <!-- Settings screen -->

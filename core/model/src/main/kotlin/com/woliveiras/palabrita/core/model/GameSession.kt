@@ -8,5 +8,4 @@ data class GameSession(
   val completedAt: Long? = null,
   val hintsUsed: Int = 0,
   val won: Boolean = false,
-  val chatExplored: Boolean = false,
 )

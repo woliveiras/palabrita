@@ -114,10 +114,7 @@ constructor(
     repeat(GameRules.MAX_GENERATION_RETRIES) { attempt ->
       try {
         val userPrompt = promptProvider.hintUserPrompt(word, language)
-        val rawResponse =
-          engineManager.createChatSession(systemPrompt).use { session ->
-            session.sendMessage(userPrompt)
-          }
+        val rawResponse = engineManager.generateSingleTurn(systemPrompt, userPrompt)
         Log.d(
           TAG,
           "  hint attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(200)}",

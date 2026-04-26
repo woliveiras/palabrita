@@ -5,8 +5,6 @@ interface PromptProvider {
 
   fun hintUserPrompt(word: String, language: String): String
 
-  fun chatSystemPrompt(word: String, language: String): String
-
   fun languageDisplayName(code: String): String
 }
 
@@ -55,16 +53,6 @@ object PromptTemplates : PromptProvider {
 
       Good style:
       hints: <vague hint in $lang> | <medium hint in $lang> | <specific hint in $lang>
-    """
-      .trimIndent()
-  }
-
-  override fun chatSystemPrompt(word: String, language: String): String {
-    val lang = languageDisplayName(language)
-    return """
-    You are an educational assistant. The player just guessed the word "$word".
-    Answer questions about: word origin, etymology, fun facts, usage in sentences, synonyms, translations to other languages.
-    Keep responses short (max 3 paragraphs). Always respond in $lang.
     """
       .trimIndent()
   }

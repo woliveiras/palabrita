@@ -26,7 +26,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.woliveiras.palabrita.core.common.PalabritaColors
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
-import com.woliveiras.palabrita.feature.chat.ChatScreen
 import com.woliveiras.palabrita.feature.game.GameScreen
 import com.woliveiras.palabrita.feature.home.HomeScreen
 import com.woliveiras.palabrita.feature.home.HowToPlayScreen
@@ -50,8 +49,6 @@ import kotlinx.serialization.Serializable
 data class GenerationRoute(val modelId: String = "", val isRegeneration: Boolean = false)
 
 @Serializable data object GameRoute
-
-@Serializable data class ChatRoute(val puzzleId: Long)
 
 @Serializable data object SettingsRoute
 
@@ -156,7 +153,6 @@ fun PalabritaNavGraph(appPreferences: AppPreferences, darkTheme: Boolean) {
         }
         composable<GameRoute> {
           GameScreen(
-            onNavigateToChat = { puzzleId -> navController.navigate(ChatRoute(puzzleId)) },
             onNavigateToSettings = { navController.navigate(SettingsRoute) },
             onNavigateToHome = { navController.popBackStack(HomeRoute, inclusive = false) },
             onNoPuzzlesLeft = {
@@ -165,10 +161,6 @@ fun PalabritaNavGraph(appPreferences: AppPreferences, darkTheme: Boolean) {
               }
             },
           )
-        }
-        composable<ChatRoute> { backStackEntry ->
-          val route = backStackEntry.toRoute<ChatRoute>()
-          ChatScreen(puzzleId = route.puzzleId, onBack = { navController.popBackStack() })
         }
         composable<SettingsRoute> {
           SettingsScreen(

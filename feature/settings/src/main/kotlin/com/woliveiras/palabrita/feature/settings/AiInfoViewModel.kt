@@ -21,7 +21,6 @@ data class AiInfoState(
   val modelPath: String? = null,
   val hintSystemPrompt: String = "",
   val hintSamplePrompt: String = "",
-  val chatSamplePrompt: String = "",
 )
 
 @HiltViewModel
@@ -51,7 +50,6 @@ constructor(
             modelPath = config.modelPath,
             hintSystemPrompt = promptProvider.hintSystemPrompt("pt"),
             hintSamplePrompt = promptProvider.hintUserPrompt(word = "gatos", language = "pt"),
-            chatSamplePrompt = promptProvider.chatSystemPrompt(word = "gatos", language = "pt"),
           )
         }
       }

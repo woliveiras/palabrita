@@ -71,7 +71,6 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun GameScreen(
-  onNavigateToChat: (Long) -> Unit,
   onNavigateToSettings: () -> Unit,
   onNavigateToHome: () -> Unit,
   onNoPuzzlesLeft: () -> Unit,
@@ -142,7 +141,6 @@ fun GameScreen(
           puzzle = state.puzzle,
           attempts = state.attempts,
           hintsUsed = state.revealedHints.size,
-          onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
           onShare = { shareResult(won = true) },
           onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
           onHome = onNavigateToHome,
@@ -152,7 +150,6 @@ fun GameScreen(
           puzzle = state.puzzle,
           attempts = state.attempts,
           hintsUsed = state.revealedHints.size,
-          onExplore = { state.puzzle?.let { onNavigateToChat(it.id) } },
           onShare = { shareResult(won = false) },
           onPlayAgain = { viewModel.onAction(GameAction.LoadNextPuzzle) },
           onHome = onNavigateToHome,

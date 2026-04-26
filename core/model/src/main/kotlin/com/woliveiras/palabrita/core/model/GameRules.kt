@@ -3,7 +3,6 @@ package com.woliveiras.palabrita.core.model
 object GameRules {
   const val MAX_ATTEMPTS = 6
   const val MIN_HINTS = 3
-  const val MAX_CHAT_MESSAGES = 10
   const val MAX_WORD_LENGTH = 6
   const val REPLENISHMENT_THRESHOLD = 5
   const val MAX_GENERATION_RETRIES = 5

@@ -182,14 +182,6 @@ fun AiInfoScreen(
       content = state.hintSamplePrompt,
     )
 
-    Spacer(Modifier.height(12.dp))
-
-    PromptCard(
-      icon = Icons.Rounded.Code,
-      title = stringResource(CommonR.string.ai_info_chat_prompt),
-      content = state.chatSamplePrompt,
-    )
-
     Spacer(Modifier.height(24.dp))
 
     // Change model button

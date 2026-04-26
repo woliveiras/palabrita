@@ -50,9 +50,6 @@ constructor(
       is GameAction.ShareResult -> {
         /* handled by UI */
       }
-      is GameAction.NavigateToChat -> {
-        /* handled by UI */
-      }
       is GameAction.NavigateToStats -> {
         /* handled by UI */
       }

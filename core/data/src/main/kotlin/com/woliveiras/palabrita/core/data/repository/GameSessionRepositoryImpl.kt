@@ -38,8 +38,6 @@ class GameSessionRepositoryImpl @Inject constructor(private val dao: GameSession
   override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
     dao.getByPuzzleId(puzzleId)?.toDomain()
 
-  override suspend fun markChatExplored(puzzleId: Long) = dao.markChatExplored(puzzleId)
-
   override suspend fun getCurrentStreak(): Int =
     dao.getCompletedSessionsDesc().takeWhile { it.won }.count()
 

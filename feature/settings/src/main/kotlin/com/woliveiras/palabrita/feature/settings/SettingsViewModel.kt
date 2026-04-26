@@ -9,7 +9,6 @@ import com.woliveiras.palabrita.core.model.DownloadState
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
-import com.woliveiras.palabrita.core.model.repository.ChatRepository
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
@@ -46,7 +45,6 @@ constructor(
   private val downloadManager: ModelDownloadManager,
   private val appPreferences: AppPreferences,
   private val gameSessionRepository: GameSessionRepository,
-  private val chatRepository: ChatRepository,
   private val puzzleRepository: PuzzleRepository,
 ) : ViewModel() {
 
@@ -100,7 +98,6 @@ constructor(
       puzzleRepository.deleteAllAiPuzzles()
       puzzleRepository.markAllUnplayed()
       gameSessionRepository.deleteAll()
-      chatRepository.deleteAll()
       appPreferences.resetGenerationCycle()
       // Reset stats last — this triggers HomeViewModel.observeStats() which re-reads
       // countAllUnplayed.

@@ -1,6 +1,5 @@
 package com.woliveiras.palabrita.core.data.db
 
-import com.woliveiras.palabrita.core.data.db.entity.ChatMessageEntity
 import com.woliveiras.palabrita.core.data.db.entity.GameSessionEntity
 import com.woliveiras.palabrita.core.data.db.entity.ModelConfigEntity
 import com.woliveiras.palabrita.core.data.db.entity.PlayerStatsEntity
@@ -71,21 +70,6 @@ fun createTestGameSessionEntity(
     completedAt = completedAt,
     hintsUsed = hintsUsed,
     won = won,
-  )
-
-fun createTestChatMessageEntity(
-  id: Long = 0,
-  puzzleId: Long = 1,
-  role: String = "user",
-  content: String = "O que significa essa palavra?",
-  timestamp: Long = System.currentTimeMillis(),
-): ChatMessageEntity =
-  ChatMessageEntity(
-    id = id,
-    puzzleId = puzzleId,
-    role = role,
-    content = content,
-    timestamp = timestamp,
   )
 
 fun createTestModelConfigEntity(

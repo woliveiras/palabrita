@@ -3,7 +3,6 @@ package com.woliveiras.palabrita.core.data.di
 import android.content.Context
 import androidx.room.Room
 import com.woliveiras.palabrita.core.data.db.PalabritaDatabase
-import com.woliveiras.palabrita.core.data.db.dao.ChatMessageDao
 import com.woliveiras.palabrita.core.data.db.dao.GameSessionDao
 import com.woliveiras.palabrita.core.data.db.dao.ModelConfigDao
 import com.woliveiras.palabrita.core.data.db.dao.PlayerStatsDao
@@ -31,8 +30,6 @@ object DatabaseModule {
   @Provides fun providePlayerStatsDao(db: PalabritaDatabase): PlayerStatsDao = db.playerStatsDao()
 
   @Provides fun provideGameSessionDao(db: PalabritaDatabase): GameSessionDao = db.gameSessionDao()
-
-  @Provides fun provideChatMessageDao(db: PalabritaDatabase): ChatMessageDao = db.chatMessageDao()
 
   @Provides fun provideModelConfigDao(db: PalabritaDatabase): ModelConfigDao = db.modelConfigDao()
 }

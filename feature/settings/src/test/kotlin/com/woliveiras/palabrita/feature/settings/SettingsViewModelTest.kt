@@ -9,8 +9,10 @@ import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.PlayerStats
 import com.woliveiras.palabrita.core.testing.FakeAppPreferences
+import com.woliveiras.palabrita.core.testing.FakeGameSessionRepository
 import com.woliveiras.palabrita.core.testing.FakeModelDownloadManager
 import com.woliveiras.palabrita.core.testing.FakeModelRepository
+import com.woliveiras.palabrita.core.testing.FakePuzzleRepository
 import com.woliveiras.palabrita.core.testing.FakeStatsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -199,6 +201,8 @@ class SettingsViewModelTest {
     modelRepo: FakeModelRepository = FakeModelRepository(modelConfig),
     downloadManager: FakeModelDownloadManager = FakeModelDownloadManager(),
     appPrefs: FakeAppPreferences = FakeAppPreferences(),
+    gameSessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(),
+    puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(),
   ): SettingsViewModel =
     SettingsViewModel(
       statsRepository = statsRepo,
@@ -207,5 +211,7 @@ class SettingsViewModelTest {
       modelRegistry = AiModelRegistry,
       downloadManager = downloadManager,
       appPreferences = appPrefs,
+      gameSessionRepository = gameSessionRepo,
+      puzzleRepository = puzzleRepo,
     )
 }

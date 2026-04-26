@@ -41,6 +41,4 @@ include(":feature:game")
 
 include(":feature:home")
 
-include(":feature:chat")
-
 include(":feature:settings")

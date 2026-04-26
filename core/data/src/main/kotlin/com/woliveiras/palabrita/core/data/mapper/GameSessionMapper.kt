@@ -16,7 +16,6 @@ fun GameSessionEntity.toDomain(): GameSession =
     completedAt = completedAt,
     hintsUsed = hintsUsed,
     won = won,
-    chatExplored = chatExplored,
   )
 
 fun GameSession.toEntity(): GameSessionEntity =
@@ -28,5 +27,4 @@ fun GameSession.toEntity(): GameSessionEntity =
     completedAt = completedAt,
     hintsUsed = hintsUsed,
     won = won,
-    chatExplored = chatExplored,
   )
