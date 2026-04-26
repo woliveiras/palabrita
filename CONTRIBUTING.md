@@ -6,6 +6,7 @@ Thank you for your interest in contributing. This document explains how to get s
 
 - [Getting Started](#getting-started)
 - [Development Workflow](#development-workflow)
+- [Adding a Puzzle Language](#adding-a-puzzle-language)
 - [Code Standards](#code-standards)
 - [Submitting a Pull Request](#submitting-a-pull-request)
 - [Reporting Bugs](#reporting-bugs)
@@ -63,6 +64,73 @@ docs(adr): add ADR 005 for offline-first strategy
 - Breaking changes: add `!` — `feat!: remove legacy Light mode fallback`
 
 ## Code Standards
+
+### Adding a Puzzle Language
+
+You can add a new puzzle language **without writing any Kotlin code**. The game dynamically
+discovers available languages from dataset files.
+
+#### Step-by-step
+
+1. **Create the word list** at `core/ai/src/main/resources/wordlists/<code>.json`
+
+   Use the ISO 639-1 language code as the filename (e.g., `it.json` for Italian, `fr.json` for French).
+
+   Format — keys are word lengths (as strings), values are arrays of lowercase words:
+
+   ```json
+   {
+     "4": ["casa", "luna", "mare", "sole", "vita", "arte", "mano", "anno", "onda", "alba"],
+     "5": ["cielo", "mondo", "cuore", "latte", "ponte", "fiore", "notte", "campo", "acqua", "torre"],
+     "6": ["albero", "giorno", "piazza", "strada", "inverno", "sapore", "balena", "musica", "nuvola", "gelato"]
+   }
+   ```
+
+   **Word rules:**
+   - Use common nouns that native speakers recognize immediately
+   - Normalize to ASCII (no accents/diacritics): `água` → `agua`, `café` → `cafe`
+   - No verbs, adjectives, proper nouns, or obscure terms
+   - Minimum **10 words per length** for lengths 4, 5, and 6 (more is better!)
+   - Lengths 7 and 8 are optional but recommended for higher difficulty levels
+
+2. **Register in the manifest** — add an entry to `core/ai/src/main/resources/wordlists/manifest.json`:
+
+   ```json
+   {
+     "code": "it",
+     "displayName": "Italiano",
+     "flag": "🇮🇹",
+     "promptName": "Italian"
+   }
+   ```
+
+   | Field | Description | Example |
+   |-------|-------------|---------|
+   | `code` | ISO 639-1 code (lowercase, 2–3 chars) — must match the filename | `"it"` |
+   | `displayName` | Language name shown to players (in its own language) | `"Italiano"` |
+   | `flag` | Emoji flag for visual identification | `"🇮🇹"` |
+   | `promptName` | Full English name sent to the AI for hint generation | `"Italian"` |
+
+3. **Validate locally** before committing:
+
+   ```bash
+   ./scripts/validate-datasets.sh
+   ```
+
+   This runs the same checks as CI: valid JSON, required fields, minimum word counts, and file consistency.
+
+4. **Open a PR** — CI will automatically validate your dataset. That's it!
+
+#### What happens behind the scenes
+
+- The app discovers your language from the manifest at startup
+- It appears automatically in the onboarding and settings language selection screens
+- When a player picks your language, words come from your word list
+- The on-device AI generates hints using the `promptName` you specified
+- If the AI fails, generic English fallback hints are used (no extra work needed)
+
+> **Note:** This adds a *puzzle language* (words to guess). It does NOT add a new *UI language*
+> (app translations). UI translations require Android string resources and are a separate process.
 
 ### Kotlin
 

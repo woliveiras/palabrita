@@ -1,0 +1,20 @@
+[
+  {
+    "code": "pt",
+    "displayName": "Português",
+    "flag": "🇧🇷",
+    "promptName": "Brazilian Portuguese"
+  },
+  {
+    "code": "en",
+    "displayName": "English",
+    "flag": "🇺🇸",
+    "promptName": "English"
+  },
+  {
+    "code": "es",
+    "displayName": "Español",
+    "flag": "🇪🇸",
+    "promptName": "Spanish"
+  }
+]

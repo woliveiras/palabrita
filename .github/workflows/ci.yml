@@ -43,6 +43,9 @@ jobs:
       - name: Detekt
         run: ./gradlew detekt
 
+      - name: Validate Datasets
+        run: ./scripts/validate-datasets.sh
+
       # Requires a committed baseline. Run locally first:
       #   ./gradlew dependencyGuardBaseline
       # then commit the generated app/dependencies/*.txt files.
