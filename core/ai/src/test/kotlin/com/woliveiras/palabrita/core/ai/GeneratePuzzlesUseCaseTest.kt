@@ -166,9 +166,7 @@ class GeneratePuzzlesUseCaseTest {
     val reportedBatchSizes = mutableListOf<Int>()
     val useCase = createUseCase(generator = generator)
 
-    useCase.execute("pt", ModelId.QWEN3_0_6B) { _, batchSize ->
-      reportedBatchSizes.add(batchSize)
-    }
+    useCase.execute("pt", ModelId.QWEN3_0_6B) { _, batchSize -> reportedBatchSizes.add(batchSize) }
 
     // cycle 0 → batchSize = 5
     assertThat(reportedBatchSizes).isNotEmpty()
@@ -209,22 +207,23 @@ class GeneratePuzzlesUseCaseTest {
   @Test
   fun `CancellationException propagates through execute`() = runTest {
     val engine = FakeLlmEngineManager()
-    val generator = object : PuzzleGenerator {
-      override val activity: kotlinx.coroutines.flow.StateFlow<GenerationActivity?> =
-        kotlinx.coroutines.flow.MutableStateFlow(null)
+    val generator =
+      object : PuzzleGenerator {
+        override val activity: kotlinx.coroutines.flow.StateFlow<GenerationActivity?> =
+          kotlinx.coroutines.flow.MutableStateFlow(null)
 
-      override suspend fun generateBatch(
-        count: Int,
-        language: String,
-        wordLength: Int,
-        recentWords: List<String>,
-        allExistingWords: Set<String>,
-        modelId: ModelId,
-        onPuzzleAttempted: suspend (Int) -> Unit,
-      ): List<com.woliveiras.palabrita.core.model.Puzzle> {
-        throw kotlinx.coroutines.CancellationException("test cancel")
+        override suspend fun generateBatch(
+          count: Int,
+          language: String,
+          wordLength: Int,
+          recentWords: List<String>,
+          allExistingWords: Set<String>,
+          modelId: ModelId,
+          onPuzzleAttempted: suspend (Int) -> Unit,
+        ): List<com.woliveiras.palabrita.core.model.Puzzle> {
+          throw kotlinx.coroutines.CancellationException("test cancel")
+        }
       }
-    }
     val useCase = createUseCase(engine = engine, generator = generator)
 
     var threw = false

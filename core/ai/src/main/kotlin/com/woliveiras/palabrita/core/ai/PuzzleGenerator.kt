@@ -26,13 +26,13 @@ interface PuzzleGenerator {
 }
 
 /**
- * Hybrid puzzle generator: words come from a curated [WordListProvider], the LLM only
- * generates hints. This eliminates greedy-decoding issues (invented words, wrong length,
- * loops) while keeping the "AI-generated" feel for hints.
+ * Hybrid puzzle generator: words come from a curated [WordListProvider], the LLM only generates
+ * hints. This eliminates greedy-decoding issues (invented words, wrong length, loops) while keeping
+ * the "AI-generated" feel for hints.
  *
- * If the LLM fails to produce valid hints after [GameRules.MAX_GENERATION_RETRIES] attempts,
- * a [HintFallbackProvider] supplies generic template-based hints so that puzzle generation
- * never fails.
+ * If the LLM fails to produce valid hints after [GameRules.MAX_GENERATION_RETRIES] attempts, a
+ * [HintFallbackProvider] supplies generic template-based hints so that puzzle generation never
+ * fails.
  */
 @Singleton
 class PuzzleGeneratorImpl
@@ -101,8 +101,9 @@ constructor(
   }
 
   /**
-   * Asks the LLM to generate hints for a given word. Retries up to [GameRules.MAX_GENERATION_RETRIES]
-   * times. If all attempts fail, returns fallback hints from [HintFallbackProvider].
+   * Asks the LLM to generate hints for a given word. Retries up to
+   * [GameRules.MAX_GENERATION_RETRIES] times. If all attempts fail, returns fallback hints from
+   * [HintFallbackProvider].
    */
   private suspend fun generateHintsForWord(
     systemPrompt: String,
@@ -117,22 +118,26 @@ constructor(
           engineManager.createChatSession(systemPrompt).use { session ->
             session.sendMessage(userPrompt)
           }
-        Log.d(TAG, "  hint attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(200)}")
+        Log.d(
+          TAG,
+          "  hint attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(200)}",
+        )
 
         val parseResult = hintParser.parseHints(rawResponse)
         if (parseResult is ParseResult.Success) {
           val hints = parseResult.data
           // Validate hints don't contain the word
-          val leaksWord = hints.any { hint ->
-            hint.lowercase().contains(normalizedWord)
-          }
+          val leaksWord = hints.any { hint -> hint.lowercase().contains(normalizedWord) }
           if (!leaksWord && hints.size >= GameRules.MIN_HINTS) {
             Log.d(TAG, "  hint attempt $attempt VALID")
             return hints.take(GameRules.MIN_HINTS)
           }
           Log.w(TAG, "  hint attempt $attempt invalid: leaksWord=$leaksWord size=${hints.size}")
         } else {
-          Log.w(TAG, "  hint attempt $attempt parse failed: ${(parseResult as ParseResult.Error).reason}")
+          Log.w(
+            TAG,
+            "  hint attempt $attempt parse failed: ${(parseResult as ParseResult.Error).reason}",
+          )
         }
       } catch (e: Exception) {
         Log.w(TAG, "  hint attempt $attempt exception: ${e.message}")

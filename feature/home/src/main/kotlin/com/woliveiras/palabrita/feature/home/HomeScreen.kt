@@ -2,7 +2,6 @@ package com.woliveiras.palabrita.feature.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Info
@@ -173,11 +171,7 @@ private val GradientPurple =
   Brush.linearGradient(listOf(Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFA855F7)))
 
 @Composable
-private fun PlayCtaCard(
-  unplayedCount: Int,
-  onPlay: () -> Unit,
-  onGenerate: () -> Unit,
-) {
+private fun PlayCtaCard(unplayedCount: Int, onPlay: () -> Unit, onGenerate: () -> Unit) {
   val hasPlayable = unplayedCount > 0
   Card(
     onClick = if (hasPlayable) onPlay else onGenerate,

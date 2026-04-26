@@ -152,9 +152,7 @@ class WordListTest {
     for (lang in listOf("en", "pt", "es")) {
       for (len in listOf(4, 5, 6)) {
         val words = WordList.getWords(lang, len)
-        assertWithMessage("$lang $len-letter words")
-          .that(words.size)
-          .isAtLeast(100)
+        assertWithMessage("$lang $len-letter words").that(words.size).isAtLeast(100)
       }
     }
   }
@@ -163,9 +161,7 @@ class WordListTest {
   fun `6-letter lists have at least 200 words for long gameplay`() {
     for (lang in listOf("en", "pt", "es")) {
       val words = WordList.getWords(lang, 6)
-      assertWithMessage("$lang 6-letter words")
-        .that(words.size)
-        .isAtLeast(200)
+      assertWithMessage("$lang 6-letter words").that(words.size).isAtLeast(200)
     }
   }
 
@@ -177,9 +173,7 @@ class WordListTest {
       for (len in listOf(4, 5, 6)) {
         val words = WordList.getWords(lang, len)
         val nonLower = words.filter { it != it.lowercase() }
-        assertWithMessage("$lang $len-letter non-lowercase words")
-          .that(nonLower)
-          .isEmpty()
+        assertWithMessage("$lang $len-letter non-lowercase words").that(nonLower).isEmpty()
       }
     }
   }
@@ -192,9 +186,7 @@ class WordListTest {
       for (len in listOf(4, 5, 6)) {
         val words = WordList.getWords(lang, len)
         val nonAlpha = words.filter { word -> !word.all { it.isLetter() } }
-        assertWithMessage("$lang $len-letter non-alpha words")
-          .that(nonAlpha)
-          .isEmpty()
+        assertWithMessage("$lang $len-letter non-alpha words").that(nonAlpha).isEmpty()
       }
     }
   }

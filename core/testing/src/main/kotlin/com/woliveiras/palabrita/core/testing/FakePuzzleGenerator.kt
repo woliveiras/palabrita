@@ -45,19 +45,20 @@ class FakePuzzleGenerator : PuzzleGenerator {
     val fraction = batchResults.getOrNull(callCount) ?: 0f
     callCount++
     val toGenerate = (count * fraction).toInt().coerceIn(0, count)
-    val puzzles = (1..toGenerate).map { i ->
-      Puzzle(
-        id = 0,
-        word = "word$callCount$i",
-        wordDisplay = "WORD$callCount$i",
-        language = language,
-        difficulty = wordLength,
-        category = "",
-        hints = listOf("hint 1", "hint 2", "hint 3"),
-        source = PuzzleSource.AI,
-        generatedAt = System.currentTimeMillis(),
-      )
-    }
+    val puzzles =
+      (1..toGenerate).map { i ->
+        Puzzle(
+          id = 0,
+          word = "word$callCount$i",
+          wordDisplay = "WORD$callCount$i",
+          language = language,
+          difficulty = wordLength,
+          category = "",
+          hints = listOf("hint 1", "hint 2", "hint 3"),
+          source = PuzzleSource.AI,
+          generatedAt = System.currentTimeMillis(),
+        )
+      }
     puzzles.forEachIndexed { index, _ -> onPuzzleAttempted(index + 1) }
     return puzzles
   }

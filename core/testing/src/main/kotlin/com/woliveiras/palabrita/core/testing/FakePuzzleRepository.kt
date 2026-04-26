@@ -18,7 +18,9 @@ class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepositor
   private val _unplayedCount = MutableStateFlow(if (puzzle != null) 1 else 0)
   var unplayedCount: Int
     get() = _unplayedCount.value
-    set(value) { _unplayedCount.value = value }
+    set(value) {
+      _unplayedCount.value = value
+    }
 
   override suspend fun getNextUnplayed(language: String): Puzzle? = puzzle
 

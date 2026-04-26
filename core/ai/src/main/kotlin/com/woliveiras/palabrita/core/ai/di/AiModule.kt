@@ -45,9 +45,7 @@ abstract class AiModule {
 
   @Binds
   @Singleton
-  abstract fun bindGeneratePuzzlesUseCase(
-    impl: GeneratePuzzlesUseCaseImpl
-  ): GeneratePuzzlesUseCase
+  abstract fun bindGeneratePuzzlesUseCase(impl: GeneratePuzzlesUseCaseImpl): GeneratePuzzlesUseCase
 
   @Binds abstract fun bindWordListProvider(impl: WordListProviderImpl): WordListProvider
 

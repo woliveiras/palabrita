@@ -9,7 +9,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -81,8 +80,7 @@ fun GenerationScreen(
   // When generation is done, bar is always 100% — partial slots (LLM retries exhausted) are normal.
   val progressFraction =
     if (isComplete) 1f
-    else if (totalPuzzles > 0) (puzzlesGenerated.toFloat() / totalPuzzles).coerceIn(0f, 1f)
-    else 0f
+    else if (totalPuzzles > 0) (puzzlesGenerated.toFloat() / totalPuzzles).coerceIn(0f, 1f) else 0f
   val isFailed = state.failed
   val isCancelled = state.cancelled
   val steps = state.steps
@@ -349,10 +347,7 @@ fun GenerationScreen(
 
 @Composable
 private fun GenerationStepRow(step: GenerationStep) {
-  Row(
-    verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier.fillMaxWidth(),
-  ) {
+  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     when (step.status) {
       StepStatus.COMPLETED ->
         Icon(
@@ -384,8 +379,7 @@ private fun GenerationStepRow(step: GenerationStep) {
       style = MaterialTheme.typography.bodyMedium,
       color =
         when (step.status) {
-          StepStatus.PENDING ->
-            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+          StepStatus.PENDING -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
           else -> MaterialTheme.colorScheme.onSurface
         },
     )

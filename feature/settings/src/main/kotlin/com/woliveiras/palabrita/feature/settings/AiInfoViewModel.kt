@@ -50,11 +50,7 @@ constructor(
             modelId = config.modelId,
             modelPath = config.modelPath,
             hintSystemPrompt = promptProvider.hintSystemPrompt("pt"),
-            hintSamplePrompt =
-              promptProvider.hintUserPrompt(
-                word = "gatos",
-                language = "pt",
-              ),
+            hintSamplePrompt = promptProvider.hintUserPrompt(word = "gatos", language = "pt"),
             chatSamplePrompt = promptProvider.chatSystemPrompt(word = "gatos", language = "pt"),
           )
         }

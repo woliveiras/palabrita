@@ -10,10 +10,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 
-data class GenerationResult(
-  val generatedCount: Int,
-  val batchSize: Int,
-)
+data class GenerationResult(val generatedCount: Int, val batchSize: Int)
 
 interface GeneratePuzzlesUseCase {
   /**
@@ -21,9 +18,10 @@ interface GeneratePuzzlesUseCase {
    *
    * @param language ISO language code (e.g. "pt", "en", "es")
    * @param modelId The model to use for generation
-   * @param onProgress Called after each successfully generated puzzle with (successCount, batchSize)
-   * @return [GenerationResult] with the final counts; [GenerationResult.generatedCount] may be 0
-   *   if all LLM retries failed, and [GenerationResult.batchSize] is -1 if generation was skipped
+   * @param onProgress Called after each successfully generated puzzle with (successCount,
+   *   batchSize)
+   * @return [GenerationResult] with the final counts; [GenerationResult.generatedCount] may be 0 if
+   *   all LLM retries failed, and [GenerationResult.batchSize] is -1 if generation was skipped
    *   because the threshold was already met.
    */
   suspend fun execute(

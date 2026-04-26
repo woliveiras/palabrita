@@ -109,8 +109,7 @@ class GenerationViewModelTest {
 
   @Test
   fun `engine error before generation results in failure`() = runTest {
-    val engineManager =
-      FakeLlmEngineManager(initialState = EngineState.Error("GPU not supported"))
+    val engineManager = FakeLlmEngineManager(initialState = EngineState.Error("GPU not supported"))
     // Make initialize() fail by having it set an error state
     val vm = createViewModel(engineManager = engineManager)
 
@@ -175,7 +174,8 @@ class GenerationViewModelTest {
   private fun createViewModel(
     useCase: FakeGeneratePuzzlesUseCase = FakeGeneratePuzzlesUseCase(),
     engineManager: FakeLlmEngineManager = FakeLlmEngineManager(EngineState.Ready),
-    modelRepository: FakeModelRepository = FakeModelRepository(ModelConfig(modelId = ModelId.QWEN3_0_6B)),
+    modelRepository: FakeModelRepository =
+      FakeModelRepository(ModelConfig(modelId = ModelId.QWEN3_0_6B)),
   ): GenerationViewModel =
     GenerationViewModel(
       generatePuzzlesUseCase = useCase,
@@ -186,4 +186,3 @@ class GenerationViewModelTest {
       puzzleGenerator = FakePuzzleGenerator(),
     )
 }
-

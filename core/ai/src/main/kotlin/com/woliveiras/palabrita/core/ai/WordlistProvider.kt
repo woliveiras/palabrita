@@ -6,15 +6,14 @@ import javax.inject.Singleton
 
 /**
  * Selects words from the curated [WordList] for puzzle generation. Words are picked
- * deterministically by shuffling with a seed derived from [allExistingWords] size, then
- * filtering out already-used words. This avoids the need for random state while still
- * providing variety across batches.
+ * deterministically by shuffling with a seed derived from [allExistingWords] size, then filtering
+ * out already-used words. This avoids the need for random state while still providing variety
+ * across batches.
  */
 interface WordListProvider {
   /**
-   * Picks up to [count] words for the given [language] and [wordLength], excluding any
-   * word already in [allExistingWords]. Returns fewer than [count] only if the word list
-   * is exhausted.
+   * Picks up to [count] words for the given [language] and [wordLength], excluding any word already
+   * in [allExistingWords]. Returns fewer than [count] only if the word list is exhausted.
    */
   fun pickWords(
     language: String,

@@ -42,28 +42,26 @@ constructor(
   init {
     viewModelScope.launch {
       @OptIn(ExperimentalCoroutinesApi::class)
-      statsRepository.observeStats()
+      statsRepository
+        .observeStats()
         .flatMapLatest { stats ->
-          puzzleRepository.observeUnplayedCount(stats.preferredLanguage)
-            .also { _ ->
-              val streak = gameSessionRepository.getCurrentStreak()
-              val languageDisplay = buildLanguageDisplay(stats.preferredLanguage)
-              val winRate =
-                if (stats.totalPlayed > 0) stats.totalWon.toFloat() / stats.totalPlayed else 0f
-              _state.update {
-                it.copy(
-                  totalPlayed = stats.totalPlayed,
-                  winRate = winRate,
-                  currentStreak = streak,
-                  languageDisplay = languageDisplay,
-                  isLoading = false,
-                )
-              }
+          puzzleRepository.observeUnplayedCount(stats.preferredLanguage).also { _ ->
+            val streak = gameSessionRepository.getCurrentStreak()
+            val languageDisplay = buildLanguageDisplay(stats.preferredLanguage)
+            val winRate =
+              if (stats.totalPlayed > 0) stats.totalWon.toFloat() / stats.totalPlayed else 0f
+            _state.update {
+              it.copy(
+                totalPlayed = stats.totalPlayed,
+                winRate = winRate,
+                currentStreak = streak,
+                languageDisplay = languageDisplay,
+                isLoading = false,
+              )
             }
+          }
         }
-        .collect { unplayed ->
-          _state.update { it.copy(unplayedCount = unplayed) }
-        }
+        .collect { unplayed -> _state.update { it.copy(unplayedCount = unplayed) } }
     }
   }
 

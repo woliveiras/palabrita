@@ -7,11 +7,11 @@ import com.woliveiras.palabrita.core.model.ModelId
 /**
  * Fake [GeneratePuzzlesUseCase] for use in unit tests.
  *
- * By default returns a successful result of 5 puzzles in a batch of 5.
- * Set [result] before calling [execute] to control the outcome.
+ * By default returns a successful result of 5 puzzles in a batch of 5. Set [result] before calling
+ * [execute] to control the outcome.
  */
 class FakeGeneratePuzzlesUseCase(
-  var result: GenerationResult = GenerationResult(generatedCount = 5, batchSize = 5),
+  var result: GenerationResult = GenerationResult(generatedCount = 5, batchSize = 5)
 ) : GeneratePuzzlesUseCase {
   var capturedLanguage: String? = null
   var capturedModelId: ModelId? = null

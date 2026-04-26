@@ -342,7 +342,6 @@ private fun ModelPickerBottomSheet(
           onClick = { onSelect(model.modelId) },
         )
       }
-
     }
   }
 }

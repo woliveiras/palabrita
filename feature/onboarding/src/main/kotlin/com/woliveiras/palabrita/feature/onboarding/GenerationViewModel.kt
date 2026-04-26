@@ -232,8 +232,7 @@ constructor(
         // F2.3: Evaluate isComplete/failed inside update to avoid TOCTOU between
         // the snapshot read and the subsequent update call.
         _state.update { current ->
-          val resId =
-            if (current.isComplete || current.failed) null else activityToResId(activity)
+          val resId = if (current.isComplete || current.failed) null else activityToResId(activity)
           current.copy(currentActivityResId = resId)
         }
       }

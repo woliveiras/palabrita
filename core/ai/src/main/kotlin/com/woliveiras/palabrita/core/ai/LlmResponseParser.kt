@@ -104,6 +104,7 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
    * ```
    * hints: hint 1 | hint 2 | hint 3
    * ```
+   *
    * Tolerates extra prose lines, markdown fences, and localized keys.
    */
   override fun parseHints(rawResponse: String): ParseResult<List<String>> {

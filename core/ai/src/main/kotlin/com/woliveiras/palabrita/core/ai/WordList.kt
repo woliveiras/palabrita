@@ -7,14 +7,14 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
- * Curated word lists loaded from JSON resource files (`wordlists/{lang}.json`).
- * Words are guaranteed to be:
+ * Curated word lists loaded from JSON resource files (`wordlists/{lang}.json`). Words are
+ * guaranteed to be:
  * - Real, common nouns that native speakers recognize immediately
  * - Exactly the declared length (after diacritic normalization to ASCII)
  * - Free of verbs, adjectives, proper nouns, or obscure terms
  *
- * The LLM is NOT responsible for choosing words — only for generating hints.
- * This eliminates greedy-decoding loop issues and invented words.
+ * The LLM is NOT responsible for choosing words — only for generating hints. This eliminates
+ * greedy-decoding loop issues and invented words.
  */
 object WordList {
 

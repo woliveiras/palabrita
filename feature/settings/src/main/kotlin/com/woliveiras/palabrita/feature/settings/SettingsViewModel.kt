@@ -102,7 +102,8 @@ constructor(
       gameSessionRepository.deleteAll()
       chatRepository.deleteAll()
       appPreferences.resetGenerationCycle()
-      // Reset stats last — this triggers HomeViewModel.observeStats() which re-reads countAllUnplayed.
+      // Reset stats last — this triggers HomeViewModel.observeStats() which re-reads
+      // countAllUnplayed.
       statsRepository.resetProgress()
       _state.update { it.copy(isResetting = false) }
     }

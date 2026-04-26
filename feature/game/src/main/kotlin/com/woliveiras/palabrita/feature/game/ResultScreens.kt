@@ -78,7 +78,7 @@ internal fun WinResultScreen(
           PalabritaColors.ResultWinGradientStart,
           PalabritaColors.ResultWinGradientMid,
           PalabritaColors.ResultWinGradientEnd,
-        ),
+        )
     )
 
   val contentAlpha = remember { Animatable(0f) }
@@ -117,7 +117,7 @@ internal fun WinResultScreen(
       Modifier.fillMaxSize()
         .background(gradient)
         .windowInsetsPadding(WindowInsets.statusBars)
-        .windowInsetsPadding(WindowInsets.navigationBars),
+        .windowInsetsPadding(WindowInsets.navigationBars)
   ) {
     Column(
       modifier =
@@ -131,7 +131,10 @@ internal fun WinResultScreen(
       Box(
         modifier =
           Modifier.size(112.dp)
-            .graphicsLayer { scaleX = iconScale.value; scaleY = iconScale.value }
+            .graphicsLayer {
+              scaleX = iconScale.value
+              scaleY = iconScale.value
+            }
             .clip(CircleShape)
             .background(Color.White.copy(alpha = 0.2f)),
         contentAlignment = Alignment.Center,
@@ -174,8 +177,7 @@ internal fun WinResultScreen(
       // Word reveal
       puzzle?.let {
         Text(
-          text =
-            "${stringResource(CommonR.string.result_word_was)} ${it.wordDisplay.uppercase()}",
+          text = "${stringResource(CommonR.string.result_word_was)} ${it.wordDisplay.uppercase()}",
           fontSize = 16.sp,
           color = Color.White.copy(alpha = 0.8f),
           fontWeight = FontWeight.Bold,
@@ -195,12 +197,9 @@ internal fun WinResultScreen(
           Modifier.graphicsLayer {
             alpha = contentAlpha.value
             translationY = contentOffset.value
-          },
+          }
       ) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
           StatItem(
             icon = Icons.Rounded.Star,
             value = stringResource(CommonR.string.result_attempts_value, attemptCount),
@@ -285,7 +284,7 @@ internal fun LoseResultScreen(
           PalabritaColors.ResultLoseGradientStart,
           PalabritaColors.ResultLoseGradientMid,
           PalabritaColors.ResultLoseGradientEnd,
-        ),
+        )
     )
 
   val contentAlpha = remember { Animatable(0f) }
@@ -312,7 +311,7 @@ internal fun LoseResultScreen(
       Modifier.fillMaxSize()
         .background(gradient)
         .windowInsetsPadding(WindowInsets.statusBars)
-        .windowInsetsPadding(WindowInsets.navigationBars),
+        .windowInsetsPadding(WindowInsets.navigationBars)
   ) {
     Column(
       modifier =
@@ -326,7 +325,10 @@ internal fun LoseResultScreen(
       Box(
         modifier =
           Modifier.size(112.dp)
-            .graphicsLayer { scaleX = iconScale.value; scaleY = iconScale.value }
+            .graphicsLayer {
+              scaleX = iconScale.value
+              scaleY = iconScale.value
+            }
             .clip(CircleShape)
             .background(Color.White.copy(alpha = 0.2f)),
         contentAlignment = Alignment.Center,
@@ -403,13 +405,10 @@ internal fun LoseResultScreen(
           Modifier.graphicsLayer {
             alpha = contentAlpha.value
             translationY = contentOffset.value
-          },
+          }
       ) {
         // Stats row
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
           StatItem(
             icon = Icons.Rounded.Star,
             value = "6/6",
@@ -514,7 +513,7 @@ private fun StatsCard(modifier: Modifier = Modifier, content: @Composable () -> 
         .fillMaxWidth()
         .clip(RoundedCornerShape(24.dp))
         .background(Color.White.copy(alpha = 0.2f))
-        .padding(24.dp),
+        .padding(24.dp)
   ) {
     content()
   }
@@ -525,24 +524,17 @@ private fun StatItem(icon: ImageVector, value: String, label: String) {
   Column(horizontalAlignment = Alignment.CenterHorizontally) {
     Box(
       modifier =
-        Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Color.White.copy(alpha = 0.3f)),
+        Modifier.size(48.dp)
+          .clip(RoundedCornerShape(16.dp))
+          .background(Color.White.copy(alpha = 0.3f)),
       contentAlignment = Alignment.Center,
     ) {
       Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
     }
     Spacer(Modifier.height(8.dp))
-    Text(
-      text = value,
-      fontSize = 20.sp,
-      fontWeight = FontWeight.Bold,
-      color = Color.White,
-    )
+    Text(text = value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
     Spacer(Modifier.height(2.dp))
-    Text(
-      text = label,
-      fontSize = 12.sp,
-      color = Color.White.copy(alpha = 0.8f),
-    )
+    Text(text = label, fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
   }
 }
 
