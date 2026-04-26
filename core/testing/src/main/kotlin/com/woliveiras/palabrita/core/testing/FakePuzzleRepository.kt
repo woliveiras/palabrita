@@ -2,6 +2,9 @@ package com.woliveiras.palabrita.core.testing
 
 import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepository {
   val markedPlayed: MutableList<Long> = mutableListOf()
@@ -11,11 +14,17 @@ class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepositor
   var allUnplayed = false
   var allDeleted = false
   val savedPuzzles: MutableList<Puzzle> = mutableListOf()
-  var unplayedCount: Int = if (puzzle != null) 1 else 0
+
+  private val _unplayedCount = MutableStateFlow(if (puzzle != null) 1 else 0)
+  var unplayedCount: Int
+    get() = _unplayedCount.value
+    set(value) { _unplayedCount.value = value }
 
   override suspend fun getNextUnplayed(language: String): Puzzle? = puzzle
 
   override suspend fun countAllUnplayed(language: String): Int = unplayedCount
+
+  override fun observeUnplayedCount(language: String): Flow<Int> = _unplayedCount.asStateFlow()
 
   override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
 

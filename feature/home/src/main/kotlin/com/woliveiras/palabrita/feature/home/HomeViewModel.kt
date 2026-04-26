@@ -10,9 +10,11 @@ import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -39,24 +41,29 @@ constructor(
 
   init {
     viewModelScope.launch {
-      statsRepository.observeStats().collect { stats ->
-        val winRate =
-          if (stats.totalPlayed > 0) stats.totalWon.toFloat() / stats.totalPlayed else 0f
-        val unplayed = puzzleRepository.countAllUnplayed(stats.preferredLanguage)
-        val streak = gameSessionRepository.getCurrentStreak()
-        val languageDisplay = buildLanguageDisplay(stats.preferredLanguage)
-
-        _state.update {
-          it.copy(
-            totalPlayed = stats.totalPlayed,
-            winRate = winRate,
-            unplayedCount = unplayed,
-            currentStreak = streak,
-            languageDisplay = languageDisplay,
-            isLoading = false,
-          )
+      @OptIn(ExperimentalCoroutinesApi::class)
+      statsRepository.observeStats()
+        .flatMapLatest { stats ->
+          puzzleRepository.observeUnplayedCount(stats.preferredLanguage)
+            .also { _ ->
+              val streak = gameSessionRepository.getCurrentStreak()
+              val languageDisplay = buildLanguageDisplay(stats.preferredLanguage)
+              val winRate =
+                if (stats.totalPlayed > 0) stats.totalWon.toFloat() / stats.totalPlayed else 0f
+              _state.update {
+                it.copy(
+                  totalPlayed = stats.totalPlayed,
+                  winRate = winRate,
+                  currentStreak = streak,
+                  languageDisplay = languageDisplay,
+                  isLoading = false,
+                )
+              }
+            }
         }
-      }
+        .collect { unplayed ->
+          _state.update { it.copy(unplayedCount = unplayed) }
+        }
     }
   }
 

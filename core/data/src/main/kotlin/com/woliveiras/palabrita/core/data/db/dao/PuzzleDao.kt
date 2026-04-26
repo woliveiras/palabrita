@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.woliveiras.palabrita.core.data.db.entity.PuzzleEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PuzzleDao {
@@ -44,6 +45,14 @@ interface PuzzleDao {
         """
   )
   suspend fun countAllUnplayed(lang: String): Int
+
+  @Query(
+    """
+        SELECT COUNT(*) FROM puzzles
+        WHERE isPlayed = 0 AND language = :lang
+        """
+  )
+  fun observeUnplayedCount(lang: String): Flow<Int>
 
   @Query("SELECT word FROM puzzles") suspend fun getAllWords(): List<String>
 

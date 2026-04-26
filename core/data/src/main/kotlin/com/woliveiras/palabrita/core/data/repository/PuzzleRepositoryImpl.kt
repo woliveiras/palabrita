@@ -7,6 +7,7 @@ import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
 
 @Singleton
 class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao) :
@@ -17,6 +18,9 @@ class PuzzleRepositoryImpl @Inject constructor(private val puzzleDao: PuzzleDao)
 
   override suspend fun countAllUnplayed(language: String): Int =
     puzzleDao.countAllUnplayed(language)
+
+  override fun observeUnplayedCount(language: String): Flow<Int> =
+    puzzleDao.observeUnplayedCount(language)
 
   override suspend fun getAllGeneratedWords(): Set<String> = puzzleDao.getAllWords().toSet()
 

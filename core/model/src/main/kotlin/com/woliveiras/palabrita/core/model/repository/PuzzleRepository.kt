@@ -1,11 +1,14 @@
 package com.woliveiras.palabrita.core.model.repository
 
 import com.woliveiras.palabrita.core.model.Puzzle
+import kotlinx.coroutines.flow.Flow
 
 interface PuzzleRepository {
   suspend fun getNextUnplayed(language: String): Puzzle?
 
   suspend fun countAllUnplayed(language: String): Int
+
+  fun observeUnplayedCount(language: String): Flow<Int>
 
   suspend fun getAllGeneratedWords(): Set<String>
 

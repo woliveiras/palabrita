@@ -110,6 +110,9 @@ class ResetProgressUseCaseTest {
 
     override suspend fun countAllUnplayed(language: String) = 0
 
+    override fun observeUnplayedCount(language: String): kotlinx.coroutines.flow.Flow<Int> =
+      kotlinx.coroutines.flow.flowOf(0)
+
     override suspend fun getAllGeneratedWords(): Set<String> = emptySet()
 
     override suspend fun getRecentWords(limit: Int) = emptyList<String>()
@@ -121,6 +124,10 @@ class ResetProgressUseCaseTest {
     override suspend fun markAsPlayed(puzzleId: Long) {}
 
     override suspend fun deleteUnplayedAiPuzzles() {}
+
+    override suspend fun deleteAllAiPuzzles() {}
+
+    override suspend fun deleteUnplayedByLanguage(language: String) {}
 
     override suspend fun markAllUnplayed() {}
 
@@ -140,6 +147,12 @@ class ResetProgressUseCaseTest {
     val cycleValue: Int
       get() = _cycle.value
 
+    private val _appLanguage = MutableStateFlow("en")
+    override val appLanguage: Flow<String> = _appLanguage
+
+    private val _themeMode = MutableStateFlow(com.woliveiras.palabrita.core.model.ThemeMode.SYSTEM)
+    override val themeMode: Flow<com.woliveiras.palabrita.core.model.ThemeMode> = _themeMode
+
     override suspend fun setOnboardingComplete() {
       _onboarding.value = true
     }
@@ -150,6 +163,14 @@ class ResetProgressUseCaseTest {
 
     override suspend fun resetGenerationCycle() {
       _cycle.value = 0
+    }
+
+    override suspend fun setAppLanguage(language: String) {
+      _appLanguage.value = language
+    }
+
+    override suspend fun setThemeMode(mode: com.woliveiras.palabrita.core.model.ThemeMode) {
+      _themeMode.value = mode
     }
   }
 }
