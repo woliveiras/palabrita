@@ -126,6 +126,50 @@ class GenerationViewModelTest {
     assertThat(vm.state.value.isComplete).isFalse()
   }
 
+  // --- Double-launch guard ---
+
+  @Test
+  fun `triggerGeneration called twice only launches one coroutine`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase()
+    val vm = createViewModel(useCase = useCase)
+
+    vm.triggerGeneration(ModelId.QWEN3_0_6B)
+    vm.triggerGeneration(ModelId.QWEN3_0_6B) // second call while first is still active
+    advanceUntilIdle()
+
+    assertThat(useCase.callCount).isEqualTo(1)
+  }
+
+  // --- cancelGeneration actually prevents completion ---
+
+  @Test
+  fun `cancelGeneration prevents isComplete after cancel`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase()
+    val vm = createViewModel(useCase = useCase)
+
+    vm.triggerGeneration(ModelId.QWEN3_0_6B)
+    vm.cancelGeneration()
+    advanceUntilIdle()
+
+    assertThat(vm.state.value.cancelled).isTrue()
+    assertThat(vm.state.value.isComplete).isFalse()
+  }
+
+  // --- Partial result treated as complete with actual counts ---
+
+  @Test
+  fun `partial result is treated as complete with actual progress counts`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase(GenerationResult(generatedCount = 8, batchSize = 10))
+    val vm = createViewModel(useCase = useCase)
+
+    vm.triggerGeneration(ModelId.QWEN3_0_6B)
+    advanceUntilIdle()
+
+    assertThat(vm.state.value.isComplete).isTrue()
+    assertThat(vm.state.value.progress.generatedCount).isEqualTo(8)
+    assertThat(vm.state.value.progress.totalExpected).isEqualTo(10)
+  }
+
   // --- Helpers ---
 
   private fun createViewModel(

@@ -7,6 +7,7 @@ import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 
 data class GenerationResult(
@@ -76,27 +77,48 @@ constructor(
       puzzleRepository.savePuzzles(puzzles)
       generatedCount = puzzles.size
 
-      val missing = batchSize - generatedCount
-      if (missing > 0) {
-        Log.w(TAG, "$generatedCount/$batchSize puzzles generated; retrying $missing missing slot(s)")
-        val retryExistingWords = existingWords + puzzles.map { it.word }.toSet()
-        val retryRecentWords = recentWords + puzzles.map { it.word }
+      // Retry loop: keep filling missing slots across multiple passes.
+      // Use mutable collections to avoid repeated allocation on each pass.
+      val updatedExistingWords = (existingWords + puzzles.map { it.word }).toMutableSet()
+      val updatedRecentWords = (recentWords + puzzles.map { it.word }).toMutableList()
+      var retryPass = 0
+
+      while (generatedCount < batchSize && retryPass < MAX_BATCH_RETRY_PASSES) {
+        retryPass++
+        val missing = batchSize - generatedCount
+        Log.w(
+          TAG,
+          "Retry pass $retryPass/$MAX_BATCH_RETRY_PASSES: $generatedCount/$batchSize, filling $missing slot(s)",
+        )
+        val countBeforeRetry = generatedCount
         val retryPuzzles =
           puzzleGenerator.generateBatch(
             count = missing,
             language = language,
             wordLength = wordLength,
-            recentWords = retryRecentWords,
-            allExistingWords = retryExistingWords,
+            recentWords = updatedRecentWords,
+            allExistingWords = updatedExistingWords,
             modelId = modelId,
-          )
+          ) { successCount ->
+            onProgress(countBeforeRetry + successCount, batchSize)
+          }
         puzzleRepository.savePuzzles(retryPuzzles)
         generatedCount += retryPuzzles.size
+        updatedExistingWords.addAll(retryPuzzles.map { it.word })
+        updatedRecentWords.addAll(retryPuzzles.map { it.word })
       }
 
-      if (generatedCount > 0) {
+      if (generatedCount < batchSize) {
+        Log.w(TAG, "Gave up after $retryPass retry pass(es): $generatedCount/$batchSize generated")
+      }
+
+      // Only advance the cycle if at least half the batch was generated.
+      // Generating a single puzzle is not enough signal to graduate to the next difficulty tier.
+      if (generatedCount >= batchSize / 2) {
         appPreferences.incrementGenerationCycle()
       }
+    } catch (e: CancellationException) {
+      throw e
     } catch (e: Exception) {
       Log.e(TAG, "Batch generation failed", e)
     }
@@ -106,5 +128,7 @@ constructor(
 
   private companion object {
     const val TAG = "GeneratePuzzlesUseCase"
+    /** Maximum additional passes to fill slots the LLM failed on the first attempt. */
+    const val MAX_BATCH_RETRY_PASSES = 3
   }
 }

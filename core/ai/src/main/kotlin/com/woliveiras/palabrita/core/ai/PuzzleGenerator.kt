@@ -58,41 +58,45 @@ constructor(
     val systemPrompt = promptProvider.puzzleSystemPrompt()
     var puzzleIndex = 0
 
-    while (puzzleIndex < count) {
-      val remaining = count - puzzleIndex
-      val chunkSize = remaining.coerceAtMost(SESSION_ROTATION)
+    try {
+      while (puzzleIndex < count) {
+        val remaining = count - puzzleIndex
+        val chunkSize = remaining.coerceAtMost(SESSION_ROTATION)
 
-      engineManager.createChatSession(systemPrompt).use { session ->
-        repeat(chunkSize) {
-          val i = puzzleIndex++
-          val puzzle =
-            generateSinglePuzzle(
-              session = session,
-              language = language,
-              wordLength = wordLength,
-              lengthRange = lengthRange,
-              recentWords = recentWords,
-              usedWords = usedWords,
-              modelId = modelId,
-            )
-          if (puzzle != null) {
-            generated.add(puzzle)
-            usedWords.add(puzzle.word)
-            Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
-          } else {
-            Log.w(
-              TAG,
-              "  puzzle ${i + 1}/$count FAILED after ${GameRules.MAX_GENERATION_RETRIES} retries",
-            )
+        engineManager.createChatSession(systemPrompt).use { session ->
+          repeat(chunkSize) {
+            val i = puzzleIndex++
+            val puzzle =
+              generateSinglePuzzle(
+                session = session,
+                language = language,
+                wordLength = wordLength,
+                lengthRange = lengthRange,
+                recentWords = recentWords,
+                usedWords = usedWords,
+                modelId = modelId,
+              )
+            if (puzzle != null) {
+              generated.add(puzzle)
+              usedWords.add(puzzle.word)
+              Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
+            } else {
+              Log.w(
+                TAG,
+                "  puzzle ${i + 1}/$count FAILED after ${GameRules.MAX_GENERATION_RETRIES} retries",
+              )
+            }
+            onPuzzleAttempted(generated.size)
           }
-          onPuzzleAttempted(generated.size)
         }
+        Log.d(TAG, "  session rotated after $chunkSize puzzles (${generated.size} total OK)")
       }
-      Log.d(TAG, "  session rotated after $chunkSize puzzles (${generated.size} total OK)")
+    } finally {
+      // F3.5: Always clear activity state, even if an exception is thrown mid-batch.
+      _activity.value = null
     }
 
     Log.i(TAG, "generateBatch: done, ${generated.size}/$count succeeded")
-    _activity.value = null
     return generated
   }
 
@@ -105,6 +109,9 @@ constructor(
     usedWords: Set<String>,
     modelId: ModelId,
   ): Puzzle? {
+    // F3.1: Accumulate words rejected within this slot so the prompt's avoid-list grows
+    // across retries. Without this the LLM may reproduce the same rejected word.
+    val localRejectedWords = mutableSetOf<String>()
     var lastFailureReason: String? = null
     repeat(GameRules.MAX_GENERATION_RETRIES) { attempt ->
       _activity.value = GenerationActivity.CREATING
@@ -114,7 +121,7 @@ constructor(
           language,
           wordLength,
           recentWords,
-          usedWords,
+          usedWords + localRejectedWords,
           attempt,
           lastFailureReason,
         )
@@ -128,6 +135,7 @@ constructor(
 
       when (parseResult) {
         is ParseResult.Success -> {
+          val normalizedWord = TextNormalizer.normalizeToAscii(parseResult.data.word)
           val validation = validator.validate(parseResult.data, usedWords, lengthRange)
           when (validation) {
             is ValidationResult.Valid -> {
@@ -136,6 +144,7 @@ constructor(
               return puzzleFromResponse(parseResult.data, language, wordLength)
             }
             is ValidationResult.Invalid -> {
+              localRejectedWords.add(normalizedWord)
               lastFailureReason = validation.reasons.joinToString("; ")
               Log.w(TAG, "  attempt $attempt validation failed: ${validation.reasons}")
               _activity.value = GenerationActivity.VALIDATION_FAILED

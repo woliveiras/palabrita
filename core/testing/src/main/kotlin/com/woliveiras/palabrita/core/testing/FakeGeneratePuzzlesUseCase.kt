@@ -15,12 +15,14 @@ class FakeGeneratePuzzlesUseCase(
 ) : GeneratePuzzlesUseCase {
   var capturedLanguage: String? = null
   var capturedModelId: ModelId? = null
+  var callCount: Int = 0
 
   override suspend fun execute(
     language: String,
     modelId: ModelId,
     onProgress: (successCount: Int, batchSize: Int) -> Unit,
   ): GenerationResult {
+    callCount++
     capturedLanguage = language
     capturedModelId = modelId
     if (result.batchSize > 0 && result.generatedCount > 0) {

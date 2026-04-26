@@ -11,6 +11,8 @@ android {
 
   defaultConfig { minSdk = 31 }
 
+  testOptions { unitTests.isReturnDefaultValues = true }
+
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
@@ -35,4 +37,5 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.truth)
   testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(project(":core:testing"))
 }

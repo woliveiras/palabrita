@@ -15,9 +15,11 @@ import com.woliveiras.palabrita.core.model.repository.ModelRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -60,13 +62,21 @@ constructor(
   private val _state = MutableStateFlow(GenerationState())
   val state: StateFlow<GenerationState> = _state.asStateFlow()
 
+  /** Holds the currently-running generation coroutine so it can be cancelled. */
+  private var generationJob: Job? = null
+
   init {
     observeActivity()
   }
 
   fun triggerGeneration(modelId: ModelId?) {
-    viewModelScope.launch {
-      val resolvedModelId = modelId ?: modelRepository.getConfig().modelId
+    // F2.1: Guard — ignore concurrent calls while a generation is already in flight.
+    if (generationJob?.isActive == true) return
+
+    generationJob = viewModelScope.launch {
+      // F3.4: Snapshot config once to avoid two separate DB reads with potential inconsistency.
+      val config = modelRepository.getConfig()
+      val resolvedModelId = modelId ?: config.modelId
       if (resolvedModelId == ModelId.NONE) {
         _state.update { it.copy(isGenerating = false, failed = true) }
         return@launch
@@ -75,16 +85,27 @@ constructor(
       _state.update { GenerationState() }
 
       if (!engineManager.isReady()) {
-        val modelPath = modelRepository.getConfig().modelPath
-        if (modelPath != null) {
-          updateSteps(engineManager.engineState.value)
-          engineManager.initialize(modelPath)
+        val modelPath = config.modelPath
+        if (modelPath == null) {
+          _state.update { it.copy(isGenerating = false, failed = true) }
+          return@launch
         }
+        updateSteps(engineManager.engineState.value)
+        engineManager.initialize(modelPath)
       }
 
-      val engineState = engineManager.engineState.value
+      // F2.2: Await the StateFlow to settle instead of reading .value immediately after
+      // initialize(), which may update its StateFlow asynchronously internally.
+      val engineState =
+        engineManager.engineState.first { it is EngineState.Ready || it is EngineState.Error }
       if (engineState is EngineState.Error) {
-        _state.update { it.copy(isGenerating = false, failed = true, steps = buildSteps(engineState, GenerationProgress())) }
+        _state.update {
+          it.copy(
+            isGenerating = false,
+            failed = true,
+            steps = buildSteps(engineState, GenerationProgress()),
+          )
+        }
         return@launch
       }
 
@@ -126,6 +147,8 @@ constructor(
           }
         }
         else -> {
+          // Partial or full batch — always mark complete with actual progress so the
+          // UI shows the real count (e.g., 8/10) rather than treating partial as full.
           val finalProgress = GenerationProgress(result.generatedCount, result.batchSize)
           val completedSteps =
             buildSteps(engineManager.engineState.value, finalProgress).map {
@@ -198,17 +221,21 @@ constructor(
   }
 
   fun cancelGeneration() {
-    // Cancellation is handled by the coroutine scope — the launch in triggerGeneration will be
-    // cancelled when the ViewModel is cleared or when the user navigates away.
+    // F1.2: Cancel the running coroutine so LLM inference actually stops.
+    generationJob?.cancel()
     _state.update { it.copy(isGenerating = false, cancelled = true) }
   }
 
   private fun observeActivity() {
     viewModelScope.launch {
       puzzleGenerator.activity.collect { activity ->
-        val current = _state.value
-        val resId = if (current.isComplete || current.failed) null else activityToResId(activity)
-        _state.update { it.copy(currentActivityResId = resId) }
+        // F2.3: Evaluate isComplete/failed inside update to avoid TOCTOU between
+        // the snapshot read and the subsequent update call.
+        _state.update { current ->
+          val resId =
+            if (current.isComplete || current.failed) null else activityToResId(activity)
+          current.copy(currentActivityResId = resId)
+        }
       }
     }
   }
