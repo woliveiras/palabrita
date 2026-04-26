@@ -39,7 +39,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -186,7 +185,13 @@ private fun LoadingScreen() {
 // --- Game Top Bar ---
 
 @Composable
-private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int) {
+private fun GameTopBar(
+  onBack: () -> Unit,
+  hintsRemaining: Int,
+  totalHints: Int,
+  onHintClick: () -> Unit,
+  hintButtonEnabled: Boolean,
+) {
   Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceBetween,
@@ -205,21 +210,38 @@ private fun GameTopBar(onBack: () -> Unit, hintsRemaining: Int, totalHints: Int)
       fontWeight = FontWeight.Bold,
     )
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
-      val hintCounterDescription =
-        stringResource(CommonR.string.hint_counter_description, hintsRemaining, totalHints)
+    val hintButtonDescription =
+      stringResource(CommonR.string.hint_counter_description, hintsRemaining, totalHints)
+    Surface(
+      onClick = onHintClick,
+      enabled = hintButtonEnabled,
+      shape = RoundedCornerShape(50),
+      color =
+        if (hintButtonEnabled) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.surfaceVariant,
+      modifier =
+        Modifier.padding(end = 8.dp).semantics { contentDescription = hintButtonDescription },
+    ) {
       Row(
+        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
-        modifier =
-          Modifier.semantics(mergeDescendants = true) {
-            contentDescription = hintCounterDescription
-          },
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
       ) {
-        Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(16.dp))
-        Spacer(Modifier.width(2.dp))
-        Text(text = "$hintsRemaining/$totalHints", style = MaterialTheme.typography.labelMedium)
+        val contentColor =
+          if (hintButtonEnabled) MaterialTheme.colorScheme.onPrimaryContainer
+          else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+        Icon(
+          Icons.Rounded.Lightbulb,
+          contentDescription = null,
+          modifier = Modifier.size(16.dp),
+          tint = contentColor,
+        )
+        Text(
+          text = "$hintsRemaining",
+          style = MaterialTheme.typography.labelMedium,
+          color = contentColor,
+        )
       }
-      Spacer(Modifier.width(8.dp))
     }
   }
 }
@@ -250,7 +272,16 @@ private fun PlayingScreen(
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     // Top Bar — contextual header
-    GameTopBar(onBack = onBack, hintsRemaining = hintsRemaining, totalHints = puzzle.hints.size)
+    GameTopBar(
+      onBack = onBack,
+      hintsRemaining = hintsRemaining,
+      totalHints = puzzle.hints.size,
+      onHintClick = {
+        if (hintsRemaining > 0) onRevealHint()
+        showHintsDialog = true
+      },
+      hintButtonEnabled = hintsRemaining > 0 || state.revealedHints.isNotEmpty(),
+    )
     Spacer(Modifier.height(8.dp))
 
     // Word Grid — fluid, edge-to-edge
@@ -273,28 +304,8 @@ private fun PlayingScreen(
       )
     }
 
-    // Space above hint button
-    Spacer(Modifier.weight(0.3f))
-
-    // Hint button
-    FilledTonalButton(
-      onClick = {
-        if (hintsRemaining > 0) onRevealHint()
-        showHintsDialog = true
-      },
-      enabled = hintsRemaining > 0 || state.revealedHints.isNotEmpty(),
-    ) {
-      Icon(Icons.Rounded.Lightbulb, contentDescription = null, modifier = Modifier.size(18.dp))
-      Spacer(Modifier.width(4.dp))
-      Text(
-        if (state.revealedHints.isNotEmpty() && hintsRemaining == 0)
-          stringResource(CommonR.string.hint_view_all)
-        else stringResource(CommonR.string.hint_button, hintsRemaining, puzzle.hints.size)
-      )
-    }
-
-    // Space below hint button — push keyboard toward bottom
-    Spacer(Modifier.weight(0.7f))
+    // Push keyboard toward bottom
+    Spacer(Modifier.weight(1f))
 
     // Keyboard
     GameKeyboard(
