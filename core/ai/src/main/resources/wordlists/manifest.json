@@ -16,5 +16,11 @@
     "displayName": "Español",
     "flag": "🇪🇸",
     "promptName": "Spanish"
+  },
+  {
+    "code": "it",
+    "displayName": "Italiano",
+    "flag": "🇮🇹",
+    "promptName": "Italian"
   }
 ]
