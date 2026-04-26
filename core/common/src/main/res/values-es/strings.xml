@@ -151,12 +151,34 @@
     <string name="share_hints_label">pistas usadas</string>
 
     <!-- Game: Result -->
-    <string name="result_won">¡Felicidades!</string>
+    <string name="result_won">¡Victoria!</string>
     <string name="result_lost">No fue esta vez</string>
+    <string name="result_lost_subtitle">¡No te rindas! Cada intento es aprendizaje.</string>
+    <string name="result_word_was">La palabra era</string>
     <string name="result_attempts">Lo descubriste en %1$d/6</string>
+    <string name="result_attempts_label">Intentos</string>
+    <string name="result_attempts_value">%1$d/6</string>
     <string name="result_word">Palabra: %s</string>
     <string name="result_hints_used">%d pistas usadas</string>
     <string name="result_explore">Explorar la palabra</string>
+    <string name="result_precision_label">Precisión</string>
+    <string name="result_xp_label">XP Ganado</string>
+    <string name="result_streak_label">Streak</string>
+    <string name="result_streak_reset">Reiniciado</string>
+    <string name="result_word_label">Palabra</string>
+    <string name="result_share">Compartir Resultado</string>
+    <string name="result_try_again">Intentar de Nuevo</string>
+    <string name="result_home">Home</string>
+    <string name="result_play_again">Jugar de Nuevo</string>
+    <string name="result_perf_perfect">¡PERFECTO!</string>
+    <string name="result_perf_incredible">¡Increíble!</string>
+    <string name="result_perf_excellent">¡Excelente!</string>
+    <string name="result_perf_very_good">¡Muy bien!</string>
+    <string name="result_perf_got_it">¡Lo lograste!</string>
+    <string name="result_tips_title">Tips para la próxima</string>
+    <string name="result_tip_1">Empieza con palabras que tengan vocales comunes</string>
+    <string name="result_tip_2">Usa las pistas de colores para eliminar posibilidades</string>
+    <string name="result_tip_3">Piensa en palabras relacionadas con los patrones descubiertos</string>
 
     <!-- Game: Error -->
     <string name="error_no_puzzle">No hay puzzles disponibles</string>

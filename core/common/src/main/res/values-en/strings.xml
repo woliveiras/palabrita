@@ -149,12 +149,34 @@
     <string name="share_hints_label">hints used</string>
 
     <!-- Game: Result -->
-    <string name="result_won">Congratulations!</string>
-    <string name="result_lost">Better luck next time</string>
+    <string name="result_won">Victory!</string>
+    <string name="result_lost">Not this time</string>
+    <string name="result_lost_subtitle">Don\'t give up! Every try is a lesson.</string>
+    <string name="result_word_was">The word was</string>
     <string name="result_attempts">You got it in %1$d/6</string>
+    <string name="result_attempts_label">Attempts</string>
+    <string name="result_attempts_value">%1$d/6</string>
     <string name="result_word">Word: %s</string>
     <string name="result_hints_used">%d hints used</string>
     <string name="result_explore">Explore the word</string>
+    <string name="result_precision_label">Accuracy</string>
+    <string name="result_xp_label">XP Earned</string>
+    <string name="result_streak_label">Streak</string>
+    <string name="result_streak_reset">Reset</string>
+    <string name="result_word_label">Word</string>
+    <string name="result_share">Share Result</string>
+    <string name="result_try_again">Try Again</string>
+    <string name="result_home">Home</string>
+    <string name="result_play_again">Play Again</string>
+    <string name="result_perf_perfect">PERFECT!</string>
+    <string name="result_perf_incredible">Incredible!</string>
+    <string name="result_perf_excellent">Excellent!</string>
+    <string name="result_perf_very_good">Very good!</string>
+    <string name="result_perf_got_it">You got it!</string>
+    <string name="result_tips_title">Tips for next time</string>
+    <string name="result_tip_1">Start with words that have common vowels</string>
+    <string name="result_tip_2">Use the color hints to eliminate possibilities</string>
+    <string name="result_tip_3">Think of words related to the patterns you found</string>
 
     <!-- Game: Error -->
     <string name="error_no_puzzle">No puzzle available</string>

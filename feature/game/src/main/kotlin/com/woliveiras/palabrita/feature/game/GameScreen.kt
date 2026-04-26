@@ -42,7 +42,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -141,8 +140,7 @@ fun GameScreen(
           onShakeComplete = { viewModel.onAction(GameAction.ClearShake) },
         )
       GameStatus.WON ->
-        ResultScreen(
-          won = true,
+        WinResultScreen(
           puzzle = state.puzzle,
           attempts = state.attempts,
           hintsUsed = state.revealedHints.size,
@@ -152,8 +150,7 @@ fun GameScreen(
           onHome = onNavigateToHome,
         )
       GameStatus.LOST ->
-        ResultScreen(
-          won = false,
+        LoseResultScreen(
           puzzle = state.puzzle,
           attempts = state.attempts,
           hintsUsed = state.revealedHints.size,
@@ -874,112 +871,4 @@ private fun AbandonDialog(onContinue: () -> Unit, onAbandon: () -> Unit) {
       }
     },
   )
-}
-
-// --- Result Screen ---
-
-@Composable
-private fun ResultScreen(
-  won: Boolean,
-  puzzle: com.woliveiras.palabrita.core.model.Puzzle?,
-  attempts: List<Attempt>,
-  hintsUsed: Int,
-  onExplore: () -> Unit,
-  onShare: () -> Unit,
-  onPlayAgain: () -> Unit,
-  onHome: () -> Unit,
-) {
-  Column(
-    modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).padding(32.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
-  ) {
-    Text(
-      text =
-        if (won) stringResource(CommonR.string.result_won)
-        else stringResource(CommonR.string.result_lost),
-      style = MaterialTheme.typography.headlineMedium,
-    )
-    Spacer(Modifier.height(16.dp))
-
-    if (won) {
-      Text(
-        text = stringResource(CommonR.string.result_attempts, attempts.size),
-        style = MaterialTheme.typography.bodyLarge,
-      )
-    }
-
-    Spacer(Modifier.height(12.dp))
-    puzzle?.let {
-      Text(
-        text = stringResource(CommonR.string.result_word, it.wordDisplay),
-        style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
-      )
-    }
-
-    if (hintsUsed > 0) {
-      Spacer(Modifier.height(8.dp))
-      Text(
-        text = stringResource(CommonR.string.result_hints_used, hintsUsed),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-    }
-
-    Spacer(Modifier.height(24.dp))
-
-    // Chat Card — CTA principal
-    if (puzzle != null) {
-      ChatCardCta(word = puzzle.wordDisplay, onExplore = onExplore)
-      Spacer(Modifier.height(16.dp))
-    }
-
-    // Play Again / Go Home
-    OutlinedButton(onClick = onPlayAgain, modifier = Modifier.fillMaxWidth()) {
-      Text(stringResource(CommonR.string.play_again))
-    }
-
-    Spacer(Modifier.height(8.dp))
-    TextButton(onClick = onShare) { Text(stringResource(CommonR.string.share)) }
-  }
-}
-
-// --- Chat Card CTA ---
-
-@Composable
-private fun ChatCardCta(word: String, onExplore: () -> Unit) {
-  Card(
-    modifier = Modifier.fillMaxWidth(),
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-    shape = RoundedCornerShape(16.dp),
-  ) {
-    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-      Text(
-        text = "\uD83D\uDCAC ${stringResource(CommonR.string.chat_card_title, word)}",
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-      )
-      Spacer(Modifier.height(8.dp))
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        Text(
-          "\uD83E\uDDEC ${stringResource(CommonR.string.chat_suggestion_etymology)}",
-          style = MaterialTheme.typography.labelMedium,
-        )
-        Text(
-          "\uD83C\uDF0E ${stringResource(CommonR.string.chat_suggestion_curiosity)}",
-          style = MaterialTheme.typography.labelMedium,
-        )
-        Text(
-          "\uD83D\uDCDD ${stringResource(CommonR.string.chat_suggestion_examples)}",
-          style = MaterialTheme.typography.labelMedium,
-        )
-      }
-      Spacer(Modifier.height(12.dp))
-      Button(onClick = onExplore, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(CommonR.string.chat_card_cta))
-      }
-    }
-  }
 }

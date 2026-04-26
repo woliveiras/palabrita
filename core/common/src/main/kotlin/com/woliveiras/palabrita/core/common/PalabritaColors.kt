@@ -138,6 +138,20 @@ object PalabritaColors {
   // Player tier badge colors
   // -------------------------------------------------------------------------
 
+  // -------------------------------------------------------------------------
+  // Result screen gradients (from Figma)
+  // -------------------------------------------------------------------------
+
+  /** Win gradient: indigo → purple → purple (from-indigo-500 via-purple-500 to-purple-600) */
+  val ResultWinGradientStart = Color(0xFF6366F1)
+  val ResultWinGradientMid = Color(0xFF8B5CF6)
+  val ResultWinGradientEnd = Color(0xFF9333EA)
+
+  /** Lose gradient: orange → red → pink (from-orange-400 via-red-400 to-pink-500) */
+  val ResultLoseGradientStart = Color(0xFFFB923C)
+  val ResultLoseGradientMid = Color(0xFFF87171)
+  val ResultLoseGradientEnd = Color(0xFFEC4899)
+
   val TierNovato = Color(0xFF9CA3AF)
   val TierCurioso = Color(0xFF4ECDC4)
   val TierAstuto = Color(0xFFFFB347)

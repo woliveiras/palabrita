@@ -151,12 +151,34 @@
     <string name="share_hints_label">dicas usadas</string>
 
     <!-- Game: Result -->
-    <string name="result_won">Parabéns!</string>
+    <string name="result_won">Vitória!</string>
     <string name="result_lost">Não foi dessa vez</string>
+    <string name="result_lost_subtitle">Mas não desista! Toda tentativa é aprendizado.</string>
+    <string name="result_word_was">A palavra era</string>
     <string name="result_attempts">Você descobriu em %1$d/6</string>
+    <string name="result_attempts_label">Tentativas</string>
+    <string name="result_attempts_value">%1$d/6</string>
     <string name="result_word">Palavra: %s</string>
     <string name="result_hints_used">%d dicas usadas</string>
     <string name="result_explore">Explorar a palavra</string>
+    <string name="result_precision_label">Precisão</string>
+    <string name="result_xp_label">XP Ganho</string>
+    <string name="result_streak_label">Streak</string>
+    <string name="result_streak_reset">Resetado</string>
+    <string name="result_word_label">Palavra</string>
+    <string name="result_share">Compartilhar Resultado</string>
+    <string name="result_try_again">Tentar Novamente</string>
+    <string name="result_home">Home</string>
+    <string name="result_play_again">Jogar Novamente</string>
+    <string name="result_perf_perfect">PERFEITO!</string>
+    <string name="result_perf_incredible">Incrível!</string>
+    <string name="result_perf_excellent">Excelente!</string>
+    <string name="result_perf_very_good">Muito bom!</string>
+    <string name="result_perf_got_it">Você conseguiu!</string>
+    <string name="result_tips_title">Dicas para a próxima</string>
+    <string name="result_tip_1">Comece com palavras que tenham vogais comuns</string>
+    <string name="result_tip_2">Use as dicas de cores para eliminar possibilidades</string>
+    <string name="result_tip_3">Pense em palavras relacionadas aos padrões descobertos</string>
 
     <!-- Game: Error -->
     <string name="error_no_puzzle">Nenhum puzzle disponível</string>
