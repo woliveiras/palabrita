@@ -68,17 +68,6 @@ fun HomeScreen(
     return
   }
 
-  if (state.generationComplete) {
-    GenerationSuccessScreen(
-      puzzleCount = state.generatedPuzzleCount,
-      onStartPlaying = {
-        viewModel.onAction(HomeAction.DismissGenerationBanner)
-        onNavigateToGame()
-      },
-    )
-    return
-  }
-
   Column(
     modifier =
       modifier
@@ -94,7 +83,6 @@ fun HomeScreen(
     // --- Play CTA Card ---
     PlayCtaCard(
       unplayedCount = state.unplayedCount,
-      isGenerating = state.isGeneratingPuzzles,
       onPlay = onNavigateToGame,
       onGenerate = onNavigateToGeneration,
     )
@@ -130,12 +118,6 @@ fun HomeScreen(
       iconContainerColor = PalabritaColors.ContainerPurple,
       iconTint = PalabritaColors.OnContainerPurple,
     )
-
-    // --- Generation indicator ---
-    if (state.isGeneratingPuzzles) {
-      Spacer(Modifier.height(16.dp))
-      GenerationIndicator()
-    }
 
     Spacer(Modifier.height(24.dp))
   }
@@ -193,7 +175,6 @@ private val GradientPurple =
 @Composable
 private fun PlayCtaCard(
   unplayedCount: Int,
-  isGenerating: Boolean,
   onPlay: () -> Unit,
   onGenerate: () -> Unit,
 ) {
@@ -222,7 +203,6 @@ private fun PlayCtaCard(
           text =
             when {
               hasPlayable -> stringResource(CommonR.string.home_puzzles_remaining, unplayedCount)
-              isGenerating -> stringResource(CommonR.string.home_generating)
               else -> stringResource(CommonR.string.home_no_puzzles)
             },
           style = MaterialTheme.typography.bodyMedium,
@@ -365,31 +345,6 @@ private fun InfoCard(
   }
 }
 
-// --- Generation Indicator ---
-
-@Composable
-private fun GenerationIndicator() {
-  Card(
-    modifier = Modifier.fillMaxWidth(),
-    shape = RoundedCornerShape(12.dp),
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-  ) {
-    Row(
-      modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-      Spacer(Modifier.width(8.dp))
-      Text(
-        text = stringResource(CommonR.string.home_generating),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-    }
-  }
-}
-
 // --- Loading ---
 
 @Composable
@@ -400,72 +355,5 @@ private fun LoadingHome() {
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     CircularProgressIndicator()
-  }
-}
-
-// --- Generation Success ---
-
-@Composable
-private fun GenerationSuccessScreen(puzzleCount: Int, onStartPlaying: () -> Unit) {
-  Column(
-    modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
-  ) {
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier =
-        Modifier.size(96.dp)
-          .background(
-            Brush.linearGradient(listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)),
-            RoundedCornerShape(24.dp),
-          ),
-    ) {
-      Icon(
-        imageVector = Icons.Rounded.CheckCircle,
-        contentDescription = null,
-        tint = Color.White,
-        modifier = Modifier.size(48.dp),
-      )
-    }
-
-    Spacer(Modifier.height(32.dp))
-
-    Text(
-      text = stringResource(CommonR.string.home_generation_success_title),
-      style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-      textAlign = TextAlign.Center,
-    )
-
-    Spacer(Modifier.height(8.dp))
-
-    Text(
-      text = stringResource(CommonR.string.home_generation_success_subtitle, puzzleCount),
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      textAlign = TextAlign.Center,
-    )
-
-    Spacer(Modifier.height(32.dp))
-
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier =
-        Modifier.fillMaxWidth()
-          .height(56.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .background(
-            Brush.horizontalGradient(
-              listOf(PalabritaColors.BrandIndigo, PalabritaColors.BrandViolet)
-            )
-          )
-          .clickable(onClick = onStartPlaying),
-    ) {
-      Text(
-        text = stringResource(CommonR.string.home_generation_success_cta),
-        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
-        color = Color.White,
-      )
-    }
   }
 }

@@ -1,10 +1,7 @@
 package com.woliveiras.palabrita.feature.home
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.woliveiras.palabrita.core.ai.ModelRegistry
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
@@ -18,8 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-private const val PUZZLE_GENERATION_WORK_NAME = "puzzle_generation"
 
 private val LANGUAGE_DISPLAY =
   mapOf(
@@ -36,7 +31,6 @@ constructor(
   private val puzzleRepository: PuzzleRepository,
   private val gameSessionRepository: GameSessionRepository,
   private val modelRepository: ModelRepository,
-  private val workManager: WorkManager,
   private val modelRegistry: ModelRegistry,
 ) : ViewModel() {
 
@@ -64,7 +58,6 @@ constructor(
         }
       }
     }
-    observeGeneration()
   }
 
   fun onAction(action: HomeAction) {
@@ -75,7 +68,6 @@ constructor(
       is HomeAction.OpenAboutAi -> {
         /* navigation handled by UI */
       }
-      is HomeAction.DismissGenerationBanner -> _state.update { it.copy(generationComplete = false) }
     }
   }
 
@@ -85,37 +77,5 @@ constructor(
     if (config.modelId == ModelId.NONE) return langLabel
     val modelName = modelRegistry.getInfo(config.modelId)?.displayName ?: return langLabel
     return "$langLabel \u2022 $modelName"
-  }
-
-  private fun observeGeneration() {
-    viewModelScope.launch {
-      workManager.getWorkInfosForUniqueWorkLiveData(PUZZLE_GENERATION_WORK_NAME).asFlow().collect {
-        workInfos ->
-        val info = workInfos.firstOrNull()
-        val isRunning =
-          info?.state == WorkInfo.State.RUNNING || info?.state == WorkInfo.State.ENQUEUED
-        val justSucceeded =
-          _state.value.isGeneratingPuzzles && info?.state == WorkInfo.State.SUCCEEDED
-        val generatedCount =
-          if (justSucceeded) info?.outputData?.getInt("generated_count", 0) ?: 0 else 0
-
-        val freshUnplayedCount =
-          if (justSucceeded && generatedCount > 0) {
-            val language = statsRepository.getStats().preferredLanguage
-            puzzleRepository.countAllUnplayed(language)
-          } else null
-
-        _state.update {
-          it.copy(
-            isGeneratingPuzzles = isRunning,
-            generationComplete =
-              if (justSucceeded && generatedCount > 0) true else it.generationComplete,
-            generatedPuzzleCount =
-              if (justSucceeded && generatedCount > 0) generatedCount else it.generatedPuzzleCount,
-            unplayedCount = freshUnplayedCount ?: it.unplayedCount,
-          )
-        }
-      }
-    }
   }
 }

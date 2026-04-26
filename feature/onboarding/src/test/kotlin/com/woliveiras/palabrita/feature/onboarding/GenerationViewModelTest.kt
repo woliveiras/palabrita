@@ -2,14 +2,15 @@ package com.woliveiras.palabrita.feature.onboarding
 
 import com.google.common.truth.Truth.assertThat
 import com.woliveiras.palabrita.core.ai.EngineState
-import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
+import com.woliveiras.palabrita.core.ai.GenerationResult
 import com.woliveiras.palabrita.core.model.ModelConfig
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.testing.FakeAppPreferences
-import com.woliveiras.palabrita.core.testing.FakeGenerationScheduler
+import com.woliveiras.palabrita.core.testing.FakeGeneratePuzzlesUseCase
 import com.woliveiras.palabrita.core.testing.FakeLlmEngineManager
 import com.woliveiras.palabrita.core.testing.FakeModelRepository
 import com.woliveiras.palabrita.core.testing.FakePuzzleGenerator
+import com.woliveiras.palabrita.core.testing.FakeStatsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -36,159 +37,109 @@ class GenerationViewModelTest {
     Dispatchers.resetMain()
   }
 
-  // --- Regression: "Start Playing" appeared before generation finished ---
+  // --- Happy path ---
 
-  /**
-   * Reproduces the race condition where WorkManager's stale SUCCEEDED state from the onboarding
-   * generation was visible when the ViewModel started observing. Because triggerGeneration() sets
-   * hasTriggered=true before the new work reaches RUNNING, the old SUCCEEDED was mistakenly
-   * accepted and isComplete was set to true immediately.
-   *
-   * Fix: isComplete must NOT become true unless RUNNING was observed first for this trigger.
-   */
   @Test
-  fun `isComplete stays false when stale SUCCEEDED arrives before new work starts RUNNING`() =
-    runTest {
-      val scheduler = FakeGenerationScheduler()
-      // Simulate stale state: previous generation already SUCCEEDED in WorkManager
-      scheduler.emit(GenerationWorkState.SUCCEEDED, generatedCount = 5, totalExpected = 5)
-
-      val vm = createViewModel(scheduler = scheduler)
-
-      // Trigger regeneration (as the user would after playing all puzzles)
-      vm.triggerGeneration(ModelId.QWEN3_0_6B)
-      advanceUntilIdle()
-
-      // The stale SUCCEEDED must NOT show "Start Playing"
-      assertThat(vm.state.value.isComplete).isFalse()
-      assertThat(vm.state.value.isGenerating).isTrue()
-    }
-
-  /**
-   * Verifies the normal happy path: RUNNING followed by SUCCEEDED does complete generation.
-   */
-  @Test
-  fun `isComplete becomes true only after observing RUNNING then SUCCEEDED`() = runTest {
-    val scheduler = FakeGenerationScheduler()
-    val vm = createViewModel(scheduler = scheduler)
+  fun `isComplete becomes true after successful generation`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase(GenerationResult(generatedCount = 5, batchSize = 5))
+    val vm = createViewModel(useCase = useCase)
 
     vm.triggerGeneration(ModelId.QWEN3_0_6B)
     advanceUntilIdle()
 
-    // Worker starts running
-    scheduler.emit(GenerationWorkState.RUNNING, generatedCount = 0, totalExpected = 10)
-    advanceUntilIdle()
-
-    assertThat(vm.state.value.isComplete).isFalse()
-    assertThat(vm.state.value.isGenerating).isTrue()
-
-    // Worker finishes successfully with real puzzles
-    scheduler.emit(GenerationWorkState.SUCCEEDED, generatedCount = 9, totalExpected = 10)
-    advanceUntilIdle()
-
     assertThat(vm.state.value.isComplete).isTrue()
     assertThat(vm.state.value.failed).isFalse()
+    assertThat(vm.state.value.isGenerating).isFalse()
+  }
+
+  @Test
+  fun `progress is updated during generation`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase(GenerationResult(generatedCount = 9, batchSize = 10))
+    val vm = createViewModel(useCase = useCase)
+
+    vm.triggerGeneration(ModelId.QWEN3_0_6B)
+    advanceUntilIdle()
+
     assertThat(vm.state.value.progress.generatedCount).isEqualTo(9)
+    assertThat(vm.state.value.progress.totalExpected).isEqualTo(10)
   }
 
-  /**
-   * Verifies that a SUCCEEDED with generatedCount=0 (all LLM retries failed) is shown as a
-   * failure, not as "generation complete". This prevents the user from seeing "Start Playing"
-   * with 0 new puzzles.
-   */
   @Test
-  fun `SUCCEEDED with zero puzzles is treated as failure`() = runTest {
-    val scheduler = FakeGenerationScheduler()
-    val vm = createViewModel(scheduler = scheduler)
+  fun `generation skipped (batchSize -1) is treated as complete`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase(GenerationResult(generatedCount = 0, batchSize = -1))
+    val vm = createViewModel(useCase = useCase)
 
     vm.triggerGeneration(ModelId.QWEN3_0_6B)
-    advanceUntilIdle()
-
-    scheduler.emit(GenerationWorkState.RUNNING, generatedCount = 0, totalExpected = 10)
-    advanceUntilIdle()
-
-    scheduler.emit(GenerationWorkState.SUCCEEDED, generatedCount = 0, totalExpected = 10)
-    advanceUntilIdle()
-
-    assertThat(vm.state.value.isComplete).isFalse()
-    assertThat(vm.state.value.failed).isTrue()
-  }
-
-  /**
-   * Verifies that a SUCCEEDED with totalExpected=0 (worker skipped because threshold was already
-   * met) is treated as complete, not a failure. This is the normal "enough puzzles" early-exit.
-   */
-  @Test
-  fun `SUCCEEDED with totalExpected zero is treated as complete`() = runTest {
-    val scheduler = FakeGenerationScheduler()
-    val vm = createViewModel(scheduler = scheduler)
-
-    vm.triggerGeneration(ModelId.QWEN3_0_6B)
-    advanceUntilIdle()
-
-    scheduler.emit(GenerationWorkState.RUNNING, generatedCount = 0, totalExpected = 0)
-    advanceUntilIdle()
-
-    scheduler.emit(GenerationWorkState.SUCCEEDED, generatedCount = 0, totalExpected = 0)
     advanceUntilIdle()
 
     assertThat(vm.state.value.isComplete).isTrue()
     assertThat(vm.state.value.failed).isFalse()
   }
 
-  /**
-   * Verifies that FAILED from the worker sets failed=true and not complete.
-   */
+  // --- Failure paths ---
+
   @Test
-  fun `FAILED state sets failed and keeps isComplete false`() = runTest {
-    val scheduler = FakeGenerationScheduler()
-    val vm = createViewModel(scheduler = scheduler)
+  fun `zero puzzles generated is treated as failure`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase(GenerationResult(generatedCount = 0, batchSize = 10))
+    val vm = createViewModel(useCase = useCase)
 
     vm.triggerGeneration(ModelId.QWEN3_0_6B)
-    advanceUntilIdle()
-
-    scheduler.emit(GenerationWorkState.RUNNING, generatedCount = 0, totalExpected = 10)
-    advanceUntilIdle()
-
-    scheduler.emit(GenerationWorkState.FAILED)
     advanceUntilIdle()
 
     assertThat(vm.state.value.isComplete).isFalse()
     assertThat(vm.state.value.failed).isTrue()
   }
 
-  /**
-   * Verifies that FAILED without seeing RUNNING first (another stale-state scenario) is ignored.
-   */
   @Test
-  fun `stale FAILED state before RUNNING is ignored`() = runTest {
-    val scheduler = FakeGenerationScheduler()
-    scheduler.emit(GenerationWorkState.FAILED)
+  fun `ModelId NONE results in failure without calling use case`() = runTest {
+    val useCase = FakeGeneratePuzzlesUseCase()
+    val vm =
+      createViewModel(
+        useCase = useCase,
+        modelRepository = FakeModelRepository(ModelConfig(modelId = ModelId.NONE)),
+      )
 
-    val vm = createViewModel(scheduler = scheduler)
+    vm.triggerGeneration(null)
+    advanceUntilIdle()
 
+    assertThat(vm.state.value.isComplete).isFalse()
+    assertThat(vm.state.value.failed).isTrue()
+    assertThat(useCase.capturedModelId).isNull()
+  }
+
+  @Test
+  fun `engine error before generation results in failure`() = runTest {
+    val engineManager =
+      FakeLlmEngineManager(initialState = EngineState.Error("GPU not supported"))
+    // Make initialize() fail by having it set an error state
+    val vm = createViewModel(engineManager = engineManager)
+
+    // Simulate engine erroring on initialize
+    // FakeLlmEngineManager.initialize() sets state to Ready; we need to verify
+    // that if the engine is NOT ready and init fails, failure is surfaced.
+    // This test confirms that the ViewModel handles EngineState.Error.
+    engineManager.setError("init failed")
     vm.triggerGeneration(ModelId.QWEN3_0_6B)
     advanceUntilIdle()
 
-    // Stale FAILED should not surface
-    assertThat(vm.state.value.failed).isFalse()
-    assertThat(vm.state.value.isGenerating).isTrue()
+    assertThat(vm.state.value.failed).isTrue()
+    assertThat(vm.state.value.isComplete).isFalse()
   }
 
   // --- Helpers ---
 
   private fun createViewModel(
-    scheduler: FakeGenerationScheduler = FakeGenerationScheduler(),
+    useCase: FakeGeneratePuzzlesUseCase = FakeGeneratePuzzlesUseCase(),
     engineManager: FakeLlmEngineManager = FakeLlmEngineManager(EngineState.Ready),
+    modelRepository: FakeModelRepository = FakeModelRepository(ModelConfig(modelId = ModelId.QWEN3_0_6B)),
   ): GenerationViewModel =
     GenerationViewModel(
-      generationScheduler = scheduler,
+      generatePuzzlesUseCase = useCase,
       appPreferences = FakeAppPreferences(),
-      modelRepository =
-        FakeModelRepository(
-          ModelConfig(modelId = ModelId.QWEN3_0_6B)
-        ),
+      modelRepository = modelRepository,
+      statsRepository = FakeStatsRepository(),
       engineManager = engineManager,
       puzzleGenerator = FakePuzzleGenerator(),
     )
 }
+

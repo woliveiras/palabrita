@@ -8,6 +8,4 @@ sealed class HomeAction {
   data object OpenSettings : HomeAction()
 
   data object OpenAboutAi : HomeAction()
-
-  data object DismissGenerationBanner : HomeAction()
 }

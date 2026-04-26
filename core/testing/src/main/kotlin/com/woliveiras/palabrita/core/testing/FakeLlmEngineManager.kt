@@ -30,6 +30,10 @@ class FakeLlmEngineManager(
     _engineState.value = EngineState.Uninitialized
   }
 
+  fun setError(message: String) {
+    _engineState.value = EngineState.Error(message)
+  }
+
   override fun isReady(): Boolean = _engineState.value is EngineState.Ready
 }
 

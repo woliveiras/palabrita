@@ -4,24 +4,20 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.woliveiras.palabrita.core.ai.EngineState
+import com.woliveiras.palabrita.core.ai.GeneratePuzzlesUseCase
 import com.woliveiras.palabrita.core.ai.GenerationActivity
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.PuzzleGenerator
-import com.woliveiras.palabrita.core.ai.worker.GenerationInfo
-import com.woliveiras.palabrita.core.ai.worker.GenerationProgress
-import com.woliveiras.palabrita.core.ai.worker.GenerationWorkState
-import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
 import com.woliveiras.palabrita.core.common.R as CommonR
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.ModelRepository
+import com.woliveiras.palabrita.core.model.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -37,6 +33,8 @@ data class GenerationStep(
   val detail: String? = null,
 )
 
+data class GenerationProgress(val generatedCount: Int = 0, val totalExpected: Int = 0)
+
 data class GenerationState(
   val isGenerating: Boolean = true,
   val isComplete: Boolean = false,
@@ -51,21 +49,18 @@ data class GenerationState(
 class GenerationViewModel
 @Inject
 constructor(
-  private val generationScheduler: PuzzleGenerationScheduler,
+  private val generatePuzzlesUseCase: GeneratePuzzlesUseCase,
   private val appPreferences: AppPreferences,
   private val modelRepository: ModelRepository,
+  private val statsRepository: StatsRepository,
   private val engineManager: LlmEngineManager,
   private val puzzleGenerator: PuzzleGenerator,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(GenerationState())
   val state: StateFlow<GenerationState> = _state.asStateFlow()
-  private var hasTriggered = false
-  private var hasSeenRunning = false
-  private var expectedWorkId: UUID? = null
 
   init {
-    observeGeneration()
     observeActivity()
   }
 
@@ -76,108 +71,88 @@ constructor(
         _state.update { it.copy(isGenerating = false, failed = true) }
         return@launch
       }
-      hasTriggered = true
-      hasSeenRunning = false
-      expectedWorkId = null
+
       _state.update { GenerationState() }
 
       if (!engineManager.isReady()) {
-        val config = modelRepository.getConfig()
-        val modelPath = config.modelPath
+        val modelPath = modelRepository.getConfig().modelPath
         if (modelPath != null) {
+          updateSteps(engineManager.engineState.value)
           engineManager.initialize(modelPath)
         }
       }
 
-      expectedWorkId = generationScheduler.scheduleGeneration(resolvedModelId)
-    }
-  }
+      val engineState = engineManager.engineState.value
+      if (engineState is EngineState.Error) {
+        _state.update { it.copy(isGenerating = false, failed = true, steps = buildSteps(engineState, GenerationProgress())) }
+        return@launch
+      }
 
-  private fun observeGeneration() {
-    viewModelScope.launch {
-      combine(engineManager.engineState, generationScheduler.observeGenerationInfo()) {
-          engineState,
-          info ->
-          Pair(engineState, info)
-        }
-        .collect { (engineState, info) ->
-          val steps = deriveSteps(engineState, info)
-          when (info.state) {
-            GenerationWorkState.SUCCEEDED -> {
-              if (!hasTriggered || !hasSeenRunning) return@collect
-              val expected = expectedWorkId
-              if (expected != null && info.workId != null && info.workId != expected) {
-                return@collect
-              }
-              val progress = info.progress
-              // totalExpected == -1 → worker skipped (already had enough puzzles). Ignore.
-              if (progress.totalExpected == -1) return@collect
-              // totalExpected > 0 means the worker actually tried to generate but produced nothing
-              val allRetriesFailed = progress.totalExpected > 0 && progress.generatedCount == 0
-              if (allRetriesFailed) {
-                _state.update {
-                  it.copy(
-                    isGenerating = false,
-                    failed = true,
-                    progress = progress,
-                    steps = steps,
-                    currentActivityResId = null,
-                  )
-                }
-                return@collect
-              }
-              val completedSteps = steps.map {
-                it.copy(status = StepStatus.COMPLETED, detail = null)
-              }
-              _state.update {
-                it.copy(
-                  isGenerating = false,
-                  isComplete = true,
-                  progress = progress,
-                  steps = completedSteps,
-                  currentActivityResId = null,
-                )
-              }
+      val language = statsRepository.getStats().preferredLanguage
+      val result =
+        generatePuzzlesUseCase.execute(
+          language = language,
+          modelId = resolvedModelId,
+          onProgress = { successCount, batchSize ->
+            val progress = GenerationProgress(successCount, batchSize)
+            _state.update {
+              it.copy(
+                progress = progress,
+                steps = buildSteps(engineManager.engineState.value, progress),
+              )
             }
-            GenerationWorkState.FAILED -> {
-              if (!hasTriggered || !hasSeenRunning) return@collect
-              val expected = expectedWorkId
-              if (expected != null && info.workId != null && info.workId != expected) {
-                return@collect
-              }
-              _state.update {
-                it.copy(
-                  isGenerating = false,
-                  failed = true,
-                  steps = steps,
-                  currentActivityResId = null,
-                )
-              }
+          },
+        )
+
+      when {
+        result.batchSize == -1 -> {
+          // Already had enough puzzles — treat as success
+          val completedSteps =
+            buildSteps(engineManager.engineState.value, GenerationProgress()).map {
+              it.copy(status = StepStatus.COMPLETED, detail = null)
             }
-            GenerationWorkState.RUNNING -> {
-              hasSeenRunning = true
-              _state.update {
-                it.copy(
-                  isGenerating = true,
-                  isComplete = false,
-                  failed = false,
-                  progress = info.progress,
-                  steps = steps,
-                )
-              }
-            }
-            GenerationWorkState.IDLE -> {
-              if (hasTriggered) {
-                _state.update { it.copy(steps = steps) }
-              }
-            }
+          _state.update {
+            it.copy(
+              isGenerating = false,
+              isComplete = true,
+              steps = completedSteps,
+              currentActivityResId = null,
+            )
           }
         }
+        result.generatedCount == 0 -> {
+          _state.update {
+            it.copy(isGenerating = false, failed = true, currentActivityResId = null)
+          }
+        }
+        else -> {
+          val finalProgress = GenerationProgress(result.generatedCount, result.batchSize)
+          val completedSteps =
+            buildSteps(engineManager.engineState.value, finalProgress).map {
+              it.copy(status = StepStatus.COMPLETED, detail = null)
+            }
+          _state.update {
+            it.copy(
+              isGenerating = false,
+              isComplete = true,
+              progress = finalProgress,
+              steps = completedSteps,
+              currentActivityResId = null,
+            )
+          }
+        }
+      }
     }
   }
 
-  private fun deriveSteps(engineState: EngineState, info: GenerationInfo): List<GenerationStep> {
-    val progress = info.progress
+  private fun updateSteps(engineState: EngineState) {
+    _state.update { it.copy(steps = buildSteps(engineState, it.progress)) }
+  }
+
+  private fun buildSteps(
+    engineState: EngineState,
+    progress: GenerationProgress,
+  ): List<GenerationStep> {
     val hasGenerationProgress = progress.totalExpected > 0
 
     val verifyStatus =
@@ -196,15 +171,14 @@ constructor(
 
     val initStatus =
       when (engineState) {
-          is EngineState.Ready if hasGenerationProgress -> StepStatus.COMPLETED
-          is EngineState.Ready -> StepStatus.IN_PROGRESS
-          else -> StepStatus.PENDING
+        is EngineState.Ready if hasGenerationProgress -> StepStatus.COMPLETED
+        is EngineState.Ready -> StepStatus.IN_PROGRESS
+        else -> StepStatus.PENDING
       }
 
     val generateStatus =
       when {
         !hasGenerationProgress -> StepStatus.PENDING
-        info.state == GenerationWorkState.SUCCEEDED -> StepStatus.COMPLETED
         else -> StepStatus.IN_PROGRESS
       }
 
@@ -224,7 +198,8 @@ constructor(
   }
 
   fun cancelGeneration() {
-    generationScheduler.cancelGeneration()
+    // Cancellation is handled by the coroutine scope — the launch in triggerGeneration will be
+    // cancelled when the ViewModel is cleared or when the user navigates away.
     _state.update { it.copy(isGenerating = false, cancelled = true) }
   }
 

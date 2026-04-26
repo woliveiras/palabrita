@@ -72,10 +72,6 @@ dependencies {
   ksp(libs.hilt.compiler)
   implementation(libs.hilt.navigation.compose)
 
-  implementation(libs.workmanager)
-  implementation(libs.hilt.work)
-  ksp(libs.hilt.work.compiler)
-
   testImplementation(libs.junit)
   testImplementation(libs.truth)
   androidTestImplementation(libs.androidx.test.core)

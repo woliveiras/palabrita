@@ -1,6 +1,8 @@
 package com.woliveiras.palabrita.core.ai.di
 
 import com.woliveiras.palabrita.core.ai.AiModelRegistry
+import com.woliveiras.palabrita.core.ai.GeneratePuzzlesUseCase
+import com.woliveiras.palabrita.core.ai.GeneratePuzzlesUseCaseImpl
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.LlmEngineManagerImpl
 import com.woliveiras.palabrita.core.ai.LlmResponseParser
@@ -14,8 +16,6 @@ import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.ai.PuzzleGeneratorImpl
 import com.woliveiras.palabrita.core.ai.PuzzleValidator
 import com.woliveiras.palabrita.core.ai.PuzzleValidatorImpl
-import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationScheduler
-import com.woliveiras.palabrita.core.ai.worker.PuzzleGenerationSchedulerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -41,9 +41,9 @@ abstract class AiModule {
 
   @Binds
   @Singleton
-  abstract fun bindPuzzleGenerationScheduler(
-    impl: PuzzleGenerationSchedulerImpl
-  ): PuzzleGenerationScheduler
+  abstract fun bindGeneratePuzzlesUseCase(
+    impl: GeneratePuzzlesUseCaseImpl
+  ): GeneratePuzzlesUseCase
 
   companion object {
     @Provides @Singleton fun provideModelRegistry(): ModelRegistry = AiModelRegistry

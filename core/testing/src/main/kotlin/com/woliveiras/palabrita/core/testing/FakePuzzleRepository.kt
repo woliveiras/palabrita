@@ -4,13 +4,13 @@ import com.woliveiras.palabrita.core.model.Puzzle
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 
 class FakePuzzleRepository(private val puzzle: Puzzle? = null) : PuzzleRepository {
-  val markedPlayed: mutableListOf = mutableListOf<Long>()
+  val markedPlayed: MutableList<Long> = mutableListOf()
   var unplayedAiPuzzlesCleared = false
   var allAiPuzzlesDeleted = false
   var unplayedByLanguageDeleted: String? = null
   var allUnplayed = false
   var allDeleted = false
-  val savedPuzzles: mutableListOf = mutableListOf<Puzzle>()
+  val savedPuzzles: MutableList<Puzzle> = mutableListOf()
   var unplayedCount: Int = if (puzzle != null) 1 else 0
 
   override suspend fun getNextUnplayed(language: String): Puzzle? = puzzle
