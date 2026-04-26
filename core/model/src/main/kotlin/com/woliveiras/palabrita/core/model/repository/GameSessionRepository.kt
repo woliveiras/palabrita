@@ -19,6 +19,8 @@ interface GameSessionRepository {
 
   suspend fun getCurrentStreak(): Int
 
+  suspend fun countWinsByDifficulty(difficulty: Int, language: String): Int
+
   suspend fun getActiveSession(): GameSession?
 
   suspend fun hasActiveGame(): Boolean

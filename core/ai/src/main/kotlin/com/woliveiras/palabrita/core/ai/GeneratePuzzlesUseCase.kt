@@ -4,6 +4,7 @@ import android.util.Log
 import com.woliveiras.palabrita.core.model.GameRules
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
+import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,6 +40,7 @@ constructor(
   private val puzzleGenerator: PuzzleGenerator,
   private val engineManager: LlmEngineManager,
   private val appPreferences: AppPreferences,
+  private val gameSessionRepository: GameSessionRepository,
 ) : GeneratePuzzlesUseCase {
 
   override suspend fun execute(
@@ -57,7 +59,21 @@ constructor(
     val recentWords = puzzleRepository.getRecentWords(50)
 
     val cycle = appPreferences.generationCycle.first()
-    val (wordLength, batchSize) = GameRules.levelForCycle(cycle)
+    val level = GameRules.levelForCycle(cycle)
+    val wins = gameSessionRepository.countWinsByDifficulty(level.wordLength, language)
+
+    // Mastery gate: decide whether to advance or stay at current level
+    val (wordLength, batchSize) =
+      if (wins >= level.winsRequired) {
+        appPreferences.incrementGenerationCycle()
+        val nextLevel = GameRules.levelForCycle(cycle + 1)
+        Log.i(TAG, "Mastery met ($wins/${level.winsRequired} wins), advancing to ${nextLevel.wordLength}-letter words")
+        nextLevel.wordLength to nextLevel.batchSize
+      } else {
+        val remaining = (level.winsRequired - wins).coerceAtMost(level.batchSize)
+        Log.i(TAG, "Mastery not met ($wins/${level.winsRequired} wins), generating $remaining more ${level.wordLength}-letter words")
+        level.wordLength to remaining
+      }
 
     var generatedCount = 0
     try {
@@ -108,12 +124,6 @@ constructor(
 
       if (generatedCount < batchSize) {
         Log.w(TAG, "Gave up after $retryPass retry pass(es): $generatedCount/$batchSize generated")
-      }
-
-      // Only advance the cycle if at least half the batch was generated.
-      // Generating a single puzzle is not enough signal to graduate to the next difficulty tier.
-      if (generatedCount >= batchSize / 2) {
-        appPreferences.incrementGenerationCycle()
       }
     } catch (e: CancellationException) {
       throw e

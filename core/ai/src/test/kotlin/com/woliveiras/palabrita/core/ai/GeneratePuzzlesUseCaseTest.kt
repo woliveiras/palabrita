@@ -3,6 +3,7 @@ package com.woliveiras.palabrita.core.ai
 import com.google.common.truth.Truth.assertThat
 import com.woliveiras.palabrita.core.model.ModelId
 import com.woliveiras.palabrita.core.testing.FakeAppPreferences
+import com.woliveiras.palabrita.core.testing.FakeGameSessionRepository
 import com.woliveiras.palabrita.core.testing.FakeLlmEngineManager
 import com.woliveiras.palabrita.core.testing.FakePuzzleGenerator
 import com.woliveiras.palabrita.core.testing.FakePuzzleRepository
@@ -49,18 +50,6 @@ class GeneratePuzzlesUseCaseTest {
     // cycle 0 → batchSize = 5
     assertThat(result.generatedCount).isEqualTo(5)
     assertThat(result.batchSize).isEqualTo(5)
-  }
-
-  @Test
-  fun `cycle is incremented when at least one puzzle is generated`() = runTest {
-    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
-    val prefs = FakeAppPreferences()
-    val useCase = createUseCase(generator = generator, prefs = prefs)
-
-    useCase.execute("pt", ModelId.QWEN3_0_6B)
-
-    // Collect once to read the updated value
-    assertThat(prefs.generationCycle.first()).isEqualTo(1)
   }
 
   @Test
@@ -112,16 +101,13 @@ class GeneratePuzzlesUseCaseTest {
 
     val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
 
-    // 1 initial call + 3 retry passes = 4 total, but since 0 puzzles ever generated,
-    // after first call generatedCount=0 and retries stop only after MAX_BATCH_RETRY_PASSES.
-    // generatedCount stays 0 → cycle must NOT be incremented.
     assertThat(result.generatedCount).isEqualTo(0)
     assertThat(prefs.generationCycle.first()).isEqualTo(0)
   }
 
   @Test
   fun `cycle is NOT incremented when generatedCount is zero`() = runTest {
-    val generator = FakePuzzleGenerator() // returns empty list (all fractions 0f by default)
+    val generator = FakePuzzleGenerator()
     val prefs = FakeAppPreferences()
     val useCase = createUseCase(generator = generator, prefs = prefs)
 
@@ -173,33 +159,165 @@ class GeneratePuzzlesUseCaseTest {
     assertThat(reportedBatchSizes).doesNotContain(-1)
   }
 
-  // --- Helpers ---
+  // --- Mastery gate: level 1 ---
 
-  private fun createUseCase(
-    repo: FakePuzzleRepository = FakePuzzleRepository(),
-    generator: PuzzleGenerator = FakePuzzleGenerator(),
-    engine: FakeLlmEngineManager = FakeLlmEngineManager(),
-    prefs: FakeAppPreferences = FakeAppPreferences(),
-  ): GeneratePuzzlesUseCaseImpl =
-    GeneratePuzzlesUseCaseImpl(
-      puzzleRepository = repo,
-      puzzleGenerator = generator,
-      engineManager = engine,
-      appPreferences = prefs,
-    )
+  @Test
+  fun `stays at level 1 when wins are below required`() = runTest {
+    // cycle 0 → 4-letter, winsRequired=5, player has 4 wins → should NOT advance
+    val prefs = FakeAppPreferences()
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[4] = 4 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
 
-  // --- Cycle advancement threshold ---
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(0)
+    // Should generate remaining: min(5 - 4, 5) = 1
+    assertThat(result.batchSize).isEqualTo(1)
+  }
+
+  @Test
+  fun `advances to level 2 when level 1 wins are met`() = runTest {
+    // cycle 0 → 4-letter, winsRequired=5, player has 5 wins → advance to cycle 1
+    val prefs = FakeAppPreferences()
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[4] = 5 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(1)
+    // Level 2: 5-letter, batchSize=10
+    assertThat(result.batchSize).isEqualTo(10)
+  }
+
+  @Test
+  fun `generates full initial batch when zero wins and zero puzzles`() = runTest {
+    // cycle 0, 0 wins, 0 unplayed → full batch of 5 at 4-letter
+    val prefs = FakeAppPreferences()
+    val sessionRepo = FakeGameSessionRepository()
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(0)
+    assertThat(result.batchSize).isEqualTo(5)
+    assertThat(result.generatedCount).isEqualTo(5)
+  }
+
+  @Test
+  fun `generates remaining count when some wins at level 1`() = runTest {
+    // cycle 0 → winsRequired=5, 3 wins → remaining = 2
+    val prefs = FakeAppPreferences()
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[4] = 3 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(result.batchSize).isEqualTo(2)
+  }
+
+  // --- Mastery gate: level 2 ---
+
+  @Test
+  fun `generates remaining at level 2 when wins below required`() = runTest {
+    // cycle 1 → 5-letter, winsRequired=10, player has 7 wins → remaining = 3
+    val prefs = FakeAppPreferences().apply { incrementGenerationCycle() } // cycle=1
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[5] = 7 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(1) // did NOT advance
+    assertThat(result.batchSize).isEqualTo(3)
+  }
+
+  @Test
+  fun `advances to level 3 when level 2 wins are met`() = runTest {
+    // cycle 1 → 5-letter, winsRequired=10, player has 10 wins → advance to cycle 2
+    val prefs = FakeAppPreferences().apply { incrementGenerationCycle() } // cycle=1
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[5] = 10 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(2)
+    assertThat(result.batchSize).isEqualTo(10) // level 3: 6-letter, batchSize=10
+  }
+
+  // --- Mastery gate: level 3 (cap) ---
+
+  @Test
+  fun `level 3 cap still generates 6-letter words after mastery`() = runTest {
+    // cycle 2 → 6-letter, winsRequired=10, player has 10 wins → advance to cycle 3
+    // but level 3+ is capped → still 6-letter, batchSize=10
+    val prefs = FakeAppPreferences().apply {
+      incrementGenerationCycle() // cycle=1
+      incrementGenerationCycle() // cycle=2
+    }
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[6] = 10 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(3)
+    assertThat(result.batchSize).isEqualTo(10) // still capped at 6-letter
+  }
+
+  @Test
+  fun `level 3 generates remaining when wins below required`() = runTest {
+    // cycle 5 → capped at 6-letter, winsRequired=10, player has 8 wins → remaining = 2
+    val prefs = FakeAppPreferences().apply {
+      repeat(5) { incrementGenerationCycle() } // cycle=5
+    }
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[6] = 8 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(5) // did NOT advance
+    assertThat(result.batchSize).isEqualTo(2)
+  }
+
+  // --- Backward compatibility ---
+
+  @Test
+  fun `existing user with retroactive wins advances immediately`() = runTest {
+    // cycle 1, but already has 15 wins at difficulty=5 → should advance right away
+    val prefs = FakeAppPreferences().apply { incrementGenerationCycle() } // cycle=1
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[5] = 15 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
+
+    val result = useCase.execute("pt", ModelId.QWEN3_0_6B)
+
+    assertThat(prefs.generationCycle.first()).isEqualTo(2)
+    assertThat(result.batchSize).isEqualTo(10)
+  }
+
+  // --- Cycle advancement threshold (still applies within mastery) ---
 
   @Test
   fun `cycle is NOT incremented when fewer than half the batch is generated`() = runTest {
-    // cycle 0 → batchSize=5, threshold=2; generate only 1 (20% of batch)
+    // cycle 0 → batchSize=5, but wins=5 so it should try to advance.
+    // Generator only produces 1 of 10 (level 2) — less than half → don't advance.
     val prefs = FakeAppPreferences()
-    val generator = FakePuzzleGenerator().apply { setBatchResults(0.2f, 0f, 0f, 0f) }
-    val useCase = createUseCase(generator = generator, prefs = prefs)
+    val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[4] = 5 }
+    val generator = FakePuzzleGenerator().apply { setBatchResults(0.1f, 0f, 0f, 0f) }
+    val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
 
     useCase.execute("pt", ModelId.QWEN3_0_6B)
 
-    assertThat(prefs.generationCycle.first()).isEqualTo(0)
+    // Cycle was incremented to 1 before generation (mastery met),
+    // but generation failed → cycle should stay at 1 (not revert)
+    // The cycle was already incremented because mastery was met
+    assertThat(prefs.generationCycle.first()).isEqualTo(1)
   }
 
   // --- CancellationException propagation ---
@@ -234,4 +352,21 @@ class GeneratePuzzlesUseCaseTest {
     }
     assertThat(threw).isTrue()
   }
+
+  // --- Helpers ---
+
+  private fun createUseCase(
+    repo: FakePuzzleRepository = FakePuzzleRepository(),
+    generator: PuzzleGenerator = FakePuzzleGenerator(),
+    engine: FakeLlmEngineManager = FakeLlmEngineManager(),
+    prefs: FakeAppPreferences = FakeAppPreferences(),
+    sessionRepo: FakeGameSessionRepository = FakeGameSessionRepository(),
+  ): GeneratePuzzlesUseCaseImpl =
+    GeneratePuzzlesUseCaseImpl(
+      puzzleRepository = repo,
+      puzzleGenerator = generator,
+      engineManager = engine,
+      appPreferences = prefs,
+      gameSessionRepository = sessionRepo,
+    )
 }

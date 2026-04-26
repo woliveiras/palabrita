@@ -6,6 +6,9 @@ import com.woliveiras.palabrita.core.model.repository.GameSessionRepository
 class FakeGameSessionRepository : GameSessionRepository {
   val sessions = mutableListOf<GameSession>()
 
+  /** Pre-configure wins per difficulty for mastery gate tests. Key = wordLength (difficulty). */
+  val winsPerDifficulty = mutableMapOf<Int, Int>()
+
   override suspend fun create(session: GameSession): Long {
     sessions.add(session)
     return session.id
@@ -42,6 +45,9 @@ class FakeGameSessionRepository : GameSessionRepository {
       .sortedByDescending { it.completedAt }
       .takeWhile { it.won }
       .count()
+
+  override suspend fun countWinsByDifficulty(difficulty: Int, language: String): Int =
+    winsPerDifficulty[difficulty] ?: 0
 
   override suspend fun deleteAll() {
     sessions.clear()

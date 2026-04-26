@@ -31,6 +31,18 @@ interface GameSessionDao {
 
   @Query(
     """
+    SELECT COUNT(*) FROM game_sessions gs
+    INNER JOIN puzzles p ON gs.puzzleId = p.id
+    WHERE gs.won = 1
+      AND gs.completedAt IS NOT NULL
+      AND p.difficulty = :difficulty
+      AND p.language = :language
+    """
+  )
+  suspend fun countWinsByDifficulty(difficulty: Int, language: String): Int
+
+  @Query(
+    """
     UPDATE game_sessions SET
       attempts = :attempts,
       completedAt = :completedAt,

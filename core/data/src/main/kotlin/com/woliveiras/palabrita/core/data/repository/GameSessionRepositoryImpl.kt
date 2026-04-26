@@ -41,6 +41,9 @@ class GameSessionRepositoryImpl @Inject constructor(private val dao: GameSession
   override suspend fun getCurrentStreak(): Int =
     dao.getCompletedSessionsDesc().takeWhile { it.won }.count()
 
+  override suspend fun countWinsByDifficulty(difficulty: Int, language: String): Int =
+    dao.countWinsByDifficulty(difficulty, language)
+
   override suspend fun getActiveSession(): GameSession? = dao.getActiveSession()?.toDomain()
 
   override suspend fun hasActiveGame(): Boolean = dao.hasActiveGame()

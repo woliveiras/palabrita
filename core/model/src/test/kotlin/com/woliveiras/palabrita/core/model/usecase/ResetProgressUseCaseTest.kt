@@ -74,6 +74,8 @@ class ResetProgressUseCaseTest {
 
     override suspend fun getCurrentStreak(): Int = 0
 
+    override suspend fun countWinsByDifficulty(difficulty: Int, language: String): Int = 0
+
     override suspend fun deleteAll() {
       sessions.clear()
     }
