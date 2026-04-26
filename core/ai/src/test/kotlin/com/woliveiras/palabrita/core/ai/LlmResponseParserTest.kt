@@ -143,4 +143,106 @@ class LlmResponseParserTest {
     val puzzle = (result as ParseResult.Success).data
     assertThat(puzzle.word).isEqualTo("ao")
   }
+
+  // --- parseHints: valid responses ---
+
+  @Test
+  fun `parseHints parses standard format`() {
+    val raw = "hints: A vague hint | A medium hint | A specific hint"
+
+    val result = parser.parseHints(raw)
+
+    assertThat(result).isInstanceOf(ParseResult.Success::class.java)
+    val hints = (result as ParseResult.Success).data
+    assertThat(hints).hasSize(3)
+    assertThat(hints[0]).isEqualTo("A vague hint")
+    assertThat(hints[2]).isEqualTo("A specific hint")
+  }
+
+  @Test
+  fun `parseHints parses Portuguese key dicas`() {
+    val raw = "dicas: Uma dica vaga | Uma dica média | Uma dica específica"
+
+    val result = parser.parseHints(raw)
+
+    assertThat(result).isInstanceOf(ParseResult.Success::class.java)
+    assertThat((result as ParseResult.Success).data).hasSize(3)
+  }
+
+  @Test
+  fun `parseHints parses Spanish key pistas`() {
+    val raw = "pistas: Pista vaga | Pista media | Pista específica"
+
+    val result = parser.parseHints(raw)
+
+    assertThat(result).isInstanceOf(ParseResult.Success::class.java)
+    assertThat((result as ParseResult.Success).data).hasSize(3)
+  }
+
+  @Test
+  fun `parseHints extracts hints from noisy response`() {
+    val raw =
+      """
+      Sure! Here are the hints for the word:
+      hints: Something vague | More details | Very specific
+      Hope that helps!
+      """
+        .trimIndent()
+
+    val result = parser.parseHints(raw)
+
+    assertThat(result).isInstanceOf(ParseResult.Success::class.java)
+    assertThat((result as ParseResult.Success).data).hasSize(3)
+  }
+
+  @Test
+  fun `parseHints strips markdown fences`() {
+    val raw =
+      """
+      ```
+      hints: Hint one | Hint two | Hint three
+      ```
+      """
+        .trimIndent()
+
+    val result = parser.parseHints(raw)
+
+    assertThat(result).isInstanceOf(ParseResult.Success::class.java)
+    assertThat((result as ParseResult.Success).data).hasSize(3)
+  }
+
+  // --- parseHints: invalid responses ---
+
+  @Test
+  fun `parseHints returns error for empty response`() {
+    val result = parser.parseHints("")
+
+    assertThat(result).isInstanceOf(ParseResult.Error::class.java)
+  }
+
+  @Test
+  fun `parseHints returns error for response without hints key`() {
+    val result = parser.parseHints("Here is something random without any hints format")
+
+    assertThat(result).isInstanceOf(ParseResult.Error::class.java)
+  }
+
+  @Test
+  fun `parseHints returns error for too few hints`() {
+    val raw = "hints: Only one hint"
+
+    val result = parser.parseHints(raw)
+
+    assertThat(result).isInstanceOf(ParseResult.Error::class.java)
+  }
+
+  @Test
+  fun `parseHints handles more than 3 hints`() {
+    val raw = "hints: One | Two | Three | Four"
+
+    val result = parser.parseHints(raw)
+
+    assertThat(result).isInstanceOf(ParseResult.Success::class.java)
+    assertThat((result as ParseResult.Success).data).hasSize(4)
+  }
 }

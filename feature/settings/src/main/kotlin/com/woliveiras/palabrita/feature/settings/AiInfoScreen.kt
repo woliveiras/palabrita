@@ -171,7 +171,7 @@ fun AiInfoScreen(
     PromptCard(
       icon = Icons.Rounded.Psychology,
       title = stringResource(CommonR.string.ai_info_system_prompt),
-      content = state.puzzleSystemPrompt,
+      content = state.hintSystemPrompt,
     )
 
     Spacer(Modifier.height(12.dp))
@@ -179,7 +179,7 @@ fun AiInfoScreen(
     PromptCard(
       icon = Icons.Rounded.Code,
       title = stringResource(CommonR.string.ai_info_puzzle_prompt),
-      content = state.puzzleSamplePrompt,
+      content = state.hintSamplePrompt,
     )
 
     Spacer(Modifier.height(12.dp))

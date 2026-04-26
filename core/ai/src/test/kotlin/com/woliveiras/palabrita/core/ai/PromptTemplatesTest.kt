@@ -6,88 +6,35 @@ import org.junit.Test
 class PromptTemplatesTest {
 
   @Test
-  fun `puzzle system prompt is in english`() {
-    val prompt = PromptTemplates.puzzleSystemPrompt()
-    assertThat(prompt).contains("word generator")
-    assertThat(prompt).contains("function")
+  fun `hint system prompt contains rules`() {
+    val prompt = PromptTemplates.hintSystemPrompt()
+    assertThat(prompt).contains("hints")
+    assertThat(prompt).contains("3")
   }
 
   @Test
-  fun `puzzle system prompt does not mention category or difficulty`() {
-    val prompt = PromptTemplates.puzzleSystemPrompt()
-    assertThat(prompt).doesNotContain("category")
-    assertThat(prompt).doesNotContain("difficulty")
+  fun `hint system prompt does not ask for word generation`() {
+    val prompt = PromptTemplates.hintSystemPrompt()
+    assertThat(prompt).doesNotContain("generate a word")
+    assertThat(prompt).doesNotContain("JSON")
   }
 
   @Test
-  fun `puzzle user prompt large includes language display name`() {
-    val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "pt",
-        wordLength = 6,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("Brazilian Portuguese")
-    assertThat(prompt).contains("6 letters")
+  fun `hint user prompt includes target word`() {
+    val prompt = PromptTemplates.hintUserPrompt(word = "mesa", language = "pt")
+    assertThat(prompt).contains("MESA")
   }
 
   @Test
-  fun `puzzle user prompt large includes recent words`() {
-    val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "pt",
-        wordLength = 5,
-        recentWords = listOf("gatos", "campo"),
-      )
-    assertThat(prompt).contains("gatos")
-    assertThat(prompt).contains("campo")
+  fun `hint user prompt includes language`() {
+    val prompt = PromptTemplates.hintUserPrompt(word = "table", language = "en")
+    assertThat(prompt).contains("English")
   }
 
   @Test
-  fun `puzzle user prompt large does not mention category or difficulty`() {
-    val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "pt",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).doesNotContain("category")
-    assertThat(prompt).doesNotContain("difficulty")
-  }
-
-  @Test
-  fun `puzzle prompt compact includes JSON schema`() {
-    val prompt =
-      PromptTemplates.puzzlePromptCompact(
-        language = "en",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("\"word\"")
-    assertThat(prompt).contains("\"hints\"")
-    assertThat(prompt).contains("JSON")
-  }
-
-  @Test
-  fun `puzzle prompt compact includes language display name`() {
-    val prompt =
-      PromptTemplates.puzzlePromptCompact(
-        language = "es",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("Spanish")
-  }
-
-  @Test
-  fun `puzzle prompt compact asks for 3 hints`() {
-    val prompt =
-      PromptTemplates.puzzlePromptCompact(
-        language = "pt",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("3 progressive hints")
+  fun `hint user prompt includes bad hint examples`() {
+    val prompt = PromptTemplates.hintUserPrompt(word = "mesa", language = "pt")
+    assertThat(prompt).contains("Bad hints")
   }
 
   @Test
@@ -131,69 +78,14 @@ class PromptTemplatesTest {
   }
 
   @Test
-  fun `puzzle user prompt large uses Brazilian Portuguese for pt`() {
-    val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "pt",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("Brazilian Portuguese")
-    assertThat(prompt).doesNotContain("Output language for values: pt\n")
-  }
-
-  @Test
-  fun `puzzle user prompt large uses English for en`() {
-    val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "en",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("English")
-  }
-
-  @Test
-  fun `puzzle user prompt large uses Spanish for es`() {
-    val prompt =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "es",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("Spanish")
-  }
-
-  @Test
-  fun `puzzle prompt compact uses Brazilian Portuguese for pt`() {
-    val prompt =
-      PromptTemplates.puzzlePromptCompact(
-        language = "pt",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
+  fun `hint user prompt uses Brazilian Portuguese for pt`() {
+    val prompt = PromptTemplates.hintUserPrompt(word = "mesa", language = "pt")
     assertThat(prompt).contains("Brazilian Portuguese")
   }
 
   @Test
-  fun `puzzle prompt compact uses English for en`() {
-    val prompt =
-      PromptTemplates.puzzlePromptCompact(
-        language = "en",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(prompt).contains("English")
-  }
-
-  @Test
-  fun `puzzle prompt compact uses Spanish for es`() {
-    val prompt =
-      PromptTemplates.puzzlePromptCompact(
-        language = "es",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
+  fun `hint user prompt uses Spanish for es`() {
+    val prompt = PromptTemplates.hintUserPrompt(word = "mesa", language = "es")
     assertThat(prompt).contains("Spanish")
   }
 
@@ -201,25 +93,5 @@ class PromptTemplatesTest {
   fun `chat system prompt uses Brazilian Portuguese for pt`() {
     val prompt = PromptTemplates.chatSystemPrompt(word = "gatos", language = "pt")
     assertThat(prompt).contains("Brazilian Portuguese")
-  }
-
-  // --- Accent support ---
-
-  @Test
-  fun `puzzle prompts do not restrict accented words`() {
-    val promptLarge =
-      PromptTemplates.puzzleUserPromptLarge(
-        language = "pt",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    val promptCompact =
-      PromptTemplates.puzzlePromptCompact(
-        language = "es",
-        wordLength = 5,
-        recentWords = emptyList(),
-      )
-    assertThat(promptLarge).doesNotContain("no accents")
-    assertThat(promptCompact).doesNotContain("no accents")
   }
 }

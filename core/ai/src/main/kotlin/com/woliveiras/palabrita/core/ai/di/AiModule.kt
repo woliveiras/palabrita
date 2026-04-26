@@ -3,6 +3,8 @@ package com.woliveiras.palabrita.core.ai.di
 import com.woliveiras.palabrita.core.ai.AiModelRegistry
 import com.woliveiras.palabrita.core.ai.GeneratePuzzlesUseCase
 import com.woliveiras.palabrita.core.ai.GeneratePuzzlesUseCaseImpl
+import com.woliveiras.palabrita.core.ai.HintFallbackProvider
+import com.woliveiras.palabrita.core.ai.HintFallbackProviderImpl
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.LlmEngineManagerImpl
 import com.woliveiras.palabrita.core.ai.LlmResponseParser
@@ -16,6 +18,8 @@ import com.woliveiras.palabrita.core.ai.PuzzleGenerator
 import com.woliveiras.palabrita.core.ai.PuzzleGeneratorImpl
 import com.woliveiras.palabrita.core.ai.PuzzleValidator
 import com.woliveiras.palabrita.core.ai.PuzzleValidatorImpl
+import com.woliveiras.palabrita.core.ai.WordListProvider
+import com.woliveiras.palabrita.core.ai.WordListProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -44,6 +48,10 @@ abstract class AiModule {
   abstract fun bindGeneratePuzzlesUseCase(
     impl: GeneratePuzzlesUseCaseImpl
   ): GeneratePuzzlesUseCase
+
+  @Binds abstract fun bindWordListProvider(impl: WordListProviderImpl): WordListProvider
+
+  @Binds abstract fun bindHintFallbackProvider(impl: HintFallbackProviderImpl): HintFallbackProvider
 
   companion object {
     @Provides @Singleton fun provideModelRegistry(): ModelRegistry = AiModelRegistry

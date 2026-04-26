@@ -98,8 +98,45 @@ class LlmResponseParserImpl @Inject constructor() : LlmResponseParser {
     } catch (_: Exception) {
       null
     }
+
+  /**
+   * Parses a hint-only response from the LLM. Expected format:
+   * ```
+   * hints: hint 1 | hint 2 | hint 3
+   * ```
+   * Tolerates extra prose lines, markdown fences, and localized keys.
+   */
+  override fun parseHints(rawResponse: String): ParseResult<List<String>> {
+    if (rawResponse.isBlank()) {
+      return ParseResult.Error("empty response", rawResponse)
+    }
+
+    val sanitized = sanitizeUtf8(rawResponse)
+    val cleaned = stripCodeFences(sanitized)
+
+    // Look for a line starting with a hints-like key followed by colon
+    val hintsKeys = setOf("hints", "dicas", "pistas", "clues", "indices", "consejos")
+    for (line in cleaned.lines()) {
+      val trimmed = line.trim()
+      val colonIndex = trimmed.indexOf(':')
+      if (colonIndex < 0) continue
+
+      val key = trimmed.substring(0, colonIndex).trim().lowercase()
+      if (key in hintsKeys) {
+        val value = trimmed.substring(colonIndex + 1).trim()
+        val hints = value.split("|").map { it.trim() }.filter { it.isNotBlank() }
+        if (hints.size >= GameRules.MIN_HINTS) {
+          return ParseResult.Success(hints)
+        }
+      }
+    }
+
+    return ParseResult.Error("could not parse hints from response", rawResponse)
+  }
 }
 
 interface LlmResponseParser {
   fun parsePuzzle(rawResponse: String): ParseResult<PuzzleResponse>
+
+  fun parseHints(rawResponse: String): ParseResult<List<String>>
 }

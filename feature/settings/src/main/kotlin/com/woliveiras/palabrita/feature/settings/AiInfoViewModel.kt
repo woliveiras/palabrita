@@ -19,8 +19,8 @@ data class AiInfoState(
   val modelInfo: AiModelInfo? = null,
   val modelId: ModelId = ModelId.NONE,
   val modelPath: String? = null,
-  val puzzleSystemPrompt: String = "",
-  val puzzleSamplePrompt: String = "",
+  val hintSystemPrompt: String = "",
+  val hintSamplePrompt: String = "",
   val chatSamplePrompt: String = "",
 )
 
@@ -49,12 +49,11 @@ constructor(
             modelInfo = info,
             modelId = config.modelId,
             modelPath = config.modelPath,
-            puzzleSystemPrompt = promptProvider.puzzleSystemPrompt(),
-            puzzleSamplePrompt =
-              promptProvider.puzzleUserPromptLarge(
+            hintSystemPrompt = promptProvider.hintSystemPrompt(),
+            hintSamplePrompt =
+              promptProvider.hintUserPrompt(
+                word = "gatos",
                 language = "pt",
-                wordLength = 5,
-                recentWords = listOf("gatos", "mesa"),
               ),
             chatSamplePrompt = promptProvider.chatSystemPrompt(word = "gatos", language = "pt"),
           )

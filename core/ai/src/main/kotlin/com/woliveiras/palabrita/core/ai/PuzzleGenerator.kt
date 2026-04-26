@@ -25,14 +25,25 @@ interface PuzzleGenerator {
   ): List<Puzzle>
 }
 
+/**
+ * Hybrid puzzle generator: words come from a curated [WordListProvider], the LLM only
+ * generates hints. This eliminates greedy-decoding issues (invented words, wrong length,
+ * loops) while keeping the "AI-generated" feel for hints.
+ *
+ * If the LLM fails to produce valid hints after [GameRules.MAX_GENERATION_RETRIES] attempts,
+ * a [HintFallbackProvider] supplies generic template-based hints so that puzzle generation
+ * never fails.
+ */
 @Singleton
 class PuzzleGeneratorImpl
 @Inject
 constructor(
   private val engineManager: LlmEngineManager,
-  private val parser: LlmResponseParser,
+  private val hintParser: LlmResponseParser,
   private val validator: PuzzleValidator,
   private val promptProvider: PromptProvider,
+  private val wordListProvider: WordListProvider,
+  private val hintFallback: HintFallbackProvider,
 ) : PuzzleGenerator {
 
   private val _activity = MutableStateFlow<GenerationActivity?>(null)
@@ -49,169 +60,90 @@ constructor(
   ): List<Puzzle> {
     require(engineManager.isReady()) { "Engine not ready" }
 
-    val lengthRange = wordLength..wordLength
+    val words = wordListProvider.pickWords(language, wordLength, count, allExistingWords)
     val generated = mutableListOf<Puzzle>()
     val usedWords = allExistingWords.toMutableSet()
 
-    Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count")
+    Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count words=${words.size}")
 
-    val systemPrompt = promptProvider.puzzleSystemPrompt()
-    var puzzleIndex = 0
+    val systemPrompt = promptProvider.hintSystemPrompt()
 
     try {
-      while (puzzleIndex < count) {
-        val remaining = count - puzzleIndex
-        val chunkSize = remaining.coerceAtMost(SESSION_ROTATION)
+      for ((index, word) in words.withIndex()) {
+        _activity.value = GenerationActivity.CREATING
+        val normalizedWord = TextNormalizer.normalizeToAscii(word)
 
-        engineManager.createChatSession(systemPrompt).use { session ->
-          repeat(chunkSize) {
-            val i = puzzleIndex++
-            val puzzle =
-              generateSinglePuzzle(
-                session = session,
-                language = language,
-                wordLength = wordLength,
-                lengthRange = lengthRange,
-                recentWords = recentWords,
-                usedWords = usedWords,
-                modelId = modelId,
-              )
-            if (puzzle != null) {
-              generated.add(puzzle)
-              usedWords.add(puzzle.word)
-              Log.i(TAG, "  puzzle ${i + 1}/$count OK: '${puzzle.word}'")
-            } else {
-              Log.w(
-                TAG,
-                "  puzzle ${i + 1}/$count FAILED after ${GameRules.MAX_GENERATION_RETRIES} retries",
-              )
-            }
-            onPuzzleAttempted(generated.size)
-          }
-        }
-        Log.d(TAG, "  session rotated after $chunkSize puzzles (${generated.size} total OK)")
+        val hints = generateHintsForWord(systemPrompt, word, language, normalizedWord)
+
+        val puzzle =
+          Puzzle(
+            word = normalizedWord,
+            wordDisplay = word.uppercase(),
+            language = language,
+            difficulty = wordLength,
+            category = "",
+            hints = hints,
+            source = PuzzleSource.AI,
+            generatedAt = System.currentTimeMillis(),
+          )
+        generated.add(puzzle)
+        usedWords.add(normalizedWord)
+        _activity.value = GenerationActivity.ACCEPTED
+        Log.i(TAG, "  puzzle ${index + 1}/${words.size} OK: '$normalizedWord' hints=$hints")
+        onPuzzleAttempted(generated.size)
       }
     } finally {
-      // F3.5: Always clear activity state, even if an exception is thrown mid-batch.
       _activity.value = null
     }
 
-    Log.i(TAG, "generateBatch: done, ${generated.size}/$count succeeded")
+    Log.i(TAG, "generateBatch: done, ${generated.size}/${words.size} succeeded")
     return generated
   }
 
-  private suspend fun generateSinglePuzzle(
-    session: LlmSession,
+  /**
+   * Asks the LLM to generate hints for a given word. Retries up to [GameRules.MAX_GENERATION_RETRIES]
+   * times. If all attempts fail, returns fallback hints from [HintFallbackProvider].
+   */
+  private suspend fun generateHintsForWord(
+    systemPrompt: String,
+    word: String,
     language: String,
-    wordLength: Int,
-    lengthRange: IntRange,
-    recentWords: List<String>,
-    usedWords: Set<String>,
-    modelId: ModelId,
-  ): Puzzle? {
-    // F3.1: Accumulate words rejected within this slot so the prompt's avoid-list grows
-    // across retries. Without this the LLM may reproduce the same rejected word.
-    val localRejectedWords = mutableSetOf<String>()
-    var lastFailureReason: String? = null
+    normalizedWord: String,
+  ): List<String> {
     repeat(GameRules.MAX_GENERATION_RETRIES) { attempt ->
-      _activity.value = GenerationActivity.CREATING
-      val userPrompt =
-        buildUserPrompt(
-          modelId,
-          language,
-          wordLength,
-          recentWords,
-          usedWords + localRejectedWords,
-          attempt,
-          lastFailureReason,
-        )
-      val rawResponse = session.sendMessage(userPrompt)
-      Log.d(
-        TAG,
-        "  attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(300)}",
-      )
-      _activity.value = GenerationActivity.VALIDATING
-      val parseResult = parser.parsePuzzle(rawResponse)
-
-      when (parseResult) {
-        is ParseResult.Success -> {
-          val normalizedWord = TextNormalizer.normalizeToAscii(parseResult.data.word)
-          val validation = validator.validate(parseResult.data, usedWords, lengthRange)
-          when (validation) {
-            is ValidationResult.Valid -> {
-              Log.d(TAG, "  attempt $attempt VALID: '${parseResult.data.word}'")
-              _activity.value = GenerationActivity.ACCEPTED
-              return puzzleFromResponse(parseResult.data, language, wordLength)
-            }
-            is ValidationResult.Invalid -> {
-              localRejectedWords.add(normalizedWord)
-              lastFailureReason = validation.reasons.joinToString("; ")
-              Log.w(TAG, "  attempt $attempt validation failed: ${validation.reasons}")
-              _activity.value = GenerationActivity.VALIDATION_FAILED
-            }
+      try {
+        val userPrompt = promptProvider.hintUserPrompt(word, language)
+        val rawResponse =
+          engineManager.createChatSession(systemPrompt).use { session ->
+            session.sendMessage(userPrompt)
           }
+        Log.d(TAG, "  hint attempt $attempt response (${rawResponse.length} chars): ${rawResponse.take(200)}")
+
+        val parseResult = hintParser.parseHints(rawResponse)
+        if (parseResult is ParseResult.Success) {
+          val hints = parseResult.data
+          // Validate hints don't contain the word
+          val leaksWord = hints.any { hint ->
+            hint.lowercase().contains(normalizedWord)
+          }
+          if (!leaksWord && hints.size >= GameRules.MIN_HINTS) {
+            Log.d(TAG, "  hint attempt $attempt VALID")
+            return hints.take(GameRules.MIN_HINTS)
+          }
+          Log.w(TAG, "  hint attempt $attempt invalid: leaksWord=$leaksWord size=${hints.size}")
+        } else {
+          Log.w(TAG, "  hint attempt $attempt parse failed: ${(parseResult as ParseResult.Error).reason}")
         }
-        is ParseResult.Error -> {
-          lastFailureReason = "JSON parse error: ${parseResult.reason}"
-          Log.w(TAG, "  attempt $attempt parse failed: ${parseResult.reason}")
-          _activity.value = GenerationActivity.VALIDATION_FAILED
-        }
+      } catch (e: Exception) {
+        Log.w(TAG, "  hint attempt $attempt exception: ${e.message}")
       }
     }
-    _activity.value = GenerationActivity.FAILED_RETRYING
-    return null
-  }
 
-  private fun buildUserPrompt(
-    modelId: ModelId,
-    language: String,
-    wordLength: Int,
-    recentWords: List<String>,
-    usedWords: Set<String>,
-    attempt: Int,
-    failureReason: String? = null,
-  ): String {
-    val avoidWords = (recentWords + usedWords).distinct().takeLast(30)
-    val base =
-      when (modelId) {
-        ModelId.GEMMA4_E4B,
-        ModelId.GEMMA4_E2B -> promptProvider.puzzleUserPromptLarge(language, wordLength, avoidWords)
-        ModelId.PHI4_MINI,
-        ModelId.DEEPSEEK_R1_1_5B,
-        ModelId.QWEN2_5_1_5B,
-        ModelId.QWEN3_0_6B -> promptProvider.puzzlePromptCompact(language, wordLength, avoidWords)
-        ModelId.NONE -> throw IllegalArgumentException("No model selected")
-      }
-    return if (attempt > 0 && failureReason != null) {
-      "$base\n\nYour previous response was REJECTED for this reason: $failureReason. Fix exactly that issue and choose a DIFFERENT word."
-    } else if (attempt > 0) {
-      "$base\n\nThe previous response was invalid. Generate a DIFFERENT word."
-    } else {
-      base
-    }
+    Log.w(TAG, "  all hint attempts failed for '$word', using fallback")
+    return hintFallback.fallbackHints(word, language)
   }
-
-  private fun puzzleFromResponse(
-    response: PuzzleResponse,
-    language: String,
-    wordLength: Int,
-  ): Puzzle =
-    Puzzle(
-      word = TextNormalizer.normalizeToAscii(response.word),
-      wordDisplay = response.word.uppercase(),
-      language = language,
-      difficulty = wordLength,
-      category = "",
-      hints = response.hints.take(GameRules.MIN_HINTS),
-      source = PuzzleSource.AI,
-      generatedAt = System.currentTimeMillis(),
-    )
 
   companion object {
     private const val TAG = "PuzzleGenerator"
-    // Rotate LLM sessions every N puzzles to keep context manageable.
-    // Must not leave a remainder of 1 for any expected batch size (5, 10).
-    // SESSION_ROTATION=5 → batchSize=5: [5], batchSize=10: [5,5]. No isolated single-puzzle sessions.
-    private const val SESSION_ROTATION = 5
   }
 }
