@@ -255,10 +255,11 @@ class GeneratePuzzlesUseCaseTest {
   fun `level 3 cap still generates 6-letter words after mastery`() = runTest {
     // cycle 2 → 6-letter, winsRequired=10, player has 10 wins → advance to cycle 3
     // but level 3+ is capped → still 6-letter, batchSize=10
-    val prefs = FakeAppPreferences().apply {
-      incrementGenerationCycle() // cycle=1
-      incrementGenerationCycle() // cycle=2
-    }
+    val prefs =
+      FakeAppPreferences().apply {
+        incrementGenerationCycle() // cycle=1
+        incrementGenerationCycle() // cycle=2
+      }
     val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[6] = 10 }
     val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
     val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)
@@ -272,9 +273,10 @@ class GeneratePuzzlesUseCaseTest {
   @Test
   fun `level 3 generates remaining when wins below required`() = runTest {
     // cycle 5 → capped at 6-letter, winsRequired=10, player has 8 wins → remaining = 2
-    val prefs = FakeAppPreferences().apply {
-      repeat(5) { incrementGenerationCycle() } // cycle=5
-    }
+    val prefs =
+      FakeAppPreferences().apply {
+        repeat(5) { incrementGenerationCycle() } // cycle=5
+      }
     val sessionRepo = FakeGameSessionRepository().apply { winsPerDifficulty[6] = 8 }
     val generator = FakePuzzleGenerator().apply { setBatchResults(1.0f) }
     val useCase = createUseCase(generator = generator, prefs = prefs, sessionRepo = sessionRepo)

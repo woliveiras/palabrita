@@ -68,11 +68,17 @@ constructor(
       if (wins >= level.winsRequired) {
         appPreferences.incrementGenerationCycle()
         val nextLevel = GameRules.levelForCycle(cycle + 1)
-        Log.i(TAG, "Mastery met ($wins/${level.winsRequired} wins), advancing to ${nextLevel.wordLength}-letter words")
+        Log.i(
+          TAG,
+          "Mastery met ($wins/${level.winsRequired} wins), advancing to ${nextLevel.wordLength}-letter words",
+        )
         nextLevel.wordLength to nextLevel.batchSize
       } else {
         val remaining = (level.winsRequired - wins).coerceAtMost(level.batchSize)
-        Log.i(TAG, "Mastery not met ($wins/${level.winsRequired} wins), generating $remaining more ${level.wordLength}-letter words")
+        Log.i(
+          TAG,
+          "Mastery not met ($wins/${level.winsRequired} wins), generating $remaining more ${level.wordLength}-letter words",
+        )
         level.wordLength to remaining
       }
 

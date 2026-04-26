@@ -66,7 +66,10 @@ constructor(
     val generated = mutableListOf<Puzzle>()
     val usedWords = allExistingWords.toMutableSet()
 
-    Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count words=${words.size} hintLang=$hintLanguage")
+    Log.i(
+      TAG,
+      "generateBatch: wordLength=$wordLength count=$count words=${words.size} hintLang=$hintLanguage",
+    )
 
     val systemPrompt = promptProvider.hintSystemPrompt(hintLanguage)
 
