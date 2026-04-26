@@ -40,6 +40,7 @@ class FakePuzzleGenerator : PuzzleGenerator {
     recentWords: List<String>,
     allExistingWords: Set<String>,
     modelId: ModelId,
+    hintLanguage: String,
     onPuzzleAttempted: suspend (successCount: Int) -> Unit,
   ): List<Puzzle> {
     val fraction = batchResults.getOrNull(callCount) ?: 0f

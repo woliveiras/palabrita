@@ -57,6 +57,7 @@ constructor(
 
     val existingWords = puzzleRepository.getAllGeneratedWords()
     val recentWords = puzzleRepository.getRecentWords(50)
+    val hintLanguage = appPreferences.appLanguage.first()
 
     val cycle = appPreferences.generationCycle.first()
     val level = GameRules.levelForCycle(cycle)
@@ -85,6 +86,7 @@ constructor(
           recentWords = recentWords,
           allExistingWords = existingWords,
           modelId = modelId,
+          hintLanguage = hintLanguage,
         ) { successCount ->
           onProgress(successCount, batchSize)
         }
@@ -113,6 +115,7 @@ constructor(
             recentWords = updatedRecentWords,
             allExistingWords = updatedExistingWords,
             modelId = modelId,
+            hintLanguage = hintLanguage,
           ) { successCount ->
             onProgress(countBeforeRetry + successCount, batchSize)
           }

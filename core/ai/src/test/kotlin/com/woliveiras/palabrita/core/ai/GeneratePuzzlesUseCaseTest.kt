@@ -337,6 +337,7 @@ class GeneratePuzzlesUseCaseTest {
           recentWords: List<String>,
           allExistingWords: Set<String>,
           modelId: ModelId,
+          hintLanguage: String,
           onPuzzleAttempted: suspend (Int) -> Unit,
         ): List<com.woliveiras.palabrita.core.model.Puzzle> {
           throw kotlinx.coroutines.CancellationException("test cancel")

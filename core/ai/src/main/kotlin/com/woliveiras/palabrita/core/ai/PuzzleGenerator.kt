@@ -21,6 +21,7 @@ interface PuzzleGenerator {
     recentWords: List<String>,
     allExistingWords: Set<String>,
     modelId: ModelId,
+    hintLanguage: String = language,
     onPuzzleAttempted: suspend (successCount: Int) -> Unit = {},
   ): List<Puzzle>
 }
@@ -56,6 +57,7 @@ constructor(
     recentWords: List<String>,
     allExistingWords: Set<String>,
     modelId: ModelId,
+    hintLanguage: String,
     onPuzzleAttempted: suspend (successCount: Int) -> Unit,
   ): List<Puzzle> {
     require(engineManager.isReady()) { "Engine not ready" }
@@ -64,16 +66,16 @@ constructor(
     val generated = mutableListOf<Puzzle>()
     val usedWords = allExistingWords.toMutableSet()
 
-    Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count words=${words.size}")
+    Log.i(TAG, "generateBatch: wordLength=$wordLength count=$count words=${words.size} hintLang=$hintLanguage")
 
-    val systemPrompt = promptProvider.hintSystemPrompt(language)
+    val systemPrompt = promptProvider.hintSystemPrompt(hintLanguage)
 
     try {
       for ((index, word) in words.withIndex()) {
         _activity.value = GenerationActivity.CREATING
         val normalizedWord = TextNormalizer.normalizeToAscii(word)
 
-        val hints = generateHintsForWord(systemPrompt, word, language, normalizedWord)
+        val hints = generateHintsForWord(systemPrompt, word, hintLanguage, normalizedWord)
 
         val puzzle =
           Puzzle(
@@ -108,12 +110,12 @@ constructor(
   private suspend fun generateHintsForWord(
     systemPrompt: String,
     word: String,
-    language: String,
+    hintLanguage: String,
     normalizedWord: String,
   ): List<String> {
     repeat(GameRules.MAX_GENERATION_RETRIES) { attempt ->
       try {
-        val userPrompt = promptProvider.hintUserPrompt(word, language)
+        val userPrompt = promptProvider.hintUserPrompt(word, hintLanguage)
         val rawResponse = engineManager.generateSingleTurn(systemPrompt, userPrompt)
         Log.d(
           TAG,
@@ -142,7 +144,7 @@ constructor(
     }
 
     Log.w(TAG, "  all hint attempts failed for '$word', using fallback")
-    return hintFallback.fallbackHints(word, language)
+    return hintFallback.fallbackHints(word, hintLanguage)
   }
 
   companion object {
