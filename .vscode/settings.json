@@ -12,5 +12,6 @@
   },
   "files.associations": {
     "*.gradle.kts": "kotlin"
-  }
+  },
+  "java.configuration.updateBuildConfiguration": "interactive"
 }
