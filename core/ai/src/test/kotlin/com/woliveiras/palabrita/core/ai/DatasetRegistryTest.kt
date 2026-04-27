@@ -18,8 +18,7 @@ class DatasetRegistryTest {
   fun `availableLanguages only returns entries with existing wordlist files`() {
     val languages = registry.availableLanguages()
     languages.forEach { info ->
-      val stream =
-        DatasetRegistry::class.java.getResourceAsStream("/wordlists/${info.code}.json")
+      val stream = DatasetRegistry::class.java.getResourceAsStream("/wordlists/${info.code}.json")
       assertThat(stream).isNotNull()
     }
   }

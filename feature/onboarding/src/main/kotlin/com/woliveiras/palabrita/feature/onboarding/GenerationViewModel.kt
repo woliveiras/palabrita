@@ -73,99 +73,100 @@ constructor(
     // F2.1: Guard — ignore concurrent calls while a generation is already in flight.
     if (generationJob?.isActive == true) return
 
-    generationJob = viewModelScope.launch {
-      // F3.4: Snapshot config once to avoid two separate DB reads with potential inconsistency.
-      val config = modelRepository.getConfig()
-      val resolvedModelId = modelId ?: config.modelId
-      if (resolvedModelId == ModelId.NONE) {
-        _state.update { it.copy(isGenerating = false, failed = true) }
-        return@launch
-      }
-
-      _state.update { GenerationState() }
-
-      if (!engineManager.isReady()) {
-        val modelPath = config.modelPath
-        if (modelPath == null) {
+    generationJob =
+      viewModelScope.launch {
+        // F3.4: Snapshot config once to avoid two separate DB reads with potential inconsistency.
+        val config = modelRepository.getConfig()
+        val resolvedModelId = modelId ?: config.modelId
+        if (resolvedModelId == ModelId.NONE) {
           _state.update { it.copy(isGenerating = false, failed = true) }
           return@launch
         }
-        updateSteps(engineManager.engineState.value)
-        engineManager.initialize(modelPath)
-      }
 
-      // F2.2: Await the StateFlow to settle instead of reading .value immediately after
-      // initialize(), which may update its StateFlow asynchronously internally.
-      val engineState =
-        engineManager.engineState.first { it is EngineState.Ready || it is EngineState.Error }
-      if (engineState is EngineState.Error) {
-        _state.update {
-          it.copy(
-            isGenerating = false,
-            failed = true,
-            steps = buildSteps(engineState, GenerationProgress()),
-          )
+        _state.update { GenerationState() }
+
+        if (!engineManager.isReady()) {
+          val modelPath = config.modelPath
+          if (modelPath == null) {
+            _state.update { it.copy(isGenerating = false, failed = true) }
+            return@launch
+          }
+          updateSteps(engineManager.engineState.value)
+          engineManager.initialize(modelPath)
         }
-        return@launch
-      }
 
-      val language = statsRepository.getStats().preferredLanguage
-      val result =
-        generatePuzzlesUseCase.execute(
-          language = language,
-          modelId = resolvedModelId,
-          onProgress = { successCount, batchSize ->
-            val progress = GenerationProgress(successCount, batchSize)
+        // F2.2: Await the StateFlow to settle instead of reading .value immediately after
+        // initialize(), which may update its StateFlow asynchronously internally.
+        val engineState =
+          engineManager.engineState.first { it is EngineState.Ready || it is EngineState.Error }
+        if (engineState is EngineState.Error) {
+          _state.update {
+            it.copy(
+              isGenerating = false,
+              failed = true,
+              steps = buildSteps(engineState, GenerationProgress()),
+            )
+          }
+          return@launch
+        }
+
+        val language = statsRepository.getStats().preferredLanguage
+        val result =
+          generatePuzzlesUseCase.execute(
+            language = language,
+            modelId = resolvedModelId,
+            onProgress = { successCount, batchSize ->
+              val progress = GenerationProgress(successCount, batchSize)
+              _state.update {
+                it.copy(
+                  progress = progress,
+                  steps = buildSteps(engineManager.engineState.value, progress),
+                )
+              }
+            },
+          )
+
+        when {
+          result.batchSize == -1 -> {
+            // Already had enough puzzles — treat as success
+            val completedSteps =
+              buildSteps(engineManager.engineState.value, GenerationProgress()).map {
+                it.copy(status = StepStatus.COMPLETED, detail = null)
+              }
             _state.update {
               it.copy(
-                progress = progress,
-                steps = buildSteps(engineManager.engineState.value, progress),
+                isGenerating = false,
+                isComplete = true,
+                steps = completedSteps,
+                currentActivityResId = null,
               )
             }
-          },
-        )
-
-      when {
-        result.batchSize == -1 -> {
-          // Already had enough puzzles — treat as success
-          val completedSteps =
-            buildSteps(engineManager.engineState.value, GenerationProgress()).map {
-              it.copy(status = StepStatus.COMPLETED, detail = null)
-            }
-          _state.update {
-            it.copy(
-              isGenerating = false,
-              isComplete = true,
-              steps = completedSteps,
-              currentActivityResId = null,
-            )
           }
-        }
-        result.generatedCount == 0 -> {
-          _state.update {
-            it.copy(isGenerating = false, failed = true, currentActivityResId = null)
-          }
-        }
-        else -> {
-          // Partial or full batch — always mark complete with actual progress so the
-          // UI shows the real count (e.g., 8/10) rather than treating partial as full.
-          val finalProgress = GenerationProgress(result.generatedCount, result.batchSize)
-          val completedSteps =
-            buildSteps(engineManager.engineState.value, finalProgress).map {
-              it.copy(status = StepStatus.COMPLETED, detail = null)
+          result.generatedCount == 0 -> {
+            _state.update {
+              it.copy(isGenerating = false, failed = true, currentActivityResId = null)
             }
-          _state.update {
-            it.copy(
-              isGenerating = false,
-              isComplete = true,
-              progress = finalProgress,
-              steps = completedSteps,
-              currentActivityResId = null,
-            )
+          }
+          else -> {
+            // Partial or full batch — always mark complete with actual progress so the
+            // UI shows the real count (e.g., 8/10) rather than treating partial as full.
+            val finalProgress = GenerationProgress(result.generatedCount, result.batchSize)
+            val completedSteps =
+              buildSteps(engineManager.engineState.value, finalProgress).map {
+                it.copy(status = StepStatus.COMPLETED, detail = null)
+              }
+            _state.update {
+              it.copy(
+                isGenerating = false,
+                isComplete = true,
+                progress = finalProgress,
+                steps = completedSteps,
+                currentActivityResId = null,
+              )
+            }
           }
         }
       }
-    }
   }
 
   private fun updateSteps(engineState: EngineState) {

@@ -35,9 +35,7 @@ constructor(
 
   private val languages = datasetRegistry.availableLanguages()
   private val defaultLanguage =
-    languages
-      .firstOrNull { it.code == java.util.Locale.getDefault().language }
-      ?.code
+    languages.firstOrNull { it.code == java.util.Locale.getDefault().language }?.code
       ?: languages.firstOrNull()?.code
       ?: "en"
 

@@ -46,7 +46,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -358,9 +357,7 @@ private fun LanguageScreen(
     BackButton(onBack)
     Column(
       modifier =
-        Modifier.weight(1f)
-          .verticalScroll(rememberScrollState())
-          .padding(horizontal = 24.dp),
+        Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Spacer(Modifier.height(16.dp))
@@ -417,14 +414,8 @@ private fun LanguageCard(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(16.dp),
   ) {
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier = Modifier.size(40.dp),
-    ) {
-      Text(
-        text = flag,
-        style = MaterialTheme.typography.titleLarge,
-      )
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(40.dp)) {
+      Text(text = flag, style = MaterialTheme.typography.titleLarge)
     }
     Text(
       text = label,

@@ -19,9 +19,8 @@ class FakeGameSessionRepository : GameSessionRepository {
     sessions.add(session)
   }
 
-  override suspend fun getByPuzzleId(puzzleId: Long): GameSession? = sessions.find {
-    it.puzzleId == puzzleId
-  }
+  override suspend fun getByPuzzleId(puzzleId: Long): GameSession? =
+    sessions.find { it.puzzleId == puzzleId }
 
   override suspend fun getActiveSession(): GameSession? = sessions.find { it.completedAt == null }
 

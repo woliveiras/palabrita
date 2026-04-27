@@ -16,8 +16,7 @@ object PromptTemplates : PromptProvider {
     registry = datasetRegistry
   }
 
-  override fun languageDisplayName(code: String): String =
-    registry?.promptName(code) ?: code
+  override fun languageDisplayName(code: String): String = registry?.promptName(code) ?: code
 
   override fun hintSystemPrompt(language: String): String {
     val lang = languageDisplayName(language)

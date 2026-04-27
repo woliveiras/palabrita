@@ -68,7 +68,7 @@
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun GradientButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, enabled: Boolean = true, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun LanguageCard( flag: String, label: String, code: String, selected: String, onSelect: (String) -&gt; Unit, )</ID>
-    <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun LanguageScreen( selectedLanguage: String, onSelectLanguage: (String) -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun LanguageScreen( availableLanguages: List&lt;com.woliveiras.palabrita.core.ai.DatasetRegistry.DatasetInfo&gt;, selectedLanguage: String, onSelectLanguage: (String) -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun ModelOptionCard(option: ModelOption, isSelected: Boolean, onClick: () -&gt; Unit)</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun ModelSelectionScreen( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:OnboardingScreen.kt$@Composable private fun TierWarningDialog(onConfirm: () -&gt; Unit, onChooseOther: () -&gt; Unit)</ID>
@@ -115,6 +115,7 @@
     <ID>LongParameterList:ModelDownloadScreen.kt$( modelName: String, progress: Float, downloadedBytes: Long, totalBytes: Long, onCancel: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongParameterList:OnboardingScreen.kt$( deviceTier: DeviceTier, selectedModel: ModelId?, showTierWarning: Boolean, onSelectModel: (ModelId) -&gt; Unit, onAutoSelect: () -&gt; Unit, onDismissWarning: () -&gt; Unit, onNext: () -&gt; Unit, onBack: () -&gt; Unit, )</ID>
     <ID>LongParameterList:OnboardingScreen.kt$( modelId: ModelId?, downloadProgress: Float, downloadedBytes: Long, totalBytes: Long, downloadFailed: Boolean, errorMessage: String?, downloadComplete: Boolean, onRetry: () -&gt; Unit, onCancel: () -&gt; Unit, onContinue: () -&gt; Unit, )</ID>
+    <ID>LongParameterList:OnboardingViewModel.kt$OnboardingViewModel$( deviceTier: DeviceTier, datasetRegistry: DatasetRegistry, private val statsRepository: StatsRepository, private val modelRepository: ModelRepository, private val appPreferences: AppPreferences, private val downloadManager: ModelDownloadManager, private val engineManager: LlmEngineManager, )</ID>
     <ID>LongParameterList:PuzzleGenerator.kt$PuzzleGenerator$( count: Int, language: String, wordLength: Int, recentWords: List&lt;String&gt;, allExistingWords: Set&lt;String&gt;, modelId: ModelId, hintLanguage: String = language, onPuzzleAttempted: suspend (successCount: Int) -&gt; Unit = {}, )</ID>
     <ID>LongParameterList:ResultScreens.kt$( puzzle: Puzzle?, attempts: List&lt;Attempt&gt;, hintsUsed: Int, onShare: () -&gt; Unit, onPlayAgain: () -&gt; Unit, onHome: () -&gt; Unit, )</ID>
     <ID>LongParameterList:SettingsScreen.kt$( currentModelId: ModelId, currentDownloadState: DownloadState, availableModels: List&lt;AiModelInfo&gt;, deviceTier: DeviceTier, onSelect: (ModelId) -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
@@ -243,6 +244,7 @@
     <ID>SwallowedException:GeneratePuzzlesUseCaseTest.kt$GeneratePuzzlesUseCaseTest$e: kotlinx.coroutines.CancellationException</ID>
     <ID>SwallowedException:OnboardingViewModel.kt$OnboardingViewModel$e: Exception</ID>
     <ID>ThrowsCount:ModelDownloadManager.kt$ModelDownloadManagerImpl$private suspend fun downloadFile(url: String, targetFile: File, attempt: Int)</ID>
+    <ID>TooGenericExceptionCaught:DatasetRegistry.kt$DatasetRegistry$e: Exception</ID>
     <ID>TooGenericExceptionCaught:GeneratePuzzlesUseCase.kt$GeneratePuzzlesUseCaseImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:LlmEngineManagerImpl.kt$LlmEngineManagerImpl$e: Exception</ID>
     <ID>TooGenericExceptionCaught:ModelDownloadManager.kt$ModelDownloadManagerImpl$e: Exception</ID>
