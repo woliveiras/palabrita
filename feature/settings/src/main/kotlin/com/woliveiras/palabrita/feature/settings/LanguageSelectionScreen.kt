@@ -37,7 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.woliveiras.palabrita.core.common.R as CommonR
 
-private val LANGUAGES =
+private val APP_LANGUAGES =
   listOf(
     "pt" to CommonR.string.language_pt,
     "en" to CommonR.string.language_en,
@@ -97,7 +97,7 @@ fun LanguageSelectionScreen(
       Spacer(modifier = Modifier.height(8.dp))
 
       LanguageSectionHeader(stringResource(CommonR.string.language_selection_app_section))
-      LANGUAGES.forEach { (code, nameRes) ->
+      APP_LANGUAGES.forEach { (code, nameRes) ->
         LanguageRadioRow(
           label = stringResource(nameRes),
           selected = state.appLanguage == code,
@@ -108,11 +108,11 @@ fun LanguageSelectionScreen(
       Spacer(modifier = Modifier.height(24.dp))
 
       LanguageSectionHeader(stringResource(CommonR.string.language_selection_game_section))
-      LANGUAGES.forEach { (code, nameRes) ->
+      state.gameLanguages.forEach { info ->
         LanguageRadioRow(
-          label = stringResource(nameRes),
-          selected = state.gameLanguage == code,
-          onClick = { viewModel.onAction(LanguageSelectionAction.ChangeGameLanguage(code)) },
+          label = "${info.flag} ${info.displayName}",
+          selected = state.gameLanguage == info.code,
+          onClick = { viewModel.onAction(LanguageSelectionAction.ChangeGameLanguage(info.code)) },
         )
       }
 
@@ -123,8 +123,7 @@ fun LanguageSelectionScreen(
   if (state.showConfirmDialog) {
     val pendingLang = state.pendingGameLanguage ?: ""
     val pendingLangName =
-      LANGUAGES.firstOrNull { it.first == pendingLang }?.second?.let { stringResource(it) }
-        ?: pendingLang
+      state.gameLanguages.firstOrNull { it.code == pendingLang }?.displayName ?: pendingLang
 
     AlertDialog(
       onDismissRequest = { viewModel.onAction(LanguageSelectionAction.DismissDialog) },

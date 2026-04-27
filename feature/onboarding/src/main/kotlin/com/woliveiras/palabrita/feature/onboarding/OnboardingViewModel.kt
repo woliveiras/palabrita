@@ -2,6 +2,7 @@ package com.woliveiras.palabrita.feature.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.woliveiras.palabrita.core.ai.DatasetRegistry
 import com.woliveiras.palabrita.core.ai.EngineState
 import com.woliveiras.palabrita.core.ai.LlmEngineManager
 import com.woliveiras.palabrita.core.ai.ModelDownloadManager
@@ -24,6 +25,7 @@ class OnboardingViewModel
 @Inject
 constructor(
   deviceTier: DeviceTier,
+  datasetRegistry: DatasetRegistry,
   private val statsRepository: StatsRepository,
   private val modelRepository: ModelRepository,
   private val appPreferences: AppPreferences,
@@ -31,12 +33,21 @@ constructor(
   private val engineManager: LlmEngineManager,
 ) : ViewModel() {
 
+  private val languages = datasetRegistry.availableLanguages()
+  private val defaultLanguage =
+    languages
+      .firstOrNull { it.code == java.util.Locale.getDefault().language }
+      ?.code
+      ?: languages.firstOrNull()?.code
+      ?: "en"
+
   private val _state =
     MutableStateFlow(
       OnboardingState(
         currentStep = OnboardingStep.WELCOME,
         deviceTier = deviceTier,
-        selectedLanguage = java.util.Locale.getDefault().language,
+        selectedLanguage = defaultLanguage,
+        availableLanguages = languages,
       )
     )
   val state: StateFlow<OnboardingState> = _state.asStateFlow()
@@ -97,7 +108,8 @@ constructor(
     _state.update { current ->
       val nextStep =
         when (current.currentStep) {
-          OnboardingStep.WELCOME -> OnboardingStep.LANGUAGE
+          OnboardingStep.WELCOME ->
+            if (languages.size <= 1) OnboardingStep.MODEL_SELECTION else OnboardingStep.LANGUAGE
           OnboardingStep.LANGUAGE -> OnboardingStep.MODEL_SELECTION
           OnboardingStep.MODEL_SELECTION -> OnboardingStep.DOWNLOAD
           OnboardingStep.DOWNLOAD -> OnboardingStep.COMPLETE
@@ -123,7 +135,8 @@ constructor(
         when (current.currentStep) {
           OnboardingStep.WELCOME -> OnboardingStep.WELCOME
           OnboardingStep.LANGUAGE -> OnboardingStep.WELCOME
-          OnboardingStep.MODEL_SELECTION -> OnboardingStep.LANGUAGE
+          OnboardingStep.MODEL_SELECTION ->
+            if (languages.size <= 1) OnboardingStep.WELCOME else OnboardingStep.LANGUAGE
           OnboardingStep.DOWNLOAD -> {
             downloadManager.cancelDownload()
             OnboardingStep.MODEL_SELECTION

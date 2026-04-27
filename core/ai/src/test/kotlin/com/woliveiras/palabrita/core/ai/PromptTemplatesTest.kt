@@ -1,9 +1,15 @@
 package com.woliveiras.palabrita.core.ai
 
 import com.google.common.truth.Truth.assertThat
+import org.junit.Before
 import org.junit.Test
 
 class PromptTemplatesTest {
+
+  @Before
+  fun setUp() {
+    PromptTemplates.init(DatasetRegistry())
+  }
 
   @Test
   fun `hint system prompt contains rules`() {

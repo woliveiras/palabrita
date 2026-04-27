@@ -153,6 +153,7 @@ class OnboardingViewModelTest {
   private fun createViewModel(deviceTier: DeviceTier = DeviceTier.HIGH): OnboardingViewModel =
     OnboardingViewModel(
       deviceTier = deviceTier,
+      datasetRegistry = com.woliveiras.palabrita.core.ai.DatasetRegistry(),
       statsRepository = FakeStatsRepository(),
       modelRepository = FakeModelRepository(),
       appPreferences = FakeAppPreferences(),

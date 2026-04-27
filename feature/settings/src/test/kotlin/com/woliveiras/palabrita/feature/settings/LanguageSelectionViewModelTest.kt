@@ -193,6 +193,7 @@ class LanguageSelectionViewModelTest {
     puzzleRepo: FakePuzzleRepository = FakePuzzleRepository(),
   ) =
     LanguageSelectionViewModel(
+      datasetRegistry = com.woliveiras.palabrita.core.ai.DatasetRegistry(),
       appPreferences = appPrefs,
       statsRepository = statsRepo,
       puzzleRepository = puzzleRepo,

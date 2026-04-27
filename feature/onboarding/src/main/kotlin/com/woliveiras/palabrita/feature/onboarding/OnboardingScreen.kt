@@ -119,6 +119,7 @@ fun OnboardingScreen(
         WelcomeScreen(onNext = { viewModel.onAction(OnboardingAction.Next) })
       OnboardingStep.LANGUAGE ->
         LanguageScreen(
+          availableLanguages = state.availableLanguages,
           selectedLanguage = state.selectedLanguage,
           onSelectLanguage = { viewModel.onAction(OnboardingAction.SelectLanguage(it)) },
           onNext = { viewModel.onAction(OnboardingAction.Next) },
@@ -347,6 +348,7 @@ private fun FeatureCard(icon: ImageVector, titleRes: Int, descRes: Int) {
 
 @Composable
 private fun LanguageScreen(
+  availableLanguages: List<com.woliveiras.palabrita.core.ai.DatasetRegistry.DatasetInfo>,
   selectedLanguage: String,
   onSelectLanguage: (String) -> Unit,
   onNext: () -> Unit,
@@ -355,7 +357,10 @@ private fun LanguageScreen(
   Column(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
     BackButton(onBack)
     Column(
-      modifier = Modifier.weight(1f).padding(horizontal = 24.dp),
+      modifier =
+        Modifier.weight(1f)
+          .verticalScroll(rememberScrollState())
+          .padding(horizontal = 24.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       Spacer(Modifier.height(16.dp))
@@ -372,11 +377,10 @@ private fun LanguageScreen(
       )
       Spacer(Modifier.height(32.dp))
 
-      LanguageCard("PT", "Português", "pt", selectedLanguage, onSelectLanguage)
-      Spacer(Modifier.height(12.dp))
-      LanguageCard("EN", "English", "en", selectedLanguage, onSelectLanguage)
-      Spacer(Modifier.height(12.dp))
-      LanguageCard("ES", "Español", "es", selectedLanguage, onSelectLanguage)
+      availableLanguages.forEachIndexed { index, info ->
+        LanguageCard(info.flag, info.displayName, info.code, selectedLanguage, onSelectLanguage)
+        if (index < availableLanguages.lastIndex) Spacer(Modifier.height(12.dp))
+      }
     }
 
     GradientButton(
@@ -413,19 +417,14 @@ private fun LanguageCard(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(16.dp),
   ) {
-    Surface(
-      shape = CircleShape,
-      color =
-        if (isSelected) PalabritaColors.BrandPurple else MaterialTheme.colorScheme.surfaceVariant,
+    Box(
+      contentAlignment = Alignment.Center,
       modifier = Modifier.size(40.dp),
     ) {
-      Box(contentAlignment = Alignment.Center) {
-        Text(
-          text = flag,
-          style = MaterialTheme.typography.labelMedium,
-          color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-      }
+      Text(
+        text = flag,
+        style = MaterialTheme.typography.titleLarge,
+      )
     }
     Text(
       text = label,

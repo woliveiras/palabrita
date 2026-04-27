@@ -2,6 +2,7 @@ package com.woliveiras.palabrita.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.woliveiras.palabrita.core.ai.DatasetRegistry
 import com.woliveiras.palabrita.core.model.preferences.AppPreferences
 import com.woliveiras.palabrita.core.model.repository.PuzzleRepository
 import com.woliveiras.palabrita.core.model.repository.StatsRepository
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 data class LanguageSelectionState(
   val appLanguage: String = "en",
   val gameLanguage: String = "en",
+  val gameLanguages: List<DatasetRegistry.DatasetInfo> = emptyList(),
   val pendingGameLanguage: String? = null,
   val showConfirmDialog: Boolean = false,
 )
@@ -46,12 +48,14 @@ sealed class LanguageSelectionEvent {
 class LanguageSelectionViewModel
 @Inject
 constructor(
+  datasetRegistry: DatasetRegistry,
   private val appPreferences: AppPreferences,
   private val statsRepository: StatsRepository,
   private val puzzleRepository: PuzzleRepository,
 ) : ViewModel() {
 
-  private val _state = MutableStateFlow(LanguageSelectionState())
+  private val _state =
+    MutableStateFlow(LanguageSelectionState(gameLanguages = datasetRegistry.availableLanguages()))
   val state: StateFlow<LanguageSelectionState> = _state.asStateFlow()
 
   private val _events = MutableSharedFlow<LanguageSelectionEvent>()

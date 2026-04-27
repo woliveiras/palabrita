@@ -1,6 +1,7 @@
 package com.woliveiras.palabrita.core.ai.di
 
 import com.woliveiras.palabrita.core.ai.AiModelRegistry
+import com.woliveiras.palabrita.core.ai.DatasetRegistry
 import com.woliveiras.palabrita.core.ai.GeneratePuzzlesUseCase
 import com.woliveiras.palabrita.core.ai.GeneratePuzzlesUseCaseImpl
 import com.woliveiras.palabrita.core.ai.HintFallbackProvider
@@ -54,6 +55,11 @@ abstract class AiModule {
   companion object {
     @Provides @Singleton fun provideModelRegistry(): ModelRegistry = AiModelRegistry
 
-    @Provides @Singleton fun providePromptProvider(): PromptProvider = PromptTemplates
+    @Provides
+    @Singleton
+    fun providePromptProvider(registry: DatasetRegistry): PromptProvider {
+      PromptTemplates.init(registry)
+      return PromptTemplates
+    }
   }
 }

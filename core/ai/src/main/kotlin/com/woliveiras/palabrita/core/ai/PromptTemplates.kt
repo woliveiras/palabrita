@@ -10,10 +10,14 @@ interface PromptProvider {
 
 object PromptTemplates : PromptProvider {
 
-  private val LANGUAGE_NAMES =
-    mapOf("pt" to "Brazilian Portuguese", "en" to "English", "es" to "Spanish")
+  private var registry: DatasetRegistry? = null
 
-  override fun languageDisplayName(code: String): String = LANGUAGE_NAMES[code] ?: code
+  internal fun init(datasetRegistry: DatasetRegistry) {
+    registry = datasetRegistry
+  }
+
+  override fun languageDisplayName(code: String): String =
+    registry?.promptName(code) ?: code
 
   override fun hintSystemPrompt(language: String): String {
     val lang = languageDisplayName(language)

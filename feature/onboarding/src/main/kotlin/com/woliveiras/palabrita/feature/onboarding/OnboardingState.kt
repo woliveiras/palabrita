@@ -1,11 +1,13 @@
 package com.woliveiras.palabrita.feature.onboarding
 
+import com.woliveiras.palabrita.core.ai.DatasetRegistry
 import com.woliveiras.palabrita.core.common.DeviceTier
 import com.woliveiras.palabrita.core.model.ModelId
 
 data class OnboardingState(
   val currentStep: OnboardingStep = OnboardingStep.WELCOME,
   val selectedLanguage: String = "pt",
+  val availableLanguages: List<DatasetRegistry.DatasetInfo> = emptyList(),
   val deviceTier: DeviceTier = DeviceTier.HIGH,
   val selectedModel: ModelId? = null,
   val showTierWarning: Boolean = false,
