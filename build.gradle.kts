@@ -1,3 +1,20 @@
+// Force safe versions of transitive build-tool dependencies.
+// These come from AGP (signing, emulator proto, sdklib) — not shipped in the APK.
+buildscript {
+  configurations.configureEach {
+    resolutionStrategy.eachDependency {
+      when (requested.group) {
+        "io.netty" -> useVersion("4.1.118.Final")
+        "org.bouncycastle" -> useVersion("1.84")
+      }
+      if (requested.group == "org.jdom" && requested.name == "jdom2") useVersion("2.0.6.1")
+      if (requested.group == "org.bitbucket.b_c" && requested.name == "jose4j") useVersion("0.9.6")
+      if (requested.group == "org.apache.commons" && requested.name == "commons-lang3")
+        useVersion("3.17.0")
+    }
+  }
+}
+
 plugins {
   alias(libs.plugins.android.application) apply false
   alias(libs.plugins.android.library) apply false
@@ -7,6 +24,21 @@ plugins {
   alias(libs.plugins.ksp) apply false
   alias(libs.plugins.spotless)
   alias(libs.plugins.detekt)
+}
+
+allprojects {
+  configurations.configureEach {
+    resolutionStrategy.eachDependency {
+      when (requested.group) {
+        "io.netty" -> useVersion("4.1.118.Final")
+        "org.bouncycastle" -> useVersion("1.84")
+      }
+      if (requested.group == "org.jdom" && requested.name == "jdom2") useVersion("2.0.6.1")
+      if (requested.group == "org.bitbucket.b_c" && requested.name == "jose4j") useVersion("0.9.6")
+      if (requested.group == "org.apache.commons" && requested.name == "commons-lang3")
+        useVersion("3.17.0")
+    }
+  }
 }
 
 spotless {
