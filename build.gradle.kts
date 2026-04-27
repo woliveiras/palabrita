@@ -4,13 +4,15 @@ buildscript {
   configurations.configureEach {
     resolutionStrategy.eachDependency {
       when (requested.group) {
-        "io.netty" -> useVersion("4.1.118.Final")
+        "io.netty" -> useVersion("4.1.132.Final")
         "org.bouncycastle" -> useVersion("1.84")
       }
       if (requested.group == "org.jdom" && requested.name == "jdom2") useVersion("2.0.6.1")
       if (requested.group == "org.bitbucket.b_c" && requested.name == "jose4j") useVersion("0.9.6")
       if (requested.group == "org.apache.commons" && requested.name == "commons-lang3")
         useVersion("3.17.0")
+      if (requested.group == "org.apache.httpcomponents" && requested.name == "httpclient")
+        useVersion("4.5.14")
     }
   }
 }
@@ -30,13 +32,15 @@ allprojects {
   configurations.configureEach {
     resolutionStrategy.eachDependency {
       when (requested.group) {
-        "io.netty" -> useVersion("4.1.118.Final")
+        "io.netty" -> useVersion("4.1.132.Final")
         "org.bouncycastle" -> useVersion("1.84")
       }
       if (requested.group == "org.jdom" && requested.name == "jdom2") useVersion("2.0.6.1")
       if (requested.group == "org.bitbucket.b_c" && requested.name == "jose4j") useVersion("0.9.6")
       if (requested.group == "org.apache.commons" && requested.name == "commons-lang3")
         useVersion("3.17.0")
+      if (requested.group == "org.apache.httpcomponents" && requested.name == "httpclient")
+        useVersion("4.5.14")
     }
   }
 }
