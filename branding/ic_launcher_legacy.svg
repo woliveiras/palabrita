@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 108 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect x="8" y="8" width="92" height="92" rx="20" fill="url(#gradient-bg)" />
+
+  <!-- Letter P -->
+  <path
+    d="M38 30 L38 78 M38 30 L62 30 C70 30 74 36 74 45 C74 54 70 60 62 60 L38 60"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- AI sparkle dots -->
+  <circle cx="80" cy="33" r="3" fill="white" />
+  <circle cx="84" cy="42" r="2.5" fill="white" fill-opacity="0.8" />
+  <circle cx="80" cy="51" r="2" fill="white" fill-opacity="0.6" />
+</svg>

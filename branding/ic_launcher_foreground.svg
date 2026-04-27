@@ -1,0 +1,18 @@
+<svg width="432" height="432" viewBox="0 0 108 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Adaptive icon foreground: 108dp canvas, 72dp safe zone centered (18dp inset) -->
+
+  <!-- Letter P -->
+  <path
+    d="M38 30 L38 78 M38 30 L62 30 C70 30 74 36 74 45 C74 54 70 60 62 60 L38 60"
+    stroke="white"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+
+  <!-- AI sparkle dots -->
+  <circle cx="80" cy="33" r="3" fill="white" />
+  <circle cx="84" cy="42" r="2.5" fill="white" fill-opacity="0.8" />
+  <circle cx="80" cy="51" r="2" fill="white" fill-opacity="0.6" />
+</svg>
