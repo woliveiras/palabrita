@@ -3,18 +3,19 @@
   <circle cx="50" cy="50" r="45" fill="white" fill-opacity="0.2" />
   <circle cx="50" cy="50" r="45" stroke="white" stroke-width="2" stroke-opacity="0.3" fill="none" />
 
-  <!-- Letter P -->
+  <!-- Letter P - stem -->
+  <rect x="31" y="25" width="8" height="50" rx="4" fill="white" />
+
+  <!-- Letter P - bowl -->
   <path
-    d="M35 25 L35 75 M35 25 L60 25 C68 25 72 32 72 42 C72 52 68 60 60 60 L35 60"
-    stroke="white"
-    stroke-width="8"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    fill="none"
-  />
+    d="M56,21 C70,21 76,30 76,42 C76,54 70,64 56,64 L31,64 L31,56 L56,56 C64,56 68,52 68,42 C68,32 64,28 56,28 L31,28 L31,21 Z"
+    fill="white" />
+
+  <!-- Letter P - connector -->
+  <rect x="31" y="56" width="8" height="8" fill="white" />
 
   <!-- Sparkle -->
-  <circle cx="78" cy="28" r="3" fill="white" />
-  <circle cx="82" cy="38" r="2.5" fill="white" fill-opacity="0.8" />
-  <circle cx="78" cy="48" r="2" fill="white" fill-opacity="0.6" />
+  <circle cx="80" cy="28" r="3.5" fill="white" />
+  <circle cx="84" cy="38" r="2.5" fill="white" opacity="0.8" />
+  <circle cx="80" cy="48" r="2.5" fill="white" opacity="0.6" />
 </svg>

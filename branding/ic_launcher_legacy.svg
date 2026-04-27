@@ -10,18 +10,22 @@
   <!-- Background rounded square -->
   <rect x="8" y="8" width="92" height="92" rx="20" fill="url(#gradient-bg)" />
 
-  <!-- Letter P -->
+  <!-- Letter P - stem (filled rectangle with rounded ends) -->
+  <rect x="34" y="30" width="8" height="48" rx="4" fill="white" />
+
+  <!-- Letter P - top bar -->
+  <rect x="34" y="26" width="28" height="8" rx="4" fill="white" />
+
+  <!-- Letter P - bowl (outer) -->
   <path
-    d="M38 30 L38 78 M38 30 L62 30 C70 30 74 36 74 45 C74 54 70 60 62 60 L38 60"
-    stroke="white"
-    stroke-width="8"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    fill="none"
-  />
+    d="M58,26 C72,26 78,34 78,45 C78,56 72,64 58,64 L34,64 L34,56 L58,56 C66,56 70,52 70,45 C70,38 66,34 58,34 L34,34 L34,26 Z"
+    fill="white" />
+
+  <!-- Letter P - connector bar -->
+  <rect x="34" y="56" width="8" height="8" fill="white" />
 
   <!-- AI sparkle dots -->
-  <circle cx="80" cy="33" r="3" fill="white" />
-  <circle cx="84" cy="42" r="2.5" fill="white" fill-opacity="0.8" />
-  <circle cx="80" cy="51" r="2" fill="white" fill-opacity="0.6" />
+  <circle cx="83" cy="33" r="3.5" fill="white" />
+  <circle cx="87" cy="42" r="2.5" fill="white" opacity="0.85" />
+  <circle cx="83" cy="51" r="2.5" fill="white" opacity="0.65" />
 </svg>
